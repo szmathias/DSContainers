@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic -g -O0")
 # Enable sanitizers in Debug builds
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(SANITIZER_FLAGS "-fsanitize=address,undefined -fno-omit-frame-pointer")

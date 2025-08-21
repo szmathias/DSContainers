@@ -134,7 +134,7 @@ int test_substr_out_of_bounds() {
 
 int test_reserve_and_shrink() {
     String str = str_create_empty(4);
-    size_t old_capacity = str_capacity(&str);
+    const size_t old_capacity = str_capacity(&str);
     ASSERT_TRUE(str_reserve(&str, 128));
     ASSERT_GT(str_capacity(&str), old_capacity);
     str_assign_cstring(&str, "abc");
@@ -849,6 +849,26 @@ int test_substr_create_cstring_count_0_pos_end() {
     return TEST_SUCCESS;
 }
 
+int test_null_pointer_handling() {
+    // Should not crash, should return error or handle gracefully
+    ASSERT_EQ(str_empty(nullptr), true);
+    ASSERT_EQ(str_size(nullptr), 0);
+    ASSERT_EQ(str_capacity(nullptr), 0);
+    ASSERT_EQ_PTR(str_data(nullptr), NULL);
+    // Add more NULL pointer checks for other API functions as needed
+    return TEST_SUCCESS;
+}
+
+int test_invalid_values() {
+    String str = str_create_empty(8);
+    str_insert_char(&str, (size_t)-1, 'X'); // Out-of-bounds
+    ASSERT_EQ_STR(str_data(&str), "");
+    str_erase(&str, (size_t)-1); // Out-of-bounds
+    ASSERT_TRUE(str_empty(&str));
+    str_free(&str);
+    return TEST_SUCCESS;
+}
+
 int main(void)
 {
     int failed = 0;
@@ -942,6 +962,10 @@ int main(void)
     if (test_find_string_at_end() != TEST_SUCCESS) { printf("test_find_string_at_end failed\n"); failed++; }
     if (test_substr_create_string_count_0_pos_end() != TEST_SUCCESS) { printf("test_substr_create_string_count_0_pos_end failed\n"); failed++; }
     if (test_substr_create_cstring_count_0_pos_end() != TEST_SUCCESS) { printf("test_substr_create_cstring_count_0_pos_end failed\n"); failed++; }
+
+    // Add robustness tests for NULL pointer and invalid values
+    if (test_null_pointer_handling() != TEST_SUCCESS) { printf("test_null_pointer_handling failed\n"); failed++; }
+    if (test_invalid_values() != TEST_SUCCESS) { printf("test_invalid_values failed\n"); failed++; }
 
     if (failed == 0) {
         printf("All DString tests passed.\n");

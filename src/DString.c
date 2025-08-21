@@ -27,26 +27,26 @@ static char *mem_calloc(const size_t num_elements)
 }
 
 // Centralized buffer management helper
-static void str_realloc(String* str, const size_t new_capacity)
+static void str_realloc(String *str, const size_t new_capacity)
 {
-    const char* old_data = STR_DATA(str);
+    const char *old_data = STR_DATA(str);
     const size_t copy_size = str->size;
 
     if (new_capacity <= STR_MIN_INIT_CAP)
     {
-        if (str->capacity > STR_MIN_INIT_CAP && str->data)
-        {
-            SAFE_FREE(str->data);
-        }
+        char *temp = calloc(copy_size + 1, sizeof(char));
+        memcpy(temp, old_data, copy_size);
+        SAFE_FREE(str->data);
 
         // Move to small buffer
         ZERO_MEM(str->small_data, STR_MIN_INIT_CAP);
-        memcpy(str->small_data, old_data, copy_size);
+        memcpy(str->small_data, temp, copy_size);
         str->capacity = STR_MIN_INIT_CAP;
+        free(temp);
     }
     else
     {
-        char* new_data = mem_calloc(new_capacity);
+        char *new_data = mem_calloc(new_capacity);
         memcpy(new_data, old_data, copy_size);
         if (str->capacity > STR_MIN_INIT_CAP && str->data)
         {
@@ -101,6 +101,11 @@ String str_create_empty(const size_t initial_capacity)
 
 String str_create_from_cstring(const char *cstr)
 {
+    if (!cstr)
+    {
+        return str_create_empty(0);
+    }
+
     const size_t length = strlen(cstr);
     String result = str_create_empty(length + 1); // +1 for the null-terminator
     char *data_to_use = STR_DATA(&result);
@@ -112,12 +117,22 @@ String str_create_from_cstring(const char *cstr)
 
 String str_create_from_string(const String *str)
 {
+    if (!str)
+    {
+        return str_create_empty(0);
+    }
+
     const char *data_to_use = STR_DATA(str);
     return str_create_from_cstring(data_to_use);
 }
 
 void str_free(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     if (str->capacity != STR_MIN_INIT_CAP)
     {
         free(str->data);
@@ -129,6 +144,11 @@ void str_free(String *str)
 
 void str_assign_char(String *str, const char value)
 {
+    if (!str)
+    {
+        return;
+    }
+
     str_clear(str);
     char *data_to_use = STR_DATA(str);
     data_to_use[0] = value;
@@ -137,6 +157,11 @@ void str_assign_char(String *str, const char value)
 
 void str_assign_cstring(String *str, const char *cstr)
 {
+    if (!str || !cstr)
+    {
+        return;
+    }
+
     str_clear(str);
     const size_t length = strlen(cstr);
     str_ensure_capacity(str, length + 1); // +1 for the null-terminator
@@ -147,16 +172,27 @@ void str_assign_cstring(String *str, const char *cstr)
 
 void str_assign_string(String *str, const String *from)
 {
+    if (!str || !from)
+    {
+        return;
+    }
+
     if (str == from)
     {
         return; // No need to assign if it's the same string
     }
+
     const char *data_to_use = STR_DATA(from);
     str_assign_cstring(str, data_to_use);
 }
 
 void str_push_back(String *str, const char value)
 {
+    if (!str)
+    {
+        return;
+    }
+
     str_ensure_capacity(str, str->size + 1); // Ensure enough capacity for the new character
 
     if (str->capacity == STR_MIN_INIT_CAP)
@@ -173,11 +209,21 @@ void str_push_back(String *str, const char value)
 
 void str_append_char(String *str, const char value)
 {
+    if (!str)
+    {
+        return;
+    }
+
     str_push_back(str, value);
 }
 
 void str_append_cstring(String *str, const char *cstr)
 {
+    if (!str || !cstr)
+    {
+        return;
+    }
+
     const size_t length = strlen(cstr);
     str_ensure_capacity(str, str->size + length + 1); // Ensure enough capacity for the entire C-string
 
@@ -189,12 +235,22 @@ void str_append_cstring(String *str, const char *cstr)
 
 void str_append_string(String *str, const String *from)
 {
+    if (!str || !from)
+    {
+        return;
+    }
+
     const char *data_to_use = STR_DATA(from);
     str_append_cstring(str, data_to_use);
 }
 
 void str_insert_char(String *str, const size_t pos, const char value)
 {
+    if (!str)
+    {
+        return;
+    }
+
     if (pos > str->size)
     {
         return;
@@ -224,6 +280,11 @@ void str_insert_char(String *str, const size_t pos, const char value)
 
 void str_insert_cstring(String *str, const size_t pos, const char *cstr)
 {
+    if (!str || !cstr)
+    {
+        return;
+    }
+
     if (pos > str->size)
     {
         return;
@@ -244,12 +305,22 @@ void str_insert_cstring(String *str, const size_t pos, const char *cstr)
 
 void str_insert_string(String *str, const size_t pos, const String *from)
 {
+    if (!str || !from)
+    {
+        return;
+    }
+
     const char *data_to_use = STR_DATA(from);
     str_insert_cstring(str, pos, data_to_use);
 }
 
 void str_pop_back(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     if (str->size > 0)
     {
         char *data_to_use = STR_DATA(str);
@@ -258,8 +329,23 @@ void str_pop_back(String *str)
     }
 }
 
+bool str_empty(const String *str)
+{
+    if (!str)
+    {
+        return true;
+    }
+
+    return (str->size == 0);
+}
+
 void str_erase(String *str, const size_t pos)
 {
+    if (!str)
+    {
+        return;
+    }
+
     if (str->size == 0 || pos >= str->size)
     {
         return;
@@ -282,13 +368,13 @@ void str_erase(String *str, const size_t pos)
     }
 }
 
-bool str_empty(const String *str)
-{
-    return (str->size == 0);
-}
-
 void str_clear(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     char *data_to_use = STR_DATA(str);
 
     ZERO_MEM(data_to_use, str->size);
@@ -297,6 +383,11 @@ void str_clear(String *str)
 
 bool str_reserve(String *str, const size_t new_capacity)
 {
+    if (!str)
+    {
+        return false;
+    }
+
     if (new_capacity <= str->capacity)
     {
         return false;
@@ -308,6 +399,11 @@ bool str_reserve(String *str, const size_t new_capacity)
 
 bool str_shrink_to_fit(String *str)
 {
+    if (!str)
+    {
+        return false;
+    }
+
     size_t new_capacity = str->size + 1;
     if (new_capacity < STR_MIN_INIT_CAP)
     {
@@ -325,33 +421,58 @@ bool str_shrink_to_fit(String *str)
 
 char *str_data(String *str)
 {
+    if (!str)
+    {
+        return nullptr;
+    }
+
     return STR_DATA(str);
 }
 
 size_t str_capacity(const String *str)
 {
+    if (!str)
+    {
+        return 0;
+    }
+
     return str->capacity;
 }
 
 size_t str_size(const String *str)
 {
+    if (!str)
+    {
+        return 0;
+    }
+
     return str->size;
 }
 
 size_t str_find_first_of(const String *str, const char *value)
 {
+    if (!str || !value)
+    {
+        return STR_NPOS;
+    }
+
     const char *data_to_use = STR_DATA(str);
 
     const char *result = strpbrk(data_to_use, value);
     if (result != NULL)
     {
-        return (size_t)(result - data_to_use);
+        return (size_t) (result - data_to_use);
     }
     return STR_NPOS;
 }
 
 size_t str_find_cstring(const String *str, const char *find)
 {
+    if (!str || !find)
+    {
+        return STR_NPOS;
+    }
+
     const size_t length = strlen(find);
     if (length == 0)
     {
@@ -377,12 +498,22 @@ size_t str_find_cstring(const String *str, const char *find)
 
 size_t str_find_string(const String *str, const String *find)
 {
+    if (!str || !find)
+    {
+        return STR_NPOS;
+    }
+
     const char *data_to_use = STR_DATA(find);
     return str_find_cstring(str, data_to_use);
 }
 
 void str_trim_front(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     char *data = STR_DATA(str);
     size_t i = 0;
 
@@ -397,14 +528,14 @@ void str_trim_front(String *str)
     }
 
     const size_t count = str->size - i;
-    if(count == 0)
+    if (count == 0)
     {
         str_clear(str);
     }
     else
     {
         memmove(data, data + i, count);
-        for(size_t j = 0; j < i; ++j)
+        for (size_t j = 0; j < i; ++j)
         {
             str_pop_back(str);
         }
@@ -413,13 +544,18 @@ void str_trim_front(String *str)
 
 void str_trim_back(String *str)
 {
-    if(str->size == 0)
+    if (!str)
+    {
+        return;
+    }
+
+    if (str->size == 0)
     {
         return;
     }
 
     const char *data = STR_DATA(str);
-    while(isspace(data[str->size - 1]))
+    while (isspace(data[str->size - 1]))
     {
         str_pop_back(str);
     }
@@ -427,6 +563,11 @@ void str_trim_back(String *str)
 
 void str_remove_extra_ws(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     char *data_to_use = STR_DATA(str);
 
     str_trim_back(str);
@@ -435,7 +576,7 @@ void str_remove_extra_ws(String *str)
     {
         if (isspace((unsigned char)data_to_use[i]) != 0 && isspace((unsigned char)data_to_use[i + 1]) != 0)
         {
-            if(data_to_use[i] != ' ')
+            if (data_to_use[i] != ' ')
             {
                 data_to_use[i] = ' ';
             }
@@ -451,24 +592,39 @@ void str_remove_extra_ws(String *str)
 
 void str_to_lower(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     char *data_to_use = STR_DATA(str);
     for (size_t i = 0; i < str->size; i++)
     {
-        data_to_use[i] = (char)tolower((unsigned char)data_to_use[i]);
+        data_to_use[i] = (char) tolower((unsigned char) data_to_use[i]);
     }
 }
 
 void str_to_upper(String *str)
 {
+    if (!str)
+    {
+        return;
+    }
+
     char *data_to_use = STR_DATA(str);
     for (size_t i = 0; i < str->size; i++)
     {
-        data_to_use[i] = (char)toupper((unsigned char)data_to_use[i]);
+        data_to_use[i] = (char) toupper((unsigned char) data_to_use[i]);
     }
 }
 
 String str_substr_create_cstring(const char *cstr, const size_t pos, size_t count)
 {
+    if (!cstr)
+    {
+        return str_create_empty(0);
+    }
+
     const size_t size = strlen(cstr);
 
     if (count + pos >= size)
@@ -497,12 +653,22 @@ String str_substr_create_cstring(const char *cstr, const size_t pos, size_t coun
 
 String str_substr_create_string(const String *str, const size_t pos, const size_t count)
 {
+    if (!str)
+    {
+        return str_create_empty(0);
+    }
+
     const char *data_to_use = STR_DATA(str);
     return str_substr_create_cstring(data_to_use, pos, count);
 }
 
 char *str_substr_cstring(const char *cstr, const size_t pos, size_t count, char *buffer)
 {
+    if (!cstr || !buffer)
+    {
+        return buffer;
+    }
+
     const size_t size = strlen(cstr);
     if (count + pos >= size)
     {
@@ -529,12 +695,22 @@ char *str_substr_cstring(const char *cstr, const size_t pos, size_t count, char 
 
 char *str_substr_string(const String *str, const size_t pos, const size_t count, char *buffer)
 {
+    if (!str || !buffer)
+    {
+        return buffer;
+    }
+
     const char *data_to_use = STR_DATA(str);
     return str_substr_cstring(data_to_use, pos, count, buffer);
 }
 
 int str_compare_cstring(const String *lhs, const char *rhs)
 {
+    if (!lhs || !rhs)
+    {
+        return -1;
+    }
+
     const char *data_to_use = STR_DATA(lhs);
 
     const size_t rhs_size = strlen(rhs);
@@ -558,6 +734,11 @@ int str_compare_cstring(const String *lhs, const char *rhs)
 
 int str_compare_string(const String *lhs, const String *rhs)
 {
+    if (!lhs || !rhs)
+    {
+        return -1;
+    }
+
     const char *rhs_data_to_use = STR_DATA(rhs);
     return str_compare_cstring(lhs, rhs_data_to_use);
 }
@@ -578,14 +759,14 @@ int str_getline_ch(FILE *stream, String *line, int delim)
     int ch = 0;
     int status = 0;
 
-    if(delim == '\0')
+    if (delim == '\0')
     {
         delim = '\n';
     }
 
     while ((ch = fgetc(stream)) != EOF && ch != delim)
     {
-        str_push_back(line, (char)ch);
+        str_push_back(line, (char) ch);
     }
 
     if (feof(stream))
@@ -618,7 +799,7 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
         {
             break;
         }
-        str_push_back(line, (char)ch);
+        str_push_back(line, (char) ch);
     }
 
     if (ch == EOF)
@@ -630,6 +811,11 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
 
 int str_getline_string(FILE *stream, String *line, const String *delim)
 {
+    if (!line || !stream || !delim)
+    {
+        return EOF;
+    }
+
     const char *delim_data = STR_DATA(delim);
     return str_getline_cstring(stream, line, delim_data);
 }
