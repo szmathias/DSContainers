@@ -11,7 +11,7 @@
 
 #define TEST_SUCCESS 1
 #define TEST_FAILURE 0
-#define TEST_SKIPPED -1
+#define TEST_SKIPPED (-1)
 
 #define ASSERT(expr) \
 	do \
@@ -104,23 +104,23 @@
 		} \
 	} while (0)
 
-#define ASSERT_NULL(ptr) \
+#define ASSERT_NULLPTR(ptr) \
 	do \
 	{ \
-		if ((ptr) != NULL) \
+		if ((ptr) != nullptr) \
 		{ \
-			fprintf(stderr, "Assertion failed: %s == NULL, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
-			fprintf(stderr, "  Actual: %p != NULL\n", (void*)(ptr)); \
+			fprintf(stderr, "Assertion failed: %s == nullptr, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
+			fprintf(stderr, "  Actual: %p != nullptr\n", (void*)(ptr)); \
 			return TEST_FAILURE; \
 		} \
 	} while (0)
 
-#define ASSERT_NOT_NULL(ptr) \
+#define ASSERT_NOT_NULLPTR(ptr) \
 	do \
 	{ \
-		if ((ptr) == NULL) \
+		if ((ptr) == nullptr) \
 		{ \
-			fprintf(stderr, "Assertion failed: %s != NULL, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
+			fprintf(stderr, "Assertion failed: %s != nullptr, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
 			return TEST_FAILURE; \
 		} \
 	} while (0)

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int test_create_and_assign() {
     String str = str_create_empty(32);
@@ -146,7 +147,7 @@ int test_reserve_and_shrink() {
 
 int test_buffer_growth() {
     String str = str_create_empty(4);
-    size_t initial_capacity = str_capacity(&str);
+    const size_t initial_capacity = str_capacity(&str);
     // Append enough characters to force buffer growth
     for (int i = 0; i < 100; ++i) {
         str_push_back(&str, 'x');
@@ -369,12 +370,12 @@ int test_compare_cstring_prefix_suffix() {
 int test_getline_ch_simulated() {
     // Use a temporary file on disk for portability
     FILE *fp = fopen("test_tmpfile.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     fputs("hello\nworld", fp);
     fflush(fp);
     rewind(fp);
     String line = str_create_empty(16);
-    int status = str_getline_ch(fp, &line, '\n');
+    const int status = str_getline_ch(fp, &line, '\n');
     ASSERT_EQ_STR(str_data(&line), "hello");
     ASSERT_EQ(status, 0);
     str_free(&line);
@@ -385,12 +386,12 @@ int test_getline_ch_simulated() {
 
 int test_getline_cstring_simulated() {
     FILE *fp = fopen("test_tmpfile2.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     fputs("foo,bar,baz", fp);
     fflush(fp);
     rewind(fp);
     String line = str_create_empty(16);
-    int status = str_getline_cstring(fp, &line, ",");
+    const int status = str_getline_cstring(fp, &line, ",");
     ASSERT_EQ_STR(str_data(&line), "foo");
     ASSERT_EQ(status, 0);
     str_free(&line);
@@ -524,9 +525,9 @@ int test_compare_cstring_empty() {
 
 int test_getline_ch_empty_file() {
     FILE *fp = fopen("test_tmpfile_empty.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     String line = str_create_empty(8);
-    int status = str_getline_ch(fp, &line, '\n');
+    const int status = str_getline_ch(fp, &line, '\n');
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(str_empty(&line));
     str_free(&line);
@@ -537,9 +538,9 @@ int test_getline_ch_empty_file() {
 
 int test_getline_cstring_empty_file() {
     FILE *fp = fopen("test_tmpfile_empty2.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     String line = str_create_empty(8);
-    int status = str_getline_cstring(fp, &line, ",");
+    const int status = str_getline_cstring(fp, &line, ",");
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(str_empty(&line));
     str_free(&line);
@@ -698,12 +699,12 @@ int test_compare_cstring_one_empty() {
 
 int test_getline_ch_delim_not_present() {
     FILE *fp = fopen("test_tmpfile3.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
     String line = str_create_empty(8);
-    int status = str_getline_ch(fp, &line, ';'); // Delimiter not present
+    const int status = str_getline_ch(fp, &line, ';'); // Delimiter not present
     ASSERT_EQ_STR(str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
     str_free(&line);
@@ -714,12 +715,12 @@ int test_getline_ch_delim_not_present() {
 
 int test_getline_cstring_delim_not_present() {
     FILE *fp = fopen("test_tmpfile4.txt", "w+");
-    ASSERT_NOT_NULL(fp);
+    ASSERT_NOT_NULLPTR(fp);
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
     String line = str_create_empty(8);
-    int status = str_getline_cstring(fp, &line, ";"); // Delimiter not present
+    const int status = str_getline_cstring(fp, &line, ";"); // Delimiter not present
     ASSERT_EQ_STR(str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
     str_free(&line);
@@ -869,6 +870,86 @@ int test_invalid_values() {
     return TEST_SUCCESS;
 }
 
+int test_str_free_split_basic() {
+    constexpr size_t count = 3;
+    String *arr = (String*)malloc(sizeof(String) * count);
+    arr[0] = str_create_from_cstring("one");
+    arr[1] = str_create_from_cstring("two");
+    arr[2] = str_create_from_cstring("three");
+    str_free_split(&arr, count);
+    ASSERT_NULLPTR(arr); // arr should be NULL after free
+    return TEST_SUCCESS;
+}
+
+int test_str_free_split_nullptr() {
+    str_free_split(nullptr, 3); // Should not crash
+    return TEST_SUCCESS;
+}
+
+int test_str_free_split_zero_count() {
+    String *arr = (String*)malloc(sizeof(String) * 2);
+    arr[0] = str_create_from_cstring("a");
+    arr[1] = str_create_from_cstring("b");
+    str_free_split(&arr, 0); // Should only free the array pointer
+    ASSERT_NULLPTR(arr);
+    return TEST_SUCCESS;
+}
+
+int test_str_split_basic() {
+    String str = str_create_from_cstring("a,b,c");
+    String *out = nullptr;
+    const size_t count = str_split(&str, ",", &out);
+    ASSERT_EQ(count, 3);
+    ASSERT_EQ_STR(str_data(&out[0]), "a");
+    ASSERT_EQ_STR(str_data(&out[1]), "b");
+    ASSERT_EQ_STR(str_data(&out[2]), "c");
+    str_free_split(&out, count);
+    str_free(&str);
+    return TEST_SUCCESS;
+}
+
+int test_str_split_no_delim() {
+    String str = str_create_from_cstring("abc");
+    String *out = nullptr;
+    const size_t count = str_split(&str, ";", &out);
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ_STR(str_data(&out[0]), "abc");
+    str_free_split(&out, count);
+    str_free(&str);
+    return TEST_SUCCESS;
+}
+
+int test_str_split_empty_string() {
+    String str = str_create_empty(8);
+    String *out = nullptr;
+    const size_t count = str_split(&str, ",", &out);
+    ASSERT_EQ(count, 0);
+    ASSERT_NULLPTR(out);
+    str_free(&str);
+    return TEST_SUCCESS;
+}
+
+int test_str_split_nullptr() {
+    const size_t count = str_split(nullptr, ",", nullptr);
+    ASSERT_EQ(count, 0);
+    return TEST_SUCCESS;
+}
+
+int test_str_split_and_free_split() {
+    String str = str_create_from_cstring("alpha,beta,gamma,delta");
+    String *out = nullptr;
+    const size_t count = str_split(&str, ",", &out);
+    ASSERT_EQ(count, 4);
+    ASSERT_EQ_STR(str_data(&out[0]), "alpha");
+    ASSERT_EQ_STR(str_data(&out[1]), "beta");
+    ASSERT_EQ_STR(str_data(&out[2]), "gamma");
+    ASSERT_EQ_STR(str_data(&out[3]), "delta");
+    str_free_split(&out, count);
+    ASSERT_NULLPTR(out);
+    str_free(&str);
+    return TEST_SUCCESS;
+}
+
 int main(void)
 {
     int failed = 0;
@@ -966,6 +1047,20 @@ int main(void)
     // Add robustness tests for NULL pointer and invalid values
     if (test_null_pointer_handling() != TEST_SUCCESS) { printf("test_null_pointer_handling failed\n"); failed++; }
     if (test_invalid_values() != TEST_SUCCESS) { printf("test_invalid_values failed\n"); failed++; }
+
+    // str_free_split tests
+    if (test_str_free_split_basic() != TEST_SUCCESS) { printf("test_str_free_split_basic failed\n"); failed++; }
+    if (test_str_free_split_nullptr() != TEST_SUCCESS) { printf("test_str_free_split_nullptr failed\n"); failed++; }
+    if (test_str_free_split_zero_count() != TEST_SUCCESS) { printf("test_str_free_split_zero_count failed\n"); failed++; }
+
+    // str_split tests
+    if (test_str_split_basic() != TEST_SUCCESS) { printf("test_str_split_basic failed\n"); failed++; }
+    if (test_str_split_no_delim() != TEST_SUCCESS) { printf("test_str_split_no_delim failed\n"); failed++; }
+    if (test_str_split_empty_string() != TEST_SUCCESS) { printf("test_str_split_empty_string failed\n"); failed++; }
+    if (test_str_split_nullptr() != TEST_SUCCESS) { printf("test_str_split_nullptr failed\n"); failed++; }
+
+    // str_split and str_free_split combined test
+    if (test_str_split_and_free_split() != TEST_SUCCESS) { printf("test_str_split_and_free_split failed\n"); failed++; }
 
     if (failed == 0) {
         printf("All DString tests passed.\n");

@@ -44,6 +44,7 @@ String str_create_from_string(const String *str);
 
 // String free method
 void str_free(String *str);
+void str_free_split(String **str, size_t count);
 
 // Clears the content of your string and assigns the value given
 void str_assign_char(String *str, char value);
@@ -111,6 +112,10 @@ String str_substr_create_string(const String *str, size_t pos, size_t count);
 // Buffer must be count + 1 long to append the null terminator at the end.
 char *str_substr_cstring(const char *cstr, size_t pos, size_t count, char *buffer);
 char *str_substr_string(const String *str, size_t pos, size_t count, char *buffer);
+
+// Splits the string at each occurrence of delim and returns an array of
+// Strings. The number of strings created is returned by the function.
+size_t str_split(const String *str, const char* delim, String **out);
 
 // Compares lhs to rhs. If they are equivalent then we evaluate the
 // length of each string.

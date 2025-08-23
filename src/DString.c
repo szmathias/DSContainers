@@ -142,6 +142,29 @@ void str_free(String *str)
     str->data = nullptr;
 }
 
+void str_free_split(String **str, const size_t count)
+{
+    if (!str)
+    {
+        return;
+    }
+
+    if (count == 0)
+    {
+        free(*str);
+        *str = nullptr;
+        return;
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        String temp = (*str)[i];
+        str_free(&temp);
+    }
+    free(*str);
+    *str = nullptr;
+}
+
 void str_assign_char(String *str, const char value)
 {
     if (!str)
@@ -702,6 +725,46 @@ char *str_substr_string(const String *str, const size_t pos, const size_t count,
 
     const char *data_to_use = STR_DATA(str);
     return str_substr_cstring(data_to_use, pos, count, buffer);
+}
+
+size_t str_split(const String *str, const char *delim, String **out)
+{
+    if (!str || !delim)
+    {
+        return 0;
+    }
+
+    if (str->size == 0)
+    {
+        return 0;
+    }
+
+    size_t num_strings = 0;
+    char *buffer = mem_calloc(str->size + 1);
+    memcpy(buffer, STR_DATA(str), str->size);
+
+    String *temp = calloc(0, sizeof(String));
+
+    const char *token = strtok(buffer, delim);
+    while (token != NULL)
+    {
+        String *new_temp = realloc(temp, sizeof(String) * (num_strings + 1));
+        if (!new_temp)
+        {
+            fprintf(stderr, "Error: Unable to allocate memory\n");
+            free(buffer);
+            free(temp);
+            return 0;
+        }
+        temp = new_temp;
+        temp[num_strings] = str_create_from_cstring(token);
+        num_strings++;
+        token = strtok(nullptr, delim);
+    }
+    *out = temp;
+    free(buffer);
+
+    return num_strings;
 }
 
 int str_compare_cstring(const String *lhs, const char *rhs)
