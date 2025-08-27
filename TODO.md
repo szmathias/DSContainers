@@ -5,13 +5,15 @@
 ## String View Library
 
 **Context:**  
-A string view is a lightweight, non-owning reference to a sequence of characters, useful for efficient substring operations without copying data.
+A string view is a lightweight, non-owning reference to a sequence of characters, useful for efficient substring
+operations without copying data.
 
 **Description:**  
 Implement a `StringView` type that references a portion of a string (or char array) with a pointer and length.  
 Provide utility functions for creating, slicing, comparing, and searching within string views.
 
 **Examples:**
+
 - Create a view of a substring:
   ```c
   StringView sv = strview_from_range(str_data(&s), 5, 10); // view of s[5..15]
@@ -26,6 +28,7 @@ Provide utility functions for creating, slicing, comparing, and searching within
   ```
 
 **Tasks:**
+
 - [ ] Define `StringView` struct (pointer + length)
 - [ ] Add constructors: from string, from range, from C-string
 - [ ] Add slicing and subview functions
@@ -44,6 +47,7 @@ Implement functions for printing strings and string views to stdout, files, and 
 Support formatted output and error handling.
 
 **Examples:**
+
 - Print a string view to stdout:
   ```c
   strview_print(&sv);
@@ -58,6 +62,7 @@ Support formatted output and error handling.
   ```
 
 **Tasks:**
+
 - [ ] Add `str_print`, `strview_print` for stdout
 - [ ] Add `str_write_to_file`, `strview_write_to_file`
 - [ ] Add formatted printing functions
@@ -65,4 +70,5 @@ Support formatted output and error handling.
 - [ ] Add tests for all IO functions
 
 ---
+
 

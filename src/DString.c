@@ -540,7 +540,7 @@ void str_trim_front(String *str)
     char *data = STR_DATA(str);
     size_t i = 0;
 
-    while (i < str->size && isspace((unsigned char)data[i]))
+    while (i < str->size && isspace((unsigned char) data[i]))
     {
         i++;
     }
@@ -597,7 +597,7 @@ void str_remove_extra_ws(String *str)
     str_trim_front(str);
     for (size_t i = 0; i < str->size; ++i)
     {
-        if (isspace((unsigned char)data_to_use[i]) != 0 && isspace((unsigned char)data_to_use[i + 1]) != 0)
+        if (isspace((unsigned char) data_to_use[i]) != 0 && isspace((unsigned char) data_to_use[i + 1]) != 0)
         {
             if (data_to_use[i] != ' ')
             {
@@ -606,7 +606,7 @@ void str_remove_extra_ws(String *str)
             str_erase(str, i);
             --i;
         }
-        else if (isspace((unsigned char)data_to_use[i]) != 0 && data_to_use[i] != ' ')
+        else if (isspace((unsigned char) data_to_use[i]) != 0 && data_to_use[i] != ' ')
         {
             data_to_use[i] = ' ';
         }
@@ -743,7 +743,12 @@ size_t str_split(const String *str, const char *delim, String **out)
     char *buffer = mem_calloc(str->size + 1);
     memcpy(buffer, STR_DATA(str), str->size);
 
-    String *temp = calloc(0, sizeof(String));
+    String *temp = malloc(sizeof(String));
+    if (!temp)
+    {
+        free(buffer);
+        return 0;
+    }
 
     const char *token = strtok(buffer, delim);
     while (token != NULL)

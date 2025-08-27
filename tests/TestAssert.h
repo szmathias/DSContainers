@@ -69,7 +69,7 @@
 		} \
 	} while (0)
 
-#define ASSERT_NEQ(a, b) \
+#define ASSERT_NOT_EQ(a, b) \
 	do \
 	{ \
 		if ((a) == (b)) \
@@ -80,7 +80,7 @@
 		} \
 	} while (0)
 
-#define ASSERT_NEQ_STR(a, b) \
+#define ASSERT_NOT_EQ_STR(a, b) \
 	do \
 	{ \
 		size_t _len_a = strlen(a); \
@@ -93,7 +93,7 @@
 		} \
 	} while (0)
 
-#define ASSERT_NEQ_PTR(a, b) \
+#define ASSERT_NOT_EQ_PTR(a, b) \
 	do \
 	{ \
 		if ((void*)(a) == (void*)(b)) \
@@ -188,5 +188,12 @@
 			return TEST_FAILURE; \
 		} \
 	} while (0)
+
+#define ASSERT_FAIL(msg) \
+    do \
+    { \
+        fprintf(stderr, "Assertion failed: %s, file %s, line %d\n", msg, __FILE__, __LINE__); \
+        return TEST_FAILURE; \
+    } while (0)
 
 #endif //DS_TESTASSERT_H

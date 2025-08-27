@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>cstring</w>
+      <w>dlinkedlist</w>
     </words>
   </dictionary>
 </component>
