@@ -1,9 +1,0 @@
-/home/runner/work/ds/ds/build/CMakeFiles/ds.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test_string.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test_sll.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test_dll.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test_dll_iterator.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test_generic_iterator.dir
-/home/runner/work/ds/ds/build/CMakeFiles/test.dir
-/home/runner/work/ds/ds/build/CMakeFiles/edit_cache.dir
-/home/runner/work/ds/ds/build/CMakeFiles/rebuild_cache.dir

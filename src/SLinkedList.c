@@ -30,7 +30,7 @@ static SListNode* sll_sort_helper_merge(SListNode *left, SListNode *right, const
         return left;
     }
 
-    SListNode *result;
+    SListNode *result = NULL;
 
     if (compare(left->data, right->data) <= 0)
     {
@@ -70,10 +70,10 @@ SLinkedList *sll_create_custom(alloc_func alloc, dealloc_func dealloc)
     SLinkedList *list = alloc(sizeof(SLinkedList));
     if (!list)
     {
-        return nullptr;
+        return NULL;
     }
 
-    list->head = nullptr;
+    list->head = NULL;
     list->size = 0;
     list->alloc = alloc;
     list->dealloc = dealloc;
@@ -108,7 +108,7 @@ void sll_clear(SLinkedList *list, const free_func data_free)
         list->dealloc(node);
         node = next;
     }
-    list->head = nullptr;
+    list->head = NULL;
     list->size = 0;
 }
 
@@ -134,7 +134,7 @@ SListNode *sll_find(const SLinkedList *list, const void *data, const cmp_func co
 {
     if (!list || !compare)
     {
-        return nullptr;
+        return NULL;
     }
 
     SListNode *curr = list->head;
@@ -148,7 +148,7 @@ SListNode *sll_find(const SLinkedList *list, const void *data, const cmp_func co
         curr = curr->next;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 int sll_equals(const SLinkedList *list1, const SLinkedList *list2, const cmp_func compare)
@@ -226,7 +226,7 @@ int sll_insert_back(SLinkedList *list, void *data)
     }
 
     node->data = data;
-    node->next = nullptr;
+    node->next = NULL;
     if (!list->head)
     {
         list->head = node;
@@ -293,7 +293,7 @@ int sll_remove(SLinkedList *list, const void *data, const cmp_func compare, cons
         return -1;
     }
 
-    SListNode *prev = nullptr;
+    SListNode *prev = NULL;
     SListNode *curr = list->head;
     while (curr)
     {
@@ -331,7 +331,7 @@ int sll_remove_at(SLinkedList *list, const size_t pos, const free_func remove)
         return -1;
     }
 
-    SListNode *prev = nullptr;
+    SListNode *prev = NULL;
     SListNode *curr = list->head;
 
     for (size_t i = 0; i < pos; ++i)
@@ -393,7 +393,7 @@ int sll_remove_back(SLinkedList *list, const free_func remove)
     }
 
     // Find the second-to-last node
-    SListNode *prev = nullptr;
+    SListNode *prev = NULL;
     SListNode *curr = list->head;
     while (curr->next)
     {
@@ -402,7 +402,7 @@ int sll_remove_back(SLinkedList *list, const free_func remove)
     }
 
     // Remove the last node
-    prev->next = nullptr;
+    prev->next = NULL;
 
     if (remove && curr->data)
     {
@@ -437,14 +437,14 @@ int sll_sort(SLinkedList *list, const cmp_func compare)
     while (current)
     {
         SListNode *next = current->next;
-        current->next = nullptr; // Isolate the node into a sublist of size 1
+        current->next = NULL; // Isolate the node into a sublist of size 1
 
         int i = 0;
         // Merge with existing sublists of the same "level"
-        while (i < num_sub_lists && sub_lists[i] != nullptr)
+        while (i < num_sub_lists && sub_lists[i] != NULL)
         {
             current = sll_sort_helper_merge(sub_lists[i], current, compare);
-            sub_lists[i] = nullptr;
+            sub_lists[i] = NULL;
             i++;
         }
 
@@ -481,7 +481,7 @@ int sll_reverse(SLinkedList *list)
         return 0; // Empty or single-element list is already reversed
     }
 
-    SListNode *prev = nullptr;
+    SListNode *prev = NULL;
     SListNode *current = list->head;
 
     while (current)
@@ -532,7 +532,7 @@ int sll_merge(SLinkedList *dest, SLinkedList *src)
     }
 
     // Clear src list without destroying nodes
-    src->head = nullptr;
+    src->head = NULL;
     src->size = 0;
 
     return 0;
@@ -583,7 +583,7 @@ int sll_splice(SLinkedList *dest, SLinkedList *src, const size_t pos)
     dest->size += src->size;
 
     // Clear src list without destroying nodes
-    src->head = nullptr;
+    src->head = NULL;
     src->size = 0;
 
     return 0;
@@ -597,13 +597,13 @@ SLinkedList *sll_filter(const SLinkedList *list, const pred_func pred)
 {
     if (!list || !pred)
     {
-        return nullptr;
+        return NULL;
     }
 
     SLinkedList *result = sll_create_custom(list->alloc, list->dealloc);
     if (!result)
     {
-        return nullptr;
+        return NULL;
     }
 
     const SListNode *curr = list->head;
@@ -614,8 +614,8 @@ SLinkedList *sll_filter(const SLinkedList *list, const pred_func pred)
             // Include elements that match the predicate
             if (sll_insert_back(result, curr->data) != 0)
             {
-                sll_destroy(result, nullptr); // Don't free data; it's still in source list
-                return nullptr;
+                sll_destroy(result, NULL); // Don't free data; it's still in source list
+                return NULL;
             }
         }
         curr = curr->next;
@@ -628,13 +628,13 @@ SLinkedList *sll_transform(const SLinkedList *list, const transform_func transfo
 {
     if (!list || !transform)
     {
-        return nullptr;
+        return NULL;
     }
 
     SLinkedList *result = sll_create_custom(list->alloc, list->dealloc);
     if (!result)
     {
-        return nullptr;
+        return NULL;
     }
 
     const SListNode *curr = list->head;
@@ -649,7 +649,7 @@ SLinkedList *sll_transform(const SLinkedList *list, const transform_func transfo
             }
             // Free any data already successfully inserted into the new list
             sll_destroy(result, new_data_free);
-            return nullptr;
+            return NULL;
         }
         curr = curr->next;
     }
@@ -680,13 +680,13 @@ SLinkedList *sll_copy(const SLinkedList *list)
 {
     if (!list)
     {
-        return nullptr;
+        return NULL;
     }
 
     SLinkedList *clone = sll_create_custom(list->alloc, list->dealloc);
     if (!clone)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Empty list case
@@ -701,8 +701,8 @@ SLinkedList *sll_copy(const SLinkedList *list)
     {
         if (sll_insert_back(clone, curr->data) != 0)
         {
-            sll_destroy(clone, nullptr);  // Don't free data - they're shared
-            return nullptr;
+            sll_destroy(clone, NULL);  // Don't free data - they're shared
+            return NULL;
         }
         curr = curr->next;
     }
@@ -714,13 +714,13 @@ SLinkedList *sll_copy_deep(const SLinkedList *list, const copy_func copy_data, c
 {
     if (!list || !copy_data)
     {
-        return nullptr;
+        return NULL;
     }
 
     SLinkedList *clone = sll_create_custom(list->alloc, list->dealloc);
     if (!clone)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Empty list case
@@ -738,7 +738,7 @@ SLinkedList *sll_copy_deep(const SLinkedList *list, const copy_func copy_data, c
         {
             // On failure, destroy the partially built clone, freeing any data it contains
             sll_destroy(clone, copied_data_free);
-            return nullptr;
+            return NULL;
         }
         if (sll_insert_back(clone, data_copy) != 0)
         {
@@ -747,7 +747,7 @@ SLinkedList *sll_copy_deep(const SLinkedList *list, const copy_func copy_data, c
                 copied_data_free(data_copy);
             }
             sll_destroy(clone, copied_data_free);
-            return nullptr;
+            return NULL;
         }
         curr = curr->next;
     }
@@ -776,7 +776,7 @@ static int sll_iterator_has_next(const Iterator *it)
     }
 
     const SListIteratorState *state = it->data_state;
-    return state->current != nullptr;
+    return state->current != NULL;
 }
 
 /**
@@ -786,13 +786,13 @@ static void *sll_iterator_next(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     SListIteratorState *state = it->data_state;
     if (!state->current)
     {
-        return nullptr;
+        return NULL;
     }
 
     void *data = state->current->data;
@@ -815,7 +815,7 @@ static int sll_iterator_has_prev(const Iterator *it)
 static void *sll_iterator_prev(const Iterator *it)
 {
     (void)it;  // Suppress unused parameter warning
-    return nullptr;  // Singly linked list cannot go backwards
+    return NULL;  // Singly linked list cannot go backwards
 }
 
 /**
@@ -843,7 +843,7 @@ static int sll_iterator_is_valid(const Iterator *it)
     }
 
     const SListIteratorState *state = it->data_state;
-    return state->list != nullptr;
+    return state->list != NULL;
 }
 
 /**
@@ -861,7 +861,7 @@ static void sll_iterator_destroy(Iterator *it)
     {
         state->list->dealloc(it->data_state);
     }
-    it->data_state = nullptr;
+    it->data_state = NULL;
 }
 
 /**
@@ -871,13 +871,13 @@ static void *sll_iterator_get(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     const SListIteratorState *state = it->data_state;
     if (!state->current)
     {
-        return nullptr;
+        return NULL;
     }
 
     return state->current->data;
@@ -889,7 +889,7 @@ static void *sll_iterator_get(const Iterator *it)
 
 Iterator sll_iterator(const SLinkedList *list)
 {
-    Iterator it = {};  // Initialize all fields to nullptr/0
+    Iterator it = {};  // Initialize all fields to NULL/0
 
     it.get = sll_iterator_get;
     it.next = sll_iterator_next;
@@ -928,13 +928,13 @@ SLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const 
 {
     if (!it || !it->is_valid(it))
     {
-        return nullptr;
+        return NULL;
     }
 
     SLinkedList *list = sll_create_custom(alloc, dealloc);
     if (!list)
     {
-        return nullptr;
+        return NULL;
     }
 
     while (it->has_next(it))
@@ -942,7 +942,7 @@ SLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const 
         void *data = it->next(it);
         if (!data)
         {
-            continue;  // Skip nullptr entries
+            continue;  // Skip NULL entries
         }
 
         void *data_to_insert = data;
@@ -952,7 +952,7 @@ SLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const 
             if (!data_to_insert)
             {
                 sll_destroy(list, copied_data_free);
-                return nullptr;
+                return NULL;
             }
         }
 
@@ -962,8 +962,8 @@ SLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const 
             {
                 copied_data_free(data_to_insert);  // Free the copy we just made
             }
-            sll_destroy(list, copy ? copied_data_free : nullptr);
-            return nullptr;
+            sll_destroy(list, copy ? copied_data_free : NULL);
+            return NULL;
         }
     }
 

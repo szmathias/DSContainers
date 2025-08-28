@@ -52,19 +52,19 @@ static void *transform_get(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     const TransformState *state = it->data_state;
     if (!state->base_iterator || !state->base_iterator->get)
     {
-        return nullptr;
+        return NULL;
     }
 
     void* element = state->base_iterator->get(state->base_iterator);
     if (!element)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Apply transformation
@@ -106,24 +106,24 @@ static void *transform_next(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     const TransformState *state = it->data_state;
     if (!state->base_iterator || !state->base_iterator->next || !state->transform)
     {
-        return nullptr;
+        return NULL;
     }
 
     if (!state->base_iterator->has_next(state->base_iterator))
     {
-        return nullptr;
+        return NULL;
     }
 
     void *element = state->base_iterator->next(state->base_iterator);
     if (!element)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Apply transformation and mark ownership
@@ -153,7 +153,7 @@ static int transform_has_prev(const Iterator *it)
 static void *transform_prev(const Iterator *it)
 {
     (void)it;  // Suppress unused parameter warning
-    return nullptr;  // Transform iterator does not support prev
+    return NULL;  // Transform iterator does not support prev
 }
 
 /**
@@ -202,7 +202,7 @@ static void transform_destroy(Iterator *it)
     }
 
     free(state);
-    it->data_state = nullptr;
+    it->data_state = NULL;
 }
 
 /**
@@ -210,7 +210,7 @@ static void transform_destroy(Iterator *it)
  */
 Iterator iterator_transform(Iterator *it, const transform_func transform)
 {
-    Iterator new_it = {};  // Initialize all fields to nullptr/0
+    Iterator new_it = {};  // Initialize all fields to NULL/0
 
     new_it.get = transform_get;
     new_it.has_next = transform_has_next;
@@ -250,13 +250,13 @@ static void *filter_get(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     FilterState *state = it->data_state;
     if (!state->base_iterator)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Return cached element if available
@@ -336,13 +336,13 @@ static void *filter_next(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     FilterState *state = it->data_state;
     if (!state->base_iterator || !state->base_iterator->next)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Return cached element if we have one
@@ -350,7 +350,7 @@ static void *filter_next(const Iterator *it)
     {
         state->has_cached_element = 0;
         void *result = state->next_element;
-        state->next_element = nullptr;
+        state->next_element = NULL;
 
         if (state->base_iterator->next == transform_next)
         {
@@ -368,7 +368,7 @@ static void *filter_next(const Iterator *it)
         return result;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 /**
@@ -386,7 +386,7 @@ static int filter_has_prev(const Iterator *it)
 static void *filter_prev(const Iterator *it)
 {
     (void)it;  // Suppress unused parameter warning
-    return nullptr;  // Filter iterator does not support prev
+    return NULL;  // Filter iterator does not support prev
 }
 
 /**
@@ -438,7 +438,7 @@ static void filter_destroy(Iterator *it)
         {
             free(state->next_element);
         }
-        state->next_element = nullptr;
+        state->next_element = NULL;
         state->has_cached_element = 0;
     }
 
@@ -448,7 +448,7 @@ static void filter_destroy(Iterator *it)
     }
 
     free(state);
-    it->data_state = nullptr;
+    it->data_state = NULL;
 }
 
 /**
@@ -456,7 +456,7 @@ static void filter_destroy(Iterator *it)
  */
 Iterator iterator_filter(Iterator *it, const filter_func filter)
 {
-    Iterator new_it = {};  // Initialize all fields to nullptr/0
+    Iterator new_it = {};  // Initialize all fields to NULL/0
 
     new_it.get = filter_get;
     new_it.has_next = filter_has_next;
@@ -480,7 +480,7 @@ Iterator iterator_filter(Iterator *it, const filter_func filter)
 
     state->base_iterator = it;
     state->filter = filter;
-    state->next_element = nullptr;
+    state->next_element = NULL;
     state->has_cached_element = 0;
 
     new_it.data_state = state;
@@ -499,7 +499,7 @@ Iterator iterator_filter(Iterator *it, const filter_func filter)
 // Iterator iterator_range(int start, int end, int step)
 // {
 //     // Implementation of iterator_range
-//     Iterator it = {};  // Initialize all fields to nullptr/0
+//     Iterator it = {};  // Initialize all fields to NULL/0
 //     return it;
 // }
 

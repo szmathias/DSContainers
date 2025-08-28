@@ -5,6 +5,7 @@
 #ifndef DS_STRING_H
 #define DS_STRING_H
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 // Minimum initial string capacity

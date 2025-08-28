@@ -93,7 +93,7 @@ String str_create_empty(const size_t initial_capacity)
     {
         // Use the small_data buffer for small initial capacities
         ZERO_MEM(result.small_data, STR_MIN_INIT_CAP);
-        result.data = nullptr;
+        result.data = NULL;
     }
 
     return result;
@@ -139,7 +139,7 @@ void str_free(String *str)
     }
     str->size = 0;
     str->capacity = 0;
-    str->data = nullptr;
+    str->data = NULL;
 }
 
 void str_free_split(String **str, const size_t count)
@@ -152,7 +152,7 @@ void str_free_split(String **str, const size_t count)
     if (count == 0)
     {
         free(*str);
-        *str = nullptr;
+        *str = NULL;
         return;
     }
 
@@ -162,7 +162,7 @@ void str_free_split(String **str, const size_t count)
         str_free(&temp);
     }
     free(*str);
-    *str = nullptr;
+    *str = NULL;
 }
 
 void str_assign_char(String *str, const char value)
@@ -446,7 +446,7 @@ char *str_data(String *str)
 {
     if (!str)
     {
-        return nullptr;
+        return NULL;
     }
 
     return STR_DATA(str);
@@ -764,7 +764,7 @@ size_t str_split(const String *str, const char *delim, String **out)
         temp = new_temp;
         temp[num_strings] = str_create_from_cstring(token);
         num_strings++;
-        token = strtok(nullptr, delim);
+        token = strtok(NULL, delim);
     }
     *out = temp;
     free(buffer);

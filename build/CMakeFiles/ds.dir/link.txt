@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC  -Wall -Wextra -Wpedantic -g -O0 -Wl,--dependency-file=CMakeFiles/ds.dir/link.d -shared -Wl,-soname,libds.so -o libds.so CMakeFiles/ds.dir/src/DString.c.o CMakeFiles/ds.dir/src/SLinkedList.c.o CMakeFiles/ds.dir/src/DLinkedList.c.o CMakeFiles/ds.dir/src/Iterator.c.o
