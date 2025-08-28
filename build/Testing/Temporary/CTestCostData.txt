@@ -1,0 +1,6 @@
+test_string 1 0.00168773
+test_sll 1 0.149757
+test_dll 1 0.00265119
+test_dll_iterator 1 0.00104274
+test_generic_iterator 1 0.00102271
+---

@@ -1,0 +1,101 @@
+Start testing: Aug 28 18:54 UTC
+----------------------------------------------------------
+1/5 Testing: test_string
+1/5 Test: test_string
+Command: "/home/runner/work/ds/ds/build/test_string"
+Directory: /home/runner/work/ds/ds/tests
+"test_string" start time: Aug 28 18:54 UTC
+Output:
+----------------------------------------------------------
+All DString tests passed.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_string" end time: Aug 28 18:54 UTC
+"test_string" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/5 Testing: test_sll
+2/5 Test: test_sll
+Command: "/home/runner/work/ds/ds/build/test_sll"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll" start time: Aug 28 18:54 UTC
+Output:
+----------------------------------------------------------
+
+Performance tests:
+Insert 100 elements: 0.000013 seconds
+Find last element in 100 elements: 0.000001 seconds
+Insert 1000 elements: 0.000770 seconds
+Find last element in 1000 elements: 0.000004 seconds
+Insert 10000 elements: 0.074104 seconds
+Find last element in 10000 elements: 0.000033 seconds
+SLL Sort 1000 elements: 0.000053 seconds
+All SLinkedList tests passed.
+<end of output>
+Test time =   0.15 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll" end time: Aug 28 18:54 UTC
+"test_sll" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/5 Testing: test_dll
+3/5 Test: test_dll
+Command: "/home/runner/work/ds/ds/build/test_dll"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll" start time: Aug 28 18:54 UTC
+Output:
+----------------------------------------------------------
+
+DLL Performance tests:
+Insert 100 elements: 0.000005 seconds
+Find last element in 100 elements: 0.000001 seconds
+Insert 1000 elements: 0.000030 seconds
+Find last element in 1000 elements: 0.000004 seconds
+Insert 10000 elements: 0.000301 seconds
+Find last element in 10000 elements: 0.000032 seconds
+Sort 1000 elements: 0.000052 seconds
+All DLinkedList tests passed.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll" end time: Aug 28 18:54 UTC
+"test_dll" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/5 Testing: test_dll_iterator
+4/5 Test: test_dll_iterator
+Command: "/home/runner/work/ds/ds/build/test_dll_iterator"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_iterator" start time: Aug 28 18:54 UTC
+Output:
+----------------------------------------------------------
+All tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_iterator" end time: Aug 28 18:54 UTC
+"test_dll_iterator" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/5 Testing: test_generic_iterator
+5/5 Test: test_generic_iterator
+Command: "/home/runner/work/ds/ds/build/test_generic_iterator"
+Directory: /home/runner/work/ds/ds/tests
+"test_generic_iterator" start time: Aug 28 18:54 UTC
+Output:
+----------------------------------------------------------
+All tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_generic_iterator" end time: Aug 28 18:54 UTC
+"test_generic_iterator" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 28 18:54 UTC

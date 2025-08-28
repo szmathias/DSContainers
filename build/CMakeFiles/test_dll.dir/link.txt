@@ -1,0 +1,1 @@
+/usr/bin/cc  -Wall -Wextra -Wpedantic -g -O0 -Wl,--dependency-file=CMakeFiles/test_dll.dir/link.d CMakeFiles/test_dll.dir/tests/test_dll.c.o -o test_dll  -Wl,-rpath,/home/runner/work/ds/ds/build libds.so
