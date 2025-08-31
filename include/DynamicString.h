@@ -211,8 +211,8 @@ int str_getline_string(FILE *stream, String *line, const String *delim);
 
 #define str_getline_impl(stream, line, delim)\
     _Generic(delim,\
-        char *: str_getline_cstr,\
-        const char *: str_getline_cstr,\
-        String *: str_getline_str,\
+        char *: str_getline_cstring,\
+        const char *: str_getline_cstring,\
+        String *: str_getline_string,\
         default: str_getline_ch)(stream, line, delim)
 #endif //DS_DYNAMICSTRING_H
