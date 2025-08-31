@@ -1,0 +1,621 @@
+//
+// Created by zack on 9/2/25.
+//
+
+#include "SinglyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+// Tests from test_sll.c that fit into algorithms category
+int test_sort_empty(void){
+    SinglyLinkedList *list = sll_create();
+    ASSERT_EQ(sll_sort(list, int_cmp), 0); // Empty list is already sorted
+    ASSERT_EQ(list->size, 0);
+    sll_destroy(list, NULL);
+    return TEST_SUCCESS;
+}
+
+int test_sort_already_sorted(void){
+    SinglyLinkedList *list = sll_create();
+    for (int i = 0; i < 5; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    ASSERT_EQ(sll_sort(list, int_cmp), 0);
+
+    // Verify order
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 0; i < 5; i++) {
+        ASSERT_EQ(*(int*)node->data, i);
+        node = node->next;
+    }
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_reverse_order(void){
+    SinglyLinkedList *list = sll_create();
+    for (int i = 4; i >= 0; i--) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    ASSERT_EQ(sll_sort(list, int_cmp), 0);
+
+    // Verify order
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 0; i < 5; i++) {
+        ASSERT_EQ(*(int*)node->data, i);
+        node = node->next;
+    }
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_random_order(void){
+    SinglyLinkedList *list = sll_create();
+    const int values[] = {42, 17, 9, 39, 24, 5, 58};
+    const int count = sizeof(values) / sizeof(values[0]);
+
+    for (int i = 0; i < count; i++) {
+        int *val = malloc(sizeof(int));
+        *val = values[i];
+        sll_insert_back(list, val);
+    }
+
+    ASSERT_EQ(sll_sort(list, int_cmp), 0);
+
+    // Verify order
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 0; i < count; i++) {
+        const int sorted[] = {5, 9, 17, 24, 39, 42, 58};
+        ASSERT_EQ(*(int*)node->data, sorted[i]);
+        node = node->next;
+    }
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_with_duplicates(void){
+    SinglyLinkedList *list = sll_create();
+    const int values[] = {5, 2, 9, 5, 7, 2, 9, 5};
+    const int count = sizeof(values) / sizeof(values[0]);
+
+    for (int i = 0; i < count; i++) {
+        int *val = malloc(sizeof(int));
+        *val = values[i];
+        sll_insert_back(list, val);
+    }
+
+    ASSERT_EQ(sll_sort(list, int_cmp), 0);
+
+    // Verify order
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 0; i < count; i++) {
+        const int sorted[] = {2, 2, 5, 5, 5, 7, 9, 9};
+        ASSERT_EQ(*(int*)node->data, sorted[i]);
+        node = node->next;
+    }
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_large_list(void){
+    SinglyLinkedList *list = sll_create();
+    const int SIZE = 1000;
+
+    // Insert in reverse order
+    for (int i = SIZE - 1; i >= 0; i--) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    const clock_t start = clock();
+    ASSERT_EQ(sll_sort(list, int_cmp), 0);
+    const clock_t end = clock();
+    printf("SLL Sort %d elements: %.6f seconds\n", SIZE,
+           (double)(end - start) / CLOCKS_PER_SEC);
+
+    // Verify order (first few elements)
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 0; i < 10; i++) {
+        ASSERT_EQ(*(int*)node->data, i);
+        node = node->next;
+    }
+
+    // Verify list structure
+    ASSERT_EQ(list->size, (size_t)SIZE);
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_custom_compare(void){
+    SinglyLinkedList *list = sll_create();
+    for (int i = 0; i < 5; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    // Sort in descending order
+    ASSERT_EQ(sll_sort(list, int_cmp_desc), 0);
+
+    // Verify order
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 4; i >= 0; i--) {
+        ASSERT_EQ(*(int*)node->data, i);
+        node = node->next;
+    }
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_sort_null_args(void){
+    SinglyLinkedList *list = sll_create();
+    ASSERT_EQ(sll_sort(NULL, int_cmp), -1); // NULL list
+    ASSERT_EQ(sll_sort(list, NULL), -1);    // NULL compare function
+    sll_destroy(list, NULL);
+    return TEST_SUCCESS;
+}
+
+int test_sort_stability(void){
+    SinglyLinkedList *list = sll_create();
+
+    // Person structs with same name (for comparison) but different ages
+    Person *p1 = create_person("Alice", 30);
+    Person *p2 = create_person("Alice", 25);  // Same name, different age
+    Person *p3 = create_person("Bob", 35);
+    Person *p4 = create_person("Alice", 40);  // Same name, different age
+
+    sll_insert_back(list, p1);
+    sll_insert_back(list, p2);
+    sll_insert_back(list, p3);
+    sll_insert_back(list, p4);
+
+    // Sort by name only - ages should remain in insertion order for equal names
+    ASSERT_EQ(sll_sort(list, person_cmp), 0);
+
+    // Verify order: All Alice's should come before Bob
+    const SinglyLinkedNode *node = list->head;
+    const Person *person = node->data;
+    ASSERT_EQ(strcmp(person->name, "Alice"), 0);
+    ASSERT_EQ(person->age, 30); // First Alice
+
+    node = node->next;
+    person = node->data;
+    ASSERT_EQ(strcmp(person->name, "Alice"), 0);
+    ASSERT_EQ(person->age, 25); // Second Alice
+
+    node = node->next;
+    person = node->data;
+    ASSERT_EQ(strcmp(person->name, "Alice"), 0);
+    ASSERT_EQ(person->age, 40); // Third Alice
+
+    node = node->next;
+    person = node->data;
+    ASSERT_EQ(strcmp(person->name, "Bob"), 0);
+    ASSERT_EQ(person->age, 35);
+
+    sll_destroy(list, person_free);
+    return TEST_SUCCESS;
+}
+
+int test_reverse(void){
+    SinglyLinkedList *list = sll_create();
+
+    // Test empty list
+    ASSERT_EQ(sll_reverse(list), 0);
+    ASSERT_EQ(list->size, 0);
+
+    // Test single element
+    int *a = malloc(sizeof(int)); *a = 10;
+    sll_insert_back(list, a);
+    ASSERT_EQ(sll_reverse(list), 0);
+    ASSERT_EQ(list->size, 1);
+    ASSERT_EQ(*(int*)list->head->data, 10);
+
+    // Test multiple elements
+    int *b = malloc(sizeof(int)); *b = 20;
+    int *c = malloc(sizeof(int)); *c = 30;
+    sll_insert_back(list, b);
+    sll_insert_back(list, c);
+    // List is now [10,20,30]
+
+    ASSERT_EQ(sll_reverse(list), 0);
+    // List should now be [30,20,10]
+
+    const SinglyLinkedNode *node = list->head;
+    ASSERT_EQ(*(int*)node->data, 30);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 10);
+    ASSERT_NULL(node->next);
+
+    sll_destroy(list, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_merge(void){
+    SinglyLinkedList *list1 = sll_create();
+    SinglyLinkedList *list2 = sll_create();
+
+    // Test merging empty lists
+    ASSERT_EQ(sll_merge(list1, list2), 0);
+    ASSERT_EQ(list1->size, 0);
+    ASSERT_EQ(list2->size, 0);
+
+    // Test merging empty with non-empty
+    int *a1 = malloc(sizeof(int)); *a1 = 10;
+    int *b1 = malloc(sizeof(int)); *b1 = 20;
+    sll_insert_back(list2, a1);
+    sll_insert_back(list2, b1);
+
+    ASSERT_EQ(sll_merge(list1, list2), 0);
+    ASSERT_EQ(list1->size, 2);
+    ASSERT_EQ(list2->size, 0);
+    ASSERT_NULL(list2->head);
+
+    const SinglyLinkedNode *node = list1->head;
+    ASSERT_EQ(*(int*)node->data, 10);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+
+    // Test merging two non-empty lists
+    SinglyLinkedList *list3 = sll_create();
+    int *a2 = malloc(sizeof(int)); *a2 = 30;
+    int *b2 = malloc(sizeof(int)); *b2 = 40;
+    sll_insert_back(list3, a2);
+    sll_insert_back(list3, b2);
+
+    ASSERT_EQ(sll_merge(list1, list3), 0);
+    ASSERT_EQ(list1->size, 4);
+    ASSERT_EQ(list3->size, 0);
+
+    node = list1->head;
+    ASSERT_EQ(*(int*)node->data, 10);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 30);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 40);
+
+    sll_destroy(list1, int_free);
+    sll_destroy(list2, NULL); // Already empty
+    sll_destroy(list3, NULL); // Already empty
+    return TEST_SUCCESS;
+}
+
+int test_splice(void){
+    SinglyLinkedList *dest = sll_create();
+    SinglyLinkedList *src = sll_create();
+
+    // Test splicing empty lists
+    ASSERT_EQ(sll_splice(dest, src, 0), 0);
+    ASSERT_EQ(dest->size, 0);
+    ASSERT_EQ(src->size, 0);
+
+    // Setup lists
+    int *a = malloc(sizeof(int)); *a = 10;
+    int *b = malloc(sizeof(int)); *b = 20;
+    int *c = malloc(sizeof(int)); *c = 30;
+    sll_insert_back(dest, a);
+    sll_insert_back(dest, b);
+    sll_insert_back(dest, c);
+    // dest = [10,20,30]
+
+    int *d = malloc(sizeof(int)); *d = 40;
+    int *e = malloc(sizeof(int)); *e = 50;
+    sll_insert_back(src, d);
+    sll_insert_back(src, e);
+    // src = [40,50]
+
+    // Test splicing at beginning
+    SinglyLinkedList *dest2 = sll_create();
+    SinglyLinkedList *src2 = sll_create();
+    int *a2 = malloc(sizeof(int)); *a2 = 10;
+    int *b2 = malloc(sizeof(int)); *b2 = 20;
+    int *c2 = malloc(sizeof(int)); *c2 = 30;
+    int *d2 = malloc(sizeof(int)); *d2 = 40;
+    int *e2 = malloc(sizeof(int)); *e2 = 50;
+    sll_insert_back(dest2, a2);
+    sll_insert_back(dest2, b2);
+    sll_insert_back(dest2, c2);
+    sll_insert_back(src2, d2);
+    sll_insert_back(src2, e2);
+
+    ASSERT_EQ(sll_splice(dest2, src2, 0), 0);
+    ASSERT_EQ(dest2->size, 5);
+    ASSERT_EQ(src2->size, 0);
+
+    const SinglyLinkedNode *node = dest2->head;
+    ASSERT_EQ(*(int*)node->data, 40);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 50);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 10);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 30);
+
+    // Test splicing in the middle
+    ASSERT_EQ(sll_splice(dest, src, 1), 0);
+    ASSERT_EQ(dest->size, 5);
+    ASSERT_EQ(src->size, 0);
+
+    node = dest->head;
+    ASSERT_EQ(*(int*)node->data, 10);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 40);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 50);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 30);
+
+    // Test splicing at the end
+    SinglyLinkedList *dest3 = sll_create();
+    SinglyLinkedList *src3 = sll_create();
+    int *a3 = malloc(sizeof(int)); *a3 = 10;
+    int *b3 = malloc(sizeof(int)); *b3 = 20;
+    int *c3 = malloc(sizeof(int)); *c3 = 30;
+    int *d3 = malloc(sizeof(int)); *d3 = 40;
+    int *e3 = malloc(sizeof(int)); *e3 = 50;
+    sll_insert_back(dest3, a3);
+    sll_insert_back(dest3, b3);
+    sll_insert_back(dest3, c3);
+    sll_insert_back(src3, d3);
+    sll_insert_back(src3, e3);
+
+    ASSERT_EQ(sll_splice(dest3, src3, 3), 0);
+    ASSERT_EQ(dest3->size, 5);
+    ASSERT_EQ(src3->size, 0);
+
+    node = dest3->head;
+    ASSERT_EQ(*(int*)node->data, 10);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 20);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 30);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 40);
+    node = node->next;
+    ASSERT_EQ(*(int*)node->data, 50);
+
+    sll_destroy(dest, int_free);
+    sll_destroy(src, NULL);
+    sll_destroy(dest2, int_free);
+    sll_destroy(src2, NULL);
+    sll_destroy(dest3, int_free);
+    sll_destroy(src3, NULL);
+
+    return TEST_SUCCESS;
+}
+
+int test_equals(void){
+    SinglyLinkedList *list1 = sll_create();
+    SinglyLinkedList *list2 = sll_create();
+
+    // Empty lists should be equal
+    ASSERT_EQ(sll_equals(list1, list2, int_cmp), 1);
+
+    // Lists with same elements should be equal
+    int *a1 = malloc(sizeof(int)); *a1 = 10;
+    int *b1 = malloc(sizeof(int)); *b1 = 20;
+    int *a2 = malloc(sizeof(int)); *a2 = 10;
+    int *b2 = malloc(sizeof(int)); *b2 = 20;
+    sll_insert_back(list1, a1);
+    sll_insert_back(list1, b1);
+    sll_insert_back(list2, a2);
+    sll_insert_back(list2, b2);
+
+    ASSERT_EQ(sll_equals(list1, list2, int_cmp), 1);
+
+    // Lists with different elements should not be equal
+    int *c2 = malloc(sizeof(int)); *c2 = 30;
+    sll_insert_back(list2, c2);
+
+    ASSERT_EQ(sll_equals(list1, list2, int_cmp), 0);
+
+    // Lists with same size but different elements should not be equal
+    SinglyLinkedList *list3 = sll_create();
+    int *a3 = malloc(sizeof(int)); *a3 = 10;
+    int *b3 = malloc(sizeof(int)); *b3 = 30; // Different value
+    sll_insert_back(list3, a3);
+    sll_insert_back(list3, b3);
+
+    ASSERT_EQ(sll_equals(list1, list3, int_cmp), 0);
+
+    // Error cases
+    ASSERT_EQ(sll_equals(NULL, list2, int_cmp), -1);
+    ASSERT_EQ(sll_equals(list1, NULL, int_cmp), -1);
+    ASSERT_EQ(sll_equals(list1, list2, NULL), -1);
+
+    sll_destroy(list1, int_free);
+    sll_destroy(list2, int_free);
+    sll_destroy(list3, int_free);
+    return TEST_SUCCESS;
+}
+
+int test_filter(void){
+    SinglyLinkedList *list = sll_create();
+
+    // Add numbers 0-9
+    for (int i = 0; i < 10; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    // Filter for even numbers
+    SinglyLinkedList *filtered = sll_filter(list, is_even);
+    ASSERT_NOT_NULL(filtered);
+    ASSERT_EQ(filtered->size, 5);  // Should contain 0,2,4,6,8
+
+    // Verify filtered list
+    const SinglyLinkedNode *node = filtered->head;
+    for (int i = 0; i < 5; i++) {
+        const int expected_values[] = {0, 2, 4, 6, 8};
+        ASSERT_EQ(*(int*)node->data, expected_values[i]);
+        node = node->next;
+    }
+
+    // Make sure original list is unchanged
+    ASSERT_EQ(list->size, 10);
+
+    // Test empty list
+    SinglyLinkedList *empty_list = sll_create();
+    SinglyLinkedList *filtered_empty = sll_filter(empty_list, is_even);
+    ASSERT_NOT_NULL(filtered_empty);
+    ASSERT_EQ(filtered_empty->size, 0);
+
+    // Test null cases
+    ASSERT_NULL(sll_filter(NULL, is_even));
+    ASSERT_NULL(sll_filter(list, NULL));
+
+    sll_destroy(list, int_free);
+    sll_destroy(filtered, NULL);  // Don't free data; it's owned by the original list
+    sll_destroy(empty_list, NULL);
+    sll_destroy(filtered_empty, NULL);
+    return TEST_SUCCESS;
+}
+
+int test_transform(void){
+    SinglyLinkedList *list = sll_create();
+
+    // Add numbers 1-5
+    for (int i = 1; i <= 5; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    // Map to double each value
+    SinglyLinkedList *mapped = sll_transform(list, double_value, free);
+    ASSERT_NOT_NULL(mapped);
+    ASSERT_EQ(mapped->size, 5);
+
+    // Verify mapped list (should be 2,4,6,8,10)
+    const SinglyLinkedNode *node = mapped->head;
+    for (int i = 1; i <= 5; i++) {
+        ASSERT_EQ(*(int*)node->data, i * 2);
+        node = node->next;
+    }
+
+    // Make sure original list is unchanged
+    node = list->head;
+    for (int i = 1; i <= 5; i++) {
+        ASSERT_EQ(*(int*)node->data, i);
+        node = node->next;
+    }
+
+    // Test empty list
+    SinglyLinkedList *empty_list = sll_create();
+    SinglyLinkedList *mapped_empty = sll_transform(empty_list, double_value, free);
+    ASSERT_NOT_NULL(mapped_empty);
+    ASSERT_EQ(mapped_empty->size, 0);
+
+    // Test null cases
+    ASSERT_NULL(sll_transform(NULL, double_value, free));
+    ASSERT_NULL(sll_transform(list, NULL, NULL));
+
+    sll_destroy(list, int_free);
+    sll_destroy(mapped, int_free);
+    sll_destroy(empty_list, NULL);
+    sll_destroy(mapped_empty, NULL);
+    return TEST_SUCCESS;
+}
+
+int test_for_each(void){
+    SinglyLinkedList *list = sll_create();
+
+    // Add numbers 1-5
+    for (int i = 1; i <= 5; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        sll_insert_back(list, val);
+    }
+
+    // Increment each value
+    sll_for_each(list, increment);
+
+    // Verify each value is incremented
+    const SinglyLinkedNode *node = list->head;
+    for (int i = 1; i <= 5; i++) {
+        ASSERT_EQ(*(int*)node->data, i + 1);
+        node = node->next;
+    }
+
+    // Test empty list
+    SinglyLinkedList *empty_list = sll_create();
+    sll_for_each(empty_list, increment);  // Should do nothing
+
+    // Test null cases
+    sll_for_each(NULL, increment);  // Should do nothing
+    sll_for_each(list, NULL);       // Should do nothing
+
+    sll_destroy(list, int_free);
+    sll_destroy(empty_list, NULL);
+    return TEST_SUCCESS;
+}
+
+typedef struct {
+    int (*func)(void);
+    const char *name;
+} TestCase;
+
+TestCase tests[] = {
+    {test_sort_empty, "test_sort_empty"},
+    {test_sort_already_sorted, "test_sort_already_sorted"},
+    {test_sort_reverse_order, "test_sort_reverse_order"},
+    {test_sort_random_order, "test_sort_random_order"},
+    {test_sort_with_duplicates, "test_sort_with_duplicates"},
+    {test_sort_large_list, "test_sort_large_list"},
+    {test_sort_custom_compare, "test_sort_custom_compare"},
+    {test_sort_null_args, "test_sort_null_args"},
+    {test_sort_stability, "test_sort_stability"},
+    {test_reverse, "test_reverse"},
+    {test_merge, "test_merge"},
+    {test_splice, "test_splice"},
+    {test_equals, "test_equals"},
+    {test_filter, "test_filter"},
+    {test_transform, "test_transform"},
+    {test_for_each, "test_for_each"},
+};
+
+int main(void) {
+    int failed = 0;
+    const int num_tests = sizeof(tests) / sizeof(tests[0]);
+
+    for (int i = 0; i < num_tests; i++) {
+        if (tests[i].func() != TEST_SUCCESS) {
+            printf("%s failed\n", tests[i].name);
+            failed++;
+        }
+    }
+
+    if (failed == 0) {
+        printf("All SinglyLinkedList Algorithm tests passed.\n");
+        return 0;
+    }
+
+    printf("%d SinglyLinkedList Algorithm tests failed.\n", failed);
+    return 1;
+}

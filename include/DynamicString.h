@@ -2,10 +2,11 @@
 // Created by szmat on 8/19/2025.
 //
 
-#ifndef DS_STRING_H
-#define DS_STRING_H
+#ifndef DS_DYNAMICSTRING_H
+#define DS_DYNAMICSTRING_H
 #include <stdint.h>
 #include <stdio.h>
+#include"CStandardCompatibility.h"
 
 // Minimum initial string capacity
 #define STR_MIN_INIT_CAP 16
@@ -46,9 +47,9 @@ String str_create_from_cstring(const char *cstr);
 String str_create_from_string(const String *str);
 
 // String free method
-void str_free(String *str);
+void str_destroy(String *str);
 
-void str_free_split(String **str, size_t count);
+void str_destroy_split(String **str, size_t count);
 
 // Clears the content of your string and assigns the value given
 void str_assign_char(String *str, char value);
@@ -214,4 +215,4 @@ int str_getline_string(FILE *stream, String *line, const String *delim);
         const char *: str_getline_cstr,\
         String *: str_getline_str,\
         default: str_getline_ch)(stream, line, delim)
-#endif //DS_STRING_H
+#endif //DS_DYNAMICSTRING_H

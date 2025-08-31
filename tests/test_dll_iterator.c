@@ -2,16 +2,17 @@
 // Created by zack on 8/26/25.
 //
 
-#include "DLinkedList.h"
+#include "DoublyLinkedList.h"
 #include "Iterator.h"
 #include "TestAssert.h"
+#include "TestHelpers.h"
 
 #include <stdlib.h>
 
 // Test basic iterator functionality
-static int test_basic_iteration() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_basic_iteration(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     // Insert elements
     for (int i = 1; i <= 5; i++) {
@@ -22,14 +23,14 @@ static int test_basic_iteration() {
 
     // Create iterator
     Iterator it = dll_iterator(list);
-    ASSERT_NOT_NULLPTR(it.data_state);
+    ASSERT_NOT_NULL(it.data_state);
     ASSERT_TRUE(it.has_next(&it));
 
     // Iterate through list and verify values
     int expected = 1;
     while (it.has_next(&it)) {
         const int* value = it.next(&it);
-        ASSERT_NOT_NULLPTR(value);
+        ASSERT_NOT_NULL(value);
         ASSERT_EQ(*value, expected++);
     }
 
@@ -38,7 +39,7 @@ static int test_basic_iteration() {
 
     // Verify the iterator is exhausted
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULLPTR(it.next(&it));
+    ASSERT_NULL(it.next(&it));
 
     // Cleanup
     if (it.destroy) {
@@ -50,29 +51,29 @@ static int test_basic_iteration() {
 }
 
 // Test iterator with empty list
-static int test_empty_list_iterator() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_empty_list_iterator(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     Iterator it = dll_iterator(list);
 
     // Verify iterator for empty list
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULLPTR(it.next(&it));
+    ASSERT_NULL(it.next(&it));
 
     // Cleanup
     if (it.destroy) {
         it.destroy(&it);
     }
-    dll_destroy(list, nullptr);
+    dll_destroy(list, NULL);
 
     return TEST_SUCCESS;
 }
 
 // Test iterator with modifications
-static int test_iterator_with_modifications() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_iterator_with_modifications(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     // Insert initial elements
     for (int i = 1; i <= 3; i++) {
@@ -86,7 +87,7 @@ static int test_iterator_with_modifications() {
 
     // Consume first element
     const int* value = it.next(&it);
-    ASSERT_NOT_NULLPTR(value);
+    ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 1);
 
     // Modify list by adding new elements
@@ -96,16 +97,16 @@ static int test_iterator_with_modifications() {
 
     // Continue iteration - should work with unmodified behavior
     value = (int*)it.next(&it);
-    ASSERT_NOT_NULLPTR(value);
+    ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 2);
 
     value = (int*)it.next(&it);
-    ASSERT_NOT_NULLPTR(value);
+    ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 3);
 
     // The newly added element should also be accessible
     value = (int*)it.next(&it);
-    ASSERT_NOT_NULLPTR(value);
+    ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 99);
 
     // Iterator should now be exhausted
@@ -121,9 +122,9 @@ static int test_iterator_with_modifications() {
 }
 
 // Test multiple iterators
-static int test_multiple_iterators() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_multiple_iterators(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     // Insert elements
     for (int i = 1; i <= 5; i++) {
@@ -167,9 +168,9 @@ static int test_multiple_iterators() {
 }
 
 // Test iterator reset functionality if available
-static int test_iterator_reset() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_iterator_reset(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     // Insert elements
     for (int i = 1; i <= 3; i++) {
@@ -215,9 +216,9 @@ static int test_iterator_reset() {
 }
 
 // Test reverse iterator functionality
-static int test_reverse_iteration() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_reverse_iteration(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     // Insert elements
     for (int i = 1; i <= 5; i++) {
@@ -228,14 +229,14 @@ static int test_reverse_iteration() {
 
     // Create reverse iterator
     Iterator it = dll_iterator_reverse(list);
-    ASSERT_NOT_NULLPTR(it.data_state);
+    ASSERT_NOT_NULL(it.data_state);
     ASSERT_TRUE(it.has_next(&it));
 
     // Iterate through list in reverse order and verify values
     int expected = 5;
     while (it.has_next(&it)) {
         const int* value = it.next(&it);
-        ASSERT_NOT_NULLPTR(value);
+        ASSERT_NOT_NULL(value);
         ASSERT_EQ(*value, expected--);
     }
 
@@ -244,7 +245,7 @@ static int test_reverse_iteration() {
 
     // Verify the iterator is exhausted
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULLPTR(it.next(&it));
+    ASSERT_NULL(it.next(&it));
 
     // Cleanup
     if (it.destroy) {
@@ -256,21 +257,21 @@ static int test_reverse_iteration() {
 }
 
 // Test empty list with reverse iterator
-static int test_empty_list_reverse_iterator() {
-    DLinkedList* list = dll_create();
-    ASSERT_NOT_NULLPTR(list);
+static int test_empty_list_reverse_iterator(void) {
+    DoublyLinkedList* list = dll_create();
+    ASSERT_NOT_NULL(list);
 
     Iterator it = dll_iterator_reverse(list);
 
     // Verify iterator for empty list
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULLPTR(it.next(&it));
+    ASSERT_NULL(it.next(&it));
 
     // Cleanup
     if (it.destroy) {
         it.destroy(&it);
     }
-    dll_destroy(list, nullptr);
+    dll_destroy(list, NULL);
 
     return TEST_SUCCESS;
 }
@@ -296,10 +297,10 @@ static int int_compare(const void* a, const void* b) {
 }
 
 // Test converting a basic iterator to a list with dll_from_iterator
-static int test_from_iterator_basic() {
+static int test_from_iterator_basic(void) {
     // Create a source list
-    DLinkedList* src_list = dll_create();
-    ASSERT_NOT_NULLPTR(src_list);
+    DoublyLinkedList* src_list = dll_create();
+    ASSERT_NOT_NULL(src_list);
 
     // Add some elements
     for (int i = 1; i <= 5; i++) {
@@ -313,8 +314,8 @@ static int test_from_iterator_basic() {
     ASSERT_TRUE(it.has_next(&it));
 
     // Convert iterator to a new list (shallow copy - same data pointers)
-    DLinkedList* new_list = dll_from_iterator(&it, nullptr);
-    ASSERT_NOT_NULLPTR(new_list);
+    DoublyLinkedList* new_list = dll_from_iterator(&it, NULL, NULL);
+    ASSERT_NOT_NULL(new_list);
 
     // Verify the new list has the same values
     ASSERT_EQ(dll_size(new_list), 5);
@@ -327,8 +328,8 @@ static int test_from_iterator_basic() {
     }
 
     // Since we did a shallow copy, modifying source list data should affect new list
-    DListNode* node = dll_find(src_list, &(int){1}, int_compare);
-    ASSERT_NOT_NULLPTR(node);
+    const DoublyLinkedNode* node = dll_find(src_list, &(int){1}, int_compare);
+    ASSERT_NOT_NULL(node);
 
     // FIXED: Directly modify the value instead of freeing and replacing
     // This avoids the use-after-free error because both lists share the same data
@@ -350,17 +351,17 @@ static int test_from_iterator_basic() {
     {
         it.destroy(&it);
     }
-    dll_destroy(new_list, nullptr); // Don't free data - shared with src_list
+    dll_destroy(new_list, NULL); // Don't free data - shared with src_list
     dll_destroy(src_list, free); // Free the data
 
     return TEST_SUCCESS;
 }
 
 // Test deep copying with dll_from_iterator using a copy function
-static int test_from_iterator_with_copy() {
+static int test_from_iterator_with_copy(void) {
     // Create a source list
-    DLinkedList* src_list = dll_create();
-    ASSERT_NOT_NULLPTR(src_list);
+    DoublyLinkedList* src_list = dll_create();
+    ASSERT_NOT_NULL(src_list);
 
     // Add some elements
     for (int i = 1; i <= 5; i++) {
@@ -374,15 +375,15 @@ static int test_from_iterator_with_copy() {
     ASSERT_TRUE(it.has_next(&it));
 
     // Convert iterator to a new list with deep copy
-    DLinkedList* new_list = dll_from_iterator(&it, copy_int);
-    ASSERT_NOT_NULLPTR(new_list);
+    DoublyLinkedList* new_list = dll_from_iterator(&it, copy_int, free);
+    ASSERT_NOT_NULL(new_list);
 
     // Verify the new list has the same values
     ASSERT_EQ(dll_size(new_list), 5);
 
     // Modify the first element in the source list
-    const DListNode* node = dll_find(src_list, &(int){1}, int_compare);
-    ASSERT_NOT_NULLPTR(node);
+    const DoublyLinkedNode* node = dll_find(src_list, &(int){1}, int_compare);
+    ASSERT_NOT_NULL(node);
     *((int*)node->data) = 99;
 
     // The new list should still have the original values
@@ -410,18 +411,18 @@ static int test_from_iterator_with_copy() {
 }
 
 // Test dll_from_iterator with an empty list
-static int test_from_iterator_empty() {
+static int test_from_iterator_empty(void) {
     // Create an empty source list
-    DLinkedList* src_list = dll_create();
-    ASSERT_NOT_NULLPTR(src_list);
+    DoublyLinkedList* src_list = dll_create();
+    ASSERT_NOT_NULL(src_list);
 
     // Create an iterator
     Iterator it = dll_iterator(src_list);
     ASSERT_FALSE(it.has_next(&it));
 
     // Convert iterator to a new list
-    DLinkedList* new_list = dll_from_iterator(&it, nullptr);
-    ASSERT_NOT_NULLPTR(new_list);
+    DoublyLinkedList* new_list = dll_from_iterator(&it, NULL, NULL);
+    ASSERT_NOT_NULL(new_list);
 
     // Verify the new list is empty
     ASSERT_EQ(dll_size(new_list), 0);
@@ -430,58 +431,70 @@ static int test_from_iterator_empty() {
     it.destroy(&it);
 
     // Clean up
-    dll_destroy(new_list, nullptr);
-    dll_destroy(src_list, nullptr);
+    dll_destroy(new_list, NULL);
+    dll_destroy(src_list, NULL);
 
     return TEST_SUCCESS;
 }
 
 // Test dll_from_iterator with invalid iterator
-static int test_from_iterator_invalid() {
+static int test_from_iterator_invalid(void) {
     // Test with NULL iterator
-    DLinkedList* new_list = dll_from_iterator(nullptr, nullptr);
-    ASSERT_NULLPTR(new_list);
+    DoublyLinkedList* new_list = dll_from_iterator(NULL, NULL, NULL);
+    ASSERT_NULL(new_list);
 
     // Create an iterator and destroy it to make it invalid
-    DLinkedList* list = dll_create();
+    DoublyLinkedList* list = dll_create();
     Iterator it = dll_iterator(list);
-    it.destroy(&it);
+    if (it.destroy) {
+        it.destroy(&it);
+    }
 
     // Try to create a list from the destroyed iterator
-    new_list = dll_from_iterator(&it, nullptr);
-    ASSERT_NULLPTR(new_list);
+    new_list = dll_from_iterator(&it, NULL, NULL);
+    ASSERT_NULL(new_list);
 
     // Clean up
-    dll_destroy(list, nullptr);
+    dll_destroy(list, NULL);
 
     return TEST_SUCCESS;
 }
 
-int main() {
+typedef struct {
+    int (*func)(void);
+    const char *name;
+} TestCase;
+
+TestCase tests[] = {
+    {test_basic_iteration, "test_basic_iteration"},
+    {test_empty_list_iterator, "test_empty_list_iterator"},
+    {test_iterator_with_modifications, "test_iterator_with_modifications"},
+    {test_multiple_iterators, "test_multiple_iterators"},
+    {test_iterator_reset, "test_iterator_reset"},
+    {test_reverse_iteration, "test_reverse_iteration"},
+    {test_empty_list_reverse_iterator, "test_empty_list_reverse_iterator"},
+    {test_from_iterator_basic, "test_from_iterator_basic"},
+    {test_from_iterator_with_copy, "test_from_iterator_with_copy"},
+    {test_from_iterator_empty, "test_from_iterator_empty"},
+    {test_from_iterator_invalid, "test_from_iterator_invalid"},
+};
+
+int main(void) {
     int failed = 0;
+    const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    if (test_basic_iteration() != TEST_SUCCESS) { failed++;}
-    if (test_empty_list_iterator() != TEST_SUCCESS) { failed++;}
-    if (test_iterator_with_modifications() != TEST_SUCCESS) { failed++;}
-    if (test_multiple_iterators() != TEST_SUCCESS) { failed++;}
-    if (test_iterator_reset() != TEST_SUCCESS) { failed++;}
-    if (test_reverse_iteration() != TEST_SUCCESS) { failed++;}
-    if (test_empty_list_reverse_iterator() != TEST_SUCCESS) { failed++;}
-
-    // Tests for dll_from_iterator
-    if (test_from_iterator_basic() != TEST_SUCCESS) { failed++;}
-    if (test_from_iterator_with_copy() != TEST_SUCCESS) { failed++;}
-    if (test_from_iterator_empty() != TEST_SUCCESS) { failed++;}
-    if (test_from_iterator_invalid() != TEST_SUCCESS) { failed++;}
-
-    if (failed != 0)
-    {
-        printf("%d tests failed\n", failed);
-    }
-    else
-    {
-        printf("All tests passed\n");
+    for (int i = 0; i < num_tests; i++) {
+        if (tests[i].func() != TEST_SUCCESS) {
+            printf("%s failed\n", tests[i].name);
+            failed++;
+        }
     }
 
-    return failed;
+    if (failed == 0) {
+        printf("All DoublyLinkedList Iterator tests passed.\n");
+        return 0;
+    }
+
+    printf("%d DoublyLinkedList Iterator tests failed.\n", failed);
+    return 1;
 }

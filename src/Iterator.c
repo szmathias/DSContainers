@@ -5,6 +5,7 @@
 
 #include "Iterator.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 //==============================================================================
@@ -18,6 +19,7 @@ typedef struct TransformState
 {
     Iterator *base_iterator;      // Source iterator
     transform_func transform;     // Transformation function
+    int has_owner;                // Flag indicating ownership of base element
 } TransformState;
 
 /**
@@ -29,17 +31,54 @@ typedef struct FilterState
     filter_func filter;           // Predicate function
     void *next_element;           // Next matching element (cached)
     int has_cached_element;       // Flag indicating cache validity
+    int has_owner;                // Flag indicating ownership of cached element
 } FilterState;
 
 /**
- * State structure for range iterator (not implemented).
+ * State structure for range iterator.
  */
-// typedef struct RangeState
-// {
-//     int current;               // Current value
-//     int end;                   // End value (exclusive)
-//     int step;                  // Increment value
-// } RangeState;
+typedef struct RangeState
+{
+    int start;                // Starting value (stored for reset/has_prev)
+    int current;              // Current value
+    int end;                  // End value (exclusive)
+    int step;                 // Increment value
+    int is_forward;
+} RangeState;
+
+//==============================================================================
+// Forward declarations of iterator implementation functions
+//==============================================================================
+
+// Transform iterator functions
+static void *transform_get(const Iterator *it);
+static int transform_has_next(const Iterator *it);
+static void *transform_next(const Iterator *it);
+static int transform_has_prev(const Iterator *it);
+static void *transform_prev(const Iterator *it);
+static void transform_reset(const Iterator *it);
+static int transform_is_valid(const Iterator *it);
+static void transform_destroy(Iterator *it);
+
+// Filter iterator functions
+static void *filter_get(const Iterator *it);
+static int filter_has_next(const Iterator *it);
+static void *filter_next(const Iterator *it);
+static int filter_has_prev(const Iterator *it);
+static void *filter_prev(const Iterator *it);
+static void filter_reset(const Iterator *it);
+static int filter_is_valid(const Iterator *it);
+static void filter_destroy(Iterator *it);
+
+// Range iterator functions
+static void *range_get(const Iterator *it);
+static int range_has_next(const Iterator *it);
+static void *range_next(const Iterator *it);
+static int range_has_prev(const Iterator *it);
+static void *range_prev(const Iterator *it);
+static void range_reset(const Iterator *it);
+static int range_is_valid(const Iterator *it);
+static void range_destroy(Iterator *it);
 
 //==============================================================================
 // Transform iterator implementation
@@ -52,19 +91,19 @@ static void *transform_get(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     const TransformState *state = it->data_state;
     if (!state->base_iterator || !state->base_iterator->get)
     {
-        return nullptr;
+        return NULL;
     }
 
     void* element = state->base_iterator->get(state->base_iterator);
     if (!element)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Apply transformation
@@ -72,9 +111,19 @@ static void *transform_get(const Iterator *it)
 
     // If the element came from another transform's get, free it
     // This is critical to avoid leaks in nested transform chains
-    if (state->base_iterator->get == transform_get)
+    if (state->base_iterator->get == transform_get || state->base_iterator->get == range_get)
     {
         free(element);
+        element = NULL;
+    }
+
+    if (state->base_iterator->get == filter_get)
+    {
+        const FilterState *next_it = state->base_iterator->data_state;
+        if (!next_it->has_owner && element)
+        {
+            free(element);
+        }
     }
 
     return transformed;
@@ -106,33 +155,44 @@ static void *transform_next(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     const TransformState *state = it->data_state;
-    if (!state->base_iterator || !state->base_iterator->next || !state->transform)
+    const Iterator *base_it = state->base_iterator;
+    if (!base_it || !base_it->next || !state->transform)
     {
-        return nullptr;
+        return NULL;
     }
 
-    if (!state->base_iterator->has_next(state->base_iterator))
+    if (!base_it->has_next(base_it))
     {
-        return nullptr;
+        return NULL;
     }
 
-    void *element = state->base_iterator->next(state->base_iterator);
+    void *element = base_it->next(base_it);
     if (!element)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Apply transformation and mark ownership
     void* transformed = state->transform(element);
 
     // Always free elements coming from another transform
-    if (state->base_iterator->next == transform_next)
+    if (base_it->next == transform_next || base_it->next == range_next || !state->has_owner)
     {
         free(element);
+        element = NULL;
+    }
+
+    if (base_it->get == filter_get)
+    {
+        const FilterState *next_it = base_it->data_state;
+        if (!next_it->has_owner && element)
+        {
+            free(element);
+        }
     }
 
     return transformed;
@@ -153,7 +213,7 @@ static int transform_has_prev(const Iterator *it)
 static void *transform_prev(const Iterator *it)
 {
     (void)it;  // Suppress unused parameter warning
-    return nullptr;  // Transform iterator does not support prev
+    return NULL;  // Transform iterator does not support prev
 }
 
 /**
@@ -202,7 +262,7 @@ static void transform_destroy(Iterator *it)
     }
 
     free(state);
-    it->data_state = nullptr;
+    it->data_state = NULL;
 }
 
 /**
@@ -210,7 +270,7 @@ static void transform_destroy(Iterator *it)
  */
 Iterator iterator_transform(Iterator *it, const transform_func transform)
 {
-    Iterator new_it = {};  // Initialize all fields to nullptr/0
+    Iterator new_it = {0};  // Initialize all fields to NULL/0
 
     new_it.get = transform_get;
     new_it.has_next = transform_has_next;
@@ -232,8 +292,22 @@ Iterator iterator_transform(Iterator *it, const transform_func transform)
         return new_it;
     }
 
+    int has_owner = 1;
+    if (it->get == transform_get)
+    {
+        const TransformState *next_it = it->data_state;
+        has_owner &= next_it->has_owner;
+    }
+
+    if (it->get == filter_get)
+    {
+        const FilterState *next_it = it->data_state;
+        has_owner &= next_it->has_owner;
+    }
+
     state->base_iterator = it;
     state->transform = transform;
+    state->has_owner = (it->get != range_get && has_owner);
     new_it.data_state = state;
 
     return new_it;
@@ -250,13 +324,13 @@ static void *filter_get(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     FilterState *state = it->data_state;
     if (!state->base_iterator)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Return cached element if available
@@ -296,25 +370,28 @@ static int filter_has_next(const Iterator *it)
 
     while (base_it->has_next(base_it))
     {
-        void *element = base_it->get(base_it);
+        int *element = base_it->get(base_it);
         if (!element)
         {
+            // Advance the iterator without getting the value
+            // This avoids the memory leak in range and transform iterators
             base_it->next(base_it);
             continue;
         }
 
         if (state->filter && state->filter(element))
         {
+            // Found a matching element, cache it
             state->next_element = element;
             state->has_cached_element = 1;
             return 1;
         }
 
-        const int from_transform = (base_it->next == transform_next);
-        if (from_transform)
+        // Element doesn't match filter, free it if it came from transform or range
+        if (base_it->get == transform_get || base_it->get == range_get)
         {
             free(element);
-            void *next_elem = base_it->next(base_it);
+            int *next_elem = base_it->next(base_it);
             if (next_elem)
             {
                 free(next_elem);
@@ -322,7 +399,22 @@ static int filter_has_next(const Iterator *it)
         }
         else
         {
-            base_it->next(base_it);
+            if (base_it->next == filter_next)
+            {
+                const FilterState *next_it = base_it->data_state;
+                if (!next_it->has_owner)
+                {
+                    free(base_it->next(base_it));
+                }
+                else
+                {
+                    base_it->next(base_it);
+                }
+            }
+            else
+            {
+                base_it->next(base_it);
+            }
         }
     }
 
@@ -336,39 +428,50 @@ static void *filter_next(const Iterator *it)
 {
     if (!it || !it->data_state)
     {
-        return nullptr;
+        return NULL;
     }
 
     FilterState *state = it->data_state;
-    if (!state->base_iterator || !state->base_iterator->next)
+    const Iterator *base_it = state->base_iterator;
+    if (!base_it || !base_it->next)
     {
-        return nullptr;
+        return NULL;
     }
 
     // Return cached element if we have one
     if (state->has_cached_element)
     {
         state->has_cached_element = 0;
-        void *result = state->next_element;
-        state->next_element = nullptr;
+        int *result = state->next_element;
+        state->next_element = NULL;
 
-        if (state->base_iterator->next == transform_next)
+        if (base_it->next == transform_next || base_it->next == range_next)
         {
-            void *next_elem = state->base_iterator->next(state->base_iterator);
+            void *next_elem = base_it->next(base_it);
             if (next_elem)
             {
                 free(next_elem);
             }
+            // if (base_it->next == transform_next)
+            // {
+            //     const TransformState *next_it = base_it->data_state;
+            //     if (!next_it->has_owner)
+            //     {
+            //         free(result);
+            //         result = NULL;
+            //     }
+            //
+            // }
         }
         else
         {
-            state->base_iterator->next(state->base_iterator);
+            base_it->next(base_it);
         }
 
         return result;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 /**
@@ -386,7 +489,7 @@ static int filter_has_prev(const Iterator *it)
 static void *filter_prev(const Iterator *it)
 {
     (void)it;  // Suppress unused parameter warning
-    return nullptr;  // Filter iterator does not support prev
+    return NULL;  // Filter iterator does not support prev
 }
 
 /**
@@ -438,7 +541,7 @@ static void filter_destroy(Iterator *it)
         {
             free(state->next_element);
         }
-        state->next_element = nullptr;
+        state->next_element = NULL;
         state->has_cached_element = 0;
     }
 
@@ -448,7 +551,7 @@ static void filter_destroy(Iterator *it)
     }
 
     free(state);
-    it->data_state = nullptr;
+    it->data_state = NULL;
 }
 
 /**
@@ -456,7 +559,7 @@ static void filter_destroy(Iterator *it)
  */
 Iterator iterator_filter(Iterator *it, const filter_func filter)
 {
-    Iterator new_it = {};  // Initialize all fields to nullptr/0
+    Iterator new_it = {0};  // Initialize all fields to NULL/0
 
     new_it.get = filter_get;
     new_it.has_next = filter_has_next;
@@ -478,10 +581,24 @@ Iterator iterator_filter(Iterator *it, const filter_func filter)
         return new_it;
     }
 
+    int has_owner = 1;
+    if (it->get == transform_get)
+    {
+        const TransformState *next_it = it->data_state;
+        has_owner &= next_it->has_owner;
+    }
+
+    if (it->get == filter_get)
+    {
+        const FilterState *next_it = it->data_state;
+        has_owner &= next_it->has_owner;
+    }
+
     state->base_iterator = it;
     state->filter = filter;
-    state->next_element = nullptr;
+    state->next_element = NULL;
     state->has_cached_element = 0;
+    state->has_owner = (it->get != range_get && has_owner);
 
     new_it.data_state = state;
 
@@ -489,17 +606,259 @@ Iterator iterator_filter(Iterator *it, const filter_func filter)
 }
 
 //==============================================================================
-// Range iterator implementation (placeholder)
+// Range iterator implementation
 //==============================================================================
 
 /**
- * Create an iterator that yields integers in a specified range.
- * Currently not implemented.
+ * Get current element from range iterator.
  */
-// Iterator iterator_range(int start, int end, int step)
-// {
-//     // Implementation of iterator_range
-//     Iterator it = {};  // Initialize all fields to nullptr/0
-//     return it;
-// }
+static void *range_get(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return NULL;
+    }
 
+    const RangeState *state = it->data_state;
+
+    // For ongoing iteration, return the current value
+    if ((state->step > 0 && state->current < state->end) ||
+        (state->step < 0 && state->current > state->end))
+    {
+        int *value = malloc(sizeof(int));
+        if (!value)
+        {
+            return NULL;
+        }
+        *value = state->current;
+        return value;
+    }
+
+    return NULL;
+}
+
+/**
+ * Check if range iterator has more elements.
+ */
+static int range_has_next(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    const RangeState *state = it->data_state;
+
+    // For all cases, check if next step would be within bounds
+    if (state->step > 0)
+    {
+        return state->current < state->end;  // For positive step
+    }
+    else if (state->step < 0)
+    {
+        return state->current > state->end;  // For negative step
+    }
+
+    return 0;  // Zero step, no more iterations
+}
+
+/**
+ * Get next element from range iterator and advance.
+ */
+static void *range_next(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return NULL;
+    }
+
+    RangeState *state = it->data_state;
+
+    if (!it->has_next(it))
+    {
+        return NULL;
+    }
+
+    int *value = malloc(sizeof(int));
+    if (!value)
+    {
+        return NULL;
+    }
+
+    if (state->is_forward)
+    {
+        *value = state->current;
+        state->current += state->step;
+    }
+    else
+    {
+        state->is_forward = 1;
+        state->current += state->step;
+        if (!it->has_next(it))
+        {
+            free(value);
+            return NULL;
+        }
+        state->current += state->step;
+        *value = state->current;
+        state->current += state->step;
+    }
+
+    return value;
+}
+
+/**
+ * Check if range iterator has previous elements.
+ */
+static int range_has_prev(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    const RangeState *state = it->data_state;
+
+    // For all cases, check if next step would be within bounds
+    if (state->step > 0)
+    {
+        return state->current >= state->start;  // For positive step
+    }
+    else if (state->step < 0)
+    {
+        return state->current <= state->start;  // For negative step
+    }
+
+    return 0;  // Zero step, no more iterations
+}
+
+/**
+ * Get previous element from range iterator and move back.
+ */
+static void *range_prev(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return NULL;
+    }
+
+    if (!it->has_prev(it))
+    {
+        return NULL;
+    }
+
+    RangeState *state = it->data_state;
+
+    int *value = malloc(sizeof(int));
+    if (!value)
+    {
+        return NULL;
+    }
+
+    if (!state->is_forward)
+    {
+        *value = state->current;
+        state->current -= state->step;
+    }
+    else
+    {
+        state->is_forward = 0;
+        state->current -= state->step;
+        if (!it->has_prev(it))
+        {
+            free(value);
+            return NULL;
+        }
+        state->current -= state->step;
+        *value = state->current;
+        state->current -= state->step;
+    }
+
+
+    return value;
+}
+
+/**
+ * Reset range iterator to starting position.
+ */
+static void range_reset(const Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return;
+    }
+
+    RangeState *state = it->data_state;
+
+    // Reset to initial state using the stored start value
+    state->current = state->start;
+    state->is_forward = 1;
+}
+
+/**
+ * Check if range iterator is valid.
+ */
+static int range_is_valid(const Iterator *it)
+{
+    return it && it->data_state != NULL;
+}
+
+/**
+ * Free resources used by range iterator.
+ */
+static void range_destroy(Iterator *it)
+{
+    if (!it || !it->data_state)
+    {
+        return;
+    }
+
+    free(it->data_state);
+    it->data_state = NULL;
+}
+
+/**
+ * Create an iterator that yields integers in a specified range.
+ *
+ * @param start Starting value (inclusive)
+ * @param end Ending value (exclusive)
+ * @param step Step value (positive or negative)
+ * @return A new iterator yielding integers in the specified range
+ */
+Iterator iterator_range(const int start, const int end, const int step)
+{
+    Iterator it = {0};  // Initialize all fields to NULL/0
+
+    it.get = range_get;
+    it.has_next = range_has_next;
+    it.next = range_next;
+    it.has_prev = range_has_prev;
+    it.prev = range_prev;
+    it.reset = range_reset;
+    it.is_valid = range_is_valid;
+    it.destroy = range_destroy;
+
+    // Handle invalid step
+    if (step == 0 ||
+        (start < end && step < 0) ||
+        (start > end && step > 0))
+    {
+        return it;  // Return invalid iterator with NULL data_state
+    }
+    RangeState *state = calloc(1, sizeof(RangeState));
+    if (!state)
+    {
+        return it;
+    }
+
+    state->start = start;     // Store the initial start value
+    state->current = start;
+    state->end = end;
+    state->step = step;
+    state->is_forward = 1;
+
+
+    it.data_state = state;
+
+    return it;
+}

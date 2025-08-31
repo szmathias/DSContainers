@@ -1,12 +1,13 @@
 //
 // Created by szmat on 8/19/2025.
 //
-#include "DString.h"
+#include "DynamicString.h"
 
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "CStandardCompatibility.h"
 
 #define SAFE_FREE(ptr) do { if (ptr) { free(ptr); ptr = NULL; } } while(0)
 #define GROW_CAPACITY(cap) ((cap) + ((cap) >> 1))
@@ -83,7 +84,7 @@ String str_create_empty(const size_t initial_capacity)
     const size_t capacity = (initial_capacity >= STR_MIN_INIT_CAP) ? initial_capacity : STR_MIN_INIT_CAP;
 
     result.capacity = capacity;
-    result.size = 0;
+    result.size     = 0;
 
     if (capacity > STR_MIN_INIT_CAP)
     {
@@ -93,7 +94,7 @@ String str_create_empty(const size_t initial_capacity)
     {
         // Use the small_data buffer for small initial capacities
         ZERO_MEM(result.small_data, STR_MIN_INIT_CAP);
-        result.data = nullptr;
+        result.data = NULL;
     }
 
     return result;
@@ -107,8 +108,8 @@ String str_create_from_cstring(const char *cstr)
     }
 
     const size_t length = strlen(cstr);
-    String result = str_create_empty(length + 1); // +1 for the null-terminator
-    char *data_to_use = STR_DATA(&result);
+    String result       = str_create_empty(length + 1); // +1 for the null-terminator
+    char *data_to_use   = STR_DATA(&result);
     memcpy(data_to_use, cstr, length);
     result.size = length;
 
@@ -126,7 +127,7 @@ String str_create_from_string(const String *str)
     return str_create_from_cstring(data_to_use);
 }
 
-void str_free(String *str)
+void str_destroy(String *str)
 {
     if (!str)
     {
@@ -137,12 +138,12 @@ void str_free(String *str)
     {
         free(str->data);
     }
-    str->size = 0;
+    str->size     = 0;
     str->capacity = 0;
-    str->data = nullptr;
+    str->data     = NULL;
 }
 
-void str_free_split(String **str, const size_t count)
+void str_destroy_split(String **str, const size_t count)
 {
     if (!str)
     {
@@ -152,17 +153,17 @@ void str_free_split(String **str, const size_t count)
     if (count == 0)
     {
         free(*str);
-        *str = nullptr;
+        *str = NULL;
         return;
     }
 
     for (size_t i = 0; i < count; i++)
     {
         String temp = (*str)[i];
-        str_free(&temp);
+        str_destroy(&temp);
     }
     free(*str);
-    *str = nullptr;
+    *str = NULL;
 }
 
 void str_assign_char(String *str, const char value)
@@ -174,8 +175,8 @@ void str_assign_char(String *str, const char value)
 
     str_clear(str);
     char *data_to_use = STR_DATA(str);
-    data_to_use[0] = value;
-    str->size = 1;
+    data_to_use[0]    = value;
+    str->size         = 1;
 }
 
 void str_assign_cstring(String *str, const char *cstr)
@@ -352,16 +353,6 @@ void str_pop_back(String *str)
     }
 }
 
-bool str_empty(const String *str)
-{
-    if (!str)
-    {
-        return true;
-    }
-
-    return (str->size == 0);
-}
-
 void str_erase(String *str, const size_t pos)
 {
     if (!str)
@@ -389,6 +380,16 @@ void str_erase(String *str, const size_t pos)
         str->size--;
         data_to_use[str->size] = '\0';
     }
+}
+
+bool str_empty(const String *str)
+{
+    if (!str)
+    {
+        return true;
+    }
+
+    return (str->size == 0);
 }
 
 void str_clear(String *str)
@@ -446,7 +447,7 @@ char *str_data(String *str)
 {
     if (!str)
     {
-        return nullptr;
+        return NULL;
     }
 
     return STR_DATA(str);
@@ -538,7 +539,7 @@ void str_trim_front(String *str)
     }
 
     char *data = STR_DATA(str);
-    size_t i = 0;
+    size_t i   = 0;
 
     while (i < str->size && isspace((unsigned char) data[i]))
     {
@@ -740,7 +741,7 @@ size_t str_split(const String *str, const char *delim, String **out)
     }
 
     size_t num_strings = 0;
-    char *buffer = mem_calloc(str->size + 1);
+    char *buffer       = mem_calloc(str->size + 1);
     memcpy(buffer, STR_DATA(str), str->size);
 
     String *temp = malloc(sizeof(String));
@@ -761,10 +762,10 @@ size_t str_split(const String *str, const char *delim, String **out)
             free(temp);
             return 0;
         }
-        temp = new_temp;
+        temp              = new_temp;
         temp[num_strings] = str_create_from_cstring(token);
         num_strings++;
-        token = strtok(nullptr, delim);
+        token = strtok(NULL, delim);
     }
     *out = temp;
     free(buffer);
@@ -782,7 +783,7 @@ int str_compare_cstring(const String *lhs, const char *rhs)
     const char *data_to_use = STR_DATA(lhs);
 
     const size_t rhs_size = strlen(rhs);
-    const size_t min = (lhs->size < strlen(rhs)) ? lhs->size : rhs_size;
+    const size_t min      = (lhs->size < strlen(rhs)) ? lhs->size : rhs_size;
 
     int result = strncmp(data_to_use, rhs, min);
     if (result != 0)
@@ -824,7 +825,7 @@ int str_getline_ch(FILE *stream, String *line, int delim)
     }
 
     str_clear(line);
-    int ch = 0;
+    int ch     = 0;
     int status = 0;
 
     if (delim == '\0')
@@ -858,7 +859,7 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
 
     str_clear(line);
 
-    int ch = 0;
+    int ch     = 0;
     int status = 0;
 
     while (((ch = fgetc(stream))) && ch != EOF)

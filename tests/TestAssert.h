@@ -1,5 +1,5 @@
 //
-// Created by szmat on 8/20/2025.
+// Created by zack on 8/20/2025.
 //
 
 #ifndef DS_TESTASSERT_H
@@ -8,6 +8,8 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+#include "CStandardCompatibility.h"
+#include "DynamicString.h"
 
 #define TEST_SUCCESS 1
 #define TEST_FAILURE 0
@@ -43,6 +45,18 @@
 		{ \
 			fprintf(stderr, "Assertion failed: %s == %s, file %s, line %d\n", #a, #b, __FILE__, __LINE__); \
 			fprintf(stderr, "  Actual: '%s' (len=%zu) != '%s' (len=%zu)\n", (a), len_a, (b), len_b); \
+			return TEST_FAILURE; \
+		} \
+	} while (0)
+
+/* NOTE: This macro is for DString types */
+#define ASSERT_EQ_DSTRING(a, b) \
+	do \
+	{ \
+		if (str_compare_string((a), (b)) != 0) \
+		{ \
+			fprintf(stderr, "Assertion failed: %s == %s, file %s, line %d\n", #a, #b, __FILE__, __LINE__); \
+			fprintf(stderr, "  Actual: '%s' != '%s'\n", str_data(a), str_data(b)); \
 			return TEST_FAILURE; \
 		} \
 	} while (0)
@@ -104,23 +118,23 @@
 		} \
 	} while (0)
 
-#define ASSERT_NULLPTR(ptr) \
+#define ASSERT_NULL(ptr) \
 	do \
 	{ \
-		if ((ptr) != nullptr) \
+		if ((ptr) != NULL) \
 		{ \
-			fprintf(stderr, "Assertion failed: %s == nullptr, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
-			fprintf(stderr, "  Actual: %p != nullptr\n", (void*)(ptr)); \
+			fprintf(stderr, "Assertion failed: %s == NULL, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
+			fprintf(stderr, "  Actual: %p != NULL\n", (void*)(ptr)); \
 			return TEST_FAILURE; \
 		} \
 	} while (0)
 
-#define ASSERT_NOT_NULLPTR(ptr) \
+#define ASSERT_NOT_NULL(ptr) \
 	do \
 	{ \
-		if ((ptr) == nullptr) \
+		if ((ptr) == NULL) \
 		{ \
-			fprintf(stderr, "Assertion failed: %s != nullptr, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
+			fprintf(stderr, "Assertion failed: %s != NULL, file %s, line %d\n", #ptr, __FILE__, __LINE__); \
 			return TEST_FAILURE; \
 		} \
 	} while (0)

@@ -96,8 +96,12 @@ Iterator iterator_filter(Iterator *it, filter_func filter);
 
 /**
  * Create an iterator that yields integers in a specified range.
- * Currently not implemented.
+ * 
+ * @param start Starting value (inclusive)
+ * @param end Ending value (exclusive)
+ * @param step Step value (positive or negative, non-zero)
+ * @return A new iterator yielding integers in the specified range
  */
-// Iterator iterator_range(int start, int end, int step);
+Iterator iterator_range(int start, int end, int step);
 
 #endif //DS_ITERATOR_H
