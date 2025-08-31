@@ -1,0 +1,21 @@
+test_sll_crud 1 0.091345
+test_sll_algorithms 1 0.0114878
+test_sll_memory 1 0.37117
+test_sll_iterator 1 0.00900628
+test_sll_properties 1 0.00812596
+test_dll_crud 1 0.00909853
+test_dll_algorithms 1 0.00929939
+test_dll_memory 1 0.0196531
+test_dll_iterator 1 0.00842326
+test_dll_properties 1 0.00788302
+test_dll_threaded 1 0.0318364
+test_iterator_range 1 0.0374573
+test_iterator_transform 1 0.00866473
+test_iterator_filter 1 0.00829587
+test_iterator_chains 1 0.00829551
+test_string_crud 1 0.00769023
+test_string_algorithms 1 0.00874367
+test_string_memory 1 0.00852447
+test_string_fuzz 1 0.0130306
+test_string_properties 1 0.00802609
+---

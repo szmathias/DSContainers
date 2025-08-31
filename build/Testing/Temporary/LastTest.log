@@ -1,0 +1,344 @@
+Start testing: Aug 31 00:08 UTC
+----------------------------------------------------------
+1/20 Testing: test_sll_crud
+1/20 Test: test_sll_crud
+Command: "/home/runner/work/ds/ds/build/bin/test_sll_crud"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll_crud" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All SinglyLinkedList CRUD tests passed.
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll_crud" end time: Aug 31 00:08 UTC
+"test_sll_crud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/20 Testing: test_sll_algorithms
+2/20 Test: test_sll_algorithms
+Command: "/home/runner/work/ds/ds/build/bin/test_sll_algorithms"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll_algorithms" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+SLL Sort 1000 elements: 0.000097 seconds
+All SinglyLinkedList Algorithm tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll_algorithms" end time: Aug 31 00:08 UTC
+"test_sll_algorithms" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/20 Testing: test_sll_memory
+3/20 Test: test_sll_memory
+Command: "/home/runner/work/ds/ds/build/bin/test_sll_memory"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll_memory" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+
+SLL Performance tests:
+Insert 100 elements: 0.000046 seconds
+Find last element in 100 elements: 0.000001 seconds
+Insert 1000 elements: 0.001971 seconds
+Find last element in 1000 elements: 0.000008 seconds
+Insert 10000 elements: 0.176955 seconds
+Find last element in 10000 elements: 0.000073 seconds
+All SinglyLinkedList Memory tests passed.
+<end of output>
+Test time =   0.37 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll_memory" end time: Aug 31 00:08 UTC
+"test_sll_memory" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/20 Testing: test_sll_iterator
+4/20 Test: test_sll_iterator
+Command: "/home/runner/work/ds/ds/build/bin/test_sll_iterator"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll_iterator" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All SinglyLinkedList Iterator tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll_iterator" end time: Aug 31 00:08 UTC
+"test_sll_iterator" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/20 Testing: test_sll_properties
+5/20 Test: test_sll_properties
+Command: "/home/runner/work/ds/ds/build/bin/test_sll_properties"
+Directory: /home/runner/work/ds/ds/tests
+"test_sll_properties" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All SinglyLinkedList Property tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_sll_properties" end time: Aug 31 00:08 UTC
+"test_sll_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/20 Testing: test_dll_crud
+6/20 Test: test_dll_crud
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_crud"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_crud" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DoublyLinkedList CRUD tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_crud" end time: Aug 31 00:08 UTC
+"test_dll_crud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/20 Testing: test_dll_algorithms
+7/20 Test: test_dll_algorithms
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_algorithms"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_algorithms" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+DLL Sort 1000 elements: 0.000114 seconds
+All DoublyLinkedList Algorithm tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_algorithms" end time: Aug 31 00:08 UTC
+"test_dll_algorithms" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/20 Testing: test_dll_memory
+8/20 Test: test_dll_memory
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_memory"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_memory" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+
+DLL Performance tests:
+Insert 100 elements: 0.000030 seconds
+Find last element in 100 elements: 0.000001 seconds
+Insert 1000 elements: 0.000312 seconds
+Find last element in 1000 elements: 0.000008 seconds
+Insert 10000 elements: 0.002727 seconds
+Find last element in 10000 elements: 0.000079 seconds
+All DoublyLinkedList Memory tests passed.
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_memory" end time: Aug 31 00:08 UTC
+"test_dll_memory" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/20 Testing: test_dll_iterator
+9/20 Test: test_dll_iterator
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_iterator"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_iterator" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DoublyLinkedList Iterator tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_iterator" end time: Aug 31 00:08 UTC
+"test_dll_iterator" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/20 Testing: test_dll_properties
+10/20 Test: test_dll_properties
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_properties"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_properties" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DoublyLinkedList Property tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_properties" end time: Aug 31 00:08 UTC
+"test_dll_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/20 Testing: test_dll_threaded
+11/20 Test: test_dll_threaded
+Command: "/home/runner/work/ds/ds/build/bin/test_dll_threaded"
+Directory: /home/runner/work/ds/ds/tests
+"test_dll_threaded" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+[KNOWN BEHAVIOR] Race condition detected: expected size 40000, but got 39897.
+
+[INFO] Running threaded test. This test is expected to show race conditions without thread-safety measures.
+DoublyLinkedList Threaded test completed as expected.
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"test_dll_threaded" end time: Aug 31 00:08 UTC
+"test_dll_threaded" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/20 Testing: test_iterator_range
+12/20 Test: test_iterator_range
+Command: "/home/runner/work/ds/ds/build/bin/test_iterator_range"
+Directory: /home/runner/work/ds/ds/tests
+"test_iterator_range" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All range iterator tests passed!
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"test_iterator_range" end time: Aug 31 00:08 UTC
+"test_iterator_range" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/20 Testing: test_iterator_transform
+13/20 Test: test_iterator_transform
+Command: "/home/runner/work/ds/ds/build/bin/test_iterator_transform"
+Directory: /home/runner/work/ds/ds/tests
+"test_iterator_transform" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All transform iterator tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_iterator_transform" end time: Aug 31 00:08 UTC
+"test_iterator_transform" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/20 Testing: test_iterator_filter
+14/20 Test: test_iterator_filter
+Command: "/home/runner/work/ds/ds/build/bin/test_iterator_filter"
+Directory: /home/runner/work/ds/ds/tests
+"test_iterator_filter" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All filter iterator tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_iterator_filter" end time: Aug 31 00:08 UTC
+"test_iterator_filter" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/20 Testing: test_iterator_chains
+15/20 Test: test_iterator_chains
+Command: "/home/runner/work/ds/ds/build/bin/test_iterator_chains"
+Directory: /home/runner/work/ds/ds/tests
+"test_iterator_chains" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All chained iterator tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_iterator_chains" end time: Aug 31 00:08 UTC
+"test_iterator_chains" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/20 Testing: test_string_crud
+16/20 Test: test_string_crud
+Command: "/home/runner/work/ds/ds/build/bin/test_string_crud"
+Directory: /home/runner/work/ds/ds/tests
+"test_string_crud" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DString CRUD tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_string_crud" end time: Aug 31 00:08 UTC
+"test_string_crud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/20 Testing: test_string_algorithms
+17/20 Test: test_string_algorithms
+Command: "/home/runner/work/ds/ds/build/bin/test_string_algorithms"
+Directory: /home/runner/work/ds/ds/tests
+"test_string_algorithms" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DString Algorithm tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_string_algorithms" end time: Aug 31 00:08 UTC
+"test_string_algorithms" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/20 Testing: test_string_memory
+18/20 Test: test_string_memory
+Command: "/home/runner/work/ds/ds/build/bin/test_string_memory"
+Directory: /home/runner/work/ds/ds/tests
+"test_string_memory" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DString Memory tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_string_memory" end time: Aug 31 00:08 UTC
+"test_string_memory" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/20 Testing: test_string_fuzz
+19/20 Test: test_string_fuzz
+Command: "/home/runner/work/ds/ds/build/bin/test_string_fuzz"
+Directory: /home/runner/work/ds/ds/tests
+"test_string_fuzz" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+DString fuzz test completed 100000 operations without crashing.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_string_fuzz" end time: Aug 31 00:08 UTC
+"test_string_fuzz" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/20 Testing: test_string_properties
+20/20 Test: test_string_properties
+Command: "/home/runner/work/ds/ds/build/bin/test_string_properties"
+Directory: /home/runner/work/ds/ds/tests
+"test_string_properties" start time: Aug 31 00:08 UTC
+Output:
+----------------------------------------------------------
+All DString Property tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"test_string_properties" end time: Aug 31 00:08 UTC
+"test_string_properties" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 31 00:08 UTC

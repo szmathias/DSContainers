@@ -1,0 +1,1 @@
+/usr/bin/cc  -Wall -Wextra -Wpedantic -g -g -fsanitize=address,undefined -fno-omit-frame-pointer  -fsanitize=address,undefined -fno-omit-frame-pointer -Wl,--dependency-file=CMakeFiles/test_string_crud.dir/link.d CMakeFiles/test_string_crud.dir/tests/test_string_crud.c.o -o bin/test_string_crud  -Wl,-rpath,/home/runner/work/ds/ds/build libds.so
