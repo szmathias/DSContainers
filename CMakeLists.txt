@@ -56,6 +56,7 @@ add_library(ds SHARED
         include/PlatformDefs.h
         include/SinglyLinkedList.h
         include/CStandardCompatibility.h
+        include/Alloc.h
 )
 
 # Create an OBJECT library for test helpers. This compiles the sources once
@@ -141,6 +142,19 @@ add_executable(test_dll_properties tests/test_dll_properties.c)
 target_link_libraries(test_dll_properties PRIVATE ds test_helpers)
 add_test(NAME test_dll_properties
         COMMAND test_dll_properties
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add new performance test executables
+add_executable(test_sll_performance tests/test_sll_performance.c)
+target_link_libraries(test_sll_performance PRIVATE ds test_helpers)
+add_test(NAME test_sll_performance
+        COMMAND test_sll_performance
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_dll_performance tests/test_dll_performance.c)
+target_link_libraries(test_dll_performance PRIVATE ds test_helpers)
+add_test(NAME test_dll_performance
+        COMMAND test_dll_performance
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
 # Add threaded test, requires C11 threads

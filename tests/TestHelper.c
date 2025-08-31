@@ -27,6 +27,7 @@ void int_free(void *a) {
 void *test_calloc(const size_t size) {
     return calloc(1, size);
 }
+
 void test_dealloc(void *ptr) {
     free(ptr);
 }
@@ -203,4 +204,33 @@ void *double_value_failing(const void *data) {
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(const int count) {
     alloc_fail_countdown = count;
+}
+
+// Allocator helper functions
+Alloc *create_std_allocator(void) {
+    Alloc *alloc = malloc(sizeof(Alloc));
+    if (alloc) {
+        alloc->alloc_func = malloc;
+        alloc->dealloc_func = free;
+        alloc->data_free_func = free;
+        alloc->copy_func = int_copy;
+    }
+    return alloc;
+}
+
+Alloc *create_failing_allocator(void) {
+    Alloc *alloc = malloc(sizeof(Alloc));
+    if (alloc) {
+        alloc->alloc_func = failing_alloc;
+        alloc->dealloc_func = failing_free;
+        alloc->data_free_func = failing_free;
+        alloc->copy_func = failing_int_copy;
+    }
+    return alloc;
+}
+
+void destroy_allocator(Alloc *alloc) {
+    if (alloc) {
+        free(alloc);
+    }
 }

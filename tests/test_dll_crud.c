@@ -10,17 +10,20 @@
 #include <string.h>
 
 int test_create_destroy(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
-    dll_destroy(list, NULL);
+    dll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_front_back_find(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
@@ -44,12 +47,14 @@ int test_insert_front_back_find(void) {
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
@@ -58,7 +63,7 @@ int test_remove(void) {
     dll_insert_back(list, c);
 
     const int key = 2;
-    ASSERT_EQ(dll_remove(list, &key, int_cmp, int_free), 0);
+    ASSERT_EQ(dll_remove(list, &key, int_cmp, true), 0);
     ASSERT_EQ(list->size, 2);
     DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
@@ -69,19 +74,22 @@ int test_remove(void) {
     ASSERT_EQ(*(int*)list->tail->data, 3);
     ASSERT_EQ(list->tail->prev, list->head);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_not_found(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     dll_insert_back(list, a);
 
     const int key = 99;
-    ASSERT_EQ(dll_remove(list, &key, int_cmp, int_free), -1);
+    ASSERT_EQ(dll_remove(list, &key, int_cmp, true), -1);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -89,13 +97,14 @@ int test_nullptr_handling(void) {
     ASSERT_EQ(dll_insert_back(NULL, NULL), -1);
     ASSERT_EQ(dll_insert_front(NULL, NULL), -1);
     ASSERT_EQ_PTR(dll_find(NULL, NULL, NULL), NULL);
-    ASSERT_EQ(dll_remove(NULL, NULL, NULL, NULL), -1);
-    dll_destroy(NULL, NULL); // Should not crash
+    ASSERT_EQ(dll_remove(NULL, NULL, NULL, false), -1);
+    dll_destroy(NULL, false); // Should not crash
     return TEST_SUCCESS;
 }
 
 int test_insert_at(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
@@ -115,12 +124,14 @@ int test_insert_at(void) {
     ASSERT_EQ(list->head->next, found);
     ASSERT_EQ(list->tail->prev, found);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
@@ -128,7 +139,7 @@ int test_remove_at(void) {
     dll_insert_back(list, b); // [10,20]
     dll_insert_back(list, c); // [10,20,30]
 
-    ASSERT_EQ(dll_remove_at(list, 1, int_free), 0); // remove 20
+    ASSERT_EQ(dll_remove_at(list, 1, true), 0); // remove 20 (free data)
     ASSERT_EQ(list->size, 2);
 
     const int key = 20;
@@ -139,15 +150,17 @@ int test_remove_at(void) {
     ASSERT_EQ(list->head->next, list->tail);
     ASSERT_EQ(list->tail->prev, list->head);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_front(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Test on empty list
-    ASSERT_EQ(dll_remove_front(list, int_free), -1);
+    ASSERT_EQ(dll_remove_front(list, true), -1);
 
     // Add elements
     int *a = malloc(sizeof(int)); *a = 10;
@@ -159,7 +172,7 @@ int test_remove_front(void) {
     ASSERT_EQ(list->size, 3);
 
     // Remove front
-    ASSERT_EQ(dll_remove_front(list, int_free), 0);
+    ASSERT_EQ(dll_remove_front(list, true), 0);
     ASSERT_EQ(list->size, 2);
 
     // Check first element is now 20
@@ -171,26 +184,28 @@ int test_remove_front(void) {
     ASSERT_NULL(list->head->prev);
 
     // Remove until empty
-    ASSERT_EQ(dll_remove_front(list, int_free), 0);
-    ASSERT_EQ(dll_remove_front(list, int_free), 0);
+    ASSERT_EQ(dll_remove_front(list, true), 0);
+    ASSERT_EQ(dll_remove_front(list, true), 0);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
 
-    dll_destroy(list, NULL);
+    dll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_back(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Test on empty list
-    ASSERT_EQ(dll_remove_back(list, int_free), -1);
+    ASSERT_EQ(dll_remove_back(list, true), -1);
 
     // Test on single element list
     int *a = malloc(sizeof(int)); *a = 10;
     dll_insert_back(list, a);
-    ASSERT_EQ(dll_remove_back(list, int_free), 0);
+    ASSERT_EQ(dll_remove_back(list, true), 0);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
@@ -205,7 +220,7 @@ int test_remove_back(void) {
     ASSERT_EQ(list->size, 3);
 
     // Remove back
-    ASSERT_EQ(dll_remove_back(list, int_free), 0);
+    ASSERT_EQ(dll_remove_back(list, true), 0);
     ASSERT_EQ(list->size, 2);
 
     // Check last element was removed
@@ -216,18 +231,20 @@ int test_remove_back(void) {
     ASSERT_EQ(list->tail->data, dll_find(list, &key, int_cmp)->data);
     ASSERT_NULL(list->tail->next);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_head(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 100;
     int *b = malloc(sizeof(int)); *b = 200;
     dll_insert_back(list, a); // [100]
     dll_insert_back(list, b); // [100,200]
 
-    ASSERT_EQ(dll_remove_at(list, 0, int_free), 0); // remove head (100)
+    ASSERT_EQ(dll_remove_at(list, 0, true), 0); // remove head (100)
     ASSERT_EQ(list->size, 1);
     ASSERT_EQ(*(int*)list->head->data, 200);
     ASSERT_EQ(list->head, list->tail);
@@ -236,12 +253,14 @@ int test_remove_at_head(void) {
     DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_last(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
@@ -249,7 +268,7 @@ int test_remove_at_last(void) {
     dll_insert_back(list, b); // [1,2]
     dll_insert_back(list, c); // [1,2,3]
 
-    ASSERT_EQ(dll_remove_at(list, 2, int_free), 0); // remove last (3)
+    ASSERT_EQ(dll_remove_at(list, 2, true), 0); // remove last (3)
     ASSERT_EQ(list->size, 2);
     ASSERT_EQ(*(int*)list->tail->data, 2);
 
@@ -257,73 +276,87 @@ int test_remove_at_last(void) {
     DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_invalid(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     dll_insert_back(list, a); // [1]
 
-    ASSERT_EQ(dll_remove_at(list, 5, int_free), -1); // invalid position
-    ASSERT_EQ(dll_remove_at(list, (size_t)-1, int_free), -1); // negative as size_t (very large)
+    ASSERT_EQ(dll_remove_at(list, 5, true), -1); // invalid position
+    ASSERT_EQ(dll_remove_at(list, (size_t)-1, true), -1); // negative as size_t (very large)
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_empty(void) {
-    DoublyLinkedList *list = dll_create();
-    ASSERT_EQ(dll_remove_at(list, 0, int_free), -1); // nothing to remove
-    dll_destroy(list, int_free);
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
+    ASSERT_EQ(dll_remove_at(list, 0, true), -1); // nothing to remove
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 123;
     dll_insert_back(list, a); // [123]
-    ASSERT_EQ(dll_remove_at(list, 0, int_free), 0); // remove only element
+    ASSERT_EQ(dll_remove_at(list, 0, true), 0); // remove only element
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element_invalid_pos(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 123;
     dll_insert_back(list, a); // [123]
-    ASSERT_EQ(dll_remove_at(list, 1, int_free), -1); // invalid position
+    ASSERT_EQ(dll_remove_at(list, 1, true), -1); // invalid position
     ASSERT_EQ(list->size, 1);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_at_out_of_bounds(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     ASSERT_EQ(dll_insert_at(list, 2, a), -1); // out of bounds (list size is 0)
     ASSERT_EQ(dll_insert_at(list, (size_t)-1, a), -1); // very large index
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     free(a);
     return TEST_SUCCESS;
 }
 
 int test_insert_remove_null_data(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_EQ(dll_insert_back(list, NULL), 0); // allow NULL data
     ASSERT_EQ(list->size, 1);
-    ASSERT_EQ(dll_remove_at(list, 0, NULL), 0); // remove node with NULL data, no free_func
+    ASSERT_EQ(dll_remove_at(list, 0, false), 0); // remove node with NULL data, no free
     ASSERT_EQ(list->size, 0);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_mixed_operations_integrity(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
@@ -340,7 +373,7 @@ int test_mixed_operations_integrity(void) {
     ASSERT_EQ(*(int*)list->tail->prev->data, 30);
     ASSERT_EQ(*(int*)list->tail->prev->prev->data, 20);
 
-    ASSERT_EQ(dll_remove_at(list, 1, int_free), 0); // remove 30, [20,10]
+    ASSERT_EQ(dll_remove_at(list, 1, true), 0); // remove 30, [20,10]
     const int key = 30;
     DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
@@ -353,12 +386,14 @@ int test_mixed_operations_integrity(void) {
     ASSERT_NULL(list->head->prev);
     ASSERT_NULL(list->tail->next);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_size(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_EQ(dll_size(list), 0);
 
     int *a = malloc(sizeof(int)); *a = 10;
@@ -368,32 +403,36 @@ int test_size(void) {
     dll_insert_back(list, b);
     ASSERT_EQ(dll_size(list), 2);
 
-    dll_remove_at(list, 0, int_free);
+    dll_remove_at(list, 0, true);
     ASSERT_EQ(dll_size(list), 1);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_is_empty(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_EQ(dll_is_empty(list), 1); // Empty list
 
     int *a = malloc(sizeof(int)); *a = 10;
     dll_insert_back(list, a);
     ASSERT_EQ(dll_is_empty(list), 0); // Non-empty list
 
-    dll_remove_at(list, 0, int_free);
+    dll_remove_at(list, 0, true);
     ASSERT_EQ(dll_is_empty(list), 1); // Empty again
 
     ASSERT_EQ(dll_is_empty(NULL), 1); // NULL list should be considered empty
 
-    dll_destroy(list, NULL);
+    dll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_complex_data_type(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     Person *p1 = create_person("Alice", 30);
     Person *p2 = create_person("Bob", 25);
@@ -414,12 +453,14 @@ int test_complex_data_type(void) {
     ASSERT_EQ(found_person->age, 25);
 
     // Clean up
-    dll_destroy(list, person_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_all(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Add 10 elements
     for (int i = 0; i < 10; i++) {
@@ -431,14 +472,15 @@ int test_remove_all(void) {
 
     // Remove all elements one by one
     while (!dll_is_empty(list)) {
-        dll_remove_front(list, int_free);
+        dll_remove_front(list, true);
     }
 
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
 
-    dll_destroy(list, NULL); // Already freed all data
+    dll_destroy(list, false); // Already freed all data
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

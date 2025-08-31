@@ -9,7 +9,8 @@
 
 // Property: The size of the list should be consistent after a series of insertions and removals.
 int test_dll_size_after_insert_and_remove(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_EQ(dll_size(list), 0);
 
     int *a = malloc(sizeof(int)); *a = 1;
@@ -20,53 +21,58 @@ int test_dll_size_after_insert_and_remove(void) {
     dll_insert_front(list, b);
     ASSERT_EQ(dll_size(list), 2);
 
-    dll_remove_at(list, 0, int_free);
+    dll_remove_at(list, 0, true);
     ASSERT_EQ(dll_size(list), 1);
 
-    dll_remove_back(list, int_free);
+    dll_remove_back(list, true);
     ASSERT_EQ(dll_size(list), 0);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Property: Sorting an already sorted list should not change it.
 int test_dll_sort_is_idempotent(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     for (int i = 0; i < 10; i++) {
         int *val = malloc(sizeof(int)); *val = i;
         dll_insert_back(list, val);
     }
 
     dll_sort(list, int_cmp); // First sort
-    DoublyLinkedList *copy = dll_copy_deep(list, int_copy, int_free);
+    DoublyLinkedList *copy = dll_copy_deep(list, true);
 
     dll_sort(list, int_cmp); // Second sort
 
     ASSERT_EQ(dll_equals(list, copy, int_cmp), 1);
 
-    dll_destroy(list, int_free);
-    dll_destroy(copy, int_free);
+    dll_destroy(list, true);
+    dll_destroy(copy, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Property: Reversing a list twice should return it to its original state.
 int test_dll_reverse_is_involution(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     for (int i = 0; i < 10; i++) {
         int *val = malloc(sizeof(int)); *val = i;
         dll_insert_back(list, val);
     }
 
-    DoublyLinkedList *copy = dll_copy_deep(list, int_copy, int_free);
+    DoublyLinkedList *copy = dll_copy_deep(list, true);
 
     dll_reverse(list);
     dll_reverse(list);
 
     ASSERT_EQ(dll_equals(list, copy, int_cmp), 1);
 
-    dll_destroy(list, int_free);
-    dll_destroy(copy, int_free);
+    dll_destroy(list, true);
+    dll_destroy(copy, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

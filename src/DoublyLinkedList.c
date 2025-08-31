@@ -292,7 +292,7 @@ static void dll_iterator_destroy(Iterator *it)
     const ListIteratorState *state = it->data_state;
     if (state && state->list)
     {
-        state->list->dealloc(it->data_state);
+        state->list->alloc->dealloc_func(it->data_state);
     }
     it->data_state = NULL;
 }
@@ -320,24 +320,29 @@ static void *dll_iterator_get(const Iterator *it)
 // Creation and destruction functions
 //==============================================================================
 
-DoublyLinkedList *dll_create(void)
-{
-    return dll_create_custom(malloc, free);
-}
-
-DoublyLinkedList *dll_create_custom(alloc_func alloc, dealloc_func dealloc)
+DoublyLinkedList *dll_create(Alloc *alloc)
 {
     if (!alloc)
     {
-        alloc = malloc;
+        return NULL;
     }
 
-    if (!dealloc)
+    if (!alloc->alloc_func)
     {
-        dealloc = free;
+        alloc->alloc_func = malloc;
     }
 
-    DoublyLinkedList *list = alloc(sizeof(DoublyLinkedList));
+    if (!alloc->dealloc_func)
+    {
+        alloc->dealloc_func = free;
+    }
+
+    if (!alloc->data_free_func)
+    {
+        alloc->data_free_func = free;
+    }
+
+    DoublyLinkedList *list = alloc->alloc_func(sizeof(DoublyLinkedList));
     if (!list)
     {
         return NULL;
@@ -347,21 +352,20 @@ DoublyLinkedList *dll_create_custom(alloc_func alloc, dealloc_func dealloc)
     list->tail = NULL;
     list->size = 0;
     list->alloc = alloc;
-    list->dealloc = dealloc;
 
     return list;
 }
 
-void dll_destroy(DoublyLinkedList *list, const free_func data_free)
+void dll_destroy(DoublyLinkedList *list, const bool should_free_data)
 {
     if (list)
     {
-        dll_clear(list, data_free);
-        list->dealloc(list);
+        dll_clear(list, should_free_data);
+        list->alloc->dealloc_func(list);
     }
 }
 
-void dll_clear(DoublyLinkedList *list, const free_func data_free)
+void dll_clear(DoublyLinkedList *list, const bool should_free_data)
 {
     if (!list)
     {
@@ -372,12 +376,12 @@ void dll_clear(DoublyLinkedList *list, const free_func data_free)
     while (node)
     {
         DoublyLinkedNode *next = node->next;
-        if (data_free && node->data)
+        if (should_free_data && node->data)
         {
-            data_free(node->data);
+            list->alloc->data_free_func(node->data);
         }
 
-        list->dealloc(node);
+        list->alloc->dealloc_func(node);
         node = next;
     }
 
@@ -474,7 +478,7 @@ int dll_insert_front(DoublyLinkedList *list, void *data)
         return -1;
     }
 
-    DoublyLinkedNode *node = list->alloc(sizeof(DoublyLinkedNode));
+    DoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -507,7 +511,7 @@ int dll_insert_back(DoublyLinkedList *list, void *data)
         return -1;
     }
 
-    DoublyLinkedNode *node = list->alloc(sizeof(DoublyLinkedNode));
+    DoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -550,7 +554,7 @@ int dll_insert_at(DoublyLinkedList *list, const size_t pos, void *data)
         return dll_insert_back(list, data);
     }
 
-    DoublyLinkedNode *node = list->alloc(sizeof(DoublyLinkedNode));
+    DoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -597,7 +601,7 @@ int dll_insert_at(DoublyLinkedList *list, const size_t pos, void *data)
 // Removal functions
 //==============================================================================
 
-int dll_remove(DoublyLinkedList *list, const void *data, const cmp_func compare, const free_func remove)
+int dll_remove(DoublyLinkedList *list, const void *data, const cmp_func compare, const bool should_free_data)
 {
     if (!list || !compare || list->size == 0)
     {
@@ -630,11 +634,11 @@ int dll_remove(DoublyLinkedList *list, const void *data, const cmp_func compare,
                 list->tail = curr->prev;
             }
 
-            if (remove && curr->data)
+            if (should_free_data && curr->data)
             {
-                remove(curr->data);
+                list->alloc->data_free_func(curr->data);
             }
-            list->dealloc(curr);
+            list->alloc->dealloc_func(curr);
             list->size--;
 
             return 0;
@@ -645,7 +649,7 @@ int dll_remove(DoublyLinkedList *list, const void *data, const cmp_func compare,
     return -1;  // Node not found
 }
 
-int dll_remove_at(DoublyLinkedList *list, const size_t pos, const free_func remove)
+int dll_remove_at(DoublyLinkedList *list, const size_t pos, const bool should_free_data)
 {
     if (!list || pos >= list->size)
     {
@@ -700,17 +704,17 @@ int dll_remove_at(DoublyLinkedList *list, const size_t pos, const free_func remo
         node_to_remove->next->prev = node_to_remove->prev;
     }
 
-    if (remove && node_to_remove->data)
+    if (should_free_data && node_to_remove->data)
     {
-        remove(node_to_remove->data);
+        list->alloc->data_free_func(node_to_remove->data);
     }
-    list->dealloc(node_to_remove);
+    list->alloc->dealloc_func(node_to_remove);
     list->size--;
 
     return 0;
 }
 
-int dll_remove_front(DoublyLinkedList *list, const free_func remove)
+int dll_remove_front(DoublyLinkedList *list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -730,18 +734,18 @@ int dll_remove_front(DoublyLinkedList *list, const free_func remove)
         list->tail = NULL;
     }
 
-    if (remove && node_to_remove->data)
+    if (should_free_data && node_to_remove->data)
     {
-        remove(node_to_remove->data);
+        list->alloc->data_free_func(node_to_remove->data);
     }
 
-    list->dealloc(node_to_remove);
+    list->alloc->dealloc_func(node_to_remove);
     list->size--;
 
     return 0;
 }
 
-int dll_remove_back(DoublyLinkedList *list, const free_func remove)
+int dll_remove_back(DoublyLinkedList *list, const bool should_free_data)
 {
     if (!list || !list->tail)
     {
@@ -761,12 +765,13 @@ int dll_remove_back(DoublyLinkedList *list, const free_func remove)
         list->head = NULL;
     }
 
-    if (remove && node_to_remove->data)
+    if (should_free_data && node_to_remove->data)
     {
-        remove(node_to_remove->data);
+        list->alloc->data_free_func(node_to_remove->data);
     }
 
-    list->dealloc(node_to_remove);
+    // Free the node memory using the allocator's dealloc function
+    list->alloc->dealloc_func(node_to_remove);
     list->size--;
     return 0;
 }
@@ -963,7 +968,7 @@ DoublyLinkedList *dll_filter(const DoublyLinkedList *list, const pred_func pred)
         return NULL;
     }
 
-    DoublyLinkedList *result = dll_create_custom(list->alloc, list->dealloc);
+    DoublyLinkedList *result = dll_create(list->alloc);
     if (!result)
     {
         return NULL;
@@ -987,14 +992,14 @@ DoublyLinkedList *dll_filter(const DoublyLinkedList *list, const pred_func pred)
     return result;
 }
 
-DoublyLinkedList *dll_transform(const DoublyLinkedList *list, const transform_func transform, const free_func new_data_free)
+DoublyLinkedList *dll_transform(const DoublyLinkedList *list, const transform_func transform, const bool should_free_data)
 {
     if (!list || !transform)
     {
         return NULL;
     }
 
-    DoublyLinkedList *result = dll_create_custom(list->alloc, list->dealloc);
+    DoublyLinkedList *result = dll_create(list->alloc);
     if (!result)
     {
         return NULL;
@@ -1006,12 +1011,12 @@ DoublyLinkedList *dll_transform(const DoublyLinkedList *list, const transform_fu
         void *new_data = transform(curr->data);
         if (dll_insert_back(result, new_data) != 0)
         {
-            if (new_data_free && new_data)
+            if (should_free_data && new_data)
             {
-                new_data_free(new_data);  // Free the transformed data if insertion fails
+                result->alloc->data_free_func(new_data);  // Free the transformed data if insertion fails
             }
             // Free any data already successfully inserted into the new list
-            dll_destroy(result, new_data_free);
+            dll_destroy(result, should_free_data);
             return NULL;
         }
         curr = curr->next;
@@ -1046,8 +1051,8 @@ DoublyLinkedList *dll_copy(const DoublyLinkedList *list)
         return NULL;
     }
 
-    DoublyLinkedList *clone = dll_create_custom(list->alloc, list->dealloc);
-    if (!clone)
+    DoublyLinkedList *copy = dll_create(list->alloc);
+    if (!copy)
     {
         return NULL;
     }
@@ -1055,33 +1060,33 @@ DoublyLinkedList *dll_copy(const DoublyLinkedList *list)
     // Empty list case
     if (list->size == 0)
     {
-        return clone;
+        return copy;
     }
 
     // Copy nodes, sharing data pointers
     const DoublyLinkedNode *curr = list->head;
     while (curr)
     {
-        if (dll_insert_back(clone, curr->data) != 0)
+        if (dll_insert_back(copy, curr->data) != 0)
         {
-            dll_destroy(clone, NULL);  // Don't free data - they're shared
+            dll_destroy(copy, NULL);  // Don't free data - they're shared
             return NULL;
         }
         curr = curr->next;
     }
 
-    return clone;
+    return copy;
 }
 
-DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, const copy_func copy_data, const free_func copied_data_free)
+DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, const bool should_free_data)
 {
-    if (!list || !copy_data)
+    if (!list || !list->alloc->copy_func)
     {
         return NULL;
     }
 
-    DoublyLinkedList *clone = dll_create_custom(list->alloc, list->dealloc);
-    if (!clone)
+    DoublyLinkedList *copy = dll_create(list->alloc);
+    if (!copy)
     {
         return NULL;
     }
@@ -1089,58 +1094,50 @@ DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, const copy_func co
     // Empty list case
     if (list->size == 0)
     {
-        return clone;
+        return copy;
     }
 
     // Copy nodes and clone data
     const DoublyLinkedNode *curr = list->head;
     while (curr)
     {
-        void *data_copy = copy_data(curr->data);
+        void *data_copy = copy->alloc->copy_func(curr->data);
         if (!data_copy)
         {
             // On failure, destroy the partially built clone, freeing any data it contains
-            dll_destroy(clone, copied_data_free);
+            dll_destroy(copy, should_free_data);
             return NULL;
         }
-        if (dll_insert_back(clone, data_copy) != 0)
+        if (dll_insert_back(copy, data_copy) != 0)
         {
             // If insertion fails, free the orphaned copy and destroy the partial clone
-            if (copied_data_free) {
-                copied_data_free(data_copy);
+            if (should_free_data) {
+                list->alloc->data_free_func(data_copy);
             }
-            dll_destroy(clone, copied_data_free);
+            dll_destroy(copy, should_free_data);
             return NULL;
         }
         curr = curr->next;
     }
 
-    return clone;
+    return copy;
 }
 
-DoublyLinkedList *dll_from_iterator(Iterator *it, const copy_func copy, const free_func copied_data_free)
-{
-    return dll_from_iterator_custom(it, copy, copied_data_free, malloc, free);
-}
-
-DoublyLinkedList *dll_from_iterator_custom(Iterator *it, const copy_func copy, const free_func copied_data_free, const alloc_func alloc, const dealloc_func dealloc)
+// Create a list from an iterator using a provided allocator. This function
+// matches the header declaration `dll_from_iterator_custom(Iterator*, Alloc*)`.
+DoublyLinkedList *dll_from_iterator(Iterator *it, Alloc *alloc)
 {
     if (!it)
     {
         return NULL;
     }
 
-    if(!it->is_valid)
+    if (!it->is_valid || !it->is_valid(it))
     {
         return NULL;
     }
 
-    if (!it->is_valid(it))
-    {
-        return NULL;
-    }
-
-    DoublyLinkedList *list = dll_create_custom(alloc, dealloc);
+    DoublyLinkedList *list = dll_create(alloc);
     if (!list)
     {
         return NULL;
@@ -1155,23 +1152,23 @@ DoublyLinkedList *dll_from_iterator_custom(Iterator *it, const copy_func copy, c
         }
 
         void *data_to_insert = data;
-        if (copy)
+        if (alloc->copy_func)
         {
-            data_to_insert = copy(data);
+            data_to_insert = alloc->copy_func(data);
             if (!data_to_insert)
             {
-                dll_destroy(list, copied_data_free);
+                dll_destroy(list, true);
                 return NULL;
             }
         }
 
         if (dll_insert_back(list, data_to_insert) != 0)
         {
-            if (copy && copied_data_free)
+            if (alloc->copy_func && alloc->data_free_func)
             {
-                copied_data_free(data_to_insert);  // Free the copy we just made
+                alloc->data_free_func(data_to_insert);  // Free the copy we just made
             }
-            dll_destroy(list, copy ? copied_data_free : NULL);
+            dll_destroy(list, alloc->copy_func != NULL);
             return NULL;
         }
     }
@@ -1201,7 +1198,7 @@ Iterator dll_iterator(const DoublyLinkedList *list)
         return it;
     }
 
-    ListIteratorState *state = list->alloc(sizeof(ListIteratorState));
+    ListIteratorState *state = list->alloc->alloc_func(sizeof(ListIteratorState));
     if (!state)
     {
         return it;
@@ -1234,7 +1231,7 @@ Iterator dll_iterator_reverse(const DoublyLinkedList *list)
         return it;
     }
 
-    ListIteratorState *state = list->alloc(sizeof(ListIteratorState));
+    ListIteratorState *state = list->alloc->alloc_func(sizeof(ListIteratorState));
     if (!state)
     {
         return it;

@@ -11,7 +11,8 @@
 // Test basic transform iterator functionality
 static int test_transform_iterator(void) {
     // Create a list with integers
-    DoublyLinkedList* list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList* list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Add some elements
@@ -44,7 +45,8 @@ static int test_transform_iterator(void) {
 
     // Cleanup
     transform_it.destroy(&transform_it);
-    dll_destroy(list, free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
@@ -52,7 +54,8 @@ static int test_transform_iterator(void) {
 // Test transform iterator with edge cases
 static int test_transform_edge_cases(void) {
     // Test with empty list
-    DoublyLinkedList* empty_list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList* empty_list = dll_create(alloc);
     ASSERT_NOT_NULL(empty_list);
 
     Iterator empty_it = dll_iterator(empty_list);
@@ -63,7 +66,8 @@ static int test_transform_edge_cases(void) {
     ASSERT_NULL(transform_empty.next(&transform_empty));
 
     transform_empty.destroy(&transform_empty);
-    dll_destroy(empty_list, NULL);
+    dll_destroy(empty_list, false);
+    destroy_allocator(alloc);
 
     // Test with NULL base iterator (should handle gracefully)
     Iterator null_transform = iterator_transform(NULL, double_value);
@@ -77,7 +81,8 @@ static int test_transform_edge_cases(void) {
 
 // Test transform iterator chaining
 static int test_transform_chaining(void) {
-    DoublyLinkedList* list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList* list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Add elements 1-3
@@ -109,7 +114,8 @@ static int test_transform_chaining(void) {
     // Cleanup - note that destroying the outermost iterator should
     // recursively destroy all inner iterators
     chain_it.destroy(&chain_it);
-    dll_destroy(list, free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }

@@ -24,7 +24,7 @@ typedef struct {
 
 // Thread function to add items to the list
 int add_items(void *arg) {
-    thread_data_t *data = (thread_data_t *)arg;
+    const thread_data_t *data = (thread_data_t *)arg;
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
         int *val = malloc(sizeof(int));
         *val = data->start_val + i;
@@ -38,7 +38,8 @@ int add_items(void *arg) {
 // due to race conditions when updating head/tail/size pointers.
 int test_concurrent_insertions(void) {
     printf("\n[INFO] Running threaded test. This test is expected to show race conditions without thread-safety measures.\n");
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     thrd_t threads[NUM_THREADS];
     thread_data_t thread_data[NUM_THREADS];
 
@@ -62,7 +63,8 @@ int test_concurrent_insertions(void) {
          printf("[INFO] Threaded test passed, which may indicate a single-core environment or sheer luck.\n");
     }
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

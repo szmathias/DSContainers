@@ -5,7 +5,7 @@
 #ifndef DS_TESTHELPERS_H
 #define DS_TESTHELPERS_H
 
-#include <stdio.h>
+#include "../include/Alloc.h"
 
 // Complex data type for testing
 typedef struct {
@@ -22,7 +22,7 @@ int int_cmp_desc(const void *a, const void *b);
 void int_free(void *a);
 
 // Custom allocator for testing
-void *test_calloc(size_t size) ;
+void *test_calloc(size_t size);
 void test_dealloc(void *ptr);
 
 // Person comparison function
@@ -89,5 +89,10 @@ void *double_value_failing(const void *data);
 
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(int count);
+
+// Allocator helper functions
+Alloc* create_std_allocator(void);
+Alloc* create_failing_allocator(void);
+void destroy_allocator(Alloc* alloc);
 
 #endif //DS_TESTHELPERS_H

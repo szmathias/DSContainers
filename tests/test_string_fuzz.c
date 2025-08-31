@@ -10,7 +10,7 @@
 #define NUM_FUZZ_OPERATIONS 100000
 
 static void perform_random_operation(String* str) {
-    int op = rand() % 8;
+    const int op = rand() % 8;
 
     switch (op) {
         case 0: // push_back
@@ -43,6 +43,9 @@ static void perform_random_operation(String* str) {
             break;
         case 7: // reserve
             str_reserve(str, rand() % 256);
+            break;
+
+        default:
             break;
     }
 }

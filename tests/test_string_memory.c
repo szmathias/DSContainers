@@ -6,7 +6,6 @@
 #include "TestAssert.h"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 
 int test_reserve_and_shrink(void) {

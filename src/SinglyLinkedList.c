@@ -81,7 +81,7 @@ SinglyLinkedList *sll_create_custom(alloc_func alloc, dealloc_func dealloc)
     return list;
 }
 
-void sll_destroy(SinglyLinkedList *list, const free_func data_free)
+void sll_destroy(SinglyLinkedList *list, const data_free_func data_free)
 {
     if (list)
     {
@@ -90,7 +90,7 @@ void sll_destroy(SinglyLinkedList *list, const free_func data_free)
     }
 }
 
-void sll_clear(SinglyLinkedList *list, const free_func data_free)
+void sll_clear(SinglyLinkedList *list, const data_free_func data_free)
 {
     if (!list)
     {
@@ -286,7 +286,7 @@ int sll_insert_at(SinglyLinkedList *list, const size_t pos, void *data)
 // Removal functions
 //==============================================================================
 
-int sll_remove(SinglyLinkedList *list, const void *data, const cmp_func compare, const free_func remove)
+int sll_remove(SinglyLinkedList *list, const void *data, const cmp_func compare, const data_free_func remove)
 {
     if (!list || !compare)
     {
@@ -324,7 +324,7 @@ int sll_remove(SinglyLinkedList *list, const void *data, const cmp_func compare,
     return -1;
 }
 
-int sll_remove_at(SinglyLinkedList *list, const size_t pos, const free_func remove)
+int sll_remove_at(SinglyLinkedList *list, const size_t pos, const data_free_func remove)
 {
     if (!list || pos >= list->size)
     {
@@ -359,7 +359,7 @@ int sll_remove_at(SinglyLinkedList *list, const size_t pos, const free_func remo
     return 0;
 }
 
-int sll_remove_front(SinglyLinkedList *list, const free_func remove)
+int sll_remove_front(SinglyLinkedList *list, const data_free_func remove)
 {
     if (!list || !list->head)
     {
@@ -379,7 +379,7 @@ int sll_remove_front(SinglyLinkedList *list, const free_func remove)
     return 0;
 }
 
-int sll_remove_back(SinglyLinkedList *list, const free_func remove)
+int sll_remove_back(SinglyLinkedList *list, const data_free_func remove)
 {
     if (!list || !list->head)
     {
@@ -402,7 +402,10 @@ int sll_remove_back(SinglyLinkedList *list, const free_func remove)
     }
 
     // Remove the last node
-    prev->next = NULL;
+    if (prev)
+    {
+        prev->next = NULL;
+    }
 
     if (remove && curr->data)
     {
@@ -624,7 +627,7 @@ SinglyLinkedList *sll_filter(const SinglyLinkedList *list, const pred_func pred)
     return result;
 }
 
-SinglyLinkedList *sll_transform(const SinglyLinkedList *list, const transform_func transform, const free_func new_data_free)
+SinglyLinkedList *sll_transform(const SinglyLinkedList *list, const transform_func transform, const data_free_func new_data_free)
 {
     if (!list || !transform)
     {
@@ -710,7 +713,7 @@ SinglyLinkedList *sll_copy(const SinglyLinkedList *list)
     return clone;
 }
 
-SinglyLinkedList *sll_copy_deep(const SinglyLinkedList *list, const copy_func copy_data, const free_func copied_data_free)
+SinglyLinkedList *sll_copy_deep(const SinglyLinkedList *list, const copy_func copy_data, const data_free_func copied_data_free)
 {
     if (!list || !copy_data)
     {
@@ -919,12 +922,12 @@ Iterator sll_iterator(const SinglyLinkedList *list)
     return it;
 }
 
-SinglyLinkedList *sll_from_iterator(Iterator *it, const copy_func copy, const free_func copied_data_free)
+SinglyLinkedList *sll_from_iterator(Iterator *it, const copy_func copy, const data_free_func copied_data_free)
 {
     return sll_from_iterator_custom(it, copy, copied_data_free, malloc, free);
 }
 
-SinglyLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const free_func copied_data_free, const alloc_func alloc, const dealloc_func dealloc)
+SinglyLinkedList *sll_from_iterator_custom(Iterator *it, const copy_func copy, const data_free_func copied_data_free, const alloc_func alloc, const dealloc_func dealloc)
 {
     if (!it)
     {

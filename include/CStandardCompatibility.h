@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #if !defined(COMPAT_HAS_C23) || !defined(__cplusplus)
-    #define nullptr ((void*)0)
+    #define nullptr NULL
     #define constexpr const
     #include <stdbool.h>
     #define static_assert(condition, message) _Static_assert(condition, message)

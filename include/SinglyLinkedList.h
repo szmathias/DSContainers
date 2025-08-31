@@ -59,7 +59,7 @@ typedef void (*dealloc_func)(void *ptr);
  *
  * @param ptr Pointer to user data to be freed
  */
-typedef void (*free_func)(void *ptr);
+typedef void (*data_free_func)(void *ptr);
 
 /**
  * Comparison function for list elements.
@@ -137,7 +137,7 @@ SinglyLinkedList *sll_create_custom(alloc_func alloc, dealloc_func dealloc);
  * @param list The list to destroy
  * @param data_free Function to free user data (can be NULL if data shouldn't be freed)
  */
-void sll_destroy(SinglyLinkedList *list, free_func data_free);
+void sll_destroy(SinglyLinkedList *list, data_free_func data_free);
 
 /**
  * Clear all nodes from the list, but keep the list structure intact.
@@ -145,7 +145,7 @@ void sll_destroy(SinglyLinkedList *list, free_func data_free);
  * @param list The list to clear
  * @param data_free Function to free user data (can be NULL if data shouldn't be freed)
  */
-void sll_clear(SinglyLinkedList *list, free_func data_free);
+void sll_clear(SinglyLinkedList *list, data_free_func data_free);
 
 //==============================================================================
 // Information functions
@@ -232,7 +232,7 @@ int sll_insert_at(SinglyLinkedList *list, size_t pos, void *data);
  * @param remove Function to free user data (can be NULL)
  * @return 0 on success, -1 if not found or on error
  */
-int sll_remove(SinglyLinkedList *list, const void *data, cmp_func compare, free_func remove);
+int sll_remove(SinglyLinkedList *list, const void *data, cmp_func compare, data_free_func remove);
 
 /**
  * Remove node at a specific position.
@@ -242,7 +242,7 @@ int sll_remove(SinglyLinkedList *list, const void *data, cmp_func compare, free_
  * @param remove Function to free user data (can be NULL)
  * @return 0 on success, -1 on error (e.g., invalid position)
  */
-int sll_remove_at(SinglyLinkedList *list, size_t pos, free_func remove);
+int sll_remove_at(SinglyLinkedList *list, size_t pos, data_free_func remove);
 
 /**
  * Remove the first node in the list.
@@ -251,7 +251,7 @@ int sll_remove_at(SinglyLinkedList *list, size_t pos, free_func remove);
  * @param remove Function to free user data (can be NULL)
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int sll_remove_front(SinglyLinkedList *list, free_func remove);
+int sll_remove_front(SinglyLinkedList *list, data_free_func remove);
 
 /**
  * Remove the last node in the list.
@@ -260,7 +260,7 @@ int sll_remove_front(SinglyLinkedList *list, free_func remove);
  * @param remove Function to free user data (can be NULL)
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int sll_remove_back(SinglyLinkedList *list, free_func remove);
+int sll_remove_back(SinglyLinkedList *list, data_free_func remove);
 
 //==============================================================================
 // List manipulation functions
@@ -325,7 +325,7 @@ SinglyLinkedList *sll_filter(const SinglyLinkedList *list, pred_func pred);
  * @param new_data_free Function to free the data created by `transform` (used for cleanup on failure).
  * @return A new list with transformed elements, or NULL on error
  */
-SinglyLinkedList *sll_transform(const SinglyLinkedList *list, transform_func transform, free_func new_data_free);
+SinglyLinkedList *sll_transform(const SinglyLinkedList *list, transform_func transform, data_free_func new_data_free);
 
 /**
  * Apply an action function to each element in the list.
@@ -355,7 +355,7 @@ SinglyLinkedList *sll_copy(const SinglyLinkedList *list);
  * @param copied_data_free Function to free the data created by `copy_data` (used for cleanup on failure).
  * @return A new list with copies of all data, or NULL on error
  */
-SinglyLinkedList *sll_copy_deep(const SinglyLinkedList *list, copy_func copy_data, free_func copied_data_free);
+SinglyLinkedList *sll_copy_deep(const SinglyLinkedList *list, copy_func copy_data, data_free_func copied_data_free);
 
 //==============================================================================
 // Iterator functions
@@ -377,7 +377,7 @@ Iterator sll_iterator(const SinglyLinkedList *list);
  * @param copied_data_free If `copy` is provided, this function is used to free copied data on failure. If NULL, `free` is assumed.
  * @return A new list with elements from iterator, or NULL on error
  */
-SinglyLinkedList *sll_from_iterator(Iterator *it, copy_func copy, free_func copied_data_free);
+SinglyLinkedList *sll_from_iterator(Iterator *it, copy_func copy, data_free_func copied_data_free);
 
 /**
  * Create a new list from an iterator with custom allocator.
@@ -389,6 +389,6 @@ SinglyLinkedList *sll_from_iterator(Iterator *it, copy_func copy, free_func copi
  * @param dealloc Custom deallocation function (if NULL, uses free)
  * @return A new list with elements from iterator, or NULL on error
  */
-SinglyLinkedList *sll_from_iterator_custom(Iterator *it, copy_func copy, free_func copied_data_free, alloc_func alloc, dealloc_func dealloc);
+SinglyLinkedList *sll_from_iterator_custom(Iterator *it, copy_func copy, data_free_func copied_data_free, alloc_func alloc, dealloc_func dealloc);
 
 #endif //DS_SINGLYLINKEDLIST_H

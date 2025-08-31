@@ -9,7 +9,8 @@
 #define DS_DOUBLYLINKEDLIST_H
 
 #include <stddef.h>
-
+#include "Alloc.h"
+#include "CStandardCompatibility.h"
 #include "Iterator.h"
 
 //==============================================================================
@@ -27,57 +28,12 @@ typedef struct DoublyLinkedNode
 // Doubly linked list structure with custom allocator support
 typedef struct DoublyLinkedList
 {
-    DoublyLinkedNode *head;          // Pointer to first node
-    DoublyLinkedNode *tail;          // Pointer to last node
-    size_t size;              // Number of nodes in list
+    DoublyLinkedNode *head;         // Pointer to first node
+    DoublyLinkedNode *tail;         // Pointer to last node
+    size_t size;                    // Number of nodes in list
 
-    void * (*alloc)(size_t);  // Custom allocation function
-    void (*dealloc)(void *);  // Custom deallocation function
+    Alloc *alloc;
 } DoublyLinkedList;
-
-//==============================================================================
-// Function pointer types
-//==============================================================================
-
-/**
- * Memory allocation function compatible with malloc.
- * Used for custom allocation of nodes and list structures.
- *
- * @param size Number of bytes to allocate
- * @return Pointer to allocated memory, or NULL on failure
- */
-typedef void * (*alloc_func)(size_t size);
-
-/**
- * Memory deallocation function compatible with free.
- * Used for custom deallocation of nodes and list structures.
- *
- * @param ptr Pointer to memory to be freed
- */
-typedef void (*dealloc_func)(void *ptr);
-
-/**
- * Function to free user data stored in the list.
- * Used when destroying or removing nodes.
- *
- * @param ptr Pointer to user data to be freed
- */
-typedef void (*free_func)(void *ptr);
-
-/**
- * Comparison function for list elements.
- * Should return:
- *   <0 if a < b,
- *    0 if a == b,
- *   >0 if a > b.
- *
- * Used for searching, sorting, and equality checks.
- *
- * @param a Pointer to first element
- * @param b Pointer to second element
- * @return Integer indicating comparison result
- */
-typedef int (*cmp_func)(const void *a, const void *b);
 
 /**
  * Predicate function for filtering elements.
@@ -105,50 +61,32 @@ typedef void *(*transform_func)(const void *data);
  */
 typedef void (*action_func)(void *data);
 
-/**
- * Copy function for deep copying element data.
- * Should return a pointer to a newly allocated copy of the data.
- *
- * @param data Pointer to original element data
- * @return Pointer to copied data (must be freed by caller)
- */
-typedef void *(*copy_func)(const void *data);
-
 //==============================================================================
 // Creation and destruction functions
 //==============================================================================
 
 /**
- * Create a new, empty doubly linked list using malloc/free.
- *
- * @return Pointer to new DoublyLinkedList, or NULL on allocation failure.
- */
-DoublyLinkedList *dll_create(void);
-
-/**
  * Create a new, empty doubly linked list with custom allocator.
  *
- * @param alloc Custom allocation function (if NULL, uses malloc)
- * @param dealloc Custom deallocation function (if NULL, uses free)
  * @return Pointer to new DoublyLinkedList, or NULL on failure.
  */
-DoublyLinkedList *dll_create_custom(alloc_func alloc, dealloc_func dealloc);
+DoublyLinkedList *dll_create(Alloc *alloc);
 
 /**
  * Destroy the list and free all nodes.
  *
  * @param list The list to destroy
- * @param data_free Function to free user data (can be NULL if data shouldn't be freed)
+ * @param should_free_data
  */
-void dll_destroy(DoublyLinkedList *list, free_func data_free);
+void dll_destroy(DoublyLinkedList *list, bool should_free_data);
 
 /**
  * Clear all nodes from the list, but keep the list structure intact.
  *
  * @param list The list to clear
- * @param data_free Function to free user data (can be NULL if data shouldn't be freed)
+ * @param should_free_data
  */
-void dll_clear(DoublyLinkedList *list, free_func data_free);
+void dll_clear(DoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // Information functions
@@ -232,38 +170,38 @@ int dll_insert_at(DoublyLinkedList *list, size_t pos, void *data);
  * @param list The list to modify
  * @param data The data to match for removal
  * @param compare Function to compare elements
- * @param remove Function to free user data (can be NULL)
+ * @param should_free_data
  * @return 0 on success, -1 if not found or on error
  */
-int dll_remove(DoublyLinkedList *list, const void *data, cmp_func compare, free_func remove);
+int dll_remove(DoublyLinkedList *list, const void *data, cmp_func compare, bool should_free_data);
 
 /**
  * Remove node at a specific position.
  *
  * @param list The list to modify
  * @param pos Zero-based index of node to remove
- * @param remove Function to free user data (can be NULL)
+ * @param should_free_data
  * @return 0 on success, -1 on error (e.g., invalid position)
  */
-int dll_remove_at(DoublyLinkedList *list, size_t pos, free_func remove);
+int dll_remove_at(DoublyLinkedList *list, size_t pos, bool should_free_data);
 
 /**
  * Remove the first node in the list.
  *
  * @param list The list to modify
- * @param remove Function to free user data (can be NULL)
+ * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int dll_remove_front(DoublyLinkedList *list, free_func remove);
+int dll_remove_front(DoublyLinkedList *list, bool should_free_data);
 
 /**
  * Remove the last node in the list.
  *
  * @param list The list to modify
- * @param remove Function to free user data (can be NULL)
+ * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int dll_remove_back(DoublyLinkedList *list, free_func remove);
+int dll_remove_back(DoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // List manipulation functions
@@ -325,10 +263,10 @@ DoublyLinkedList *dll_filter(const DoublyLinkedList *list, pred_func pred);
  *
  * @param list The source list
  * @param transform Function that returns a new element based on the original
- * @param new_data_free
+ * @param should_free_data
  * @return A new list with transformed elements, or NULL on error
  */
-DoublyLinkedList *dll_transform(const DoublyLinkedList *list, transform_func transform, free_func new_data_free);
+DoublyLinkedList *dll_transform(const DoublyLinkedList *list, transform_func transform, bool should_free_data);
 
 /**
  * Apply an action function to each element in the list.
@@ -354,11 +292,10 @@ DoublyLinkedList *dll_copy(const DoublyLinkedList *list);
  * Create a deep copy of the list (cloning data using the provided function).
  *
  * @param list The list to copy
- * @param copy_data Function to create copies of the data (required)
- * @param copied_data_free
+ * @param should_free_data
  * @return A new list with copies of all data, or NULL on error
  */
-DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, copy_func copy_data, free_func copied_data_free);
+DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // Iterator functions
@@ -381,26 +318,13 @@ Iterator dll_iterator(const DoublyLinkedList *list);
 Iterator dll_iterator_reverse(const DoublyLinkedList *list);
 
 /**
- * Create a new list from an iterator.
- *
- * @param it The source iterator (must be valid)
- * @param copy Optional function to copy data (if NULL, uses original pointers)
- * @param copied_data_free Function to free copied data (can be NULL)
- * @return A new list with elements from iterator, or NULL on error
- */
-DoublyLinkedList *dll_from_iterator(Iterator *it, copy_func copy, free_func copied_data_free);
-
-/**
  * Create a new list from an iterator with custom allocator.
  *
  * @param it The source iterator (must be valid)
- * @param copy Optional function to copy data (if NULL, uses original pointers)
- * @param copied_data_free Function to free copied data (can be NULL)
- * @param alloc Custom allocation function (if NULL, uses malloc)
- * @param dealloc Custom deallocation function (if NULL, uses free)
+ * @param alloc The custom allocator to use
  * @return A new list with elements from iterator, or NULL on error
  */
-DoublyLinkedList *dll_from_iterator_custom(Iterator *it, copy_func copy, free_func copied_data_free, alloc_func alloc, dealloc_func dealloc);
+DoublyLinkedList *dll_from_iterator(Iterator *it, Alloc *alloc);
 
 
 #endif //DS_DOUBLYLINKEDLIST_H

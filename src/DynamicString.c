@@ -7,9 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "CStandardCompatibility.h"
 
-#define SAFE_FREE(ptr) do { if (ptr) { free(ptr); ptr = NULL; } } while(0)
+#define SAFE_FREE(ptr) do { if ((ptr)) { free((ptr)); (ptr) = NULL; } } while(0)
 #define GROW_CAPACITY(cap) ((cap) + ((cap) >> 1))
 
 #define STR_DATA(str) ((str)->capacity == STR_MIN_INIT_CAP ? (str)->small_data : (str)->data)

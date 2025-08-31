@@ -136,14 +136,14 @@ clang-tidy src/*.c --
 
 ## Performance Characteristics
 
-| Operation | Singly Linked List | Doubly Linked List | Dynamic String |
-|-----------|-------------------|-------------------|----------------|
-| Insert Front | O(1) | O(1) | O(n) |
-| Insert Back | O(n) | O(1) | O(1) amortized |
-| Remove Front | O(1) | O(1) | O(n) |
-| Remove Back | O(n) | O(1) | O(1) |
-| Search | O(n) | O(n) | O(n) |
-| Sort | O(n log n) | O(n log n) | O(n log n) |
+| Operation    | Singly Linked List | Doubly Linked List | Dynamic String |
+|--------------|--------------------|--------------------|----------------|
+| Insert Front | O(1)               | O(1)               | O(n)           |
+| Insert Back  | O(n)               | O(1)               | O(1) amortized |
+| Remove Front | O(1)               | O(1)               | O(n)           |
+| Remove Back  | O(n)               | O(1)               | O(1)           |
+| Search       | O(n)               | O(n)               | O(n)           |
+| Sort         | O(n log n)         | O(n log n)         | O(n log n)     |
 
 ## Planned Features
 

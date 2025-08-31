@@ -10,7 +10,8 @@
 
 // Test filter iterator functionality
 static int test_filter_iterator(void) {
-    DoublyLinkedList* list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList* list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements 1-10
@@ -44,14 +45,16 @@ static int test_filter_iterator(void) {
     if (filter_it.destroy) {
         filter_it.destroy(&filter_it);
     }
-    dll_destroy(list, free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
 
 // Test filter iterator with no matches
 static int test_filter_no_matches(void) {
-    DoublyLinkedList* list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList* list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert odd numbers only
@@ -75,7 +78,8 @@ static int test_filter_no_matches(void) {
     if (filter_it.destroy) {
         filter_it.destroy(&filter_it);
     }
-    dll_destroy(list, free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }

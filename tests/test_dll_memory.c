@@ -11,17 +11,20 @@
 #include <time.h>
 
 int test_custom_allocator(void) {
-    DoublyLinkedList *list = dll_create_custom(test_calloc, test_dealloc);
+    Alloc *alloc = create_failing_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     ASSERT_NOT_NULL(list);
     int *a = malloc(sizeof(int)); *a = 42;
     ASSERT_EQ(dll_insert_back(list, a), 0);
     ASSERT_EQ(list->size, 1);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++) {
@@ -32,7 +35,7 @@ int test_clear(void) {
     ASSERT_EQ(list->size, 5);
 
     // Clear the list
-    dll_clear(list, int_free);
+    dll_clear(list, true);
 
     // Verify list state
     ASSERT_NULL(list->head);
@@ -46,99 +49,35 @@ int test_clear(void) {
     ASSERT_EQ(dll_insert_back(list, val), 0);
     ASSERT_EQ(list->size, 1);
 
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear_empty(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Clear an already empty list
-    dll_clear(list, int_free);
+    dll_clear(list, true);
     ASSERT_NULL(list->head);
     ASSERT_NULL(list->tail);
     ASSERT_EQ(list->size, 0);
 
-    dll_destroy(list, NULL);
+    dll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear_null(void) {
     // Calling clear on NULL shouldn't crash
-    dll_clear(NULL, int_free);
-    return TEST_SUCCESS;
-}
-
-int test_stress(void) {
-    DoublyLinkedList *list = dll_create();
-    const int NUM_ELEMENTS = 10000;
-
-    // Add many elements
-    for (int i = 0; i < NUM_ELEMENTS; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
-        ASSERT_EQ(dll_insert_back(list, val), 0);
-    }
-    ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS);
-
-    // Find an element in the middle
-    int key = NUM_ELEMENTS / 2;
-    const DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
-    ASSERT_NOT_NULL(found);
-    ASSERT_EQ(*(int*)found->data, key);
-
-    // Remove elements from the front
-    for (int i = 0; i < NUM_ELEMENTS / 2; i++) {
-        ASSERT_EQ(dll_remove_front(list, int_free), 0);
-    }
-    ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS / 2);
-
-    // The first element should now be NUM_ELEMENTS/2
-    key = NUM_ELEMENTS / 2;
-    ASSERT_EQ(*(int*)list->head->data, key);
-
-    dll_destroy(list, int_free);
-    return TEST_SUCCESS;
-}
-
-int test_performance(void) {
-    const int SIZES[] = {100, 1000, 10000};
-    const size_t NUM_SIZES = sizeof(SIZES)/sizeof(SIZES[0]);
-
-    printf("\nDLL Performance tests:\n");
-    for (size_t s = 0; s < NUM_SIZES; s++) {
-        const int SIZE = SIZES[s];
-        DoublyLinkedList *list = dll_create();
-
-        // Measure insertion time
-        clock_t start = clock();
-        for (int i = 0; i < SIZE; i++) {
-            int *val = malloc(sizeof(int));
-            *val = i;
-            dll_insert_back(list, val);
-        }
-        clock_t end = clock();
-        printf("Insert %d elements: %.6f seconds\n", SIZE,
-               (double)(end - start) / CLOCKS_PER_SEC);
-
-        // Measure search time for last element
-        start = clock();
-        int key = SIZE - 1;
-        const DoublyLinkedNode *found = dll_find(list, &key, int_cmp);
-        end = clock();
-        printf("Find last element in %d elements: %.6f seconds\n", SIZE,
-               (double)(end - start) / CLOCKS_PER_SEC);
-        ASSERT_NOT_NULL(found);
-
-        // Cleanup
-        dll_destroy(list, int_free);
-    }
-
+    dll_clear(NULL, true);
     return TEST_SUCCESS;
 }
 
 int test_copy_shallow(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++) {
@@ -189,14 +128,16 @@ int test_copy_shallow(void) {
     ASSERT_EQ(*(int*)copy->head->data, 999);
 
     // Cleanup - free each int only once since they're shared
-    dll_destroy(list, int_free);
-    dll_destroy(copy, NULL);
+    dll_destroy(list, true);
+    dll_destroy(copy, false);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
 
 int test_copy_deep(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++) {
@@ -206,7 +147,7 @@ int test_copy_deep(void) {
     }
 
     // Create deep clone
-    DoublyLinkedList *copy = dll_copy_deep(list, int_copy, free);
+    DoublyLinkedList *copy = dll_copy_deep(list, true);
     ASSERT_NOT_NULL(copy);
     ASSERT_EQ(copy->size, list->size);
 
@@ -244,14 +185,16 @@ int test_copy_deep(void) {
     ASSERT_NOT_EQ(*(int*)copy->head->data, 999);
 
     // Cleanup - each list has its own data
-    dll_destroy(list, int_free);
-    dll_destroy(copy, int_free);
+    dll_destroy(list, true);
+    dll_destroy(copy, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
 
 int test_copy_complex_data(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Add some people
     Person *p1 = create_person("Alice", 30);
@@ -263,8 +206,12 @@ int test_copy_complex_data(void) {
     dll_insert_back(list, p3);
     ASSERT_EQ(list->size, 3);
 
+    // Ensure the allocator knows how to copy/free Person objects for deep copy
+    list->alloc->copy_func = person_copy;
+    list->alloc->data_free_func = person_free;
+
     // Create deep clone
-    DoublyLinkedList *copy = dll_copy_deep(list, person_copy, person_free);
+    DoublyLinkedList *copy = dll_copy_deep(list, true);
     ASSERT_NOT_NULL(copy);
     ASSERT_EQ(copy->size, list->size);
 
@@ -292,14 +239,16 @@ int test_copy_complex_data(void) {
     ASSERT_NOT_EQ(first_person->age, copy_first->age);
 
     // Cleanup
-    dll_destroy(list, person_free);
-    dll_destroy(copy, person_free);
+    dll_destroy(list, true);
+    dll_destroy(copy, true);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
 
 int test_copy_empty(void) {
-    DoublyLinkedList *list = dll_create();
+    Alloc *alloc = create_std_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
 
     // Clone empty list
     DoublyLinkedList *shallow_copy = dll_copy(list);
@@ -308,16 +257,17 @@ int test_copy_empty(void) {
     ASSERT_NULL(shallow_copy->head);
     ASSERT_NULL(shallow_copy->tail);
 
-    DoublyLinkedList *deep_copy = dll_copy_deep(list, int_copy, free);
+    DoublyLinkedList *deep_copy = dll_copy_deep(list, true);
     ASSERT_NOT_NULL(deep_copy);
     ASSERT_EQ(deep_copy->size, 0);
     ASSERT_NULL(deep_copy->head);
     ASSERT_NULL(deep_copy->tail);
 
     // Cleanup
-    dll_destroy(list, NULL);
-    dll_destroy(shallow_copy, NULL);
-    dll_destroy(deep_copy, NULL);
+    dll_destroy(list, false);
+    dll_destroy(shallow_copy, false);
+    dll_destroy(deep_copy, false);
+    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
@@ -325,19 +275,15 @@ int test_copy_empty(void) {
 int test_copy_null(void) {
     // Should handle NULL gracefully
     ASSERT_NULL(dll_copy(NULL));
-    ASSERT_NULL(dll_copy_deep(NULL, int_copy, free));
-
-    // Should require a valid copy function
-    DoublyLinkedList *list = dll_create();
-    ASSERT_NULL(dll_copy_deep(list, NULL, free));
-    dll_destroy(list, NULL);
+    ASSERT_NULL(dll_copy_deep(NULL, true));
 
     return TEST_SUCCESS;
 }
 
 int test_insert_allocation_failure(void) {
     set_alloc_fail_countdown(-1);
-    DoublyLinkedList *list = dll_create_custom(failing_alloc, failing_free);
+    Alloc *alloc = create_failing_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     int *a = malloc(sizeof(int)); *a = 1;
     dll_insert_back(list, a);
     ASSERT_EQ(list->size, 1);
@@ -354,14 +300,16 @@ int test_insert_allocation_failure(void) {
     ASSERT_NULL(list->head->next);
 
     set_alloc_fail_countdown(-1);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     free(b); // 'b' was never added to the list, so we must free it manually
     return TEST_SUCCESS;
 }
 
 int test_copy_deep_allocation_failure(void) {
     set_alloc_fail_countdown(-1);
-    DoublyLinkedList *list = dll_create_custom(failing_alloc, failing_free);
+    Alloc *alloc = create_failing_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     for (int i = 0; i < 5; i++) {
         int *val = malloc(sizeof(int)); *val = i;
         dll_insert_back(list, val);
@@ -369,27 +317,34 @@ int test_copy_deep_allocation_failure(void) {
 
     // Case 1: Fail allocating the new list struct itself
     set_alloc_fail_countdown(0);
-    DoublyLinkedList *clone1 = dll_copy_deep(list, failing_int_copy, failing_free);
+    // Install the copy function on the allocator used by list so dll_copy_deep can use it
+    list->alloc->copy_func = failing_int_copy;
+    list->alloc->data_free_func = failing_free;
+    DoublyLinkedList *clone1 = dll_copy_deep(list, true);
     ASSERT_NULL(clone1);
 
     // Case 2: Fail allocating the data partway through
     set_alloc_fail_countdown(3); // 1=clone list, 2=data0, 3=node0, FAIL on data1
-    DoublyLinkedList *clone2 = dll_copy_deep(list, failing_int_copy, failing_free);
+    DoublyLinkedList *clone2 = dll_copy_deep(list, true);
     ASSERT_NULL(clone2);
 
     // Case 3: Fail allocating a node partway through
     set_alloc_fail_countdown(2); // 1=clone list, 2=data0, FAIL on node0
-    DoublyLinkedList *clone3 = dll_copy_deep(list, failing_int_copy, failing_free);
+    DoublyLinkedList *clone3 = dll_copy_deep(list, true);
     ASSERT_NULL(clone3);
 
     set_alloc_fail_countdown(-1); // Reset for cleanup
-    dll_destroy(list, int_free);
+    // clear copy_func to avoid unexpected behavior in destroy
+    list->alloc->copy_func = NULL;
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_transform_allocation_failure(void) {
     set_alloc_fail_countdown(-1);
-    DoublyLinkedList *list = dll_create_custom(failing_alloc, failing_free);
+    Alloc *alloc = create_failing_allocator();
+    DoublyLinkedList *list = dll_create(alloc);
     for (int i = 0; i < 5; i++) {
         int *val = malloc(sizeof(int)); *val = i;
         dll_insert_back(list, val);
@@ -397,27 +352,29 @@ int test_transform_allocation_failure(void) {
 
     // Case 1: Fail on creation of the result list
     set_alloc_fail_countdown(0);
-    DoublyLinkedList *mapped1 = dll_transform(list, double_value_failing, failing_free);
+    DoublyLinkedList *mapped1 = dll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped1);
 
     // Case 2: Fail on data allocation inside the transform function
     set_alloc_fail_countdown(1); // 1=result list, FAIL on data for first element
-    DoublyLinkedList *mapped2 = dll_transform(list, double_value_failing, failing_free);
+    DoublyLinkedList *mapped2 = dll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped2);
 
     // Case 3: Fail on node allocation inside dll_insert_back
     set_alloc_fail_countdown(2); // 1=result list, 2=data for first element, FAIL on 3=node
-    DoublyLinkedList *mapped3 = dll_transform(list, double_value_failing, failing_free);
+    DoublyLinkedList *mapped3 = dll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped3);
 
     set_alloc_fail_countdown(-1);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator_custom_alloc_failure(void) {
     set_alloc_fail_countdown(-1);
-    DoublyLinkedList *list = dll_create_custom(failing_alloc, failing_free);
+    Alloc *src_alloc = create_failing_allocator();
+    DoublyLinkedList *list = dll_create(src_alloc);
     for (int i = 0; i < 5; i++) {
         int *val = malloc(sizeof(int)); *val = i;
         dll_insert_back(list, val);
@@ -426,23 +383,28 @@ int test_from_iterator_custom_alloc_failure(void) {
 
     // Case 1: Fail on list creation
     set_alloc_fail_countdown(0);
-    DoublyLinkedList *new_list1 = dll_from_iterator_custom(&it, failing_int_copy, failing_free, failing_alloc, failing_free);
+    Alloc *alloc_for_new = create_failing_allocator();
+    alloc_for_new->copy_func = failing_int_copy;
+    alloc_for_new->data_free_func = failing_free;
+    DoublyLinkedList *new_list1 = dll_from_iterator(&it, alloc_for_new);
     ASSERT_NULL(new_list1);
     it.reset(&it);
 
     // Case 2: Fail on data copy
     set_alloc_fail_countdown(1); // 1=new list, FAIL on data copy
-    DoublyLinkedList *new_list2 = dll_from_iterator_custom(&it, failing_int_copy, failing_free, failing_alloc, failing_free);
+    DoublyLinkedList *new_list2 = dll_from_iterator(&it, alloc_for_new);
     ASSERT_NULL(new_list2);
     it.reset(&it);
 
     // Case 3: Fail on node insertion
     set_alloc_fail_countdown(2); // 1=new list, 2=data copy, FAIL on node insert
-    DoublyLinkedList *new_list3 = dll_from_iterator_custom(&it, failing_int_copy, failing_free, failing_alloc, failing_free);
+    DoublyLinkedList *new_list3 = dll_from_iterator(&it, alloc_for_new);
     ASSERT_NULL(new_list3);
 
     it.destroy(&it);
-    dll_destroy(list, int_free);
+    dll_destroy(list, true);
+    destroy_allocator(src_alloc);
+    destroy_allocator(alloc_for_new);
     return TEST_SUCCESS;
 }
 
@@ -455,9 +417,7 @@ TestCase tests[] = {
     {test_custom_allocator, "test_custom_allocator"},
     {test_clear, "test_clear"},
     {test_clear_empty, "test_clear_empty"},
-    {test_clear_null, "test_clear_null"},
-    {test_stress, "test_stress"},
-    {test_performance, "test_performance"},
+    {test_clear_null, "test_clear_null"},    
     {test_copy_shallow, "test_copy_shallow"},
     {test_copy_deep, "test_copy_deep"},
     {test_copy_complex_data, "test_copy_complex_data"},
