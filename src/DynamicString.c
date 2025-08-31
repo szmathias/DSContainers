@@ -18,17 +18,11 @@
 // Helper function to allocate zeroed memory
 static char *mem_calloc(const size_t num_elements)
 {
-    void *result = calloc(num_elements, sizeof(char));
-    if (!result)
-    {
-        fprintf(stderr, "Error: Unable to allocate memory\n");
-        exit(EXIT_FAILURE);
-    }
-    return result;
+    return calloc(num_elements, sizeof(char));
 }
 
 // Centralized buffer management helper
-static void str_realloc(String *str, const size_t new_capacity)
+static bool str_realloc(String *str, const size_t new_capacity)
 {
     const char *old_data = STR_DATA(str);
     const size_t copy_size = str->size;
@@ -36,6 +30,10 @@ static void str_realloc(String *str, const size_t new_capacity)
     if (new_capacity <= STR_MIN_INIT_CAP)
     {
         char *temp = calloc(copy_size + 1, sizeof(char));
+        if (!temp && copy_size > 0) {
+            return false; // Failed to allocate temporary buffer
+        }
+        
         memcpy(temp, old_data, copy_size);
         SAFE_FREE(str->data);
 
@@ -48,6 +46,10 @@ static void str_realloc(String *str, const size_t new_capacity)
     else
     {
         char *new_data = mem_calloc(new_capacity);
+        if (!new_data) {
+            return false; // Failed to allocate new buffer
+        }
+        
         memcpy(new_data, old_data, copy_size);
         if (str->capacity > STR_MIN_INIT_CAP && str->data)
         {
@@ -57,14 +59,15 @@ static void str_realloc(String *str, const size_t new_capacity)
         str->data = new_data;
         str->capacity = new_capacity;
     }
+    return true;
 }
 
 // Helper function to ensure enough capacity for data
 static bool str_ensure_capacity(String *str, const size_t required_capacity)
 {
-    if (required_capacity < str->capacity)
+    if (required_capacity <= str->capacity)
     {
-        return false;
+        return true; // Already have enough capacity
     }
 
     size_t new_capacity = GROW_CAPACITY(str->capacity);
@@ -73,8 +76,7 @@ static bool str_ensure_capacity(String *str, const size_t required_capacity)
         new_capacity = required_capacity;
     }
 
-    str_realloc(str, new_capacity);
-    return true;
+    return str_realloc(str, new_capacity);
 }
 
 String str_create_empty(const size_t initial_capacity)
@@ -89,6 +91,11 @@ String str_create_empty(const size_t initial_capacity)
     if (capacity > STR_MIN_INIT_CAP)
     {
         result.data = mem_calloc(capacity);
+        if (!result.data) {
+            // Fallback to small buffer on allocation failure
+            result.capacity = STR_MIN_INIT_CAP;
+            ZERO_MEM(result.small_data, STR_MIN_INIT_CAP);
+        }
     }
     else
     {
@@ -416,9 +423,8 @@ bool str_reserve(String *str, const size_t new_capacity)
     {
         return false;
     }
-    str_realloc(str, new_capacity);
-
-    return true;
+    
+    return str_realloc(str, new_capacity);
 }
 
 bool str_shrink_to_fit(String *str)
