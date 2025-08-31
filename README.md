@@ -1,4 +1,4 @@
-# Data Structures Library (ds)
+# Data Structures Library
 
 A comprehensive C library implementing essential data structures with a focus on memory safety, performance, and usability.
 
