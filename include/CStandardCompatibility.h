@@ -2,8 +2,8 @@
 // Created by zack on 8/27/25.
 //
 
-#ifndef DS_CSTANDARDCOMPATIBILITY_H
-#define DS_CSTANDARDCOMPATIBILITY_H
+#ifndef DSC_CSTANDARDCOMPATIBILITY_H
+#define DSC_CSTANDARDCOMPATIBILITY_H
 
 #include "PlatformDefs.h"
 
@@ -30,25 +30,25 @@ extern "C" {
     
 /* Attribute compatibility macros */
 #ifdef COMPAT_HAS_C23
-    #define DS_NODISCARD [[nodiscard]]
-    #define DS_DEPRECATED [[deprecated]]
-    #define DS_NORETURN [[noreturn]]
+    #define DSC_NODISCARD [[nodiscard]]
+    #define DSC_DEPRECATED [[deprecated]]
+    #define DSC_NORETURN [[noreturn]]
 #elif defined(__GNUC__) || defined(__clang__)
-    #define DS_NODISCARD __attribute__((warn_unused_result))
-    #define DS_DEPRECATED __attribute__((deprecated))
-    #define DS_NORETURN __attribute__((noreturn))
+    #define DSC_NODISCARD __attribute__((warn_unused_result))
+    #define DSC_DEPRECATED __attribute__((deprecated))
+    #define DSC_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
-    #define DS_NODISCARD _Check_return_
-    #define DS_DEPRECATED __declspec(deprecated)
-    #define DS_NORETURN __declspec(noreturn)
+    #define DSC_NODISCARD _Check_return_
+    #define DSC_DEPRECATED __declspec(deprecated)
+    #define DSC_NORETURN __declspec(noreturn)
 #else
-    #define DS_NODISCARD
-    #define DS_DEPRECATED
-    #define DS_NORETURN
+    #define DSC_NODISCARD
+    #define DSC_DEPRECATED
+    #define DSC_NORETURN
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* DS_CSTANDARDCOMPATIBILITY_H */
+#endif /* DSC_CSTANDARDCOMPATIBILITY_H */

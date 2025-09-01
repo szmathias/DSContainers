@@ -11,364 +11,364 @@
 
 // Tests from test_sll.c that fit into CRUD category
 int test_create_destroy(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(list->size, 0);
-    sll_destroy(list, NULL);
+    dsc_sll_destroy(list, NULL);
     return TEST_SUCCESS;
 }
 
 int test_insert_front_back_find(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
-    ASSERT_EQ(sll_insert_front(list, a), 0);
-    ASSERT_EQ(sll_insert_back(list, b), 0);
-    ASSERT_EQ(sll_insert_back(list, c), 0);
+    ASSERT_EQ(dsc_sll_insert_front(list, a), 0);
+    ASSERT_EQ(dsc_sll_insert_back(list, b), 0);
+    ASSERT_EQ(dsc_sll_insert_back(list, c), 0);
     ASSERT_EQ(list->size, 3);
 
     const int key = 2;
-    const SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    const DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
-    sll_insert_back(list, a);
-    sll_insert_back(list, b);
-    sll_insert_back(list, c);
+    dsc_sll_insert_back(list, a);
+    dsc_sll_insert_back(list, b);
+    dsc_sll_insert_back(list, c);
 
     const int key = 2;
-    ASSERT_EQ(sll_remove(list, &key, int_cmp, int_free), 0);
+    ASSERT_EQ(dsc_sll_remove(list, &key, int_cmp, int_free), 0);
     ASSERT_EQ(list->size, 2);
-    SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_not_found(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
-    sll_insert_back(list, a);
+    dsc_sll_insert_back(list, a);
 
     const int key = 99;
-    ASSERT_EQ(sll_remove(list, &key, int_cmp, int_free), -1);
+    ASSERT_EQ(dsc_sll_remove(list, &key, int_cmp, int_free), -1);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_NULL_handling(void){
-    ASSERT_EQ(sll_insert_back(NULL, NULL), -1);
-    ASSERT_EQ(sll_insert_front(NULL, NULL), -1);
-    ASSERT_EQ_PTR(sll_find(NULL, NULL, NULL), NULL);
-    ASSERT_EQ(sll_remove(NULL, NULL, NULL, NULL), -1);
-    sll_destroy(NULL, NULL); // Should not crash
+    ASSERT_EQ(dsc_sll_insert_back(NULL, NULL), -1);
+    ASSERT_EQ(dsc_sll_insert_front(NULL, NULL), -1);
+    ASSERT_EQ_PTR(dsc_sll_find(NULL, NULL, NULL), NULL);
+    ASSERT_EQ(dsc_sll_remove(NULL, NULL, NULL, NULL), -1);
+    dsc_sll_destroy(NULL, NULL); // Should not crash
     return TEST_SUCCESS;
 }
 
 int test_insert_at(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
-    ASSERT_EQ(sll_insert_back(list, a), 0); // [1]
-    ASSERT_EQ(sll_insert_back(list, c), 0); // [1,3]
-    ASSERT_EQ(sll_insert_at(list, 1, b), 0); // [1,2,3]
+    ASSERT_EQ(dsc_sll_insert_back(list, a), 0); // [1]
+    ASSERT_EQ(dsc_sll_insert_back(list, c), 0); // [1,3]
+    ASSERT_EQ(dsc_sll_insert_at(list, 1, b), 0); // [1,2,3]
     ASSERT_EQ(list->size, 3);
 
     const int key = 2;
-    const SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    const DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
-    sll_insert_back(list, a); // [10]
-    sll_insert_back(list, b); // [10,20]
-    sll_insert_back(list, c); // [10,20,30]
+    dsc_sll_insert_back(list, a); // [10]
+    dsc_sll_insert_back(list, b); // [10,20]
+    dsc_sll_insert_back(list, c); // [10,20,30]
 
-    ASSERT_EQ(sll_remove_at(list, 1, int_free), 0); // remove 20
+    ASSERT_EQ(dsc_sll_remove_at(list, 1, int_free), 0); // remove 20
     ASSERT_EQ(list->size, 2);
 
     const int key = 20;
-    SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_head(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 100;
     int *b = malloc(sizeof(int)); *b = 200;
-    sll_insert_back(list, a); // [100]
-    sll_insert_back(list, b); // [100,200]
+    dsc_sll_insert_back(list, a); // [100]
+    dsc_sll_insert_back(list, b); // [100,200]
 
-    ASSERT_EQ(sll_remove_at(list, 0, int_free), 0); // remove head (100)
+    ASSERT_EQ(dsc_sll_remove_at(list, 0, int_free), 0); // remove head (100)
     ASSERT_EQ(list->size, 1);
 
     const int key = 100;
-    SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_last(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
     int *b = malloc(sizeof(int)); *b = 2;
     int *c = malloc(sizeof(int)); *c = 3;
-    sll_insert_back(list, a); // [1]
-    sll_insert_back(list, b); // [1,2]
-    sll_insert_back(list, c); // [1,2,3]
+    dsc_sll_insert_back(list, a); // [1]
+    dsc_sll_insert_back(list, b); // [1,2]
+    dsc_sll_insert_back(list, c); // [1,2,3]
 
-    ASSERT_EQ(sll_remove_at(list, 2, int_free), 0); // remove last (3)
+    ASSERT_EQ(dsc_sll_remove_at(list, 2, int_free), 0); // remove last (3)
     ASSERT_EQ(list->size, 2);
 
     const int key = 3;
-    SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_invalid(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
-    sll_insert_back(list, a); // [1]
+    dsc_sll_insert_back(list, a); // [1]
 
-    ASSERT_EQ(sll_remove_at(list, 5, int_free), -1); // invalid position
-    ASSERT_EQ(sll_remove_at(list, (size_t)-1, int_free), -1); // negative as size_t (very large)
+    ASSERT_EQ(dsc_sll_remove_at(list, 5, int_free), -1); // invalid position
+    ASSERT_EQ(dsc_sll_remove_at(list, (size_t)-1, int_free), -1); // negative as size_t (very large)
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_empty(void){
-    SinglyLinkedList *list = sll_create();
-    ASSERT_EQ(sll_remove_at(list, 0, int_free), -1); // nothing to remove
-    sll_destroy(list, int_free);
+    DSCSinglyLinkedList *list = dsc_sll_create();
+    ASSERT_EQ(dsc_sll_remove_at(list, 0, int_free), -1); // nothing to remove
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 123;
-    sll_insert_back(list, a); // [123]
-    ASSERT_EQ(sll_remove_at(list, 0, int_free), 0); // remove only element
+    dsc_sll_insert_back(list, a); // [123]
+    ASSERT_EQ(dsc_sll_remove_at(list, 0, int_free), 0); // remove only element
     ASSERT_EQ(list->size, 0);
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element_invalid_pos(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 123;
-    sll_insert_back(list, a); // [123]
-    ASSERT_EQ(sll_remove_at(list, 1, int_free), -1); // invalid position
+    dsc_sll_insert_back(list, a); // [123]
+    ASSERT_EQ(dsc_sll_remove_at(list, 1, int_free), -1); // invalid position
     ASSERT_EQ(list->size, 1);
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_insert_at_out_of_bounds(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 1;
-    ASSERT_EQ(sll_insert_at(list, 2, a), -1); // out of bounds (list size is 0)
-    ASSERT_EQ(sll_insert_at(list, (size_t)-1, a), -1); // very large index
-    sll_destroy(list, int_free);
+    ASSERT_EQ(dsc_sll_insert_at(list, 2, a), -1); // out of bounds (list size is 0)
+    ASSERT_EQ(dsc_sll_insert_at(list, (size_t)-1, a), -1); // very large index
+    dsc_sll_destroy(list, int_free);
     free(a);
     return TEST_SUCCESS;
 }
 
 int test_insert_remove_null_data(void){
-    SinglyLinkedList *list = sll_create();
-    ASSERT_EQ(sll_insert_back(list, NULL), 0); // allow nullptr data
+    DSCSinglyLinkedList *list = dsc_sll_create();
+    ASSERT_EQ(dsc_sll_insert_back(list, NULL), 0); // allow nullptr data
     ASSERT_EQ(list->size, 1);
-    ASSERT_EQ(sll_remove_at(list, 0, NULL), 0); // remove node with nullptr data, no free_func
+    ASSERT_EQ(dsc_sll_remove_at(list, 0, NULL), 0); // remove node with nullptr data, no free_func
     ASSERT_EQ(list->size, 0);
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_mixed_operations_integrity(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
-    sll_insert_back(list, a); // [10]
-    sll_insert_front(list, b); // [20,10]
-    sll_insert_at(list, 1, c); // [20,30,10]
+    dsc_sll_insert_back(list, a); // [10]
+    dsc_sll_insert_front(list, b); // [20,10]
+    dsc_sll_insert_at(list, 1, c); // [20,30,10]
     ASSERT_EQ(list->size, 3);
 
-    ASSERT_EQ(sll_remove_at(list, 1, int_free), 0); // remove 30, [20,10]
+    ASSERT_EQ(dsc_sll_remove_at(list, 1, int_free), 0); // remove 30, [20,10]
     int key = 30;
-    SinglyLinkedNode *found = sll_find(list, &key, int_cmp);
+    DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     key = 20;
-    found = sll_find(list, &key, int_cmp);
+    found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
 
     key = 10;
-    found = sll_find(list, &key, int_cmp);
+    found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_size(void){
-    SinglyLinkedList *list = sll_create();
-    ASSERT_EQ(sll_size(list), 0);
+    DSCSinglyLinkedList *list = dsc_sll_create();
+    ASSERT_EQ(dsc_sll_size(list), 0);
 
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
-    sll_insert_back(list, a);
-    ASSERT_EQ(sll_size(list), 1);
-    sll_insert_back(list, b);
-    ASSERT_EQ(sll_size(list), 2);
+    dsc_sll_insert_back(list, a);
+    ASSERT_EQ(dsc_sll_size(list), 1);
+    dsc_sll_insert_back(list, b);
+    ASSERT_EQ(dsc_sll_size(list), 2);
 
-    sll_remove_at(list, 0, int_free);
-    ASSERT_EQ(sll_size(list), 1);
+    dsc_sll_remove_at(list, 0, int_free);
+    ASSERT_EQ(dsc_sll_size(list), 1);
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
 int test_is_empty(void){
-    SinglyLinkedList *list = sll_create();
-    ASSERT_EQ(sll_is_empty(list), 1); // Empty list
+    DSCSinglyLinkedList *list = dsc_sll_create();
+    ASSERT_EQ(dsc_sll_is_empty(list), 1); // Empty list
 
     int *a = malloc(sizeof(int)); *a = 10;
-    sll_insert_back(list, a);
-    ASSERT_EQ(sll_is_empty(list), 0); // Non-empty list
+    dsc_sll_insert_back(list, a);
+    ASSERT_EQ(dsc_sll_is_empty(list), 0); // Non-empty list
 
-    sll_remove_at(list, 0, int_free);
-    ASSERT_EQ(sll_is_empty(list), 1); // Empty again
+    dsc_sll_remove_at(list, 0, int_free);
+    ASSERT_EQ(dsc_sll_is_empty(list), 1); // Empty again
 
-    ASSERT_EQ(sll_is_empty(NULL), 1); // NULL list should be considered empty
+    ASSERT_EQ(dsc_sll_is_empty(NULL), 1); // NULL list should be considered empty
 
-    sll_destroy(list, NULL);
+    dsc_sll_destroy(list, NULL);
     return TEST_SUCCESS;
 }
 
 int test_complex_data_type(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
 
     Person *p1 = create_person("Alice", 30);
     Person *p2 = create_person("Bob", 25);
     Person *p3 = create_person("Charlie", 40);
 
-    sll_insert_back(list, p1);
-    sll_insert_back(list, p2);
-    sll_insert_back(list, p3);
+    dsc_sll_insert_back(list, p1);
+    dsc_sll_insert_back(list, p2);
+    dsc_sll_insert_back(list, p3);
     ASSERT_EQ(list->size, 3);
 
     Person search_key;
     strcpy(search_key.name, "Bob");
     search_key.age = 0; // Age doesn't matter for comparison
 
-    const SinglyLinkedNode *found = sll_find(list, &search_key, person_cmp);
+    const DSCSinglyLinkedNode *found = dsc_sll_find(list, &search_key, person_cmp);
     ASSERT_NOT_NULL(found);
     const Person *found_person = found->data;
     ASSERT_EQ(found_person->age, 25);
 
     // Clean up
-    sll_destroy(list, person_free);
+    dsc_sll_destroy(list, person_free);
     return TEST_SUCCESS;
 }
 
 int test_remove_all(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
 
     // Add 10 elements
     for (int i = 0; i < 10; i++) {
         int *val = malloc(sizeof(int));
         *val = i;
-        sll_insert_back(list, val);
+        dsc_sll_insert_back(list, val);
     }
     ASSERT_EQ(list->size, 10);
 
     // Remove all elements one by one
-    while (!sll_is_empty(list)) {
-        sll_remove_at(list, 0, int_free);
+    while (!dsc_sll_is_empty(list)) {
+        dsc_sll_remove_at(list, 0, int_free);
     }
 
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
 
-    sll_destroy(list, NULL); // Already freed all data
+    dsc_sll_destroy(list, NULL); // Already freed all data
     return TEST_SUCCESS;
 }
 
 int test_remove_front(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
 
     // Test on empty list
-    ASSERT_EQ(sll_remove_front(list, int_free), -1);
+    ASSERT_EQ(dsc_sll_remove_front(list, int_free), -1);
 
     // Add elements
     int *a = malloc(sizeof(int)); *a = 10;
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
-    sll_insert_back(list, a);
-    sll_insert_back(list, b);
-    sll_insert_back(list, c);
+    dsc_sll_insert_back(list, a);
+    dsc_sll_insert_back(list, b);
+    dsc_sll_insert_back(list, c);
     ASSERT_EQ(list->size, 3);
 
     // Remove front
-    ASSERT_EQ(sll_remove_front(list, int_free), 0);
+    ASSERT_EQ(dsc_sll_remove_front(list, int_free), 0);
     ASSERT_EQ(list->size, 2);
 
     // Check first element is now 20
     int key = 10;
-    ASSERT_NULL(sll_find(list, &key, int_cmp));
+    ASSERT_NULL(dsc_sll_find(list, &key, int_cmp));
     key = 20;
-    ASSERT_NOT_NULL(sll_find(list, &key, int_cmp));
+    ASSERT_NOT_NULL(dsc_sll_find(list, &key, int_cmp));
 
     // Remove until empty
-    ASSERT_EQ(sll_remove_front(list, int_free), 0);
-    ASSERT_EQ(sll_remove_front(list, int_free), 0);
+    ASSERT_EQ(dsc_sll_remove_front(list, int_free), 0);
+    ASSERT_EQ(dsc_sll_remove_front(list, int_free), 0);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
 
-    sll_destroy(list, NULL);
+    dsc_sll_destroy(list, NULL);
     return TEST_SUCCESS;
 }
 
 int test_remove_back(void){
-    SinglyLinkedList *list = sll_create();
+    DSCSinglyLinkedList *list = dsc_sll_create();
 
     // Test on empty list
-    ASSERT_EQ(sll_remove_back(list, int_free), -1);
+    ASSERT_EQ(dsc_sll_remove_back(list, int_free), -1);
 
     // Test on single element list
     int *a = malloc(sizeof(int)); *a = 10;
-    sll_insert_back(list, a);
-    ASSERT_EQ(sll_remove_back(list, int_free), 0);
+    dsc_sll_insert_back(list, a);
+    ASSERT_EQ(dsc_sll_remove_back(list, int_free), 0);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
 
@@ -376,22 +376,22 @@ int test_remove_back(void){
     int *b = malloc(sizeof(int)); *b = 20;
     int *c = malloc(sizeof(int)); *c = 30;
     int *d = malloc(sizeof(int)); *d = 40;
-    sll_insert_back(list, b);
-    sll_insert_back(list, c);
-    sll_insert_back(list, d);
+    dsc_sll_insert_back(list, b);
+    dsc_sll_insert_back(list, c);
+    dsc_sll_insert_back(list, d);
     ASSERT_EQ(list->size, 3);
 
     // Remove back
-    ASSERT_EQ(sll_remove_back(list, int_free), 0);
+    ASSERT_EQ(dsc_sll_remove_back(list, int_free), 0);
     ASSERT_EQ(list->size, 2);
 
     // Check last element was removed
     int key = 40;
-    ASSERT_NULL(sll_find(list, &key, int_cmp));
+    ASSERT_NULL(dsc_sll_find(list, &key, int_cmp));
     key = 30;
-    ASSERT_NOT_NULL(sll_find(list, &key, int_cmp));
+    ASSERT_NOT_NULL(dsc_sll_find(list, &key, int_cmp));
 
-    sll_destroy(list, int_free);
+    dsc_sll_destroy(list, int_free);
     return TEST_SUCCESS;
 }
 
