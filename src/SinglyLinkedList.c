@@ -24,7 +24,7 @@
  * @param compare Comparison function
  * @return Pointer to the head of the merged sorted list
  */
-static DSCSinglyLinkedNode* sll_sort_helper_merge(DSCSinglyLinkedNode *left, DSCSinglyLinkedNode *right, const cmp_func compare)
+static DSCSinglyLinkedNode* sll_sort_helper_merge(DSCSinglyLinkedNode* left, DSCSinglyLinkedNode* right, const cmp_func compare)
 {
     if (!left)
     {
@@ -35,16 +35,16 @@ static DSCSinglyLinkedNode* sll_sort_helper_merge(DSCSinglyLinkedNode *left, DSC
         return left;
     }
 
-    DSCSinglyLinkedNode *result;
+    DSCSinglyLinkedNode* result;
 
     if (compare(left->data, right->data) <= 0)
     {
-        result = left;
+        result       = left;
         result->next = sll_sort_helper_merge(left->next, right, compare);
     }
     else
     {
-        result = right;
+        result       = right;
         result->next = sll_sort_helper_merge(left, right->next, compare);
     }
 
@@ -59,7 +59,7 @@ static DSCSinglyLinkedNode* sll_sort_helper_merge(DSCSinglyLinkedNode *left, DSC
  * Create a new singly linked list using the provided allocator.
  * The allocator's function pointers are defaulted to malloc/free when NULL.
  */
-DSCSinglyLinkedList *dsc_sll_create(DSCAlloc *alloc)
+DSCSinglyLinkedList* dsc_sll_create(DSCAlloc* alloc)
 {
     if (!alloc)
     {
@@ -81,14 +81,15 @@ DSCSinglyLinkedList *dsc_sll_create(DSCAlloc *alloc)
         alloc->data_free_func = free;
     }
 
-    DSCSinglyLinkedList *list = alloc->alloc_func(sizeof(DSCSinglyLinkedList));
+    DSCSinglyLinkedList* list = alloc->alloc_func(sizeof(DSCSinglyLinkedList));
     if (!list)
     {
         return NULL;
     }
 
-    list->head = NULL;
-    list->size = 0;
+    list->head  = NULL;
+    list->tail  = NULL;
+    list->size  = 0;
     list->alloc = alloc;
 
     return list;
@@ -98,7 +99,7 @@ DSCSinglyLinkedList *dsc_sll_create(DSCAlloc *alloc)
  * Destroy the list and free nodes. When should_free_data is true the
  * allocator's data_free_func is used on stored element pointers.
  */
-void dsc_sll_destroy(DSCSinglyLinkedList *list, const bool should_free_data)
+void dsc_sll_destroy(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (list)
     {
@@ -110,17 +111,17 @@ void dsc_sll_destroy(DSCSinglyLinkedList *list, const bool should_free_data)
 /**
  * Clear all nodes but keep the list structure.
  */
-void dsc_sll_clear(DSCSinglyLinkedList *list, const bool should_free_data)
+void dsc_sll_clear(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list)
     {
         return;
     }
 
-    DSCSinglyLinkedNode *node = list->head;
+    DSCSinglyLinkedNode* node = list->head;
     while (node)
     {
-        DSCSinglyLinkedNode *next = node->next;
+        DSCSinglyLinkedNode* next = node->next;
         if (should_free_data && node->data)
         {
             list->alloc->data_free_func(node->data);
@@ -129,6 +130,7 @@ void dsc_sll_clear(DSCSinglyLinkedList *list, const bool should_free_data)
         node = next;
     }
     list->head = NULL;
+    list->tail = NULL;
     list->size = 0;
 }
 
@@ -139,7 +141,7 @@ void dsc_sll_clear(DSCSinglyLinkedList *list, const bool should_free_data)
 /**
  * Return the number of elements in the list.
  */
-size_t dsc_sll_size(const DSCSinglyLinkedList *list)
+size_t dsc_sll_size(const DSCSinglyLinkedList* list)
 {
     if (!list)
     {
@@ -151,7 +153,7 @@ size_t dsc_sll_size(const DSCSinglyLinkedList *list)
 /**
  * Return non-zero if the list is empty or NULL.
  */
-int dsc_sll_is_empty(const DSCSinglyLinkedList *list)
+int dsc_sll_is_empty(const DSCSinglyLinkedList* list)
 {
     return !list || list->size == 0;
 }
@@ -159,14 +161,14 @@ int dsc_sll_is_empty(const DSCSinglyLinkedList *list)
 /**
  * Find the first node equal to data using compare.
  */
-DSCSinglyLinkedNode *dsc_sll_find(const DSCSinglyLinkedList *list, const void *data, const cmp_func compare)
+DSCSinglyLinkedNode* dsc_sll_find(const DSCSinglyLinkedList* list, const void* data, const cmp_func compare)
 {
     if (!list || !compare)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedNode *curr = list->head;
+    DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         if (compare(curr->data, data) == 0)
@@ -184,7 +186,7 @@ DSCSinglyLinkedNode *dsc_sll_find(const DSCSinglyLinkedList *list, const void *d
  * Compare two lists element-wise using compare.
  * Returns 1 if equal, 0 if not equal, -1 on error.
  */
-int dsc_sll_equals(const DSCSinglyLinkedList *list1, const DSCSinglyLinkedList *list2, const cmp_func compare)
+int dsc_sll_equals(const DSCSinglyLinkedList* list1, const DSCSinglyLinkedList* list2, const cmp_func compare)
 {
     if (!list1 || !list2 || !compare)
     {
@@ -201,8 +203,8 @@ int dsc_sll_equals(const DSCSinglyLinkedList *list1, const DSCSinglyLinkedList *
         return 1;
     }
 
-    const DSCSinglyLinkedNode *node1 = list1->head;
-    const DSCSinglyLinkedNode *node2 = list2->head;
+    const DSCSinglyLinkedNode* node1 = list1->head;
+    const DSCSinglyLinkedNode* node2 = list2->head;
 
     while (node1 && node2)
     {
@@ -225,14 +227,14 @@ int dsc_sll_equals(const DSCSinglyLinkedList *list1, const DSCSinglyLinkedList *
 /**
  * Insert data at the front of the list.
  */
-int dsc_sll_insert_front(DSCSinglyLinkedList *list, void *data)
+int dsc_sll_insert_front(DSCSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
         return -1;
     }
 
-    DSCSinglyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
+    DSCSinglyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
     if (!node)
     {
         return -1;
@@ -241,6 +243,13 @@ int dsc_sll_insert_front(DSCSinglyLinkedList *list, void *data)
     node->data = data;
     node->next = list->head;
     list->head = node;
+
+    // If this is the first node, also set tail
+    if (!list->tail)
+    {
+        list->tail = node;
+    }
+
     list->size++;
     return 0;
 }
@@ -248,14 +257,14 @@ int dsc_sll_insert_front(DSCSinglyLinkedList *list, void *data)
 /**
  * Insert data at the back of the list.
  */
-int dsc_sll_insert_back(DSCSinglyLinkedList *list, void *data)
+int dsc_sll_insert_back(DSCSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
         return -1;
     }
 
-    DSCSinglyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
+    DSCSinglyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
     if (!node)
     {
         return -1;
@@ -263,18 +272,18 @@ int dsc_sll_insert_back(DSCSinglyLinkedList *list, void *data)
 
     node->data = data;
     node->next = NULL;
+
     if (!list->head)
     {
+        // Empty list - set both head and tail
         list->head = node;
+        list->tail = node;
     }
     else
     {
-        DSCSinglyLinkedNode *curr = list->head;
-        while (curr->next)
-        {
-            curr = curr->next;
-        }
-        curr->next = node;
+        // Non-empty list - append to tail in O(1)
+        list->tail->next = node;
+        list->tail = node;
     }
 
     list->size++;
@@ -284,7 +293,7 @@ int dsc_sll_insert_back(DSCSinglyLinkedList *list, void *data)
 /**
  * Insert data at a specific zero-based position (0...size).
  */
-int dsc_sll_insert_at(DSCSinglyLinkedList *list, const size_t pos, void *data)
+int dsc_sll_insert_at(DSCSinglyLinkedList* list, const size_t pos, void* data)
 {
     if (!list || pos > list->size)
     {
@@ -296,7 +305,7 @@ int dsc_sll_insert_at(DSCSinglyLinkedList *list, const size_t pos, void *data)
         return dsc_sll_insert_front(list, data);
     }
 
-    DSCSinglyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
+    DSCSinglyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCSinglyLinkedNode));
     if (!node)
     {
         return -1;
@@ -304,7 +313,7 @@ int dsc_sll_insert_at(DSCSinglyLinkedList *list, const size_t pos, void *data)
 
     node->data = data;
 
-    DSCSinglyLinkedNode *prev = list->head;
+    DSCSinglyLinkedNode* prev = list->head;
     for (size_t i = 1; i < pos; ++i)
     {
         prev = prev->next;
@@ -328,15 +337,15 @@ int dsc_sll_insert_at(DSCSinglyLinkedList *list, const size_t pos, void *data)
 /**
  * Remove first element matching data using compare. Optionally free data.
  */
-int dsc_sll_remove(DSCSinglyLinkedList *list, const void *data, const cmp_func compare, const bool should_free_data)
+int dsc_sll_remove(DSCSinglyLinkedList* list, const void* data, const cmp_func compare, const bool should_free_data)
 {
     if (!list || !compare)
     {
         return -1;
     }
 
-    DSCSinglyLinkedNode *prev = NULL;
-    DSCSinglyLinkedNode *curr = list->head;
+    DSCSinglyLinkedNode* prev = NULL;
+    DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         if (compare(curr->data, data) == 0)
@@ -348,6 +357,12 @@ int dsc_sll_remove(DSCSinglyLinkedList *list, const void *data, const cmp_func c
             else
             {
                 list->head = curr->next;
+            }
+
+            // Update tail if we're removing the last node
+            if (curr == list->tail)
+            {
+                list->tail = prev;
             }
 
             if (should_free_data && curr->data)
@@ -369,15 +384,15 @@ int dsc_sll_remove(DSCSinglyLinkedList *list, const void *data, const cmp_func c
 /**
  * Remove element at zero-based position. Optionally free data.
  */
-int dsc_sll_remove_at(DSCSinglyLinkedList *list, const size_t pos, const bool should_free_data)
+int dsc_sll_remove_at(DSCSinglyLinkedList* list, const size_t pos, const bool should_free_data)
 {
     if (!list || pos >= list->size)
     {
         return -1;
     }
 
-    DSCSinglyLinkedNode *prev = NULL;
-    DSCSinglyLinkedNode *curr = list->head;
+    DSCSinglyLinkedNode* prev = NULL;
+    DSCSinglyLinkedNode* curr = list->head;
 
     for (size_t i = 0; i < pos; ++i)
     {
@@ -407,15 +422,15 @@ int dsc_sll_remove_at(DSCSinglyLinkedList *list, const size_t pos, const bool sh
 /**
  * Remove first element.
  */
-int dsc_sll_remove_front(DSCSinglyLinkedList *list, const bool should_free_data)
+int dsc_sll_remove_front(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
         return -1;
     }
 
-    DSCSinglyLinkedNode *node_to_remove = list->head;
-    list->head = node_to_remove->next;
+    DSCSinglyLinkedNode* node_to_remove = list->head;
+    list->head                          = node_to_remove->next;
 
     if (should_free_data && node_to_remove->data)
     {
@@ -430,7 +445,7 @@ int dsc_sll_remove_front(DSCSinglyLinkedList *list, const bool should_free_data)
 /**
  * Remove last element.
  */
-int dsc_sll_remove_back(DSCSinglyLinkedList *list, const bool should_free_data)
+int dsc_sll_remove_back(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -442,8 +457,8 @@ int dsc_sll_remove_back(DSCSinglyLinkedList *list, const bool should_free_data)
         return dsc_sll_remove_front(list, should_free_data);
     }
 
-    DSCSinglyLinkedNode *prev = NULL;
-    DSCSinglyLinkedNode *curr = list->head;
+    DSCSinglyLinkedNode* prev = NULL;
+    DSCSinglyLinkedNode* curr = list->head;
     while (curr->next)
     {
         prev = curr;
@@ -472,7 +487,7 @@ int dsc_sll_remove_back(DSCSinglyLinkedList *list, const bool should_free_data)
 /**
  * Sort the list in-place using an iterative merge approach.
  */
-int dsc_sll_sort(DSCSinglyLinkedList *list, const cmp_func compare)
+int dsc_sll_sort(DSCSinglyLinkedList* list, const cmp_func compare)
 {
     if (!list || !compare)
     {
@@ -483,19 +498,19 @@ int dsc_sll_sort(DSCSinglyLinkedList *list, const cmp_func compare)
         return 0;
     }
 
-    DSCSinglyLinkedNode *sub_lists[64] = {0};
-    int num_sub_lists = 0;
+    DSCSinglyLinkedNode* sub_lists[64] = {0};
+    int num_sub_lists                  = 0;
 
-    DSCSinglyLinkedNode *current = list->head;
+    DSCSinglyLinkedNode* current = list->head;
     while (current)
     {
-        DSCSinglyLinkedNode *next = current->next;
-        current->next = NULL;
+        DSCSinglyLinkedNode* next = current->next;
+        current->next             = NULL;
 
         int i = 0;
         while (i < num_sub_lists && sub_lists[i] != NULL)
         {
-            current = sll_sort_helper_merge(sub_lists[i], current, compare);
+            current      = sll_sort_helper_merge(sub_lists[i], current, compare);
             sub_lists[i] = NULL;
             i++;
         }
@@ -511,7 +526,7 @@ int dsc_sll_sort(DSCSinglyLinkedList *list, const cmp_func compare)
 
     for (int i = 1; i < num_sub_lists; i++)
     {
-        sub_lists[i] = sll_sort_helper_merge(sub_lists[i-1], sub_lists[i], compare);
+        sub_lists[i] = sll_sort_helper_merge(sub_lists[i - 1], sub_lists[i], compare);
     }
 
     list->head = sub_lists[num_sub_lists - 1];
@@ -522,7 +537,7 @@ int dsc_sll_sort(DSCSinglyLinkedList *list, const cmp_func compare)
 /**
  * Reverse the list in-place.
  */
-int dsc_sll_reverse(DSCSinglyLinkedList *list)
+int dsc_sll_reverse(DSCSinglyLinkedList* list)
 {
     if (!list)
     {
@@ -534,15 +549,15 @@ int dsc_sll_reverse(DSCSinglyLinkedList *list)
         return 0;
     }
 
-    DSCSinglyLinkedNode *prev = NULL;
-    DSCSinglyLinkedNode *current = list->head;
+    DSCSinglyLinkedNode* prev    = NULL;
+    DSCSinglyLinkedNode* current = list->head;
 
     while (current)
     {
         DSCSinglyLinkedNode* next = current->next;
-        current->next   = prev;
-        prev            = current;
-        current         = next;
+        current->next             = prev;
+        prev                      = current;
+        current                   = next;
     }
 
     list->head = prev;
@@ -552,7 +567,7 @@ int dsc_sll_reverse(DSCSinglyLinkedList *list)
 /**
  * Append src to dest; src is emptied but not destroyed.
  */
-int dsc_sll_merge(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src)
+int dsc_sll_merge(DSCSinglyLinkedList* dest, DSCSinglyLinkedList* src)
 {
     if (!dest || !src)
     {
@@ -571,7 +586,7 @@ int dsc_sll_merge(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src)
     }
     else
     {
-        DSCSinglyLinkedNode *last = dest->head;
+        DSCSinglyLinkedNode* last = dest->head;
         while (last->next)
         {
             last = last->next;
@@ -589,7 +604,7 @@ int dsc_sll_merge(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src)
 /**
  * Splice src into dest at position pos. Src is emptied but not destroyed.
  */
-int dsc_sll_splice(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src, const size_t pos)
+int dsc_sll_splice(DSCSinglyLinkedList* dest, DSCSinglyLinkedList* src, const size_t pos)
 {
     if (!dest || !src || pos > dest->size)
     {
@@ -606,7 +621,7 @@ int dsc_sll_splice(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src, const si
         return dsc_sll_merge(dest, src);
     }
 
-    DSCSinglyLinkedNode *src_last = src->head;
+    DSCSinglyLinkedNode* src_last = src->head;
     while (src_last->next)
     {
         src_last = src_last->next;
@@ -615,17 +630,17 @@ int dsc_sll_splice(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src, const si
     if (pos == 0)
     {
         src_last->next = dest->head;
-        dest->head = src->head;
+        dest->head     = src->head;
     }
     else
     {
-        DSCSinglyLinkedNode *prev = dest->head;
+        DSCSinglyLinkedNode* prev = dest->head;
         for (size_t i = 1; i < pos; ++i)
         {
             prev = prev->next;
         }
         src_last->next = prev->next;
-        prev->next = src->head;
+        prev->next     = src->head;
     }
 
     dest->size += src->size;
@@ -640,20 +655,20 @@ int dsc_sll_splice(DSCSinglyLinkedList *dest, DSCSinglyLinkedList *src, const si
 // Higher-order functions
 //==============================================================================
 
-DSCSinglyLinkedList *dsc_sll_filter(const DSCSinglyLinkedList *list, const pred_func pred)
+DSCSinglyLinkedList* dsc_sll_filter(const DSCSinglyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedList *filtered = dsc_sll_create(list->alloc);
+    DSCSinglyLinkedList* filtered = dsc_sll_create(list->alloc);
     if (!filtered)
     {
         return NULL;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         if (pred(curr->data))
@@ -670,25 +685,25 @@ DSCSinglyLinkedList *dsc_sll_filter(const DSCSinglyLinkedList *list, const pred_
     return filtered;
 }
 
-DSCSinglyLinkedList *dsc_sll_filter_deep(const DSCSinglyLinkedList *list, const pred_func pred)
+DSCSinglyLinkedList* dsc_sll_filter_deep(const DSCSinglyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred || !list->alloc || !list->alloc->copy_func)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedList *filtered = dsc_sll_create(list->alloc);
+    DSCSinglyLinkedList* filtered = dsc_sll_create(list->alloc);
     if (!filtered)
     {
         return NULL;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         if (pred(curr->data))
         {
-            void *filtered_data = filtered->alloc->copy_func(curr->data);
+            void* filtered_data = filtered->alloc->copy_func(curr->data);
             if (dsc_sll_insert_back(filtered, filtered_data) != 0)
             {
                 if (filtered_data)
@@ -705,23 +720,23 @@ DSCSinglyLinkedList *dsc_sll_filter_deep(const DSCSinglyLinkedList *list, const 
     return filtered;
 }
 
-DSCSinglyLinkedList *dsc_sll_transform(const DSCSinglyLinkedList *list, const transform_func transform, const bool should_free_data)
+DSCSinglyLinkedList* dsc_sll_transform(const DSCSinglyLinkedList* list, const transform_func transform, const bool should_free_data)
 {
     if (!list || !transform)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedList *transformed = dsc_sll_create(list->alloc);
+    DSCSinglyLinkedList* transformed = dsc_sll_create(list->alloc);
     if (!transformed)
     {
         return NULL;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
-        void *new_data = transform(curr->data);
+        void* new_data = transform(curr->data);
         if (dsc_sll_insert_back(transformed, new_data) != 0)
         {
             if (should_free_data && new_data)
@@ -737,14 +752,14 @@ DSCSinglyLinkedList *dsc_sll_transform(const DSCSinglyLinkedList *list, const tr
     return transformed;
 }
 
-void dsc_sll_for_each(const DSCSinglyLinkedList *list, const action_func action)
+void dsc_sll_for_each(const DSCSinglyLinkedList* list, const action_func action)
 {
     if (!list || !action)
     {
         return;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         action(curr->data);
@@ -756,14 +771,14 @@ void dsc_sll_for_each(const DSCSinglyLinkedList *list, const action_func action)
 // List copying functions
 //==============================================================================
 
-DSCSinglyLinkedList *dsc_sll_copy(const DSCSinglyLinkedList *list)
+DSCSinglyLinkedList* dsc_sll_copy(const DSCSinglyLinkedList* list)
 {
     if (!list)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedList *clone = dsc_sll_create(list->alloc);
+    DSCSinglyLinkedList* clone = dsc_sll_create(list->alloc);
     if (!clone)
     {
         return NULL;
@@ -774,7 +789,7 @@ DSCSinglyLinkedList *dsc_sll_copy(const DSCSinglyLinkedList *list)
         return clone;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
         if (dsc_sll_insert_back(clone, curr->data) != 0)
@@ -788,14 +803,14 @@ DSCSinglyLinkedList *dsc_sll_copy(const DSCSinglyLinkedList *list)
     return clone;
 }
 
-DSCSinglyLinkedList *dsc_sll_copy_deep(const DSCSinglyLinkedList *list, const copy_func copy_data, const bool should_free_data)
+DSCSinglyLinkedList* dsc_sll_copy_deep(const DSCSinglyLinkedList* list, const copy_func copy_data, const bool should_free_data)
 {
     if (!list || !copy_data)
     {
         return NULL;
     }
 
-    DSCSinglyLinkedList *clone = dsc_sll_create(list->alloc);
+    DSCSinglyLinkedList* clone = dsc_sll_create(list->alloc);
     if (!clone)
     {
         return NULL;
@@ -806,10 +821,10 @@ DSCSinglyLinkedList *dsc_sll_copy_deep(const DSCSinglyLinkedList *list, const co
         return clone;
     }
 
-    const DSCSinglyLinkedNode *curr = list->head;
+    const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
-        void *data_copy = copy_data(curr->data);
+        void* data_copy = copy_data(curr->data);
         if (!data_copy)
         {
             dsc_sll_destroy(clone, should_free_data);
@@ -817,7 +832,8 @@ DSCSinglyLinkedList *dsc_sll_copy_deep(const DSCSinglyLinkedList *list, const co
         }
         if (dsc_sll_insert_back(clone, data_copy) != 0)
         {
-            if (should_free_data) {
+            if (should_free_data)
+            {
                 list->alloc->data_free_func(data_copy);
             }
             dsc_sll_destroy(clone, should_free_data);
@@ -835,93 +851,93 @@ DSCSinglyLinkedList *dsc_sll_copy_deep(const DSCSinglyLinkedList *list, const co
 
 typedef struct SListIteratorState
 {
-    DSCSinglyLinkedNode *current;      // Current node
-    DSCSinglyLinkedList *list;       // The list being iterated
+    DSCSinglyLinkedNode* current; // Current node
+    DSCSinglyLinkedList* list;    // The list being iterated
 } SListIteratorState;
 
-static int sll_iterator_has_next(const DSCIterator *it)
+static int sll_iterator_has_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return 0;
     }
 
-    const SListIteratorState *state = it->data_state;
+    const SListIteratorState* state = it->data_state;
     return state->current != NULL;
 }
 
-static void *sll_iterator_next(const DSCIterator *it)
+static void* sll_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return NULL;
     }
 
-    SListIteratorState *state = it->data_state;
+    SListIteratorState* state = it->data_state;
     if (!state->current)
     {
         return NULL;
     }
 
-    void *data = state->current->data;
+    void* data     = state->current->data;
     state->current = state->current->next;
     return data;
 }
 
-static int sll_iterator_has_prev(const DSCIterator *it)
+static int sll_iterator_has_prev(const DSCIterator* it)
 {
     (void)it;
     return 0;
 }
 
-static void *sll_iterator_prev(const DSCIterator *it)
+static void* sll_iterator_prev(const DSCIterator* it)
 {
     (void)it;
     return NULL;
 }
 
-static void sll_iterator_reset(const DSCIterator *it)
+static void sll_iterator_reset(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return;
     }
 
-    SListIteratorState *state = it->data_state;
-    state->current = state->list->head;
+    SListIteratorState* state = it->data_state;
+    state->current            = state->list->head;
 }
 
-static int sll_iterator_is_valid(const DSCIterator *it)
+static int sll_iterator_is_valid(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return 0;
     }
 
-    const SListIteratorState *state = it->data_state;
+    const SListIteratorState* state = it->data_state;
     return state->list != NULL;
 }
 
-static void sll_iterator_destroy(DSCIterator *it)
+static void sll_iterator_destroy(DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return;
     }
 
-    const SListIteratorState *state = it->data_state;
+    const SListIteratorState* state = it->data_state;
     state->list->alloc->dealloc_func(it->data_state);
     it->data_state = NULL;
 }
 
-static void *sll_iterator_get(const DSCIterator *it)
+static void* sll_iterator_get(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return NULL;
     }
 
-    const SListIteratorState *state = it->data_state;
+    const SListIteratorState* state = it->data_state;
     if (!state->current)
     {
         return NULL;
@@ -930,46 +946,46 @@ static void *sll_iterator_get(const DSCIterator *it)
     return state->current->data;
 }
 
-DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList *list)
+DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list)
 {
     DSCIterator it = {0};
 
-    it.get = sll_iterator_get;
-    it.next = sll_iterator_next;
+    it.get      = sll_iterator_get;
+    it.next     = sll_iterator_next;
     it.has_next = sll_iterator_has_next;
-    it.prev = sll_iterator_prev;
+    it.prev     = sll_iterator_prev;
     it.has_prev = sll_iterator_has_prev;
-    it.reset = sll_iterator_reset;
+    it.reset    = sll_iterator_reset;
     it.is_valid = sll_iterator_is_valid;
-    it.destroy = sll_iterator_destroy;
+    it.destroy  = sll_iterator_destroy;
 
     if (!list)
     {
         return it;
     }
 
-    SListIteratorState *state = list->alloc->alloc_func(sizeof(SListIteratorState));
+    SListIteratorState* state = list->alloc->alloc_func(sizeof(SListIteratorState));
     if (!state)
     {
         return it;
     }
 
     state->current = list->head;
-    state->list = (DSCSinglyLinkedList *)list;
+    state->list    = (DSCSinglyLinkedList*)list;
 
     it.data_state = state;
 
     return it;
 }
 
-DSCSinglyLinkedList *dsc_sll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
+DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
 {
     if (!it)
     {
         return NULL;
     }
 
-    if(!it->is_valid)
+    if (!it->is_valid)
     {
         return NULL;
     }
@@ -979,7 +995,7 @@ DSCSinglyLinkedList *dsc_sll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
         return NULL;
     }
 
-    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
     if (!list)
     {
         return NULL;
@@ -987,13 +1003,13 @@ DSCSinglyLinkedList *dsc_sll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
 
     while (it->has_next(it))
     {
-        void *data = it->next(it);
+        void* data = it->next(it);
         if (!data)
         {
             continue;
         }
 
-        void *data_to_insert = data;
+        void* data_to_insert = data;
         if (list->alloc && list->alloc->copy_func)
         {
             data_to_insert = list->alloc->copy_func(data);

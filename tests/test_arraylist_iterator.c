@@ -9,14 +9,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-int test_forward_iterator(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_forward_iterator(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-5
-    for (int i = 1; i <= 5; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 5; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -25,8 +27,9 @@ int test_forward_iterator(void) {
 
     // Test forward iteration
     int expected = 1;
-    while (iter.has_next(&iter)) {
-        const int *val = (int*)iter.next(&iter);
+    while (iter.has_next(&iter))
+    {
+        const int* val = (int*)iter.next(&iter);
         ASSERT_NOT_NULL(val);
         ASSERT_EQ(*val, expected);
         expected++;
@@ -41,14 +44,16 @@ int test_forward_iterator(void) {
     return TEST_SUCCESS;
 }
 
-int test_reverse_iterator(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_reverse_iterator(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-5
-    for (int i = 1; i <= 5; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 5; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -57,8 +62,9 @@ int test_reverse_iterator(void) {
 
     // Test reverse iteration (should get 5, 4, 3, 2, 1)
     int expected = 5;
-    while (iter.has_next(&iter)) {
-        const int *val = (int*)iter.next(&iter);
+    while (iter.has_next(&iter))
+    {
+        const int* val = (int*)iter.next(&iter);
         ASSERT_NOT_NULL(val);
         ASSERT_EQ(*val, expected);
         expected--;
@@ -73,21 +79,23 @@ int test_reverse_iterator(void) {
     return TEST_SUCCESS;
 }
 
-int test_iterator_get(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_iterator_get(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-3
-    for (int i = 1; i <= 3; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 3; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
     DSCIterator iter = dsc_arraylist_iterator(list);
 
     // Test get without advancing
-    int *val = (int*)iter.get(&iter);
+    int* val = (int*)iter.get(&iter);
     ASSERT_NOT_NULL(val);
     ASSERT_EQ(*val, 1);
 
@@ -106,14 +114,16 @@ int test_iterator_get(void) {
     return TEST_SUCCESS;
 }
 
-int test_iterator_prev(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_iterator_prev(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-3
-    for (int i = 1; i <= 3; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 3; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -126,7 +136,7 @@ int test_iterator_prev(void) {
 
     // Test has_prev and prev
     ASSERT(iter.has_prev(&iter));
-    const int *val = (int*)iter.prev(&iter);
+    const int* val = (int*)iter.prev(&iter);
     ASSERT_EQ(*val, 3);
 
     ASSERT(iter.has_prev(&iter));
@@ -145,14 +155,16 @@ int test_iterator_prev(void) {
     return TEST_SUCCESS;
 }
 
-int test_iterator_reset(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_iterator_reset(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-3
-    for (int i = 1; i <= 3; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 3; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -164,7 +176,7 @@ int test_iterator_reset(void) {
 
     // Reset and verify back at beginning
     iter.reset(&iter);
-    int *val = (int*)iter.get(&iter);
+    int* val = (int*)iter.get(&iter);
     ASSERT_EQ(*val, 1);
     ASSERT(iter.has_next(&iter));
 
@@ -174,9 +186,10 @@ int test_iterator_reset(void) {
     return TEST_SUCCESS;
 }
 
-int test_iterator_empty_list(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_iterator_empty_list(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     DSCIterator iter = dsc_arraylist_iterator(list);
     ASSERT(iter.is_valid(&iter));
@@ -191,12 +204,13 @@ int test_iterator_empty_list(void) {
     return TEST_SUCCESS;
 }
 
-int test_iterator_single_element(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_iterator_single_element(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
-    int *val = malloc(sizeof(int));
-    *val = 42;
+    int* val = malloc(sizeof(int));
+    *val     = 42;
     dsc_arraylist_push_back(list, val);
 
     DSCIterator iter = dsc_arraylist_iterator(list);
@@ -204,7 +218,7 @@ int test_iterator_single_element(void) {
     ASSERT(iter.has_next(&iter));
     ASSERT(!iter.has_prev(&iter));
 
-    int *retrieved = (int*)iter.next(&iter);
+    int* retrieved = (int*)iter.next(&iter);
     ASSERT_EQ(*retrieved, 42);
 
     ASSERT(!iter.has_next(&iter));
@@ -216,26 +230,29 @@ int test_iterator_single_element(void) {
     return TEST_SUCCESS;
 }
 
-int test_from_iterator(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *original = dsc_arraylist_create(alloc, 0);
+int test_from_iterator(void)
+{
+    DSCAlloc* alloc        = create_std_allocator();
+    DSCArrayList* original = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-5
-    for (int i = 1; i <= 5; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 5; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(original, val);
     }
 
     // Create iterator and new list from it
-    DSCIterator iter = dsc_arraylist_iterator(original);
-    DSCArrayList *new_list = dsc_arraylist_from_iterator(&iter, alloc);
+    DSCIterator iter       = dsc_arraylist_iterator(original);
+    DSCArrayList* new_list = dsc_arraylist_from_iterator(&iter, alloc);
 
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(dsc_arraylist_size(new_list), 5);
 
     // Verify contents (should share same data pointers)
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         ASSERT_EQ(*(int*)dsc_arraylist_get(new_list, i), i + 1);
     }
 
@@ -246,14 +263,16 @@ int test_from_iterator(void) {
     return TEST_SUCCESS;
 }
 
-int test_bidirectional_iteration(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCArrayList *list = dsc_arraylist_create(alloc, 0);
+int test_bidirectional_iteration(void)
+{
+    DSCAlloc* alloc    = create_std_allocator();
+    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
 
     // Add numbers 1-5
-    for (int i = 1; i <= 5; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 1; i <= 5; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -264,7 +283,7 @@ int test_bidirectional_iteration(void) {
     iter.next(&iter); // 3
     iter.next(&iter); // 4
 
-    const int *val = (int*)iter.get(&iter);
+    const int* val = (int*)iter.get(&iter);
     ASSERT_EQ(*val, 4);
 
     // Move back
@@ -281,12 +300,14 @@ int test_bidirectional_iteration(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
-int main(void) {
+int main(void)
+{
     TestCase tests[] = {
         {test_forward_iterator, "test_forward_iterator"},
         {test_reverse_iterator, "test_reverse_iterator"},
@@ -299,16 +320,19 @@ int main(void) {
         {test_bidirectional_iteration, "test_bidirectional_iteration"},
     };
 
-    int failed = 0;
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All ArrayList iterator tests passed.\n");
         return 0;
     }

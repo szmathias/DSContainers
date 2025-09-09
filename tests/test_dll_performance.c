@@ -9,27 +9,30 @@
 #include <stdlib.h>
 #include <time.h>
 
-int test_stress(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    const int NUM_ELEMENTS = 10000;
+int test_stress(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    const int NUM_ELEMENTS    = 10000;
 
     // Add many elements
-    for (int i = 0; i < NUM_ELEMENTS; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 0; i < NUM_ELEMENTS; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         ASSERT_EQ(dsc_dll_insert_back(list, val), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS);
 
     // Find an element in the middle
-    int key = NUM_ELEMENTS / 2;
-    const DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    int key                          = NUM_ELEMENTS / 2;
+    const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, key);
 
     // Remove elements from the front
-    for (int i = 0; i < NUM_ELEMENTS / 2; i++) {
+    for (int i = 0; i < NUM_ELEMENTS / 2; i++)
+    {
         ASSERT_EQ(dsc_dll_remove_front(list, true), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS / 2);
@@ -43,21 +46,24 @@ int test_stress(void) {
     return TEST_SUCCESS;
 }
 
-int test_performance(void) {
-    const int SIZES[] = {100, 1000, 10000};
-    const size_t NUM_SIZES = sizeof(SIZES)/sizeof(SIZES[0]);
+int test_performance(void)
+{
+    const int SIZES[]      = {100, 1000, 10000};
+    const size_t NUM_SIZES = sizeof(SIZES) / sizeof(SIZES[0]);
 
     printf("\nDLL Performance tests:\n");
-    for (size_t s = 0; s < NUM_SIZES; s++) {
-        const int SIZE = SIZES[s];
-        DSCAlloc *alloc = create_std_allocator();
-        DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+    for (size_t s = 0; s < NUM_SIZES; s++)
+    {
+        const int SIZE            = SIZES[s];
+        DSCAlloc* alloc           = create_std_allocator();
+        DSCDoublyLinkedList* list = dsc_dll_create(alloc);
 
         // Measure insertion time
         clock_t start = clock();
-        for (int i = 0; i < SIZE; i++) {
-            int *val = malloc(sizeof(int));
-            *val = i;
+        for (int i = 0; i < SIZE; i++)
+        {
+            int* val = malloc(sizeof(int));
+            *val     = i;
             dsc_dll_insert_back(list, val);
         }
         clock_t end = clock();
@@ -65,10 +71,10 @@ int test_performance(void) {
                (double)(end - start) / CLOCKS_PER_SEC);
 
         // Measure search time for last element
-        start = clock();
-        int key = SIZE - 1;
-        const DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
-        end = clock();
+        start                            = clock();
+        int key                          = SIZE - 1;
+        const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
+        end                              = clock();
         printf("Find last element in %d elements: %.6f seconds\n", SIZE,
                (double)(end - start) / CLOCKS_PER_SEC);
         ASSERT_NOT_NULL(found);
@@ -81,9 +87,10 @@ int test_performance(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -91,18 +98,22 @@ TestCase tests[] = {
     {test_performance, "test_performance"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DoublyLinkedList Performance tests passed.\n");
         return 0;
     }

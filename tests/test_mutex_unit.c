@@ -4,14 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int test_mutex_init_destroy(void) {
+int test_mutex_init_destroy(void)
+{
     DSCMutex m;
     ASSERT_EQ(dsc_mutex_init(&m), 0);
     ASSERT_EQ(dsc_mutex_destroy(&m), 0);
     return TEST_SUCCESS;
 }
 
-int test_mutex_trylock_behavior(void) {
+int test_mutex_trylock_behavior(void)
+{
     DSCMutex m;
     ASSERT_EQ(dsc_mutex_init(&m), 0);
 
@@ -30,14 +32,17 @@ int test_mutex_trylock_behavior(void) {
 #define NUM_THREADS 4
 #define INCREMENTS 50000
 
-typedef struct {
-    int *counter;
-    DSCMutex *m;
+typedef struct
+{
+    int* counter;
+    DSCMutex* m;
 } inc_arg_t;
 
-static void *inc_thread(void *arg) {
-    const inc_arg_t *a = (inc_arg_t*)arg;
-    for (int i = 0; i < INCREMENTS; ++i) {
+static void* inc_thread(void* arg)
+{
+    const inc_arg_t* a = (inc_arg_t*)arg;
+    for (int i = 0; i < INCREMENTS; ++i)
+    {
         dsc_mutex_lock(a->m);
         ++*(a->counter);
         dsc_mutex_unlock(a->m);
@@ -45,7 +50,8 @@ static void *inc_thread(void *arg) {
     return NULL;
 }
 
-int test_mutex_threaded_increment(void) {
+int test_mutex_threaded_increment(void)
+{
     int counter = 0;
     DSCMutex m;
     ASSERT_EQ(dsc_mutex_init(&m), 0);
@@ -53,14 +59,16 @@ int test_mutex_threaded_increment(void) {
     DSCThread threads[NUM_THREADS];
     inc_arg_t args[NUM_THREADS];
 
-    for (int i = 0; i < NUM_THREADS; ++i) {
+    for (int i = 0; i < NUM_THREADS; ++i)
+    {
         args[i].counter = &counter;
-        args[i].m = &m;
-        const int rc = dsc_thread_create(&threads[i], inc_thread, &args[i]);
+        args[i].m       = &m;
+        const int rc    = dsc_thread_create(&threads[i], inc_thread, &args[i]);
         ASSERT_EQ(rc, 0);
     }
 
-    for (int i = 0; i < NUM_THREADS; ++i) {
+    for (int i = 0; i < NUM_THREADS; ++i)
+    {
         ASSERT_EQ(dsc_thread_join(threads[i], NULL), 0);
     }
 
@@ -70,28 +78,33 @@ int test_mutex_threaded_increment(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
-int main(void) {
+int main(void)
+{
     TestCase tests[] = {
         {test_mutex_init_destroy, "test_mutex_init_destroy"},
         {test_mutex_trylock_behavior, "test_mutex_trylock_behavior"},
         {test_mutex_threaded_increment, "test_mutex_threaded_increment"},
     };
 
-    int failed = 0;
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All mutex unit tests passed.\n");
         return 0;
     }

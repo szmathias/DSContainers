@@ -8,43 +8,44 @@
 #include "../include/Alloc.h"
 
 // Complex data type for testing
-typedef struct {
+typedef struct
+{
     char name[50];
     int age;
 } Person;
 
-int int_cmp(const void *a, const void *b);
+int int_cmp(const void* a, const void* b);
 
 // Custom comparison function for descending order
-int int_cmp_desc(const void *a, const void *b);
+int int_cmp_desc(const void* a, const void* b);
 
 // Integer free function
-void int_free(void *a);
+void int_free(void* a);
 
 // Custom allocator for testing
-void *test_calloc(size_t size);
-void test_dealloc(void *ptr);
+void* test_calloc(size_t size);
+void test_dealloc(void* ptr);
 
 // Person comparison function
-int person_cmp(const void *a, const void *b);
+int person_cmp(const void* a, const void* b);
 // Person free function
-void person_free(void *p);
+void person_free(void* p);
 // Helper to create a person
 Person* create_person(const char* name, int age);
 
 // Clone an integer
-void *int_copy(const void *data);
+void* int_copy(const void* data);
 // Clone a person
-void *person_copy(const void *data);
+void* person_copy(const void* data);
 
 // Predicate function that returns non-zero for even numbers
-int is_even(const void *data);
+int is_even(const void* data);
 
 // Transform function that doubles a number
-void *double_value(const void *data);
+void* double_value(const void* data);
 
 // Action function that increments a number
-void increment(void *data);
+void increment(void* data);
 
 // Predicate: is odd
 int is_odd(const void* data);
@@ -82,10 +83,10 @@ void* failing_alloc(size_t size);
 void failing_free(void* ptr);
 
 // A copy function that uses the failing allocator
-void *failing_int_copy(const void *data);
+void* failing_int_copy(const void* data);
 
 // A transform function that uses the failing allocator
-void *double_value_failing(const void *data);
+void* double_value_failing(const void* data);
 
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(int count);
@@ -93,6 +94,6 @@ void set_alloc_fail_countdown(int count);
 // Allocator helper functions
 DSCAlloc* create_std_allocator(void);
 DSCAlloc* create_failing_allocator(void);
-void destroy_allocator(DSCAlloc* alloc);
+void destroy_allocator(DSCAlloc * alloc);
 
 #endif //DSCONTAINERS_TESTHELPERS_H

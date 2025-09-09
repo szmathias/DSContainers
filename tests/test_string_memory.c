@@ -8,8 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int test_reserve_and_shrink(void) {
-    DSCString str = dsc_str_create_empty(4);
+int test_reserve_and_shrink(void)
+{
+    DSCString str             = dsc_str_create_empty(4);
     const size_t old_capacity = dsc_str_capacity(&str);
     ASSERT_TRUE(dsc_str_reserve(&str, 128));
     ASSERT_GT(dsc_str_capacity(&str), old_capacity);
@@ -20,8 +21,9 @@ int test_reserve_and_shrink(void) {
     return TEST_SUCCESS;
 }
 
-int test_buffer_growth(void) {
-    DSCString str = dsc_str_create_empty(4);
+int test_buffer_growth(void)
+{
+    DSCString str                 = dsc_str_create_empty(4);
     const size_t initial_capacity = dsc_str_capacity(&str);
     // Append enough characters to force buffer growth
     for (int i = 0; i < 100; ++i)
@@ -34,7 +36,8 @@ int test_buffer_growth(void) {
     return TEST_SUCCESS;
 }
 
-int test_large_string(void) {
+int test_large_string(void)
+{
     DSCString str = dsc_str_create_empty(1024);
     for (int i = 0; i < 1000; ++i)
     {
@@ -46,8 +49,9 @@ int test_large_string(void) {
     return TEST_SUCCESS;
 }
 
-int test_reserve_and_shrink_optimal(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_reserve_and_shrink_optimal(void)
+{
+    DSCString str    = dsc_str_create_from_cstring("abc");
     const size_t cap = dsc_str_capacity(&str);
     ASSERT_FALSE(dsc_str_reserve(&str, cap));
     ASSERT_TRUE(dsc_str_shrink_to_fit(&str));
@@ -55,9 +59,10 @@ int test_reserve_and_shrink_optimal(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -67,18 +72,22 @@ TestCase tests[] = {
     {test_reserve_and_shrink_optimal, "test_reserve_and_shrink_optimal"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DString Memory tests passed.\n");
         return 0;
     }

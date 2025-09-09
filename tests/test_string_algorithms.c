@@ -9,7 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-int test_find_and_compare(void) {
+int test_find_and_compare(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdefgabc");
     ASSERT_EQ(dsc_str_find_cstring(&str, "abc"), 0);
     ASSERT_EQ(dsc_str_find_cstring(&str, "fg"), 5);
@@ -19,7 +20,8 @@ int test_find_and_compare(void) {
     return TEST_SUCCESS;
 }
 
-int test_trim_and_case(void) {
+int test_trim_and_case(void)
+{
     DSCString str = dsc_str_create_from_cstring("   Hello World!   ");
     dsc_str_trim_front(&str);
     ASSERT_EQ_STR(dsc_str_data(&str), "Hello World!   ");
@@ -33,7 +35,8 @@ int test_trim_and_case(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr(void) {
+int test_substr(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdef");
     DSCString sub = dsc_str_substr_create_string(&str, 2, 3);
     ASSERT_EQ_STR(dsc_str_data(&sub), "cde");
@@ -42,8 +45,9 @@ int test_substr(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_out_of_bounds(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_substr_out_of_bounds(void)
+{
+    DSCString str  = dsc_str_create_from_cstring("abc");
     DSCString sub1 = dsc_str_substr_create_string(&str, 10, 2);
     ASSERT_EQ(dsc_str_size(&sub1), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub1), "");
@@ -55,8 +59,9 @@ int test_substr_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_embedded_null(void) {
-    DSCString str = dsc_str_create_empty(16);
+int test_embedded_null(void)
+{
+    DSCString str     = dsc_str_create_empty(16);
     const char data[] = {'a', 'b', '\0', 'c', 'd', '\0'};
     dsc_str_assign_cstring(&str, data);
     ASSERT_EQ(dsc_str_size(&str), 2); // Only up to first null
@@ -65,7 +70,8 @@ int test_embedded_null(void) {
     return TEST_SUCCESS;
 }
 
-int test_trim_all_whitespace(void) {
+int test_trim_all_whitespace(void)
+{
     DSCString str = dsc_str_create_from_cstring("    \t\n  ");
     dsc_str_trim_front(&str);
     dsc_str_trim_back(&str);
@@ -74,7 +80,8 @@ int test_trim_all_whitespace(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_different_lengths(void) {
+int test_compare_different_lengths(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("abc");
     DSCString str2 = dsc_str_create_from_cstring("abcd");
     ASSERT_LT(dsc_str_compare_string(&str1, &str2), 0);
@@ -84,7 +91,8 @@ int test_compare_different_lengths(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_different_contents(void) {
+int test_compare_different_contents(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("abc");
     DSCString str2 = dsc_str_create_from_cstring("abd");
     ASSERT_LT(dsc_str_compare_string(&str1, &str2), 0);
@@ -94,22 +102,25 @@ int test_compare_different_contents(void) {
     return TEST_SUCCESS;
 }
 
-int test_find_first_of_no_match(void) {
+int test_find_first_of_no_match(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdef");
     ASSERT_EQ(dsc_str_find_first_of(&str, "xyz"), STR_NPOS);
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_find_first_of_multiple_matches(void) {
+int test_find_first_of_multiple_matches(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdef");
     ASSERT_EQ(dsc_str_find_first_of(&str, "fa"), 0); // 'a' at pos 0
-    ASSERT_EQ(dsc_str_find_first_of(&str, "f"), 5); // 'f' at pos 5
+    ASSERT_EQ(dsc_str_find_first_of(&str, "f"), 5);  // 'f' at pos 5
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_remove_extra_ws(void) {
+int test_remove_extra_ws(void)
+{
     DSCString str = dsc_str_create_from_cstring("  a   b\t\tc  ");
     dsc_str_remove_extra_ws(&str);
     ASSERT_EQ_STR(dsc_str_data(&str), "a b c");
@@ -117,7 +128,8 @@ int test_remove_extra_ws(void) {
     return TEST_SUCCESS;
 }
 
-int test_to_lower_upper_already(void) {
+int test_to_lower_upper_already(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("abc");
     dsc_str_to_lower(&str1);
     ASSERT_EQ_STR(dsc_str_data(&str1), "abc");
@@ -134,7 +146,8 @@ int test_to_lower_upper_already(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_zero_count(void) {
+int test_substr_create_zero_count(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdef");
     DSCString sub = dsc_str_substr_create_string(&str, 2, 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
@@ -144,7 +157,8 @@ int test_substr_create_zero_count(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_string_equality(void) {
+int test_compare_string_equality(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("abc");
     DSCString str2 = dsc_str_create_from_cstring("abc");
     ASSERT_EQ(dsc_str_compare_string(&str1, &str2), 0);
@@ -154,9 +168,10 @@ int test_compare_string_equality(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_cstring_cases(void) {
-    const char *src = "abcdef";
-    DSCString sub1 = dsc_str_substr_create_cstring(src, 0, 2);
+int test_substr_create_cstring_cases(void)
+{
+    const char* src = "abcdef";
+    DSCString sub1  = dsc_str_substr_create_cstring(src, 0, 2);
     ASSERT_EQ_STR(dsc_str_data(&sub1), "ab");
     DSCString sub2 = dsc_str_substr_create_cstring(src, 4, 10); // count > length
     ASSERT_EQ_STR(dsc_str_data(&sub2), "ef");
@@ -168,7 +183,8 @@ int test_substr_create_cstring_cases(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_cstring_prefix_suffix(void) {
+int test_compare_cstring_prefix_suffix(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     ASSERT_LT(dsc_str_compare_cstring(&str, "abcd"), 0);
     ASSERT_GT(dsc_str_compare_cstring(&str, "ab"), 0);
@@ -176,14 +192,15 @@ int test_compare_cstring_prefix_suffix(void) {
     return TEST_SUCCESS;
 }
 
-int test_getline_ch_simulated(void) {
+int test_getline_ch_simulated(void)
+{
     // Use a temporary file on disk for portability
-    FILE *fp = fopen("test_tmpfile.txt", "w+");
+    FILE* fp = fopen("test_tmpfile.txt", "w+");
     ASSERT_NOT_NULL(fp);
     fputs("hello\nworld", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line = dsc_str_create_empty(16);
+    DSCString line   = dsc_str_create_empty(16);
     const int status = dsc_str_getline_ch(fp, &line, '\n');
     ASSERT_EQ_STR(dsc_str_data(&line), "hello");
     ASSERT_EQ(status, 0);
@@ -193,13 +210,14 @@ int test_getline_ch_simulated(void) {
     return TEST_SUCCESS;
 }
 
-int test_getline_cstring_simulated(void) {
-    FILE *fp = fopen("test_tmpfile2.txt", "w+");
+int test_getline_cstring_simulated(void)
+{
+    FILE* fp = fopen("test_tmpfile2.txt", "w+");
     ASSERT_NOT_NULL(fp);
     fputs("foo,bar,baz", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line = dsc_str_create_empty(16);
+    DSCString line   = dsc_str_create_empty(16);
     const int status = dsc_str_getline_cstring(fp, &line, ",");
     ASSERT_EQ_STR(dsc_str_data(&line), "foo");
     ASSERT_EQ(status, 0);
@@ -209,15 +227,17 @@ int test_getline_cstring_simulated(void) {
     return TEST_SUCCESS;
 }
 
-int test_find_cstring_empty_search(void) {
+int test_find_cstring_empty_search(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     ASSERT_EQ(dsc_str_find_cstring(&str, ""), STR_NPOS);
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_find_string_empty_search(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_find_string_empty_search(void)
+{
+    DSCString str   = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     ASSERT_EQ(dsc_str_find_string(&str, &empty), STR_NPOS);
     dsc_str_destroy(&str);
@@ -225,7 +245,8 @@ int test_find_string_empty_search(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_string_count_exceeds(void) {
+int test_substr_create_string_count_exceeds(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub = dsc_str_substr_create_string(&str, 1, 10);
     ASSERT_EQ_STR(dsc_str_data(&sub), "bc");
@@ -234,7 +255,8 @@ int test_substr_create_string_count_exceeds(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_string_pos_at_size(void) {
+int test_substr_create_string_pos_at_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub = dsc_str_substr_create_string(&str, dsc_str_size(&str), 2);
     ASSERT_EQ(dsc_str_size(&sub), 0);
@@ -244,7 +266,8 @@ int test_substr_create_string_pos_at_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_string_pos_gt_size(void) {
+int test_substr_create_string_pos_gt_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub = dsc_str_substr_create_string(&str, dsc_str_size(&str) + 1, 2);
     ASSERT_EQ(dsc_str_size(&sub), 0);
@@ -254,23 +277,26 @@ int test_substr_create_string_pos_gt_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_cstring_pos_at_length(void) {
-    const char *src = "abc";
-    char buf[8] = {0};
+int test_substr_cstring_pos_at_length(void)
+{
+    const char* src = "abc";
+    char buf[8]     = {0};
     dsc_str_substr_cstring(src, strlen(src), 2, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
 }
 
-int test_substr_cstring_pos_gt_length(void) {
-    const char *src = "abc";
-    char buf[8] = {0};
+int test_substr_cstring_pos_gt_length(void)
+{
+    const char* src = "abc";
+    char buf[8]     = {0};
     dsc_str_substr_cstring(src, strlen(src) + 1, 2, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
 }
 
-int test_compare_string_empty(void) {
+int test_compare_string_empty(void)
+{
     DSCString str1 = dsc_str_create_empty(4);
     DSCString str2 = dsc_str_create_empty(4);
     ASSERT_EQ(dsc_str_compare_string(&str1, &str2), 0);
@@ -279,17 +305,19 @@ int test_compare_string_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_cstring_empty(void) {
+int test_compare_cstring_empty(void)
+{
     DSCString str = dsc_str_create_empty(4);
     ASSERT_EQ(dsc_str_compare_cstring(&str, ""), 0);
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_getline_ch_empty_file(void) {
-    FILE *fp = fopen("test_tmpfile_empty.txt", "w+");
+int test_getline_ch_empty_file(void)
+{
+    FILE* fp = fopen("test_tmpfile_empty.txt", "w+");
     ASSERT_NOT_NULL(fp);
-    DSCString line = dsc_str_create_empty(8);
+    DSCString line   = dsc_str_create_empty(8);
     const int status = dsc_str_getline_ch(fp, &line, '\n');
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(dsc_str_empty(&line));
@@ -299,10 +327,11 @@ int test_getline_ch_empty_file(void) {
     return TEST_SUCCESS;
 }
 
-int test_getline_cstring_empty_file(void) {
-    FILE *fp = fopen("test_tmpfile_empty2.txt", "w+");
+int test_getline_cstring_empty_file(void)
+{
+    FILE* fp = fopen("test_tmpfile_empty2.txt", "w+");
     ASSERT_NOT_NULL(fp);
-    DSCString line = dsc_str_create_empty(8);
+    DSCString line   = dsc_str_create_empty(8);
     const int status = dsc_str_getline_cstring(fp, &line, ",");
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(dsc_str_empty(&line));
@@ -312,7 +341,8 @@ int test_getline_cstring_empty_file(void) {
     return TEST_SUCCESS;
 }
 
-int test_trim_front_already_trimmed(void) {
+int test_trim_front_already_trimmed(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_trim_front(&str);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -320,7 +350,8 @@ int test_trim_front_already_trimmed(void) {
     return TEST_SUCCESS;
 }
 
-int test_trim_back_already_trimmed(void) {
+int test_trim_back_already_trimmed(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_trim_back(&str);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -328,7 +359,8 @@ int test_trim_back_already_trimmed(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_extra_ws_only_spaces(void) {
+int test_remove_extra_ws_only_spaces(void)
+{
     DSCString str = dsc_str_create_from_cstring("     ");
     dsc_str_remove_extra_ws(&str);
     ASSERT_TRUE(dsc_str_empty(&str) || dsc_str_size(&str) == 0);
@@ -336,7 +368,8 @@ int test_remove_extra_ws_only_spaces(void) {
     return TEST_SUCCESS;
 }
 
-int test_to_lower_empty(void) {
+int test_to_lower_empty(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_to_lower(&str);
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -344,7 +377,8 @@ int test_to_lower_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_to_upper_empty(void) {
+int test_to_upper_empty(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_to_upper(&str);
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -352,7 +386,8 @@ int test_to_upper_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_string_zero_count_zero_pos(void) {
+int test_substr_create_string_zero_count_zero_pos(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub = dsc_str_substr_create_string(&str, 0, 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
@@ -362,33 +397,37 @@ int test_substr_create_string_zero_count_zero_pos(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_cstring_zero_count_zero_pos(void) {
-    const char *src = "abc";
-    DSCString sub = dsc_str_substr_create_cstring(src, 0, 0);
+int test_substr_create_cstring_zero_count_zero_pos(void)
+{
+    const char* src = "abc";
+    DSCString sub   = dsc_str_substr_create_cstring(src, 0, 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub), "");
     dsc_str_destroy(&sub);
     return TEST_SUCCESS;
 }
 
-int test_substr_string_zero_count_zero_pos(void) {
+int test_substr_string_zero_count_zero_pos(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
-    char buf[8] = {0};
+    char buf[8]   = {0};
     dsc_str_substr_string(&str, 0, 0, buf);
     ASSERT_EQ_STR(buf, "");
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_substr_cstring_zero_count_zero_pos(void) {
-    const char *src = "abc";
-    char buf[8] = {0};
+int test_substr_cstring_zero_count_zero_pos(void)
+{
+    const char* src = "abc";
+    char buf[8]     = {0};
     dsc_str_substr_cstring(src, 0, 0, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
 }
 
-int test_compare_string_one_empty(void) {
+int test_compare_string_one_empty(void)
+{
     DSCString str1 = dsc_str_create_empty(4);
     DSCString str2 = dsc_str_create_from_cstring("abc");
     ASSERT_LT(dsc_str_compare_string(&str1, &str2), 0);
@@ -398,7 +437,8 @@ int test_compare_string_one_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_compare_cstring_one_empty(void) {
+int test_compare_cstring_one_empty(void)
+{
     DSCString str = dsc_str_create_empty(4);
     ASSERT_LT(dsc_str_compare_cstring(&str, "abc"), 0);
     DSCString str2 = dsc_str_create_from_cstring("abc");
@@ -408,13 +448,14 @@ int test_compare_cstring_one_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_getline_ch_delim_not_present(void) {
-    FILE *fp = fopen("test_tmpfile3.txt", "w+");
+int test_getline_ch_delim_not_present(void)
+{
+    FILE* fp = fopen("test_tmpfile3.txt", "w+");
     ASSERT_NOT_NULL(fp);
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line = dsc_str_create_empty(8);
+    DSCString line   = dsc_str_create_empty(8);
     const int status = dsc_str_getline_ch(fp, &line, ';'); // Delimiter not present
     ASSERT_EQ_STR(dsc_str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
@@ -424,13 +465,14 @@ int test_getline_ch_delim_not_present(void) {
     return TEST_SUCCESS;
 }
 
-int test_getline_cstring_delim_not_present(void) {
-    FILE *fp = fopen("test_tmpfile4.txt", "w+");
+int test_getline_cstring_delim_not_present(void)
+{
+    FILE* fp = fopen("test_tmpfile4.txt", "w+");
     ASSERT_NOT_NULL(fp);
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line = dsc_str_create_empty(8);
+    DSCString line   = dsc_str_create_empty(8);
     const int status = dsc_str_getline_cstring(fp, &line, ";"); // Delimiter not present
     ASSERT_EQ_STR(dsc_str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
@@ -440,7 +482,8 @@ int test_getline_cstring_delim_not_present(void) {
     return TEST_SUCCESS;
 }
 
-int test_trim_front_back_only_ws(void) {
+int test_trim_front_back_only_ws(void)
+{
     DSCString str = dsc_str_create_from_cstring("   \t\n  ");
     dsc_str_trim_front(&str);
     ASSERT_TRUE(dsc_str_empty(&str) || dsc_str_size(&str) == 0);
@@ -451,7 +494,8 @@ int test_trim_front_back_only_ws(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_extra_ws_tabs_newlines(void) {
+int test_remove_extra_ws_tabs_newlines(void)
+{
     DSCString str = dsc_str_create_from_cstring("\t\t\n\n\t");
     dsc_str_remove_extra_ws(&str);
     ASSERT_TRUE(dsc_str_empty(&str) || dsc_str_size(&str) == 0);
@@ -459,7 +503,8 @@ int test_remove_extra_ws_tabs_newlines(void) {
     return TEST_SUCCESS;
 }
 
-int test_to_lower_upper_mixed(void) {
+int test_to_lower_upper_mixed(void)
+{
     DSCString str = dsc_str_create_from_cstring("AbC123xYz");
     dsc_str_to_lower(&str);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc123xyz");
@@ -469,22 +514,25 @@ int test_to_lower_upper_mixed(void) {
     return TEST_SUCCESS;
 }
 
-int test_find_first_of_empty_value(void) {
+int test_find_first_of_empty_value(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     ASSERT_EQ(dsc_str_find_first_of(&str, ""), STR_NPOS);
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_find_cstring_at_end(void) {
+int test_find_cstring_at_end(void)
+{
     DSCString str = dsc_str_create_from_cstring("abcdef");
     ASSERT_EQ(dsc_str_find_cstring(&str, "ef"), 4);
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_find_string_at_end(void) {
-    DSCString str = dsc_str_create_from_cstring("abcdef");
+int test_find_string_at_end(void)
+{
+    DSCString str  = dsc_str_create_from_cstring("abcdef");
     DSCString find = dsc_str_create_from_cstring("ef");
     ASSERT_EQ(dsc_str_find_string(&str, &find), 4);
     dsc_str_destroy(&str);
@@ -492,7 +540,8 @@ int test_find_string_at_end(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_string_count_0_pos_end(void) {
+int test_substr_create_string_count_0_pos_end(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub = dsc_str_substr_create_string(&str, dsc_str_size(&str), 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
@@ -502,16 +551,18 @@ int test_substr_create_string_count_0_pos_end(void) {
     return TEST_SUCCESS;
 }
 
-int test_substr_create_cstring_count_0_pos_end(void) {
-    const char *src = "abc";
-    DSCString sub = dsc_str_substr_create_cstring(src, strlen(src), 0);
+int test_substr_create_cstring_count_0_pos_end(void)
+{
+    const char* src = "abc";
+    DSCString sub   = dsc_str_substr_create_cstring(src, strlen(src), 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub), "");
     dsc_str_destroy(&sub);
     return TEST_SUCCESS;
 }
 
-int test_null_pointer_handling(void) {
+int test_null_pointer_handling(void)
+{
     // Should not crash, should return error or handle gracefully
     ASSERT_EQ(dsc_str_empty(nullptr), true);
     ASSERT_EQ(dsc_str_size(nullptr), 0);
@@ -521,44 +572,49 @@ int test_null_pointer_handling(void) {
     return TEST_SUCCESS;
 }
 
-int test_invalid_values(void) {
+int test_invalid_values(void)
+{
     DSCString str = dsc_str_create_empty(8);
-    dsc_str_insert_char(&str, (size_t) -1, 'X'); // Out-of-bounds
+    dsc_str_insert_char(&str, (size_t)-1, 'X'); // Out-of-bounds
     ASSERT_EQ_STR(dsc_str_data(&str), "");
-    dsc_str_erase(&str, (size_t) -1); // Out-of-bounds
+    dsc_str_erase(&str, (size_t)-1); // Out-of-bounds
     ASSERT_TRUE(dsc_str_empty(&str));
     dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
-int test_str_free_split_basic(void) {
+int test_str_free_split_basic(void)
+{
     const size_t count = 3;
-    DSCString *arr = (DSCString *) malloc(sizeof(DSCString) * count);
-    arr[0] = dsc_str_create_from_cstring("one");
-    arr[1] = dsc_str_create_from_cstring("two");
-    arr[2] = dsc_str_create_from_cstring("three");
+    DSCString* arr     = (DSCString*)malloc(sizeof(DSCString) * count);
+    arr[0]             = dsc_str_create_from_cstring("one");
+    arr[1]             = dsc_str_create_from_cstring("two");
+    arr[2]             = dsc_str_create_from_cstring("three");
     dsc_str_destroy_split(&arr, count);
     ASSERT_NULL(arr); // arr should be NULL after free
     return TEST_SUCCESS;
 }
 
-int test_str_free_split_nullptr(void) {
+int test_str_free_split_nullptr(void)
+{
     dsc_str_destroy_split(nullptr, 3); // Should not crash
     return TEST_SUCCESS;
 }
 
-int test_str_free_split_zero_count(void) {
-    DSCString *arr = (DSCString *) malloc(sizeof(DSCString) * 2);
-    arr[0] = dsc_str_create_from_cstring("a");
-    arr[1] = dsc_str_create_from_cstring("b");
+int test_str_free_split_zero_count(void)
+{
+    DSCString* arr = (DSCString*)malloc(sizeof(DSCString) * 2);
+    arr[0]         = dsc_str_create_from_cstring("a");
+    arr[1]         = dsc_str_create_from_cstring("b");
     dsc_str_destroy_split(&arr, 0); // Should only free the array pointer
     ASSERT_NULL(arr);
     return TEST_SUCCESS;
 }
 
-int test_str_split_basic(void) {
-    DSCString str = dsc_str_create_from_cstring("a,b,c");
-    DSCString *out = nullptr;
+int test_str_split_basic(void)
+{
+    DSCString str      = dsc_str_create_from_cstring("a,b,c");
+    DSCString* out     = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 3);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "a");
@@ -569,9 +625,10 @@ int test_str_split_basic(void) {
     return TEST_SUCCESS;
 }
 
-int test_str_split_no_delim(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    DSCString *out = nullptr;
+int test_str_split_no_delim(void)
+{
+    DSCString str      = dsc_str_create_from_cstring("abc");
+    DSCString* out     = nullptr;
     const size_t count = dsc_str_split(&str, ";", &out);
     ASSERT_EQ(count, 1);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "abc");
@@ -580,9 +637,10 @@ int test_str_split_no_delim(void) {
     return TEST_SUCCESS;
 }
 
-int test_str_split_empty_string(void) {
-    DSCString str = dsc_str_create_empty(8);
-    DSCString *out = nullptr;
+int test_str_split_empty_string(void)
+{
+    DSCString str      = dsc_str_create_empty(8);
+    DSCString* out     = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 0);
     ASSERT_NULL(out);
@@ -590,15 +648,17 @@ int test_str_split_empty_string(void) {
     return TEST_SUCCESS;
 }
 
-int test_str_split_nullptr(void) {
+int test_str_split_nullptr(void)
+{
     const size_t count = dsc_str_split(nullptr, ",", nullptr);
     ASSERT_EQ(count, 0);
     return TEST_SUCCESS;
 }
 
-int test_str_split_and_free_split(void) {
-    DSCString str = dsc_str_create_from_cstring("alpha,beta,gamma,delta");
-    DSCString *out = nullptr;
+int test_str_split_and_free_split(void)
+{
+    DSCString str      = dsc_str_create_from_cstring("alpha,beta,gamma,delta");
+    DSCString* out     = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 4);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "alpha");
@@ -611,9 +671,10 @@ int test_str_split_and_free_split(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -679,18 +740,22 @@ TestCase tests[] = {
     {test_str_split_and_free_split, "test_str_split_and_free_split"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DString Algorithm tests passed.\n");
         return 0;
     }

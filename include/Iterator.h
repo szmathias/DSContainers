@@ -23,25 +23,25 @@ typedef struct DSCIterator DSCIterator;
  */
 struct DSCIterator
 {
-    void *data_state;              // Implementation-specific state data
+    void* data_state; // Implementation-specific state data
 
     // Element access
-    void *(*get)(const DSCIterator *it);  // Get current element without advancing
+    void*(*get)(const DSCIterator* it); // Get current element without advancing
 
     // Forward iteration
-    int (*has_next)(const DSCIterator *it);  // Check if more elements exist
-    void *(*next)(const DSCIterator *it);    // Get next element and advance
+    int (*has_next)(const DSCIterator* it); // Check if more elements exist
+    void*(*next)(const DSCIterator* it);    // Get next element and advance
 
     // Backward iteration
-    int (*has_prev)(const DSCIterator *it);  // Check if previous elements exist
-    void *(*prev)(const DSCIterator *it);    // Get previous element and move back
+    int (*has_prev)(const DSCIterator* it); // Check if previous elements exist
+    void*(*prev)(const DSCIterator* it);    // Get previous element and move back
 
     // Control operations
-    void (*reset)(const DSCIterator *it);    // Reset to starting position
-    int (*is_valid)(const DSCIterator *it);  // Check if iterator is valid
+    void (*reset)(const DSCIterator* it);   // Reset to starting position
+    int (*is_valid)(const DSCIterator* it); // Check if iterator is valid
 
     // Resource management
-    void (*destroy)(DSCIterator *it);        // Free iterator resources
+    void (*destroy)(DSCIterator* it); // Free iterator resources
 };
 
 //==============================================================================
@@ -54,7 +54,7 @@ struct DSCIterator
  * @param element The source element to transform
  * @return A new element derived from the source
  */
-typedef void *(*transform_func)(const void *element);
+typedef void*(*transform_func)(const void* element);
 
 /**
  * Filter predicate function: tests if elements should be included.
@@ -62,7 +62,7 @@ typedef void *(*transform_func)(const void *element);
  * @param element The element to test
  * @return Non-zero to include element, 0 to exclude
  */
-typedef int (*filter_func)(const void *element);
+typedef int (*filter_func)(const void* element);
 
 //==============================================================================
 // Higher-order iterator functions
@@ -79,7 +79,7 @@ typedef int (*filter_func)(const void *element);
  * @param transform Function to apply to each element
  * @return A new iterator producing transformed elements
  */
-DSCIterator dsc_iterator_transform(DSCIterator *it, transform_func transform);
+DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform);
 
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
@@ -92,7 +92,7 @@ DSCIterator dsc_iterator_transform(DSCIterator *it, transform_func transform);
  * @param filter Predicate function that determines which elements to include
  * @return A new iterator yielding only elements that satisfy the predicate
  */
-DSCIterator dsc_iterator_filter(DSCIterator *it, filter_func filter);
+DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
 
 /**
  * Create an iterator that yields integers in a specified range.

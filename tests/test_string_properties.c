@@ -10,14 +10,16 @@
 
 
 // Property: The size of a string should never exceed its capacity.
-int test_string_size_and_capacity(void) {
+int test_string_size_and_capacity(void)
+{
     DSCString str = dsc_str_create_empty(0);
     ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
 
     dsc_str_assign_cstring(&str, "hello");
     ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 100; ++i)
+    {
         dsc_str_push_back(&str, 'a');
         ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
     }
@@ -30,8 +32,9 @@ int test_string_size_and_capacity(void) {
 }
 
 // Property: Trimming an already-trimmed string should not change it.
-int test_string_idempotent_trim(void) {
-    DSCString str = dsc_str_create_from_cstring("no whitespace");
+int test_string_idempotent_trim(void)
+{
+    DSCString str  = dsc_str_create_from_cstring("no whitespace");
     DSCString copy = dsc_str_create_from_string(&str);
 
     dsc_str_trim_front(&str);
@@ -45,7 +48,8 @@ int test_string_idempotent_trim(void) {
 }
 
 // Property: Converting to lower than upper case should be the same as just converting to upper case.
-int test_string_case_conversion_reversibility(void) {
+int test_string_case_conversion_reversibility(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("MiXeD cAsE 123!");
     DSCString str2 = dsc_str_create_from_string(&str1);
 
@@ -61,9 +65,10 @@ int test_string_case_conversion_reversibility(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -72,18 +77,22 @@ TestCase tests[] = {
     {test_string_case_conversion_reversibility, "test_string_case_conversion_reversibility"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DString Property tests passed.\n");
         return 0;
     }

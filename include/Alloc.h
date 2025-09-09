@@ -9,10 +9,10 @@
 
 typedef struct DSCAlloc
 {
-    void * (*alloc_func)(size_t size);
-    void   (*dealloc_func)(void *ptr);
-    void   (*data_free_func)(void *ptr);
-    void * (*copy_func)(const void *data);
+    void* (*alloc_func)(size_t size);
+    void (*dealloc_func)(void* ptr);
+    void (*data_free_func)(void* ptr);
+    void* (*copy_func)(const void* data);
 } DSCAlloc;
 
 //==============================================================================
@@ -26,7 +26,7 @@ typedef struct DSCAlloc
  * @param size Number of bytes to allocate
  * @return Pointer to allocated memory, or NULL on failure
  */
-typedef void * (*alloc_func)(size_t size);
+typedef void* (*alloc_func)(size_t size);
 
 /**
  * Memory deallocation function compatible with free.
@@ -34,7 +34,7 @@ typedef void * (*alloc_func)(size_t size);
  *
  * @param ptr Pointer to memory to be freed
  */
-typedef void (*dealloc_func)(void *ptr);
+typedef void (*dealloc_func)(void* ptr);
 
 /**
  * Function to free user data stored in the list.
@@ -42,7 +42,7 @@ typedef void (*dealloc_func)(void *ptr);
  *
  * @param ptr Pointer to user data to be freed
  */
-typedef void (*data_free_func)(void *ptr);
+typedef void (*data_free_func)(void* ptr);
 
 /**
  * Comparison function for list elements.
@@ -57,7 +57,7 @@ typedef void (*data_free_func)(void *ptr);
  * @param b Pointer to second element
  * @return Integer indicating comparison result
  */
-typedef int (*cmp_func)(const void *a, const void *b);
+typedef int (*cmp_func)(const void* a, const void* b);
 
 /**
  * Copy function for deep copying element data.
@@ -66,6 +66,6 @@ typedef int (*cmp_func)(const void *a, const void *b);
  * @param data Pointer to original element data
  * @return Pointer to copied data (must be freed by caller)
  */
-typedef void *(*copy_func)(const void *data);
+typedef void*(*copy_func)(const void* data);
 
 #endif //DSCONTAINERS_ALLOC_H

@@ -9,27 +9,30 @@
 #include <stdlib.h>
 #include <time.h>
 
-int test_stress(void){
-    DSCAlloc *alloc = create_std_allocator();
-    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+int test_stress(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
     const size_t NUM_ELEMENTS = 10000;
 
     // Add many elements
-    for (size_t i = 0; i < NUM_ELEMENTS; i++) {
-        int *val = malloc(sizeof(int));
-        *val = (int)i;
+    for (size_t i = 0; i < NUM_ELEMENTS; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = (int)i;
         ASSERT_EQ(dsc_sll_insert_back(list, val), 0);
     }
     ASSERT_EQ(list->size, NUM_ELEMENTS);
 
     // Find an element in the middle
-    const size_t key = NUM_ELEMENTS / 2;
-    const DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
+    const size_t key                 = NUM_ELEMENTS / 2;
+    const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, (int)key);
 
     // Remove elements from the front
-    for (size_t i = 0; i < NUM_ELEMENTS / 2; i++) {
+    for (size_t i = 0; i < NUM_ELEMENTS / 2; i++)
+    {
         ASSERT_EQ(dsc_sll_remove_at(list, 0, true), 0);
     }
     ASSERT_EQ(list->size, NUM_ELEMENTS / 2);
@@ -39,21 +42,24 @@ int test_stress(void){
     return TEST_SUCCESS;
 }
 
-int test_performance(void){
+int test_performance(void)
+{
     const int NUM_SIZES = 3;
 
     printf("\nSLL Performance tests:\n");
-    for (int s = 0; s < NUM_SIZES; s++) {
-        const int SIZES[] = {100, 1000, 10000};
-        const int SIZE = SIZES[s];
-        DSCAlloc *alloc = create_std_allocator();
-        DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+    for (int s = 0; s < NUM_SIZES; s++)
+    {
+        const int SIZES[]         = {100, 1000, 10000};
+        const int SIZE            = SIZES[s];
+        DSCAlloc* alloc           = create_std_allocator();
+        DSCSinglyLinkedList* list = dsc_sll_create(alloc);
 
         // Measure insertion time
         clock_t start = clock();
-        for (int i = 0; i < SIZE; i++) {
-            int *val = malloc(sizeof(int));
-            *val = i;
+        for (int i = 0; i < SIZE; i++)
+        {
+            int* val = malloc(sizeof(int));
+            *val     = i;
             dsc_sll_insert_back(list, val);
         }
         clock_t end = clock();
@@ -61,10 +67,10 @@ int test_performance(void){
                (double)(end - start) / CLOCKS_PER_SEC);
 
         // Measure search time for last element
-        start = clock();
-        int key = SIZE - 1;
-        const DSCSinglyLinkedNode *found = dsc_sll_find(list, &key, int_cmp);
-        end = clock();
+        start                            = clock();
+        int key                          = SIZE - 1;
+        const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
+        end                              = clock();
         printf("Find last element in %d elements: %.6f seconds\n", SIZE,
                (double)(end - start) / CLOCKS_PER_SEC);
         ASSERT_NOT_NULL(found);
@@ -77,9 +83,10 @@ int test_performance(void){
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -87,18 +94,22 @@ TestCase tests[] = {
     {test_performance, "test_performance"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All SinglyLinkedList Performance tests passed.\n");
         return 0;
     }
