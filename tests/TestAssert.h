@@ -2,8 +2,8 @@
 // Created by zack on 8/20/2025.
 //
 
-#ifndef DS_TESTASSERT_H
-#define DS_TESTASSERT_H
+#ifndef DSCONTAINERS_TESTASSERT_H
+#define DSCONTAINERS_TESTASSERT_H
 
 #include <string.h>
 #include <math.h>
@@ -51,15 +51,15 @@
 
 /* NOTE: This macro is for DString types */
 #define ASSERT_EQ_DSTRING(a, b) \
-	do \
-	{ \
-		if (str_compare_string((a), (b)) != 0) \
-		{ \
-			fprintf(stderr, "Assertion failed: %s == %s, file %s, line %d\n", #a, #b, __FILE__, __LINE__); \
-			fprintf(stderr, "  Actual: '%s' != '%s'\n", str_data(a), str_data(b)); \
-			return TEST_FAILURE; \
-		} \
-	} while (0)
+    do \
+    { \
+        if (dsc_str_compare_string((a), (b)) != 0) \
+        { \
+            fprintf(stderr, "Assertion failed: %s == %s, file %s, line %d\n", #a, #b, __FILE__, __LINE__); \
+            fprintf(stderr, "  Actual: '%s' != '%s'\n", dsc_str_data(a), dsc_str_data(b)); \
+            return TEST_FAILURE; \
+        } \
+    } while (0)
 
 #define ASSERT_EQ_FLOAT(a, b, eps) \
 	do \
@@ -210,4 +210,4 @@
         return TEST_FAILURE; \
     } while (0)
 
-#endif //DS_TESTASSERT_H
+#endif //DSCONTAINERS_TESTASSERT_H

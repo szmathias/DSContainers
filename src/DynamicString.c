@@ -21,7 +21,7 @@ static char *mem_calloc(const size_t num_elements)
 }
 
 // Centralized buffer management helper
-static bool str_realloc(String *str, const size_t new_capacity)
+static bool dsc_str_realloc(DSCString *str, const size_t new_capacity)
 {
     const char *old_data = STR_DATA(str);
     const size_t copy_size = str->size;
@@ -32,7 +32,7 @@ static bool str_realloc(String *str, const size_t new_capacity)
         if (!temp && copy_size > 0) {
             return false; // Failed to allocate temporary buffer
         }
-        
+
         memcpy(temp, old_data, copy_size);
         SAFE_FREE(str->data);
 
@@ -48,7 +48,7 @@ static bool str_realloc(String *str, const size_t new_capacity)
         if (!new_data) {
             return false; // Failed to allocate new buffer
         }
-        
+
         memcpy(new_data, old_data, copy_size);
         if (str->capacity > STR_MIN_INIT_CAP && str->data)
         {
@@ -62,7 +62,7 @@ static bool str_realloc(String *str, const size_t new_capacity)
 }
 
 // Helper function to ensure enough capacity for data
-static bool str_ensure_capacity(String *str, const size_t required_capacity)
+static bool dsc_str_ensure_capacity(DSCString *str, const size_t required_capacity)
 {
     if (required_capacity <= str->capacity)
     {
@@ -75,12 +75,12 @@ static bool str_ensure_capacity(String *str, const size_t required_capacity)
         new_capacity = required_capacity;
     }
 
-    return str_realloc(str, new_capacity);
+    return dsc_str_realloc(str, new_capacity);
 }
 
-String str_create_empty(const size_t initial_capacity)
+DSCString dsc_str_create_empty(const size_t initial_capacity)
 {
-    String result;
+    DSCString result;
 
     const size_t capacity = (initial_capacity >= STR_MIN_INIT_CAP) ? initial_capacity : STR_MIN_INIT_CAP;
 
@@ -106,15 +106,15 @@ String str_create_empty(const size_t initial_capacity)
     return result;
 }
 
-String str_create_from_cstring(const char *cstr)
+DSCString dsc_str_create_from_cstring(const char *cstr)
 {
     if (!cstr)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
     const size_t length = strlen(cstr);
-    String result       = str_create_empty(length + 1); // +1 for the null-terminator
+    DSCString result       = dsc_str_create_empty(length + 1); // +1 for the null-terminator
     char *data_to_use   = STR_DATA(&result);
     memcpy(data_to_use, cstr, length);
     result.size = length;
@@ -122,18 +122,18 @@ String str_create_from_cstring(const char *cstr)
     return result;
 }
 
-String str_create_from_string(const String *str)
+DSCString dsc_str_create_from_string(const DSCString *str)
 {
     if (!str)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
     const char *data_to_use = STR_DATA(str);
-    return str_create_from_cstring(data_to_use);
+    return dsc_str_create_from_cstring(data_to_use);
 }
 
-void str_destroy(String *str)
+void dsc_str_destroy(DSCString *str)
 {
     if (!str)
     {
@@ -149,7 +149,7 @@ void str_destroy(String *str)
     str->data     = NULL;
 }
 
-void str_destroy_split(String **str, const size_t count)
+void dsc_str_destroy_split(DSCString **str, const size_t count)
 {
     if (!str)
     {
@@ -165,42 +165,42 @@ void str_destroy_split(String **str, const size_t count)
 
     for (size_t i = 0; i < count; i++)
     {
-        String temp = (*str)[i];
-        str_destroy(&temp);
+        DSCString temp = (*str)[i];
+        dsc_str_destroy(&temp);
     }
     free(*str);
     *str = NULL;
 }
 
-void str_assign_char(String *str, const char value)
+void dsc_str_assign_char(DSCString *str, const char value)
 {
     if (!str)
     {
         return;
     }
 
-    str_clear(str);
+    dsc_str_clear(str);
     char *data_to_use = STR_DATA(str);
     data_to_use[0]    = value;
     str->size         = 1;
 }
 
-void str_assign_cstring(String *str, const char *cstr)
+void dsc_str_assign_cstring(DSCString *str, const char *cstr)
 {
     if (!str || !cstr)
     {
         return;
     }
 
-    str_clear(str);
+    dsc_str_clear(str);
     const size_t length = strlen(cstr);
-    str_ensure_capacity(str, length + 1); // +1 for the null-terminator
+    dsc_str_ensure_capacity(str, length + 1); // +1 for the null-terminator
     char *data_to_use = STR_DATA(str);
     memcpy(data_to_use, cstr, length + 1);
     str->size = length;
 }
 
-void str_assign_string(String *str, const String *from)
+void dsc_str_assign_string(DSCString *str, const DSCString *from)
 {
     if (!str || !from)
     {
@@ -213,17 +213,17 @@ void str_assign_string(String *str, const String *from)
     }
 
     const char *data_to_use = STR_DATA(from);
-    str_assign_cstring(str, data_to_use);
+    dsc_str_assign_cstring(str, data_to_use);
 }
 
-void str_push_back(String *str, const char value)
+void dsc_str_push_back(DSCString *str, const char value)
 {
     if (!str)
     {
         return;
     }
 
-    str_ensure_capacity(str, str->size + 1); // Ensure enough capacity for the new character
+    dsc_str_ensure_capacity(str, str->size + 1); // Ensure enough capacity for the new character
 
     if (str->capacity == STR_MIN_INIT_CAP)
     {
@@ -237,17 +237,17 @@ void str_push_back(String *str, const char value)
     ++str->size;
 }
 
-void str_append_char(String *str, const char value)
+void dsc_str_append_char(DSCString *str, const char value)
 {
     if (!str)
     {
         return;
     }
 
-    str_push_back(str, value);
+    dsc_str_push_back(str, value);
 }
 
-void str_append_cstring(String *str, const char *cstr)
+void dsc_str_append_cstring(DSCString *str, const char *cstr)
 {
     if (!str || !cstr)
     {
@@ -255,7 +255,7 @@ void str_append_cstring(String *str, const char *cstr)
     }
 
     const size_t length = strlen(cstr);
-    str_ensure_capacity(str, str->size + length + 1); // Ensure enough capacity for the entire C-string
+    dsc_str_ensure_capacity(str, str->size + length + 1); // Ensure enough capacity for the entire C-string
 
     char *data_to_use = STR_DATA(str);
     memcpy(data_to_use + str->size, cstr, length);
@@ -263,7 +263,7 @@ void str_append_cstring(String *str, const char *cstr)
     str->size += length;
 }
 
-void str_append_string(String *str, const String *from)
+void dsc_str_append_string(DSCString *str, const DSCString *from)
 {
     if (!str || !from)
     {
@@ -271,10 +271,10 @@ void str_append_string(String *str, const String *from)
     }
 
     const char *data_to_use = STR_DATA(from);
-    str_append_cstring(str, data_to_use);
+    dsc_str_append_cstring(str, data_to_use);
 }
 
-void str_insert_char(String *str, const size_t pos, const char value)
+void dsc_str_insert_char(DSCString *str, const size_t pos, const char value)
 {
     if (!str)
     {
@@ -288,7 +288,7 @@ void str_insert_char(String *str, const size_t pos, const char value)
 
     if (str->size + 1 > str->capacity - 1)
     {
-        str_realloc(str, GROW_CAPACITY(str->capacity));
+        dsc_str_realloc(str, GROW_CAPACITY(str->capacity));
     }
 
     char *data_to_use = STR_DATA(str);
@@ -308,7 +308,7 @@ void str_insert_char(String *str, const size_t pos, const char value)
     str->size++;
 }
 
-void str_insert_cstring(String *str, const size_t pos, const char *cstr)
+void dsc_str_insert_cstring(DSCString *str, const size_t pos, const char *cstr)
 {
     if (!str || !cstr)
     {
@@ -322,18 +322,18 @@ void str_insert_cstring(String *str, const size_t pos, const char *cstr)
 
     if (pos == str->size)
     {
-        str_append_cstring(str, cstr);
+        dsc_str_append_cstring(str, cstr);
     }
     else
     {
         for (size_t i = 0; i < strlen(cstr); i++)
         {
-            str_insert_char(str, pos + i, cstr[i]);
+            dsc_str_insert_char(str, pos + i, cstr[i]);
         }
     }
 }
 
-void str_insert_string(String *str, const size_t pos, const String *from)
+void dsc_str_insert_string(DSCString *str, const size_t pos, const DSCString *from)
 {
     if (!str || !from)
     {
@@ -341,10 +341,10 @@ void str_insert_string(String *str, const size_t pos, const String *from)
     }
 
     const char *data_to_use = STR_DATA(from);
-    str_insert_cstring(str, pos, data_to_use);
+    dsc_str_insert_cstring(str, pos, data_to_use);
 }
 
-void str_pop_back(String *str)
+void dsc_str_pop_back(DSCString *str)
 {
     if (!str)
     {
@@ -359,7 +359,7 @@ void str_pop_back(String *str)
     }
 }
 
-void str_erase(String *str, const size_t pos)
+void dsc_str_erase(DSCString *str, const size_t pos)
 {
     if (!str)
     {
@@ -373,7 +373,7 @@ void str_erase(String *str, const size_t pos)
 
     if (pos == str->size - 1)
     {
-        str_pop_back(str);
+        dsc_str_pop_back(str);
     }
     else
     {
@@ -388,7 +388,7 @@ void str_erase(String *str, const size_t pos)
     }
 }
 
-bool str_empty(const String *str)
+bool dsc_str_empty(const DSCString *str)
 {
     if (!str)
     {
@@ -398,7 +398,7 @@ bool str_empty(const String *str)
     return (str->size == 0);
 }
 
-void str_clear(String *str)
+void dsc_str_clear(DSCString *str)
 {
     if (!str)
     {
@@ -411,7 +411,7 @@ void str_clear(String *str)
     str->size = 0;
 }
 
-bool str_reserve(String *str, const size_t new_capacity)
+bool dsc_str_reserve(DSCString *str, const size_t new_capacity)
 {
     if (!str)
     {
@@ -422,11 +422,11 @@ bool str_reserve(String *str, const size_t new_capacity)
     {
         return false;
     }
-    
-    return str_realloc(str, new_capacity);
+
+    return dsc_str_realloc(str, new_capacity);
 }
 
-bool str_shrink_to_fit(String *str)
+bool dsc_str_shrink_to_fit(DSCString *str)
 {
     if (!str)
     {
@@ -444,11 +444,11 @@ bool str_shrink_to_fit(String *str)
         return true;
     }
 
-    str_realloc(str, new_capacity);
+    dsc_str_realloc(str, new_capacity);
     return true;
 }
 
-char *str_data(String *str)
+char *dsc_str_data(DSCString *str)
 {
     if (!str)
     {
@@ -458,7 +458,7 @@ char *str_data(String *str)
     return STR_DATA(str);
 }
 
-size_t str_capacity(const String *str)
+size_t dsc_str_capacity(const DSCString *str)
 {
     if (!str)
     {
@@ -468,7 +468,7 @@ size_t str_capacity(const String *str)
     return str->capacity;
 }
 
-size_t str_size(const String *str)
+size_t dsc_str_size(const DSCString *str)
 {
     if (!str)
     {
@@ -478,7 +478,7 @@ size_t str_size(const String *str)
     return str->size;
 }
 
-size_t str_find_first_of(const String *str, const char *value)
+size_t dsc_str_find_first_of(const DSCString *str, const char *value)
 {
     if (!str || !value)
     {
@@ -495,7 +495,7 @@ size_t str_find_first_of(const String *str, const char *value)
     return STR_NPOS;
 }
 
-size_t str_find_cstring(const String *str, const char *find)
+size_t dsc_str_find_cstring(const DSCString *str, const char *find)
 {
     if (!str || !find)
     {
@@ -525,7 +525,7 @@ size_t str_find_cstring(const String *str, const char *find)
     return pos;
 }
 
-size_t str_find_string(const String *str, const String *find)
+size_t dsc_str_find_string(const DSCString *str, const DSCString *find)
 {
     if (!str || !find)
     {
@@ -533,10 +533,10 @@ size_t str_find_string(const String *str, const String *find)
     }
 
     const char *data_to_use = STR_DATA(find);
-    return str_find_cstring(str, data_to_use);
+    return dsc_str_find_cstring(str, data_to_use);
 }
 
-void str_trim_front(String *str)
+void dsc_str_trim_front(DSCString *str)
 {
     if (!str)
     {
@@ -559,19 +559,19 @@ void str_trim_front(String *str)
     const size_t count = str->size - i;
     if (count == 0)
     {
-        str_clear(str);
+        dsc_str_clear(str);
     }
     else
     {
         memmove(data, data + i, count);
         for (size_t j = 0; j < i; ++j)
         {
-            str_pop_back(str);
+            dsc_str_pop_back(str);
         }
     }
 }
 
-void str_trim_back(String *str)
+void dsc_str_trim_back(DSCString *str)
 {
     if (!str)
     {
@@ -586,11 +586,11 @@ void str_trim_back(String *str)
     const char *data = STR_DATA(str);
     while (isspace(data[str->size - 1]))
     {
-        str_pop_back(str);
+        dsc_str_pop_back(str);
     }
 }
 
-void str_remove_extra_ws(String *str)
+void dsc_str_remove_extra_ws(DSCString *str)
 {
     if (!str)
     {
@@ -599,8 +599,8 @@ void str_remove_extra_ws(String *str)
 
     char *data_to_use = STR_DATA(str);
 
-    str_trim_back(str);
-    str_trim_front(str);
+    dsc_str_trim_back(str);
+    dsc_str_trim_front(str);
     for (size_t i = 0; i < str->size; ++i)
     {
         if (isspace((unsigned char) data_to_use[i]) != 0 && isspace((unsigned char) data_to_use[i + 1]) != 0)
@@ -609,7 +609,7 @@ void str_remove_extra_ws(String *str)
             {
                 data_to_use[i] = ' ';
             }
-            str_erase(str, i);
+            dsc_str_erase(str, i);
             --i;
         }
         else if (isspace((unsigned char) data_to_use[i]) != 0 && data_to_use[i] != ' ')
@@ -619,7 +619,7 @@ void str_remove_extra_ws(String *str)
     }
 }
 
-void str_to_lower(String *str)
+void dsc_str_to_lower(DSCString *str)
 {
     if (!str)
     {
@@ -633,7 +633,7 @@ void str_to_lower(String *str)
     }
 }
 
-void str_to_upper(String *str)
+void dsc_str_to_upper(DSCString *str)
 {
     if (!str)
     {
@@ -647,11 +647,11 @@ void str_to_upper(String *str)
     }
 }
 
-String str_substr_create_cstring(const char *cstr, const size_t pos, size_t count)
+DSCString dsc_str_substr_create_cstring(const char *cstr, const size_t pos, size_t count)
 {
     if (!cstr)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
     const size_t size = strlen(cstr);
@@ -663,35 +663,35 @@ String str_substr_create_cstring(const char *cstr, const size_t pos, size_t coun
 
     if (size - count > size)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
     if (pos >= size)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
-    String result = str_create_empty(count);
+    DSCString result = dsc_str_create_empty(count);
     for (size_t i = 0; i < count; i++)
     {
-        str_push_back(&result, cstr[i + pos]);
+        dsc_str_push_back(&result, cstr[i + pos]);
     }
 
     return result;
 }
 
-String str_substr_create_string(const String *str, const size_t pos, const size_t count)
+DSCString dsc_str_substr_create_string(const DSCString *str, const size_t pos, const size_t count)
 {
     if (!str)
     {
-        return str_create_empty(0);
+        return dsc_str_create_empty(0);
     }
 
     const char *data_to_use = STR_DATA(str);
-    return str_substr_create_cstring(data_to_use, pos, count);
+    return dsc_str_substr_create_cstring(data_to_use, pos, count);
 }
 
-char *str_substr_cstring(const char *cstr, const size_t pos, size_t count, char *buffer)
+char *dsc_str_substr_cstring(const char *cstr, const size_t pos, size_t count, char *buffer)
 {
     if (!cstr || !buffer)
     {
@@ -722,7 +722,7 @@ char *str_substr_cstring(const char *cstr, const size_t pos, size_t count, char 
     return buffer;
 }
 
-char *str_substr_string(const String *str, const size_t pos, const size_t count, char *buffer)
+char *dsc_str_substr_string(const DSCString *str, const size_t pos, const size_t count, char *buffer)
 {
     if (!str || !buffer)
     {
@@ -730,10 +730,10 @@ char *str_substr_string(const String *str, const size_t pos, const size_t count,
     }
 
     const char *data_to_use = STR_DATA(str);
-    return str_substr_cstring(data_to_use, pos, count, buffer);
+    return dsc_str_substr_cstring(data_to_use, pos, count, buffer);
 }
 
-size_t str_split(const String *str, const char *delim, String **out)
+size_t dsc_str_split(const DSCString *str, const char *delim, DSCString **out)
 {
     if (!str || !delim)
     {
@@ -749,7 +749,7 @@ size_t str_split(const String *str, const char *delim, String **out)
     char *buffer       = mem_calloc(str->size + 1);
     memcpy(buffer, STR_DATA(str), str->size);
 
-    String *temp = malloc(sizeof(String));
+    DSCString *temp = malloc(sizeof(DSCString));
     if (!temp)
     {
         free(buffer);
@@ -759,7 +759,7 @@ size_t str_split(const String *str, const char *delim, String **out)
     const char *token = strtok(buffer, delim);
     while (token != NULL)
     {
-        String *new_temp = realloc(temp, sizeof(String) * (num_strings + 1));
+        DSCString *new_temp = realloc(temp, sizeof(DSCString) * (num_strings + 1));
         if (!new_temp)
         {
             fprintf(stderr, "Error: Unable to allocate memory\n");
@@ -768,7 +768,7 @@ size_t str_split(const String *str, const char *delim, String **out)
             return 0;
         }
         temp              = new_temp;
-        temp[num_strings] = str_create_from_cstring(token);
+        temp[num_strings] = dsc_str_create_from_cstring(token);
         num_strings++;
         token = strtok(NULL, delim);
     }
@@ -778,7 +778,7 @@ size_t str_split(const String *str, const char *delim, String **out)
     return num_strings;
 }
 
-int str_compare_cstring(const String *lhs, const char *rhs)
+int dsc_str_compare_cstring(const DSCString *lhs, const char *rhs)
 {
     if (!lhs || !rhs)
     {
@@ -806,7 +806,7 @@ int str_compare_cstring(const String *lhs, const char *rhs)
     return result;
 }
 
-int str_compare_string(const String *lhs, const String *rhs)
+int dsc_str_compare_string(const DSCString *lhs, const DSCString *rhs)
 {
     if (!lhs || !rhs)
     {
@@ -814,10 +814,10 @@ int str_compare_string(const String *lhs, const String *rhs)
     }
 
     const char *rhs_data_to_use = STR_DATA(rhs);
-    return str_compare_cstring(lhs, rhs_data_to_use);
+    return dsc_str_compare_cstring(lhs, rhs_data_to_use);
 }
 
-int str_getline_ch(FILE *stream, String *line, int delim)
+int dsc_str_getline_ch(FILE *stream, DSCString *line, int delim)
 {
     if (line == NULL || stream == NULL)
     {
@@ -829,7 +829,7 @@ int str_getline_ch(FILE *stream, String *line, int delim)
         return EOF; // Invalid delimiter
     }
 
-    str_clear(line);
+    dsc_str_clear(line);
     int ch     = 0;
     int status = 0;
 
@@ -840,7 +840,7 @@ int str_getline_ch(FILE *stream, String *line, int delim)
 
     while ((ch = fgetc(stream)) != EOF && ch != delim)
     {
-        str_push_back(line, (char) ch);
+        dsc_str_push_back(line, (char) ch);
     }
 
     if (feof(stream))
@@ -850,7 +850,7 @@ int str_getline_ch(FILE *stream, String *line, int delim)
     return status;
 }
 
-int str_getline_cstring(FILE *stream, String *line, const char *delim)
+int dsc_str_getline_cstring(FILE *stream, DSCString *line, const char *delim)
 {
     if (line == NULL || stream == NULL)
     {
@@ -862,7 +862,7 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
         delim = "\n"; // Default delimiter is newline
     }
 
-    str_clear(line);
+    dsc_str_clear(line);
 
     int ch     = 0;
     int status = 0;
@@ -873,7 +873,7 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
         {
             break;
         }
-        str_push_back(line, (char) ch);
+        dsc_str_push_back(line, (char) ch);
     }
 
     if (ch == EOF)
@@ -883,7 +883,7 @@ int str_getline_cstring(FILE *stream, String *line, const char *delim)
     return status;
 }
 
-int str_getline_string(FILE *stream, String *line, const String *delim)
+int dsc_str_getline_string(FILE *stream, DSCString *line, const DSCString *delim)
 {
     if (!line || !stream || !delim)
     {
@@ -891,5 +891,5 @@ int str_getline_string(FILE *stream, String *line, const String *delim)
     }
 
     const char *delim_data = STR_DATA(delim);
-    return str_getline_cstring(stream, line, delim_data);
+    return dsc_str_getline_cstring(stream, line, delim_data);
 }

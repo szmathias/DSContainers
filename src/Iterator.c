@@ -17,7 +17,7 @@
  */
 typedef struct TransformState
 {
-    Iterator *base_iterator;      // Source iterator
+    DSCIterator *base_iterator;      // Source iterator
     transform_func transform;     // Transformation function
     int has_owner;                // Flag indicating ownership of base element
 } TransformState;
@@ -27,7 +27,7 @@ typedef struct TransformState
  */
 typedef struct FilterState
 {
-    Iterator *base_iterator;      // Source iterator
+    DSCIterator *base_iterator;      // Source iterator
     filter_func filter;           // Predicate function
     void *next_element;           // Next matching element (cached)
     int has_cached_element;       // Flag indicating cache validity
@@ -51,34 +51,34 @@ typedef struct RangeState
 //==============================================================================
 
 // Transform iterator functions
-static void *transform_get(const Iterator *it);
-static int transform_has_next(const Iterator *it);
-static void *transform_next(const Iterator *it);
-static int transform_has_prev(const Iterator *it);
-static void *transform_prev(const Iterator *it);
-static void transform_reset(const Iterator *it);
-static int transform_is_valid(const Iterator *it);
-static void transform_destroy(Iterator *it);
+static void *transform_get(const DSCIterator *it);
+static int transform_has_next(const DSCIterator *it);
+static void *transform_next(const DSCIterator *it);
+static int transform_has_prev(const DSCIterator *it);
+static void *transform_prev(const DSCIterator *it);
+static void transform_reset(const DSCIterator *it);
+static int transform_is_valid(const DSCIterator *it);
+static void transform_destroy(DSCIterator *it);
 
 // Filter iterator functions
-static void *filter_get(const Iterator *it);
-static int filter_has_next(const Iterator *it);
-static void *filter_next(const Iterator *it);
-static int filter_has_prev(const Iterator *it);
-static void *filter_prev(const Iterator *it);
-static void filter_reset(const Iterator *it);
-static int filter_is_valid(const Iterator *it);
-static void filter_destroy(Iterator *it);
+static void *filter_get(const DSCIterator *it);
+static int filter_has_next(const DSCIterator *it);
+static void *filter_next(const DSCIterator *it);
+static int filter_has_prev(const DSCIterator *it);
+static void *filter_prev(const DSCIterator *it);
+static void filter_reset(const DSCIterator *it);
+static int filter_is_valid(const DSCIterator *it);
+static void filter_destroy(DSCIterator *it);
 
 // Range iterator functions
-static void *range_get(const Iterator *it);
-static int range_has_next(const Iterator *it);
-static void *range_next(const Iterator *it);
-static int range_has_prev(const Iterator *it);
-static void *range_prev(const Iterator *it);
-static void range_reset(const Iterator *it);
-static int range_is_valid(const Iterator *it);
-static void range_destroy(Iterator *it);
+static void *range_get(const DSCIterator *it);
+static int range_has_next(const DSCIterator *it);
+static void *range_next(const DSCIterator *it);
+static int range_has_prev(const DSCIterator *it);
+static void *range_prev(const DSCIterator *it);
+static void range_reset(const DSCIterator *it);
+static int range_is_valid(const DSCIterator *it);
+static void range_destroy(DSCIterator *it);
 
 //==============================================================================
 // Transform iterator implementation
@@ -87,7 +87,7 @@ static void range_destroy(Iterator *it);
 /**
  * Get current element from transform iterator.
  */
-static void *transform_get(const Iterator *it)
+static void *transform_get(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -132,7 +132,7 @@ static void *transform_get(const Iterator *it)
 /**
  * Check if transform iterator has more elements.
  */
-static int transform_has_next(const Iterator *it)
+static int transform_has_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -151,7 +151,7 @@ static int transform_has_next(const Iterator *it)
 /**
  * Get next element from transform iterator and advance.
  */
-static void *transform_next(const Iterator *it)
+static void *transform_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -159,7 +159,7 @@ static void *transform_next(const Iterator *it)
     }
 
     const TransformState *state = it->data_state;
-    const Iterator *base_it = state->base_iterator;
+    const DSCIterator *base_it = state->base_iterator;
     if (!base_it || !base_it->next || !state->transform)
     {
         return NULL;
@@ -201,7 +201,7 @@ static void *transform_next(const Iterator *it)
 /**
  * Check if transform iterator has previous elements (not supported).
  */
-static int transform_has_prev(const Iterator *it)
+static int transform_has_prev(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     return 0;  // Transform iterator does not support has_prev
@@ -210,7 +210,7 @@ static int transform_has_prev(const Iterator *it)
 /**
  * Get previous element from transform iterator (not supported).
  */
-static void *transform_prev(const Iterator *it)
+static void *transform_prev(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     return NULL;  // Transform iterator does not support prev
@@ -219,7 +219,7 @@ static void *transform_prev(const Iterator *it)
 /**
  * Reset transform iterator (not supported).
  */
-static void transform_reset(const Iterator *it)
+static void transform_reset(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     // Transform iterator does not support reset
@@ -228,7 +228,7 @@ static void transform_reset(const Iterator *it)
 /**
  * Check if transform iterator is valid.
  */
-static int transform_is_valid(const Iterator *it)
+static int transform_is_valid(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -247,7 +247,7 @@ static int transform_is_valid(const Iterator *it)
 /**
  * Free resources used by transform iterator.
  */
-static void transform_destroy(Iterator *it)
+static void transform_destroy(DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -268,9 +268,9 @@ static void transform_destroy(Iterator *it)
 /**
  * Create a transforming iterator that applies a function to each element.
  */
-Iterator iterator_transform(Iterator *it, const transform_func transform)
+DSCIterator dsc_iterator_transform(DSCIterator *it, const transform_func transform)
 {
-    Iterator new_it = {0};  // Initialize all fields to NULL/0
+    DSCIterator new_it = {0};  // Initialize all fields to NULL/0
 
     new_it.get = transform_get;
     new_it.has_next = transform_has_next;
@@ -320,7 +320,7 @@ Iterator iterator_transform(Iterator *it, const transform_func transform)
 /**
  * Get current element from filter iterator.
  */
-static void *filter_get(const Iterator *it)
+static void *filter_get(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -348,7 +348,7 @@ static void *filter_get(const Iterator *it)
 /**
  * Check if filter iterator has more elements.
  */
-static int filter_has_next(const Iterator *it)
+static int filter_has_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -366,7 +366,7 @@ static int filter_has_next(const Iterator *it)
         return 1;
     }
 
-    const Iterator *base_it = state->base_iterator;
+    const DSCIterator *base_it = state->base_iterator;
 
     while (base_it->has_next(base_it))
     {
@@ -424,7 +424,7 @@ static int filter_has_next(const Iterator *it)
 /**
  * Get next element from filter iterator and advance.
  */
-static void *filter_next(const Iterator *it)
+static void *filter_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -432,7 +432,7 @@ static void *filter_next(const Iterator *it)
     }
 
     FilterState *state = it->data_state;
-    const Iterator *base_it = state->base_iterator;
+    const DSCIterator *base_it = state->base_iterator;
     if (!base_it || !base_it->next)
     {
         return NULL;
@@ -477,7 +477,7 @@ static void *filter_next(const Iterator *it)
 /**
  * Check if filter iterator has previous elements (not supported).
  */
-static int filter_has_prev(const Iterator *it)
+static int filter_has_prev(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     return 0;  // Filter iterator does not support has_prev
@@ -486,7 +486,7 @@ static int filter_has_prev(const Iterator *it)
 /**
  * Get previous element from filter iterator (not supported).
  */
-static void *filter_prev(const Iterator *it)
+static void *filter_prev(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     return NULL;  // Filter iterator does not support prev
@@ -495,7 +495,7 @@ static void *filter_prev(const Iterator *it)
 /**
  * Reset filter iterator (not supported).
  */
-static void filter_reset(const Iterator *it)
+static void filter_reset(const DSCIterator *it)
 {
     (void)it;  // Suppress unused parameter warning
     // Filter iterator does not support reset
@@ -504,7 +504,7 @@ static void filter_reset(const Iterator *it)
 /**
  * Check if filter iterator is valid.
  */
-static int filter_is_valid(const Iterator *it)
+static int filter_is_valid(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -523,7 +523,7 @@ static int filter_is_valid(const Iterator *it)
 /**
  * Free resources used by filter iterator.
  */
-static void filter_destroy(Iterator *it)
+static void filter_destroy(DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -557,9 +557,9 @@ static void filter_destroy(Iterator *it)
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
  */
-Iterator iterator_filter(Iterator *it, const filter_func filter)
+DSCIterator dsc_iterator_filter(DSCIterator *it, const filter_func filter)
 {
-    Iterator new_it = {0};  // Initialize all fields to NULL/0
+    DSCIterator new_it = {0};  // Initialize all fields to NULL/0
 
     new_it.get = filter_get;
     new_it.has_next = filter_has_next;
@@ -612,7 +612,7 @@ Iterator iterator_filter(Iterator *it, const filter_func filter)
 /**
  * Get current element from range iterator.
  */
-static void *range_get(const Iterator *it)
+static void *range_get(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -640,7 +640,7 @@ static void *range_get(const Iterator *it)
 /**
  * Check if range iterator has more elements.
  */
-static int range_has_next(const Iterator *it)
+static int range_has_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -665,7 +665,7 @@ static int range_has_next(const Iterator *it)
 /**
  * Get next element from range iterator and advance.
  */
-static void *range_next(const Iterator *it)
+static void *range_next(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -710,7 +710,7 @@ static void *range_next(const Iterator *it)
 /**
  * Check if range iterator has previous elements.
  */
-static int range_has_prev(const Iterator *it)
+static int range_has_prev(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -735,7 +735,7 @@ static int range_has_prev(const Iterator *it)
 /**
  * Get previous element from range iterator and move back.
  */
-static void *range_prev(const Iterator *it)
+static void *range_prev(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -781,7 +781,7 @@ static void *range_prev(const Iterator *it)
 /**
  * Reset range iterator to starting position.
  */
-static void range_reset(const Iterator *it)
+static void range_reset(const DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -798,7 +798,7 @@ static void range_reset(const Iterator *it)
 /**
  * Check if range iterator is valid.
  */
-static int range_is_valid(const Iterator *it)
+static int range_is_valid(const DSCIterator *it)
 {
     return it && it->data_state != NULL;
 }
@@ -806,7 +806,7 @@ static int range_is_valid(const Iterator *it)
 /**
  * Free resources used by range iterator.
  */
-static void range_destroy(Iterator *it)
+static void range_destroy(DSCIterator *it)
 {
     if (!it || !it->data_state)
     {
@@ -825,9 +825,9 @@ static void range_destroy(Iterator *it)
  * @param step Step value (positive or negative)
  * @return A new iterator yielding integers in the specified range
  */
-Iterator iterator_range(const int start, const int end, const int step)
+DSCIterator dsc_iterator_range(const int start, const int end, const int step)
 {
-    Iterator it = {0};  // Initialize all fields to NULL/0
+    DSCIterator it = {0};  // Initialize all fields to NULL/0
 
     it.get = range_get;
     it.has_next = range_has_next;

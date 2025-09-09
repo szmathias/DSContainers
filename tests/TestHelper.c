@@ -207,8 +207,8 @@ void set_alloc_fail_countdown(const int count) {
 }
 
 // Allocator helper functions
-Alloc *create_std_allocator(void) {
-    Alloc *alloc = malloc(sizeof(Alloc));
+DSCAlloc *create_std_allocator(void) {
+    DSCAlloc *alloc = malloc(sizeof(DSCAlloc));
     if (alloc) {
         alloc->alloc_func = malloc;
         alloc->dealloc_func = free;
@@ -218,8 +218,8 @@ Alloc *create_std_allocator(void) {
     return alloc;
 }
 
-Alloc *create_failing_allocator(void) {
-    Alloc *alloc = malloc(sizeof(Alloc));
+DSCAlloc *create_failing_allocator(void) {
+    DSCAlloc *alloc = malloc(sizeof(DSCAlloc));
     if (alloc) {
         alloc->alloc_func = failing_alloc;
         alloc->dealloc_func = failing_free;
@@ -229,7 +229,7 @@ Alloc *create_failing_allocator(void) {
     return alloc;
 }
 
-void destroy_allocator(Alloc *alloc) {
+void destroy_allocator(DSCAlloc *alloc) {
     if (alloc) {
         free(alloc);
     }

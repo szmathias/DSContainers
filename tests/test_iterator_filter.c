@@ -10,22 +10,22 @@
 
 // Test filter iterator functionality
 static int test_filter_iterator(void) {
-    Alloc *alloc = create_std_allocator();
-    DoublyLinkedList* list = dll_create(alloc);
+    DSCAlloc *alloc = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements 1-10
     for (int i = 1; i <= 10; i++) {
         int* val = malloc(sizeof(int));
         *val = i;
-        dll_insert_back(list, val);
+        dsc_dll_insert_back(list, val);
     }
 
     // Create base iterator
-    Iterator base_it = dll_iterator(list);
+    DSCIterator base_it = dsc_dll_iterator(list);
 
     // Create filter iterator for even numbers
-    Iterator filter_it = iterator_filter(&base_it, is_even);
+    DSCIterator filter_it = dsc_iterator_filter(&base_it, is_even);
     ASSERT_NOT_NULL(filter_it.data_state);
 
     // Verify filter correctly returns only even numbers
@@ -45,7 +45,7 @@ static int test_filter_iterator(void) {
     if (filter_it.destroy) {
         filter_it.destroy(&filter_it);
     }
-    dll_destroy(list, true);
+    dsc_dll_destroy(list, true);
     destroy_allocator(alloc);
 
     return TEST_SUCCESS;
@@ -53,22 +53,22 @@ static int test_filter_iterator(void) {
 
 // Test filter iterator with no matches
 static int test_filter_no_matches(void) {
-    Alloc *alloc = create_std_allocator();
-    DoublyLinkedList* list = dll_create(alloc);
+    DSCAlloc *alloc = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert odd numbers only
     for (int i = 1; i <= 5; i += 2) {
         int* val = malloc(sizeof(int));
         *val = i;
-        dll_insert_back(list, val);
+        dsc_dll_insert_back(list, val);
     }
 
     // Create base iterator
-    Iterator base_it = dll_iterator(list);
+    DSCIterator base_it = dsc_dll_iterator(list);
 
     // Create filter iterator for even numbers (should find none)
-    Iterator filter_it = iterator_filter(&base_it, is_even);
+    DSCIterator filter_it = dsc_iterator_filter(&base_it, is_even);
 
     // Verify filter correctly returns no results
     ASSERT_FALSE(filter_it.has_next(&filter_it));
@@ -78,7 +78,7 @@ static int test_filter_no_matches(void) {
     if (filter_it.destroy) {
         filter_it.destroy(&filter_it);
     }
-    dll_destroy(list, true);
+    dsc_dll_destroy(list, true);
     destroy_allocator(alloc);
 
     return TEST_SUCCESS;
@@ -87,13 +87,13 @@ static int test_filter_no_matches(void) {
 // Test chaining multiple filters
 static int test_multiple_filters(void) {
     // Create range from 1 to 30, then keep only even numbers, then only those divisible by 3
-    Iterator range_it = iterator_range(1, 30, 1);
+    DSCIterator range_it = dsc_iterator_range(1, 30, 1);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
-    Iterator even_it = iterator_filter(&range_it, is_even);
+    DSCIterator even_it = dsc_iterator_filter(&range_it, is_even);
     ASSERT_TRUE(even_it.is_valid(&even_it));
 
-    Iterator div3_it = iterator_filter(&even_it, is_divisible_by_3);
+    DSCIterator div3_it = dsc_iterator_filter(&even_it, is_divisible_by_3);
     ASSERT_TRUE(div3_it.is_valid(&div3_it));
 
     // Expected: [6,12,18,24] (even numbers from 1-29 that are also divisible by 3)

@@ -2,18 +2,18 @@
 // Created by zack on 8/30/25.
 //
 
-#ifndef DS_ALLOC_H
-#define DS_ALLOC_H
+#ifndef DSCONTAINERS_ALLOC_H
+#define DSCONTAINERS_ALLOC_H
 
 #include <stddef.h>
 
-typedef struct Alloc
+typedef struct DSCAlloc
 {
     void * (*alloc_func)(size_t size);
     void   (*dealloc_func)(void *ptr);
     void   (*data_free_func)(void *ptr);
     void * (*copy_func)(const void *data);
-} Alloc;
+} DSCAlloc;
 
 //==============================================================================
 // Function pointer types
@@ -68,4 +68,4 @@ typedef int (*cmp_func)(const void *a, const void *b);
  */
 typedef void *(*copy_func)(const void *data);
 
-#endif //DS_ALLOC_H
+#endif //DSCONTAINERS_ALLOC_H

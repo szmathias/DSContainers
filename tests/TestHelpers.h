@@ -2,8 +2,8 @@
 // Created by zack on 9/1/25.
 //
 
-#ifndef DS_TESTHELPERS_H
-#define DS_TESTHELPERS_H
+#ifndef DSCONTAINERS_TESTHELPERS_H
+#define DSCONTAINERS_TESTHELPERS_H
 
 #include "../include/Alloc.h"
 
@@ -91,8 +91,8 @@ void *double_value_failing(const void *data);
 void set_alloc_fail_countdown(int count);
 
 // Allocator helper functions
-Alloc* create_std_allocator(void);
-Alloc* create_failing_allocator(void);
-void destroy_allocator(Alloc* alloc);
+DSCAlloc* create_std_allocator(void);
+DSCAlloc* create_failing_allocator(void);
+void destroy_allocator(DSCAlloc* alloc);
 
-#endif //DS_TESTHELPERS_H
+#endif //DSCONTAINERS_TESTHELPERS_H

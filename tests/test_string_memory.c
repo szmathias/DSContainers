@@ -9,49 +9,49 @@
 #include <stdlib.h>
 
 int test_reserve_and_shrink(void) {
-    String str = str_create_empty(4);
-    const size_t old_capacity = str_capacity(&str);
-    ASSERT_TRUE(str_reserve(&str, 128));
-    ASSERT_GT(str_capacity(&str), old_capacity);
-    str_assign_cstring(&str, "abc");
-    ASSERT_TRUE(str_shrink_to_fit(&str));
-    ASSERT_GTE(str_capacity(&str), str_size(&str) + 1);
-    str_destroy(&str);
+    DSCString str = dsc_str_create_empty(4);
+    const size_t old_capacity = dsc_str_capacity(&str);
+    ASSERT_TRUE(dsc_str_reserve(&str, 128));
+    ASSERT_GT(dsc_str_capacity(&str), old_capacity);
+    dsc_str_assign_cstring(&str, "abc");
+    ASSERT_TRUE(dsc_str_shrink_to_fit(&str));
+    ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str) + 1);
+    dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_buffer_growth(void) {
-    String str = str_create_empty(4);
-    const size_t initial_capacity = str_capacity(&str);
+    DSCString str = dsc_str_create_empty(4);
+    const size_t initial_capacity = dsc_str_capacity(&str);
     // Append enough characters to force buffer growth
     for (int i = 0; i < 100; ++i)
     {
-        str_push_back(&str, 'x');
+        dsc_str_push_back(&str, 'x');
     }
-    ASSERT_GT(str_capacity(&str), initial_capacity);
-    ASSERT_EQ(str_size(&str), 100);
-    str_destroy(&str);
+    ASSERT_GT(dsc_str_capacity(&str), initial_capacity);
+    ASSERT_EQ(dsc_str_size(&str), 100);
+    dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_large_string(void) {
-    String str = str_create_empty(1024);
+    DSCString str = dsc_str_create_empty(1024);
     for (int i = 0; i < 1000; ++i)
     {
-        str_push_back(&str, 'x');
+        dsc_str_push_back(&str, 'x');
     }
-    ASSERT_EQ(str_size(&str), 1000);
-    ASSERT_GT(str_capacity(&str), 1000);
-    str_destroy(&str);
+    ASSERT_EQ(dsc_str_size(&str), 1000);
+    ASSERT_GT(dsc_str_capacity(&str), 1000);
+    dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_reserve_and_shrink_optimal(void) {
-    String str = str_create_from_cstring("abc");
-    const size_t cap = str_capacity(&str);
-    ASSERT_FALSE(str_reserve(&str, cap));
-    ASSERT_TRUE(str_shrink_to_fit(&str));
-    str_destroy(&str);
+    DSCString str = dsc_str_create_from_cstring("abc");
+    const size_t cap = dsc_str_capacity(&str);
+    ASSERT_FALSE(dsc_str_reserve(&str, cap));
+    ASSERT_TRUE(dsc_str_shrink_to_fit(&str));
+    dsc_str_destroy(&str);
     return TEST_SUCCESS;
 }
 

@@ -5,8 +5,8 @@
 // This implementation provides a comprehensive set of operations
 // for a doubly linked list with support for custom memory allocation.
 
-#ifndef DS_DOUBLYLINKEDLIST_H
-#define DS_DOUBLYLINKEDLIST_H
+#ifndef DSCONTAINERS_DOUBLYLINKEDLIST_H
+#define DSCONTAINERS_DOUBLYLINKEDLIST_H
 
 #include <stddef.h>
 #include "Alloc.h"
@@ -18,22 +18,22 @@
 //==============================================================================
 
 // Node of doubly linked list
-typedef struct DoublyLinkedNode
+typedef struct DSCDoublyLinkedNode
 {
     void *data;               // Pointer to user data
-    struct DoublyLinkedNode *next;   // Pointer to next node
-    struct DoublyLinkedNode *prev;   // Pointer to previous node
-} DoublyLinkedNode;
+    struct DSCDoublyLinkedNode *next;   // Pointer to next node
+    struct DSCDoublyLinkedNode *prev;   // Pointer to previous node
+} DSCDoublyLinkedNode;
 
 // Doubly linked list structure with custom allocator support
-typedef struct DoublyLinkedList
+typedef struct DSCDoublyLinkedList
 {
-    DoublyLinkedNode *head;         // Pointer to first node
-    DoublyLinkedNode *tail;         // Pointer to last node
+    DSCDoublyLinkedNode *head;         // Pointer to first node
+    DSCDoublyLinkedNode *tail;         // Pointer to last node
     size_t size;                    // Number of nodes in list
 
-    Alloc *alloc;
-} DoublyLinkedList;
+    DSCAlloc *alloc;
+} DSCDoublyLinkedList;
 
 /**
  * Predicate function for filtering elements.
@@ -70,7 +70,7 @@ typedef void (*action_func)(void *data);
  *
  * @return Pointer to new DoublyLinkedList, or NULL on failure.
  */
-DoublyLinkedList *dll_create(Alloc *alloc);
+DSCDoublyLinkedList *dsc_dll_create(DSCAlloc *alloc);
 
 /**
  * Destroy the list and free all nodes.
@@ -78,7 +78,7 @@ DoublyLinkedList *dll_create(Alloc *alloc);
  * @param list The list to destroy
  * @param should_free_data
  */
-void dll_destroy(DoublyLinkedList *list, bool should_free_data);
+void dsc_dll_destroy(DSCDoublyLinkedList *list, bool should_free_data);
 
 /**
  * Clear all nodes from the list, but keep the list structure intact.
@@ -86,7 +86,7 @@ void dll_destroy(DoublyLinkedList *list, bool should_free_data);
  * @param list The list to clear
  * @param should_free_data
  */
-void dll_clear(DoublyLinkedList *list, bool should_free_data);
+void dsc_dll_clear(DSCDoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // Information functions
@@ -98,7 +98,7 @@ void dll_clear(DoublyLinkedList *list, bool should_free_data);
  * @param list The list to query
  * @return Number of elements, or 0 if list is NULL
  */
-size_t dll_size(const DoublyLinkedList *list);
+size_t dsc_dll_size(const DSCDoublyLinkedList *list);
 
 /**
  * Check if the list is empty.
@@ -106,7 +106,7 @@ size_t dll_size(const DoublyLinkedList *list);
  * @param list The list to check
  * @return 1 if list is empty or NULL, 0 if list contains elements
  */
-int dll_is_empty(const DoublyLinkedList *list);
+int dsc_dll_is_empty(const DSCDoublyLinkedList *list);
 
 /**
  * Find the first node matching data using the comparison function.
@@ -116,7 +116,7 @@ int dll_is_empty(const DoublyLinkedList *list);
  * @param compare The comparison function to use
  * @return Pointer to matching node, or NULL if not found or on error
  */
-DoublyLinkedNode *dll_find(DoublyLinkedList *list, const void *data, cmp_func compare);
+DSCDoublyLinkedNode *dsc_dll_find(DSCDoublyLinkedList *list, const void *data, cmp_func compare);
 
 /**
  * Compare two lists for equality using the given comparison function.
@@ -126,7 +126,7 @@ DoublyLinkedNode *dll_find(DoublyLinkedList *list, const void *data, cmp_func co
  * @param compare Function to compare elements
  * @return 1 if lists are equal, 0 if not equal, -1 on error
  */
-int dll_equals(const DoublyLinkedList *list1, const DoublyLinkedList *list2, cmp_func compare);
+int dsc_dll_equals(const DSCDoublyLinkedList *list1, const DSCDoublyLinkedList *list2, cmp_func compare);
 
 //==============================================================================
 // Insertion functions
@@ -139,7 +139,7 @@ int dll_equals(const DoublyLinkedList *list1, const DoublyLinkedList *list2, cmp
  * @param data Pointer to the data to insert (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-int dll_insert_front(DoublyLinkedList *list, void *data);
+int dsc_dll_insert_front(DSCDoublyLinkedList *list, void *data);
 
 /**
  * Insert data at the back of the list.
@@ -148,7 +148,7 @@ int dll_insert_front(DoublyLinkedList *list, void *data);
  * @param data Pointer to the data to insert (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-int dll_insert_back(DoublyLinkedList *list, void *data);
+int dsc_dll_insert_back(DSCDoublyLinkedList *list, void *data);
 
 /**
  * Insert data at a specific position in the list.
@@ -158,7 +158,7 @@ int dll_insert_back(DoublyLinkedList *list, void *data);
  * @param data Pointer to the data to insert (ownership transferred to list)
  * @return 0 on success, -1 on error (e.g., invalid position)
  */
-int dll_insert_at(DoublyLinkedList *list, size_t pos, void *data);
+int dsc_dll_insert_at(DSCDoublyLinkedList *list, size_t pos, void *data);
 
 //==============================================================================
 // Removal functions
@@ -173,7 +173,7 @@ int dll_insert_at(DoublyLinkedList *list, size_t pos, void *data);
  * @param should_free_data
  * @return 0 on success, -1 if not found or on error
  */
-int dll_remove(DoublyLinkedList *list, const void *data, cmp_func compare, bool should_free_data);
+int dsc_dll_remove(DSCDoublyLinkedList *list, const void *data, cmp_func compare, bool should_free_data);
 
 /**
  * Remove node at a specific position.
@@ -183,7 +183,7 @@ int dll_remove(DoublyLinkedList *list, const void *data, cmp_func compare, bool 
  * @param should_free_data
  * @return 0 on success, -1 on error (e.g., invalid position)
  */
-int dll_remove_at(DoublyLinkedList *list, size_t pos, bool should_free_data);
+int dsc_dll_remove_at(DSCDoublyLinkedList *list, size_t pos, bool should_free_data);
 
 /**
  * Remove the first node in the list.
@@ -192,7 +192,7 @@ int dll_remove_at(DoublyLinkedList *list, size_t pos, bool should_free_data);
  * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int dll_remove_front(DoublyLinkedList *list, bool should_free_data);
+int dsc_dll_remove_front(DSCDoublyLinkedList *list, bool should_free_data);
 
 /**
  * Remove the last node in the list.
@@ -201,7 +201,7 @@ int dll_remove_front(DoublyLinkedList *list, bool should_free_data);
  * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-int dll_remove_back(DoublyLinkedList *list, bool should_free_data);
+int dsc_dll_remove_back(DSCDoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // List manipulation functions
@@ -214,7 +214,7 @@ int dll_remove_back(DoublyLinkedList *list, bool should_free_data);
  * @param compare Comparison function
  * @return 0 on success, -1 on error
  */
-int dll_sort(DoublyLinkedList *list, cmp_func compare);
+int dsc_dll_sort(DSCDoublyLinkedList *list, cmp_func compare);
 
 /**
  * Reverse the order of nodes in the list.
@@ -222,7 +222,7 @@ int dll_sort(DoublyLinkedList *list, cmp_func compare);
  * @param list The list to reverse
  * @return 0 on success, -1 on error
  */
-int dll_reverse(DoublyLinkedList *list);
+int dsc_dll_reverse(DSCDoublyLinkedList *list);
 
 /**
  * Merge src list into dest list (append src to the end of dest).
@@ -232,7 +232,7 @@ int dll_reverse(DoublyLinkedList *list);
  * @param src Source list (will be emptied)
  * @return 0 on success, -1 on error
  */
-int dll_merge(DoublyLinkedList *dest, DoublyLinkedList *src);
+int dsc_dll_merge(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src);
 
 /**
  * Splice src list into dest list at the specified position.
@@ -243,7 +243,7 @@ int dll_merge(DoublyLinkedList *dest, DoublyLinkedList *src);
  * @param pos Position in dest where to insert src
  * @return 0 on success, -1 on error
  */
-int dll_splice(DoublyLinkedList *dest, DoublyLinkedList *src, size_t pos);
+int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, size_t pos);
 
 //==============================================================================
 // Higher-order functions
@@ -251,22 +251,35 @@ int dll_splice(DoublyLinkedList *dest, DoublyLinkedList *src, size_t pos);
 
 /**
  * Create a new list containing only elements that satisfy the predicate function.
+ * Performs a shallow copy: the new list shares data pointers with the source.
  *
  * @param list The source list
  * @param pred Function that returns non-zero for elements to include
- * @return A new list with matching elements, or NULL on error
+ * @return A new list with matching elements (shallow copy), or NULL on error
  */
-DoublyLinkedList *dll_filter(const DoublyLinkedList *list, pred_func pred);
+DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, pred_func pred);
+
+/**
+ * Create a new list containing only elements that satisfy the predicate function.
+ * Performs a deep copy: the new list contains cloned copies of the matching elements.
+ *
+ * @param list The source list
+ * @param pred Function that returns non-zero for elements to include
+ * @return A new list with matching elements (deep copy), or NULL on error
+ */
+DSCDoublyLinkedList *dsc_dll_filter_deep(const DSCDoublyLinkedList *list, pred_func pred);
+
 
 /**
  * Create a new list by transforming each element with the given function.
  *
  * @param list The source list
  * @param transform Function that returns a new element based on the original
- * @param should_free_data
+* @param should_free_data Whether to free the data returned after
+ * transformation if an error occurred
  * @return A new list with transformed elements, or NULL on error
  */
-DoublyLinkedList *dll_transform(const DoublyLinkedList *list, transform_func transform, bool should_free_data);
+DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, transform_func transform, bool should_free_data);
 
 /**
  * Apply an action function to each element in the list.
@@ -274,7 +287,7 @@ DoublyLinkedList *dll_transform(const DoublyLinkedList *list, transform_func tra
  * @param list The list to process
  * @param action Function applied to each element
  */
-void dll_for_each(const DoublyLinkedList *list, action_func action);
+void dsc_dll_for_each(const DSCDoublyLinkedList *list, action_func action);
 
 //==============================================================================
 // List copying functions
@@ -286,7 +299,7 @@ void dll_for_each(const DoublyLinkedList *list, action_func action);
  * @param list The list to copy
  * @return A new list with same structure but sharing data, or NULL on error
  */
-DoublyLinkedList *dll_copy(const DoublyLinkedList *list);
+DSCDoublyLinkedList *dsc_dll_copy(const DSCDoublyLinkedList *list);
 
 /**
  * Create a deep copy of the list (cloning data using the provided function).
@@ -295,7 +308,7 @@ DoublyLinkedList *dll_copy(const DoublyLinkedList *list);
  * @param should_free_data
  * @return A new list with copies of all data, or NULL on error
  */
-DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, bool should_free_data);
+DSCDoublyLinkedList *dsc_dll_copy_deep(const DSCDoublyLinkedList *list, bool should_free_data);
 
 //==============================================================================
 // Iterator functions
@@ -307,7 +320,7 @@ DoublyLinkedList *dll_copy_deep(const DoublyLinkedList *list, bool should_free_d
  * @param list The list to iterate over
  * @return An Iterator object for forward traversal
  */
-Iterator dll_iterator(const DoublyLinkedList *list);
+DSCIterator dsc_dll_iterator(const DSCDoublyLinkedList *list);
 
 /**
  * Create a reverse iterator for the list (tail to head traversal).
@@ -315,7 +328,7 @@ Iterator dll_iterator(const DoublyLinkedList *list);
  * @param list The list to iterate over
  * @return An Iterator object for backward traversal
  */
-Iterator dll_iterator_reverse(const DoublyLinkedList *list);
+DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList *list);
 
 /**
  * Create a new list from an iterator with custom allocator.
@@ -324,7 +337,7 @@ Iterator dll_iterator_reverse(const DoublyLinkedList *list);
  * @param alloc The custom allocator to use
  * @return A new list with elements from iterator, or NULL on error
  */
-DoublyLinkedList *dll_from_iterator(Iterator *it, Alloc *alloc);
+DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc);
 
 
-#endif //DS_DOUBLYLINKEDLIST_H
+#endif //DSCONTAINERS_DOUBLYLINKEDLIST_H
