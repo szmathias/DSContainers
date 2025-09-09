@@ -2,8 +2,8 @@
 // Created by zack on 9/1/25.
 //
 
-#ifndef DSC_TESTHELPERS_H
-#define DSC_TESTHELPERS_H
+#ifndef DSCONTAINERS_TESTHELPERS_H
+#define DSCONTAINERS_TESTHELPERS_H
 
 #include "../include/Alloc.h"
 
@@ -95,4 +95,4 @@ DSCAlloc* create_std_allocator(void);
 DSCAlloc* create_failing_allocator(void);
 void destroy_allocator(DSCAlloc* alloc);
 
-#endif //DSC_TESTHELPERS_H
+#endif //DSCONTAINERS_TESTHELPERS_H

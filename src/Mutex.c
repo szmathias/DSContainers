@@ -1,108 +1,176 @@
 // Mutex.c
 // Cross-platform mutex implementation
+//
+// Provides a thin portable wrapper around platform native mutex primitives:
+// - pthread_mutex_t on POSIX systems
+// - CRITICAL_SECTION on Windows
+//
+// The functions mirror the declarations in Mutex.h and return 0 on success
+// and non-zero on failure. POSIX functions return the underlying pthread
+// return codes where applicable.
 
 #include "Mutex.h"
 #include <stdlib.h>
 
-#ifdef DSC_PLATFORM_WINDOWS
+#ifdef DSCONTAINERS_PLATFORM_WINDOWS
 #include <windows.h>
 
-int dsc_mutex_init(DSCMutex* m)
+/**
+ * Initialize a DSCMutex (CRITICAL_SECTION) instance.
+ *
+ * @param mtx Pointer to an uninitialized DSCMutex.
+ * @return 0 on success, -1 on invalid argument.
+ */
+int dsc_mutex_init(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    InitializeCriticalSection(m);
+    InitializeCriticalSection(mtx);
     return 0;
 }
 
-int dsc_mutex_lock(DSCMutex* m)
+/**
+ * Lock the mutex (blocking).
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, -1 on invalid argument.
+ */
+int dsc_mutex_lock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    EnterCriticalSection(m);
+    EnterCriticalSection(mtx);
     return 0;
 }
 
-int dsc_mutex_trylock(DSCMutex* m)
+/**
+ * Try to lock the mutex without blocking.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 if lock acquired, 1 if not acquired, -1 on invalid argument.
+ */
+int dsc_mutex_trylock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    return TryEnterCriticalSection(m) ? 0 : 1;
+    return TryEnterCriticalSection(mtx) ? 0 : 1;
 }
 
-int dsc_mutex_unlock(DSCMutex* m)
+/**
+ * Unlock the mutex.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, -1 on invalid argument.
+ */
+int dsc_mutex_unlock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    LeaveCriticalSection(m);
+    LeaveCriticalSection(mtx);
     return 0;
 }
 
-int dsc_mutex_destroy(DSCMutex* m)
+/**
+ * Destroy the mutex and free underlying resources.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, -1 on invalid argument.
+ */
+int dsc_mutex_destroy(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    DeleteCriticalSection(m);
+    DeleteCriticalSection(mtx);
     return 0;
 }
 
 #else
 #include <pthread.h>
 
-int dsc_mutex_init(DSCMutex* m)
+/**
+ * Initialize a DSCMutex (pthread_mutex_t) instance.
+ *
+ * @param mtx Pointer to an uninitialized DSCMutex.
+ * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
+ */
+int dsc_mutex_init(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    return pthread_mutex_init(m, NULL);
+    return pthread_mutex_init(mtx, NULL);
 }
 
-int dsc_mutex_lock(DSCMutex* m)
+/**
+ * Lock the mutex (blocking).
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
+ */
+int dsc_mutex_lock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    return pthread_mutex_lock(m);
+    return pthread_mutex_lock(mtx);
 }
 
-int dsc_mutex_trylock(DSCMutex* m)
+/**
+ * Try to lock the mutex without blocking.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 if lock acquired, EBUSY if already locked, other pthread error codes on failure, -1 on invalid argument.
+ */
+int dsc_mutex_trylock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    const int rc = pthread_mutex_trylock(m);
+    const int rc = pthread_mutex_trylock(mtx);
     return rc == 0 ? 0 : rc; // return 0 on success, error code otherwise
 }
 
-int dsc_mutex_unlock(DSCMutex* m)
+/**
+ * Unlock the mutex.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
+ */
+int dsc_mutex_unlock(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    return pthread_mutex_unlock(m);
+    return pthread_mutex_unlock(mtx);
 }
 
-int dsc_mutex_destroy(DSCMutex* m)
+/**
+ * Destroy the mutex and free underlying resources.
+ *
+ * @param mtx Pointer to an initialized DSCMutex.
+ * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
+ */
+int dsc_mutex_destroy(DSCMutex* mtx)
 {
-    if (!m)
+    if (!mtx)
     {
         return -1;
     }
-    return pthread_mutex_destroy(m);
+    return pthread_mutex_destroy(mtx);
 }
 
 #endif

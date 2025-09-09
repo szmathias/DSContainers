@@ -560,9 +560,55 @@ int test_filter(void) {
     ASSERT_NULL(dsc_dll_filter(list, NULL));
 
     dsc_dll_destroy(list, true);
-    dsc_dll_destroy(filtered, false);  // Don't free data; it's owned by the original list
+    dsc_dll_destroy(filtered, false);
     dsc_dll_destroy(empty_list, false);
     dsc_dll_destroy(filtered_empty, false);
+    destroy_allocator(alloc);
+    return TEST_SUCCESS;
+}
+
+int test_filter_deep(void) {
+    DSCAlloc *alloc = create_std_allocator();
+    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+
+    // Add numbers 0-9
+    for (int i = 0; i < 10; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        dsc_dll_insert_back(list, val);
+    }
+
+    // Deep-filter for even numbers
+    DSCDoublyLinkedList *filtered = dsc_dll_filter_deep(list, is_even);
+    ASSERT_NOT_NULL(filtered);
+    ASSERT_EQ(filtered->size, 5); // 0,2,4,6,8
+
+    // Verify values and deep-copy semantics (pointers differ)
+    const DSCDoublyLinkedNode *orig = list->head;
+    const DSCDoublyLinkedNode *node = filtered->head;
+    int idx                         = 0;
+    while (node && orig) {
+        const int expected_values[] = {0,2,4,6,8};
+        // advance orig to next matching even
+        while (orig && (*(int*)orig->data % 2) != 0) orig = orig->next;
+        ASSERT_NOT_NULL(orig);
+        ASSERT_EQ(*(int*)node->data, expected_values[idx]);
+        // deep copy -> different pointers
+        ASSERT_NOT_EQ(orig->data, node->data);
+        orig = orig->next;
+        node = node->next;
+        idx++;
+    }
+
+    // Mutate original and ensure filtered copy unchanged
+    if (list->head && list->head->data) {
+        *(int*)list->head->data = 99; // change 0 -> 99
+        const DSCDoublyLinkedNode *fnode = filtered->head;
+        ASSERT_EQ(*(int*)fnode->data, 0);
+    }
+
+    dsc_dll_destroy(list, true);
+    dsc_dll_destroy(filtered, true);
     destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
@@ -680,6 +726,7 @@ TestCase tests[] = {
     {test_splice, "test_splice"},
     {test_equals, "test_equals"},
     {test_filter, "test_filter"},
+    {test_filter_deep, "test_filter_deep"},
     {test_transform, "test_transform"},
     {test_for_each, "test_for_each"},
 };

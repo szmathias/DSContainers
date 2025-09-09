@@ -2,8 +2,8 @@
 // Created by zack on 8/20/2025.
 //
 
-#ifndef DSC_TESTASSERT_H
-#define DSC_TESTASSERT_H
+#ifndef DSCONTAINERS_TESTASSERT_H
+#define DSCONTAINERS_TESTASSERT_H
 
 #include <string.h>
 #include <math.h>
@@ -210,4 +210,4 @@
         return TEST_FAILURE; \
     } while (0)
 
-#endif //DSC_TESTASSERT_H
+#endif //DSCONTAINERS_TESTASSERT_H

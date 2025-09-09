@@ -12,15 +12,20 @@
 
 // Tests from test_sll.c that fit into algorithms category
 int test_sort_empty(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+
     ASSERT_EQ(dsc_sll_sort(list, int_cmp), 0); // Empty list is already sorted
     ASSERT_EQ(list->size, 0);
-    dsc_sll_destroy(list, NULL);
+
+    dsc_sll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_already_sorted(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     for (int i = 0; i < 5; i++) {
         int *val = malloc(sizeof(int));
         *val = i;
@@ -36,12 +41,14 @@ int test_sort_already_sorted(void){
         node = node->next;
     }
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_reverse_order(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     for (int i = 4; i >= 0; i--) {
         int *val = malloc(sizeof(int));
         *val = i;
@@ -57,12 +64,14 @@ int test_sort_reverse_order(void){
         node = node->next;
     }
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_random_order(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     const int values[] = {42, 17, 9, 39, 24, 5, 58};
     const int count = sizeof(values) / sizeof(values[0]);
 
@@ -82,12 +91,14 @@ int test_sort_random_order(void){
         node = node->next;
     }
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_with_duplicates(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     const int values[] = {5, 2, 9, 5, 7, 2, 9, 5};
     const int count = sizeof(values) / sizeof(values[0]);
 
@@ -107,12 +118,14 @@ int test_sort_with_duplicates(void){
         node = node->next;
     }
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_large_list(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     const int SIZE = 1000;
 
     // Insert in reverse order
@@ -138,12 +151,14 @@ int test_sort_large_list(void){
     // Verify list structure
     ASSERT_EQ(list->size, (size_t)SIZE);
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_custom_compare(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     for (int i = 0; i < 5; i++) {
         int *val = malloc(sizeof(int));
         *val = i;
@@ -160,20 +175,24 @@ int test_sort_custom_compare(void){
         node = node->next;
     }
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_null_args(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     ASSERT_EQ(dsc_sll_sort(NULL, int_cmp), -1); // NULL list
     ASSERT_EQ(dsc_sll_sort(list, NULL), -1);    // NULL compare function
-    dsc_sll_destroy(list, NULL);
+    dsc_sll_destroy(list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_stability(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
     // Person structs with same name (for comparison) but different ages
     Person *p1 = create_person("Alice", 30);
@@ -210,12 +229,14 @@ int test_sort_stability(void){
     ASSERT_EQ(strcmp(person->name, "Bob"), 0);
     ASSERT_EQ(person->age, 35);
 
-    dsc_sll_destroy(list, person_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_reverse(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
     // Test empty list
     ASSERT_EQ(dsc_sll_reverse(list), 0);
@@ -246,13 +267,15 @@ int test_reverse(void){
     ASSERT_EQ(*(int*)node->data, 10);
     ASSERT_NULL(node->next);
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_merge(void){
-    DSCSinglyLinkedList *list1 = dsc_sll_create();
-    DSCSinglyLinkedList *list2 = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list1 = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *list2 = dsc_sll_create(alloc);
 
     // Test merging empty lists
     ASSERT_EQ(dsc_sll_merge(list1, list2), 0);
@@ -276,7 +299,7 @@ int test_merge(void){
     ASSERT_EQ(*(int*)node->data, 20);
 
     // Test merging two non-empty lists
-    DSCSinglyLinkedList *list3 = dsc_sll_create();
+    DSCSinglyLinkedList *list3 = dsc_sll_create(alloc);
     int *a2 = malloc(sizeof(int)); *a2 = 30;
     int *b2 = malloc(sizeof(int)); *b2 = 40;
     dsc_sll_insert_back(list3, a2);
@@ -295,15 +318,17 @@ int test_merge(void){
     node = node->next;
     ASSERT_EQ(*(int*)node->data, 40);
 
-    dsc_sll_destroy(list1, int_free);
-    dsc_sll_destroy(list2, NULL); // Already empty
-    dsc_sll_destroy(list3, NULL); // Already empty
+    dsc_sll_destroy(list1, true);
+    dsc_sll_destroy(list2, false); // Already empty
+    dsc_sll_destroy(list3, false); // Already empty
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_splice(void){
-    DSCSinglyLinkedList *dest = dsc_sll_create();
-    DSCSinglyLinkedList *src = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *dest = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *src = dsc_sll_create(alloc);
 
     // Test splicing empty lists
     ASSERT_EQ(dsc_sll_splice(dest, src, 0), 0);
@@ -326,8 +351,8 @@ int test_splice(void){
     // src = [40,50]
 
     // Test splicing at beginning
-    DSCSinglyLinkedList *dest2 = dsc_sll_create();
-    DSCSinglyLinkedList *src2 = dsc_sll_create();
+    DSCSinglyLinkedList *dest2 = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *src2 = dsc_sll_create(alloc);
     int *a2 = malloc(sizeof(int)); *a2 = 10;
     int *b2 = malloc(sizeof(int)); *b2 = 20;
     int *c2 = malloc(sizeof(int)); *c2 = 30;
@@ -371,8 +396,8 @@ int test_splice(void){
     ASSERT_EQ(*(int*)node->data, 30);
 
     // Test splicing at the end
-    DSCSinglyLinkedList *dest3 = dsc_sll_create();
-    DSCSinglyLinkedList *src3 = dsc_sll_create();
+    DSCSinglyLinkedList *dest3 = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *src3 = dsc_sll_create(alloc);
     int *a3 = malloc(sizeof(int)); *a3 = 10;
     int *b3 = malloc(sizeof(int)); *b3 = 20;
     int *c3 = malloc(sizeof(int)); *c3 = 30;
@@ -399,19 +424,20 @@ int test_splice(void){
     node = node->next;
     ASSERT_EQ(*(int*)node->data, 50);
 
-    dsc_sll_destroy(dest, int_free);
-    dsc_sll_destroy(src, NULL);
-    dsc_sll_destroy(dest2, int_free);
-    dsc_sll_destroy(src2, NULL);
-    dsc_sll_destroy(dest3, int_free);
-    dsc_sll_destroy(src3, NULL);
-
+    dsc_sll_destroy(dest, true);
+    dsc_sll_destroy(src, false);
+    dsc_sll_destroy(dest2, true);
+    dsc_sll_destroy(src2, false);
+    dsc_sll_destroy(dest3, true);
+    dsc_sll_destroy(src3, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_equals(void){
-    DSCSinglyLinkedList *list1 = dsc_sll_create();
-    DSCSinglyLinkedList *list2 = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list1 = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *list2 = dsc_sll_create(alloc);
 
     // Empty lists should be equal
     ASSERT_EQ(dsc_sll_equals(list1, list2, int_cmp), 1);
@@ -435,7 +461,7 @@ int test_equals(void){
     ASSERT_EQ(dsc_sll_equals(list1, list2, int_cmp), 0);
 
     // Lists with same size but different elements should not be equal
-    DSCSinglyLinkedList *list3 = dsc_sll_create();
+    DSCSinglyLinkedList *list3 = dsc_sll_create(alloc);
     int *a3 = malloc(sizeof(int)); *a3 = 10;
     int *b3 = malloc(sizeof(int)); *b3 = 30; // Different value
     dsc_sll_insert_back(list3, a3);
@@ -448,14 +474,16 @@ int test_equals(void){
     ASSERT_EQ(dsc_sll_equals(list1, NULL, int_cmp), -1);
     ASSERT_EQ(dsc_sll_equals(list1, list2, NULL), -1);
 
-    dsc_sll_destroy(list1, int_free);
-    dsc_sll_destroy(list2, int_free);
-    dsc_sll_destroy(list3, int_free);
+    dsc_sll_destroy(list1, true);
+    dsc_sll_destroy(list2, true);
+    dsc_sll_destroy(list3, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_filter(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
     // Add numbers 0-9
     for (int i = 0; i < 10; i++) {
@@ -481,7 +509,7 @@ int test_filter(void){
     ASSERT_EQ(list->size, 10);
 
     // Test empty list
-    DSCSinglyLinkedList *empty_list = dsc_sll_create();
+    DSCSinglyLinkedList *empty_list = dsc_sll_create(alloc);
     DSCSinglyLinkedList *filtered_empty = dsc_sll_filter(empty_list, is_even);
     ASSERT_NOT_NULL(filtered_empty);
     ASSERT_EQ(filtered_empty->size, 0);
@@ -490,15 +518,63 @@ int test_filter(void){
     ASSERT_NULL(dsc_sll_filter(NULL, is_even));
     ASSERT_NULL(dsc_sll_filter(list, NULL));
 
-    dsc_sll_destroy(list, int_free);
-    dsc_sll_destroy(filtered, NULL);  // Don't free data; it's owned by the original list
-    dsc_sll_destroy(empty_list, NULL);
-    dsc_sll_destroy(filtered_empty, NULL);
+    dsc_sll_destroy(list, true);
+    dsc_sll_destroy(filtered, false);
+    dsc_sll_destroy(empty_list, false);
+    dsc_sll_destroy(filtered_empty, false);
+    destroy_allocator(alloc);
+    return TEST_SUCCESS;
+}
+
+int test_filter_deep(void){
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+
+    // Add numbers 0-9
+    for (int i = 0; i < 10; i++) {
+        int *val = malloc(sizeof(int));
+        *val = i;
+        dsc_sll_insert_back(list, val);
+    }
+
+    // Deep-filter for even numbers
+    DSCSinglyLinkedList *filtered = dsc_sll_filter_deep(list, is_even);
+    ASSERT_NOT_NULL(filtered);
+    ASSERT_EQ(filtered->size, 5);  // Should contain 0,2,4,6,8
+
+    // Verify filtered list values and that data pointers are different (deep copy)
+    const DSCSinglyLinkedNode *orig = list->head;
+    const DSCSinglyLinkedNode *node = filtered->head;
+    int idx = 0;
+    while (node && orig) {
+        const int expected_values[] = {0, 2, 4, 6, 8};
+        // advance orig until next even
+        while (orig && (*(int*)orig->data % 2) != 0) orig = orig->next;
+        ASSERT_NOT_NULL(orig);
+        ASSERT_EQ(*(int*)node->data, expected_values[idx]);
+        // pointers must be different for deep copy
+        ASSERT_NOT_EQ(orig->data, node->data);
+        orig = orig->next;
+        node = node->next;
+        idx++;
+    }
+
+    // Modify original data and ensure filtered copy is unaffected
+    if (list->head && list->head->data) {
+        *(int*)list->head->data = 99; // change 0 -> 99
+        const DSCSinglyLinkedNode *fnode = filtered->head;
+        ASSERT_EQ(*(int*)fnode->data, 0);
+    }
+
+    dsc_sll_destroy(list, true);
+    dsc_sll_destroy(filtered, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_transform(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++) {
@@ -508,7 +584,7 @@ int test_transform(void){
     }
 
     // Map to double each value
-    DSCSinglyLinkedList *mapped = dsc_sll_transform(list, double_value, free);
+    DSCSinglyLinkedList *mapped = dsc_sll_transform(list, double_value, true);
     ASSERT_NOT_NULL(mapped);
     ASSERT_EQ(mapped->size, 5);
 
@@ -527,24 +603,26 @@ int test_transform(void){
     }
 
     // Test empty list
-    DSCSinglyLinkedList *empty_list = dsc_sll_create();
-    DSCSinglyLinkedList *mapped_empty = dsc_sll_transform(empty_list, double_value, free);
+    DSCSinglyLinkedList *empty_list = dsc_sll_create(alloc);
+    DSCSinglyLinkedList *mapped_empty = dsc_sll_transform(empty_list, double_value, true);
     ASSERT_NOT_NULL(mapped_empty);
     ASSERT_EQ(mapped_empty->size, 0);
 
     // Test null cases
-    ASSERT_NULL(dsc_sll_transform(NULL, double_value, free));
+    ASSERT_NULL(dsc_sll_transform(NULL, double_value, true));
     ASSERT_NULL(dsc_sll_transform(list, NULL, NULL));
 
-    dsc_sll_destroy(list, int_free);
-    dsc_sll_destroy(mapped, int_free);
-    dsc_sll_destroy(empty_list, NULL);
-    dsc_sll_destroy(mapped_empty, NULL);
+    dsc_sll_destroy(list, true);
+    dsc_sll_destroy(mapped, true);
+    dsc_sll_destroy(empty_list, false);
+    dsc_sll_destroy(mapped_empty, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_for_each(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++) {
@@ -564,15 +642,16 @@ int test_for_each(void){
     }
 
     // Test empty list
-    DSCSinglyLinkedList *empty_list = dsc_sll_create();
+    DSCSinglyLinkedList *empty_list = dsc_sll_create(alloc);
     dsc_sll_for_each(empty_list, increment);  // Should do nothing
 
     // Test null cases
     dsc_sll_for_each(NULL, increment);  // Should do nothing
     dsc_sll_for_each(list, NULL);       // Should do nothing
 
-    dsc_sll_destroy(list, int_free);
-    dsc_sll_destroy(empty_list, NULL);
+    dsc_sll_destroy(list, true);
+    dsc_sll_destroy(empty_list, false);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -596,6 +675,7 @@ TestCase tests[] = {
     {test_splice, "test_splice"},
     {test_equals, "test_equals"},
     {test_filter, "test_filter"},
+    {test_filter_deep, "test_filter_deep"},
     {test_transform, "test_transform"},
     {test_for_each, "test_for_each"},
 };

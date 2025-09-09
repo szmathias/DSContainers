@@ -1,13 +1,28 @@
 //
 // Created by zack on 8/31/25.
 //
+// Threads.c
+// Cross-platform thread implementation
+//
+// Provides a small portable wrapper around native thread primitives:
+// - pthreads on POSIX
+// - Win32 threads (CreateThread) on Windows
+//
+// The header (Threads.h) declares a minimal API: create, join and detach.
+// The implementation uses a lightweight wrapper on Windows to store a
+// thread function return value and support join/detach semantics similar to
+// pthreads. All public functions return 0 on success and non-zero on
+// failure where possible; platform-specific return codes are preserved for
+// pthread functions.
 
 #include "Threads.h"
 #include <stdlib.h>
 
-#ifdef DSC_PLATFORM_WINDOWS
+#ifdef DSCONTAINERS_PLATFORM_WINDOWS
 #include <windows.h>
 
+// Wrapper for a user-provided thread function and argument. The wrapper
+// stores the return value so that join can retrieve it.
 typedef struct thread_wrapper
 {
     dscthread_func func;
@@ -15,6 +30,8 @@ typedef struct thread_wrapper
     void *result;
 } thread_wrapper;
 
+// Linked-list entry used to map native HANDLEs to our thread_wrapper so
+// join/detach can locate the wrapper and free resources correctly.
 typedef struct handle_entry
 {
     DSCThread thread;
@@ -28,6 +45,7 @@ static CRITICAL_SECTION g_map_lock;
 static handle_entry *g_map_head = NULL;
 static int g_map_initialized = 0;
 
+// Ensure the global map lock is initialized before use.
 static void ensure_map_init(void)
 {
     if (!g_map_initialized)
@@ -37,6 +55,7 @@ static void ensure_map_init(void)
     }
 }
 
+// Add a mapping from a thread identifier to the wrapper.
 static void add_mapping(DSCThread thread, thread_wrapper *w)
 {
     ensure_map_init();
@@ -56,8 +75,11 @@ static void add_mapping(DSCThread thread, thread_wrapper *w)
     LeaveCriticalSection(&g_map_lock);
 }
 
+// Find and remove mapping for a given thread. Returns the removed entry or
+// NULL if not found. Caller is responsible for freeing returned entry.
 static handle_entry* find_and_remove_mapping(DSCThread thread)
 {
+    ensure_map_init();
     handle_entry *prev = NULL;
     handle_entry *cur = NULL;
     EnterCriticalSection(&g_map_lock);
@@ -87,8 +109,11 @@ static handle_entry* find_and_remove_mapping(DSCThread thread)
     return NULL;
 }
 
+// Find mapping without removing it. Returns pointer to entry while leaving
+// it owned by the global map (do not free the returned pointer).
 static handle_entry* find_mapping(DSCThread thread)
 {
+    ensure_map_init();
     handle_entry *cur = NULL;
     EnterCriticalSection(&g_map_lock);
     cur = g_map_head;
@@ -106,8 +131,12 @@ static handle_entry* find_mapping(DSCThread thread)
     return NULL;
 }
 
+// Thread entry used with CreateThread. It invokes the user function and
+// stores the return value in the wrapper. If the thread has been detached
+// before finishing, this function will free the wrapper and its mapping.
 static DWORD WINAPI thread_func_wrapper(LPVOID param)
 {
+    ensure_map_init();
     thread_wrapper *w = (thread_wrapper*)param;
     if (!w)
     {
@@ -165,6 +194,9 @@ static DWORD WINAPI thread_func_wrapper(LPVOID param)
     return 0;
 }
 
+// Public API (Windows): create a thread. On success the DSCThread is set
+// to a valid HANDLE value. Returns 0 on success, -1 on invalid args or
+// thread creation failure.
 int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg)
 {
     if (!thread || !func)
@@ -194,6 +226,9 @@ int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg)
     return 0;
 }
 
+// Public API (Windows): join a thread. Waits for the thread to exit and
+// retrieves the stored result pointer if retval is non-NULL. Returns 0 on
+// success and -1 on error.
 int dsc_thread_join(DSCThread thread, void** retval)
 {
     if (!thread)
@@ -228,6 +263,9 @@ int dsc_thread_join(DSCThread thread, void** retval)
     return 0;
 }
 
+// Public API (Windows): detach a thread. Marks the thread as detached and
+// closes the native handle. If the thread already finished, resources are
+// removed immediately.
 int dsc_thread_detach(DSCThread thread)
 {
     if (!thread)
@@ -235,6 +273,7 @@ int dsc_thread_detach(DSCThread thread)
         return -1;
     }
 
+    ensure_map_init();
     EnterCriticalSection(&g_map_lock);
     handle_entry *cur = g_map_head;
     while (cur)
@@ -272,6 +311,10 @@ int dsc_thread_detach(DSCThread thread)
 #else
 #include <pthread.h>
 
+// POSIX implementations are thin wrappers around pthreads. They forward
+// return values from pthread functions directly so callers can inspect
+// platform-specific error codes where appropriate.
+
 int dsc_thread_create(DSCThread* thread, const dscthread_func func, void* arg)
 {
     if (!thread || !func)
@@ -292,4 +335,3 @@ int dsc_thread_detach(const DSCThread thread)
 }
 
 #endif
-

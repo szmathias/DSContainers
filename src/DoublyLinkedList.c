@@ -215,11 +215,8 @@ static int dsc_dll_iterator_has_prev(const DSCIterator *it)
         // For forward iterator, check if we can go backwards
         return state->current->prev != NULL;
     }
-    else
-    {
-        // For reverse iterator, check if we can go forwards
-        return state->current->next != NULL;
-    }
+    // For reverse iterator, check if we can go forwards
+    return state->current->next != NULL;
 }
 
 /**
@@ -968,8 +965,8 @@ DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, const pred_
         return NULL;
     }
 
-    DSCDoublyLinkedList *result = dsc_dll_create(list->alloc);
-    if (!result)
+    DSCDoublyLinkedList *filtered = dsc_dll_create(list->alloc);
+    if (!filtered)
     {
         return NULL;
     }
@@ -979,17 +976,53 @@ DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, const pred_
     {
         if (pred(curr->data))
         {
-            // Include elements that match the predicate
-            if (dsc_dll_insert_back(result, curr->data) != 0)
+            if (dsc_dll_insert_back(filtered, curr->data) != 0)
             {
-                dsc_dll_destroy(result, NULL); // Don't free data; it's still in source list
+                dsc_dll_destroy(filtered, false);
                 return NULL;
             }
         }
         curr = curr->next;
     }
 
-    return result;
+    return filtered;
+}
+
+DSCDoublyLinkedList *dsc_dll_filter_deep(const DSCDoublyLinkedList *list, const pred_func pred)
+{
+    if (!list || !pred || !list->alloc->copy_func)
+    {
+        return NULL;
+    }
+
+    DSCDoublyLinkedList *filtered = dsc_dll_create(list->alloc);
+    if (!filtered)
+    {
+        return NULL;
+    }
+
+    const DSCDoublyLinkedNode *curr = list->head;
+    while (curr)
+    {
+        if (pred(curr->data))
+        {
+
+            void *filtered_data = filtered->alloc->copy_func(curr->data);
+
+            if (dsc_dll_insert_back(filtered, filtered_data) != 0)
+            {
+                if (filtered_data && filtered->alloc->data_free_func)
+                {
+                    filtered->alloc->data_free_func(filtered_data);
+                }
+                dsc_dll_destroy(filtered, true);
+                return NULL;
+            }
+        }
+        curr = curr->next;
+    }
+
+    return filtered;
 }
 
 DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, const transform_func transform, const bool should_free_data)
@@ -999,8 +1032,8 @@ DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, const tr
         return NULL;
     }
 
-    DSCDoublyLinkedList *result = dsc_dll_create(list->alloc);
-    if (!result)
+    DSCDoublyLinkedList *transformed = dsc_dll_create(list->alloc);
+    if (!transformed)
     {
         return NULL;
     }
@@ -1009,20 +1042,20 @@ DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, const tr
     while (curr)
     {
         void *new_data = transform(curr->data);
-        if (dsc_dll_insert_back(result, new_data) != 0)
+        if (dsc_dll_insert_back(transformed, new_data) != 0)
         {
             if (should_free_data && new_data)
             {
-                result->alloc->data_free_func(new_data);  // Free the transformed data if insertion fails
+                transformed->alloc->data_free_func(new_data);  // Free the transformed data if insertion fails
             }
             // Free any data already successfully inserted into the new list
-            dsc_dll_destroy(result, should_free_data);
+            dsc_dll_destroy(transformed, should_free_data);
             return NULL;
         }
         curr = curr->next;
     }
 
-    return result;
+    return transformed;
 }
 
 void dsc_dll_for_each(const DSCDoublyLinkedList *list, const action_func action)

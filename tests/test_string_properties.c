@@ -5,6 +5,9 @@
 #include "DynamicString.h"
 #include "TestAssert.h"
 #include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
 
 // Property: The size of a string should never exceed its capacity.
 int test_string_size_and_capacity(void) {
@@ -41,7 +44,7 @@ int test_string_idempotent_trim(void) {
     return TEST_SUCCESS;
 }
 
-// Property: Converting to lower then upper case should be the same as just converting to upper case.
+// Property: Converting to lower than upper case should be the same as just converting to upper case.
 int test_string_case_conversion_reversibility(void) {
     DSCString str1 = dsc_str_create_from_cstring("MiXeD cAsE 123!");
     DSCString str2 = dsc_str_create_from_string(&str1);

@@ -5,8 +5,8 @@
 // This implementation provides a flexible iterator pattern that can be
 // used with any data structure, with support for transformation and filtering.
 
-#ifndef DSC_ITERATOR_H
-#define DSC_ITERATOR_H
+#ifndef DSCONTAINERS_ITERATOR_H
+#define DSCONTAINERS_ITERATOR_H
 
 //==============================================================================
 // Iterator interface
@@ -104,4 +104,4 @@ DSCIterator dsc_iterator_filter(DSCIterator *it, filter_func filter);
  */
 DSCIterator dsc_iterator_range(int start, int end, int step);
 
-#endif //DSC_ITERATOR_H
+#endif //DSCONTAINERS_ITERATOR_H

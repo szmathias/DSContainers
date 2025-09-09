@@ -70,17 +70,32 @@ int test_mutex_threaded_increment(void) {
     return TEST_SUCCESS;
 }
 
+typedef struct {
+    int (*func)(void);
+    const char *name;
+} TestCase;
+
 int main(void) {
-    if (test_mutex_init_destroy() != TEST_SUCCESS) return 1;
-    printf("test_mutex_init_destroy passed\n");
+    TestCase tests[] = {
+        {test_mutex_init_destroy, "test_mutex_init_destroy"},
+        {test_mutex_trylock_behavior, "test_mutex_trylock_behavior"},
+        {test_mutex_threaded_increment, "test_mutex_threaded_increment"},
+    };
 
-    if (test_mutex_trylock_behavior() != TEST_SUCCESS) return 1;
-    printf("test_mutex_trylock_behavior passed\n");
+    int failed = 0;
+    const int num_tests = sizeof(tests) / sizeof(tests[0]);
+    for (int i = 0; i < num_tests; i++) {
+        if (tests[i].func() != TEST_SUCCESS) {
+            printf("%s failed\n", tests[i].name);
+            failed++;
+        }
+    }
 
-    if (test_mutex_threaded_increment() != TEST_SUCCESS) return 1;
-    printf("test_mutex_threaded_increment passed\n");
+    if (failed == 0) {
+        printf("All mutex unit tests passed.\n");
+        return 0;
+    }
 
-    printf("All mutex unit tests passed\n");
-    return 0;
+    printf("%d mutex unit tests failed.\n", failed);
+    return 1;
 }
-

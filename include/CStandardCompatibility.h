@@ -2,8 +2,8 @@
 // Created by zack on 8/27/25.
 //
 
-#ifndef DSC_CSTANDARDCOMPATIBILITY_H
-#define DSC_CSTANDARDCOMPATIBILITY_H
+#ifndef DSCONTAINERS_CSTANDARDCOMPATIBILITY_H
+#define DSCONTAINERS_CSTANDARDCOMPATIBILITY_H
 
 #include "PlatformDefs.h"
 
@@ -30,25 +30,25 @@ extern "C" {
     
 /* Attribute compatibility macros */
 #ifdef COMPAT_HAS_C23
-    #define DSC_NODISCARD [[nodiscard]]
-    #define DSC_DEPRECATED [[deprecated]]
-    #define DSC_NORETURN [[noreturn]]
+    #define DSCONTAINERS_NODISCARD [[nodiscard]]
+    #define DSCONTAINERS_DEPRECATED [[deprecated]]
+    #define DSCONTAINERS_NORETURN [[noreturn]]
 #elif defined(__GNUC__) || defined(__clang__)
-    #define DSC_NODISCARD __attribute__((warn_unused_result))
-    #define DSC_DEPRECATED __attribute__((deprecated))
-    #define DSC_NORETURN __attribute__((noreturn))
+    #define DSCONTAINERS_NODISCARD __attribute__((warn_unused_result))
+    #define DSCONTAINERS_DEPRECATED __attribute__((deprecated))
+    #define DSCONTAINERS_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
-    #define DSC_NODISCARD _Check_return_
-    #define DSC_DEPRECATED __declspec(deprecated)
-    #define DSC_NORETURN __declspec(noreturn)
+    #define DSCONTAINERS_NODISCARD _Check_return_
+    #define DSCONTAINERS_DEPRECATED __declspec(deprecated)
+    #define DSCONTAINERS_NORETURN __declspec(noreturn)
 #else
-    #define DSC_NODISCARD
-    #define DSC_DEPRECATED
-    #define DSC_NORETURN
+    #define DSCONTAINERS_NODISCARD
+    #define DSCONTAINERS_DEPRECATED
+    #define DSCONTAINERS_NORETURN
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* DSC_CSTANDARDCOMPATIBILITY_H */
+#endif /* DSCONTAINERS_CSTANDARDCOMPATIBILITY_H */

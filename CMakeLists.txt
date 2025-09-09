@@ -9,18 +9,18 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Detect platform
 if(WIN32)
-  set(DSC_PLATFORM_WINDOWS TRUE)
+  set(DSCONTAINERS_PLATFORM_WINDOWS TRUE)
 elseif(APPLE)
-  set(DSC_PLATFORM_MACOS TRUE)
+  set(DSCONTAINERS_PLATFORM_MACOS TRUE)
 elseif(UNIX)
-  set(DSC_PLATFORM_LINUX TRUE)
+  set(DSCONTAINERS_PLATFORM_LINUX TRUE)
 endif()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" OFF)
+option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" ON)
 
 # Setup compiler flags based on compiler type
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -35,6 +35,9 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} ${SANITIZER_FLAGS}")
+
+    # Define a compile-time macro so tests can detect sanitizer-enabled builds
+    add_compile_definitions(DSC_SANITIZERS_ENABLED)
 
     message(STATUS "Added sanitizer flags: ${SANITIZER_FLAGS}")
     message(STATUS "Final C flags for Debug: ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")
@@ -63,6 +66,8 @@ add_library(DSContainers SHARED
         include/Alloc.h
         include/Threads.h
         include/Mutex.h
+        include/ArrayList.h
+        src/ArrayList.c
 )
 
 # Create an OBJECT library for test helpers. This compiles the sources once
@@ -74,17 +79,17 @@ target_include_directories(test_helpers PUBLIC tests)
 target_include_directories(DSContainers PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 # Define platform-specific compile definitions
-if(DSC_PLATFORM_WINDOWS)
-  target_compile_definitions(DSContainers PUBLIC DSC_PLATFORM_WINDOWS)
-elseif(DSC_PLATFORM_MACOS)
-  target_compile_definitions(DSContainers PUBLIC DSC_PLATFORM_MACOS)
-elseif(DSC_PLATFORM_LINUX)
-  target_compile_definitions(DSContainers PUBLIC DSC_PLATFORM_LINUX)
+if(DSCONTAINERS_PLATFORM_WINDOWS)
+  target_compile_definitions(DSContainers PUBLIC DSCONTAINERS_PLATFORM_WINDOWS)
+elseif(DSCONTAINERS_PLATFORM_MACOS)
+  target_compile_definitions(DSContainers PUBLIC DSCONTAINERS_PLATFORM_MACOS)
+elseif(DSCONTAINERS_PLATFORM_LINUX)
+  target_compile_definitions(DSContainers PUBLIC DSCONTAINERS_PLATFORM_LINUX)
 endif()
 
 # Define DLL export macros for Windows
-if(DSC_PLATFORM_WINDOWS)
-  target_compile_definitions(DSContainers PRIVATE DSC_BUILDING_DLL)
+if(DSCONTAINERS_PLATFORM_WINDOWS)
+  target_compile_definitions(DSContainers PRIVATE DSCONTAINERS_BUILDING_DLL)
 endif()
 
 # Set output directory for binaries
@@ -163,20 +168,22 @@ add_test(NAME test_dll_performance
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
 # Add threaded test, requires C11 threads
-find_package(Threads REQUIRED)
-add_executable(test_dll_threaded tests/test_dll_threaded.c)
+if (NOT ENABLE_SANITIZERS)
+  find_package(Threads REQUIRED)
+  add_executable(test_dll_threaded tests/test_dll_threaded.c)
 
-# Build the threaded test without sanitizers because it intentionally exercises race conditions
-# which can corrupt data structures and lead to AddressSanitizer reporting leaks.
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(test_dll_threaded PRIVATE -fno-sanitize=address,undefined)
-    target_link_options(test_dll_threaded PRIVATE -fno-sanitize=address,undefined)
-endif()
+  # Build the threaded test without sanitizers because it intentionally exercises race conditions
+  # which can corrupt data structures and lead to AddressSanitizer reporting leaks.
+  if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+      target_compile_options(test_dll_threaded PRIVATE -fno-sanitize=address,undefined)
+      target_link_options(test_dll_threaded PRIVATE -fno-sanitize=address,undefined)
+  endif()
 
-target_link_libraries(test_dll_threaded PRIVATE DSContainers test_helpers Threads::Threads)
-add_test(NAME test_dll_threaded
-        COMMAND test_dll_threaded
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  target_link_libraries(test_dll_threaded PRIVATE DSContainers test_helpers Threads::Threads)
+  add_test(NAME test_dll_threaded
+          COMMAND test_dll_threaded
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+endif ()
 
 # Add new iterator test executables
 add_executable(test_iterator_range tests/test_iterator_range.c)
@@ -244,4 +251,42 @@ add_executable(test_mutex_unit tests/test_mutex_unit.c)
 target_link_libraries(test_mutex_unit PRIVATE DSContainers)
 add_test(NAME test_mutex_unit
         COMMAND test_mutex_unit
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add tests for threads and mutex extra cases
+add_executable(test_threads_mutex_extra tests/test_threads_mutex_extra.c)
+target_link_libraries(test_threads_mutex_extra PRIVATE DSContainers test_helpers)
+add_test(NAME test_threads_mutex_extra
+        COMMAND test_threads_mutex_extra
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add ArrayList test executables
+add_executable(test_arraylist_crud tests/test_arraylist_crud.c)
+target_link_libraries(test_arraylist_crud PRIVATE DSContainers test_helpers)
+add_test(NAME test_arraylist_crud
+        COMMAND test_arraylist_crud
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_arraylist_algorithms tests/test_arraylist_algorithms.c)
+target_link_libraries(test_arraylist_algorithms PRIVATE DSContainers test_helpers)
+add_test(NAME test_arraylist_algorithms
+        COMMAND test_arraylist_algorithms
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_arraylist_memory tests/test_arraylist_memory.c)
+target_link_libraries(test_arraylist_memory PRIVATE DSContainers test_helpers)
+add_test(NAME test_arraylist_memory
+        COMMAND test_arraylist_memory
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_arraylist_iterator tests/test_arraylist_iterator.c)
+target_link_libraries(test_arraylist_iterator PRIVATE DSContainers test_helpers)
+add_test(NAME test_arraylist_iterator
+        COMMAND test_arraylist_iterator
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_arraylist_properties tests/test_arraylist_properties.c)
+target_link_libraries(test_arraylist_properties PRIVATE DSContainers test_helpers)
+add_test(NAME test_arraylist_properties
+        COMMAND test_arraylist_properties
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)

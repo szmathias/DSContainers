@@ -2,8 +2,8 @@
 // Created by zack on 8/19/2025.
 //
 
-#ifndef DSC_DYNAMICSTRING_H
-#define DSC_DYNAMICSTRING_H
+#ifndef DSCONTAINERS_DYNAMICSTRING_H
+#define DSCONTAINERS_DYNAMICSTRING_H
 #include <stdint.h>
 #include <stdio.h>
 #include"CStandardCompatibility.h"
@@ -215,4 +215,4 @@ int dsc_str_getline_string(FILE *stream, DSCString *line, const DSCString *delim
         const char *: dsc_str_getline_cstring,\
         String *: dsc_str_getline_string,\
         default: dsc_str_getline_ch)(stream, line, delim)
-#endif //DSC_DYNAMICSTRING_H
+#endif //DSCONTAINERS_DYNAMICSTRING_H

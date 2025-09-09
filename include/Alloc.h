@@ -2,8 +2,8 @@
 // Created by zack on 8/30/25.
 //
 
-#ifndef DSC_ALLOC_H
-#define DSC_ALLOC_H
+#ifndef DSCONTAINERS_ALLOC_H
+#define DSCONTAINERS_ALLOC_H
 
 #include <stddef.h>
 
@@ -68,4 +68,4 @@ typedef int (*cmp_func)(const void *a, const void *b);
  */
 typedef void *(*copy_func)(const void *data);
 
-#endif //DSC_ALLOC_H
+#endif //DSCONTAINERS_ALLOC_H

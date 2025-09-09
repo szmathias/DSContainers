@@ -1,5 +1,6 @@
 #include "Threads.h"
 #include "Mutex.h"
+#include "TestAssert.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,12 +22,12 @@ static void *inc_thread(void *arg) {
     return NULL;
 }
 
-int main(void) {
+int test_mutex_basic(void) {
     int counter = 0;
     DSCMutex m;
     if (dsc_mutex_init(&m) != 0) {
         fprintf(stderr, "dsc_mutex_init failed\n");
-        return 1;
+        return TEST_FAILURE;
     }
 
     DSCThread threads[NUM_THREADS];
@@ -37,7 +38,8 @@ int main(void) {
         args[i].m = &m;
         if (dsc_thread_create(&threads[i], inc_thread, &args[i]) != 0) {
             fprintf(stderr, "thread_create failed\n");
-            return 1;
+            dsc_mutex_destroy(&m);
+            return TEST_FAILURE;
         }
     }
 
@@ -47,11 +49,38 @@ int main(void) {
 
     if (counter != NUM_THREADS * INCREMENTS) {
         fprintf(stderr, "Counter mismatch: expected %d, got %d\n", NUM_THREADS * INCREMENTS, counter);
-        return 1;
+        dsc_mutex_destroy(&m);
+        return TEST_FAILURE;
     }
 
     dsc_mutex_destroy(&m);
-    printf("test_dsc_mutex_basic passed\n");
-    return 0;
+    return TEST_SUCCESS;
 }
 
+typedef struct {
+    int (*func)(void);
+    const char *name;
+} TestCase;
+
+int main(void) {
+    TestCase tests[] = {
+        {test_mutex_basic, "test_mutex_basic"},
+    };
+
+    int failed = 0;
+    const int num_tests = sizeof(tests) / sizeof(tests[0]);
+    for (int i = 0; i < num_tests; i++) {
+        if (tests[i].func() != TEST_SUCCESS) {
+            printf("%s failed\n", tests[i].name);
+            failed++;
+        }
+    }
+
+    if (failed == 0) {
+        printf("All mutex basic tests passed.\n");
+        return 0;
+    }
+
+    printf("%d mutex basic tests failed.\n", failed);
+    return 1;
+}

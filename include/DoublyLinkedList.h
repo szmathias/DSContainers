@@ -5,8 +5,8 @@
 // This implementation provides a comprehensive set of operations
 // for a doubly linked list with support for custom memory allocation.
 
-#ifndef DSC_DOUBLYLINKEDLIST_H
-#define DSC_DOUBLYLINKEDLIST_H
+#ifndef DSCONTAINERS_DOUBLYLINKEDLIST_H
+#define DSCONTAINERS_DOUBLYLINKEDLIST_H
 
 #include <stddef.h>
 #include "Alloc.h"
@@ -251,19 +251,32 @@ int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, size_t p
 
 /**
  * Create a new list containing only elements that satisfy the predicate function.
+ * Performs a shallow copy: the new list shares data pointers with the source.
  *
  * @param list The source list
  * @param pred Function that returns non-zero for elements to include
- * @return A new list with matching elements, or NULL on error
+ * @return A new list with matching elements (shallow copy), or NULL on error
  */
 DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, pred_func pred);
+
+/**
+ * Create a new list containing only elements that satisfy the predicate function.
+ * Performs a deep copy: the new list contains cloned copies of the matching elements.
+ *
+ * @param list The source list
+ * @param pred Function that returns non-zero for elements to include
+ * @return A new list with matching elements (deep copy), or NULL on error
+ */
+DSCDoublyLinkedList *dsc_dll_filter_deep(const DSCDoublyLinkedList *list, pred_func pred);
+
 
 /**
  * Create a new list by transforming each element with the given function.
  *
  * @param list The source list
  * @param transform Function that returns a new element based on the original
- * @param should_free_data
+* @param should_free_data Whether to free the data returned after
+ * transformation if an error occurred
  * @return A new list with transformed elements, or NULL on error
  */
 DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, transform_func transform, bool should_free_data);
@@ -327,4 +340,4 @@ DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList *list);
 DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc);
 
 
-#endif //DSC_DOUBLYLINKEDLIST_H
+#endif //DSCONTAINERS_DOUBLYLINKEDLIST_H

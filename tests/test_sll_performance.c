@@ -10,7 +10,8 @@
 #include <time.h>
 
 int test_stress(void){
-    DSCSinglyLinkedList *list = dsc_sll_create();
+    DSCAlloc *alloc = create_std_allocator();
+    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
     const size_t NUM_ELEMENTS = 10000;
 
     // Add many elements
@@ -29,11 +30,12 @@ int test_stress(void){
 
     // Remove elements from the front
     for (size_t i = 0; i < NUM_ELEMENTS / 2; i++) {
-        ASSERT_EQ(dsc_sll_remove_at(list, 0, int_free), 0);
+        ASSERT_EQ(dsc_sll_remove_at(list, 0, true), 0);
     }
     ASSERT_EQ(list->size, NUM_ELEMENTS / 2);
 
-    dsc_sll_destroy(list, int_free);
+    dsc_sll_destroy(list, true);
+    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -44,7 +46,8 @@ int test_performance(void){
     for (int s = 0; s < NUM_SIZES; s++) {
         const int SIZES[] = {100, 1000, 10000};
         const int SIZE = SIZES[s];
-        DSCSinglyLinkedList *list = dsc_sll_create();
+        DSCAlloc *alloc = create_std_allocator();
+        DSCSinglyLinkedList *list = dsc_sll_create(alloc);
 
         // Measure insertion time
         clock_t start = clock();
@@ -67,7 +70,8 @@ int test_performance(void){
         ASSERT_NOT_NULL(found);
 
         // Cleanup
-        dsc_sll_destroy(list, int_free);
+        dsc_sll_destroy(list, true);
+        destroy_allocator(alloc);
     }
 
     return TEST_SUCCESS;
