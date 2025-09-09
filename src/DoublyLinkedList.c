@@ -17,16 +17,16 @@
  * @param head The head of the list to split
  * @return Pointer to the head of the second half
  */
-static DSCDoublyLinkedNode* dsc_dll_split(DSCDoublyLinkedNode *head)
+static DSCDoublyLinkedNode* dsc_dll_split(DSCDoublyLinkedNode* head)
 {
     if (!head || !head->next)
     {
         return NULL;
     }
 
-    const DSCDoublyLinkedNode *fast = head;
-    DSCDoublyLinkedNode *slow = head;
-    DSCDoublyLinkedNode *prev = NULL;
+    const DSCDoublyLinkedNode* fast = head;
+    DSCDoublyLinkedNode* slow       = head;
+    DSCDoublyLinkedNode* prev       = NULL;
 
     while (fast && fast->next)
     {
@@ -52,7 +52,7 @@ static DSCDoublyLinkedNode* dsc_dll_split(DSCDoublyLinkedNode *head)
  * @param compare Comparison function
  * @return Pointer to the head of the merged sorted list
  */
-static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode *left, DSCDoublyLinkedNode *right, const cmp_func compare)
+static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode* left, DSCDoublyLinkedNode* right, const cmp_func compare)
 {
     if (!left)
     {
@@ -64,21 +64,21 @@ static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode *left,
         return left;
     }
 
-    DSCDoublyLinkedNode *result;
+    DSCDoublyLinkedNode* result;
 
     // Initialize result pointer
     if (compare(left->data, right->data) <= 0)
     {
         result = left;
-        left = left->next;
+        left   = left->next;
     }
     else
     {
         result = right;
-        right = right->next;
+        right  = right->next;
     }
 
-    result->prev = NULL;
+    result->prev                 = NULL;
     DSCDoublyLinkedNode* current = result;
 
     // Merge the two lists
@@ -87,14 +87,14 @@ static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode *left,
         if (compare(left->data, right->data) <= 0)
         {
             current->next = left;
-            left->prev = current;
-            left = left->next;
+            left->prev    = current;
+            left          = left->next;
         }
         else
         {
             current->next = right;
-            right->prev = current;
-            right = right->next;
+            right->prev   = current;
+            right         = right->next;
         }
         current = current->next;
     }
@@ -103,12 +103,12 @@ static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode *left,
     if (left)
     {
         current->next = left;
-        left->prev = current;
+        left->prev    = current;
     }
     else if (right)
     {
         current->next = right;
-        right->prev = current;
+        right->prev   = current;
     }
     else
     {
@@ -125,7 +125,7 @@ static DSCDoublyLinkedNode* dsc_dll_sort_helper_merge(DSCDoublyLinkedNode *left,
  * @param compare Comparison function
  * @return Pointer to the head of the sorted list
  */
-static DSCDoublyLinkedNode* dsc_dll_merge_sort(DSCDoublyLinkedNode *head, const cmp_func compare)
+static DSCDoublyLinkedNode* dsc_dll_merge_sort(DSCDoublyLinkedNode* head, const cmp_func compare)
 {
     if (!head || !head->next)
     {
@@ -133,11 +133,11 @@ static DSCDoublyLinkedNode* dsc_dll_merge_sort(DSCDoublyLinkedNode *head, const 
     }
 
     // Split the list into two halves
-    DSCDoublyLinkedNode *right = dsc_dll_split(head);
+    DSCDoublyLinkedNode* right = dsc_dll_split(head);
 
     // Recursively sort both halves
-    DSCDoublyLinkedNode *left_sorted = dsc_dll_merge_sort(head, compare);
-    DSCDoublyLinkedNode *right_sorted = dsc_dll_merge_sort(right, compare);
+    DSCDoublyLinkedNode* left_sorted  = dsc_dll_merge_sort(head, compare);
+    DSCDoublyLinkedNode* right_sorted = dsc_dll_merge_sort(right, compare);
 
     // Merge the sorted halves
     return dsc_dll_sort_helper_merge(left_sorted, right_sorted, compare);
@@ -149,42 +149,42 @@ static DSCDoublyLinkedNode* dsc_dll_merge_sort(DSCDoublyLinkedNode *head, const 
 
 typedef struct ListIteratorState
 {
-    DSCDoublyLinkedNode *current;      // Current node
-    DSCDoublyLinkedNode *start;        // Starting position (head or tail)
-    const DSCDoublyLinkedList *list; // The list being iterated (const for safety)
+    DSCDoublyLinkedNode* current;    // Current node
+    DSCDoublyLinkedNode* start;      // Starting position (head or tail)
+    const DSCDoublyLinkedList* list; // The list being iterated (const for safety)
 } ListIteratorState;
 
 /**
  * Check if iterator has more elements.
  */
-static int dsc_dll_iterator_has_next(const DSCIterator *it)
+static int dsc_dll_iterator_has_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return 0;
     }
 
-    const ListIteratorState *state = it->data_state;
+    const ListIteratorState* state = it->data_state;
     return state->current != NULL;
 }
 
 /**
  * Get next element and advance iterator.
  */
-static void *dsc_dll_iterator_next(const DSCIterator *it)
+static void* dsc_dll_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return NULL;
     }
 
-    ListIteratorState *state = it->data_state;
+    ListIteratorState* state = it->data_state;
     if (!state->current)
     {
         return NULL;
     }
 
-    void *data = state->current->data;
+    void* data = state->current->data;
     if (state->start == state->list->head)
     {
         state->current = state->current->next;
@@ -200,12 +200,12 @@ static void *dsc_dll_iterator_next(const DSCIterator *it)
 /**
  * Check if iterator has previous elements.
  */
-static int dsc_dll_iterator_has_prev(const DSCIterator *it)
+static int dsc_dll_iterator_has_prev(const DSCIterator* it)
 {
     if (!it || !it->data_state)
         return 0;
 
-    const ListIteratorState *state = it->data_state;
+    const ListIteratorState* state = it->data_state;
     if (!state->current)
         return 0;
 
@@ -222,20 +222,20 @@ static int dsc_dll_iterator_has_prev(const DSCIterator *it)
 /**
  * Get previous element and move iterator backwards.
  */
-static void *dsc_dll_iterator_prev(const DSCIterator *it)
+static void* dsc_dll_iterator_prev(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return NULL;
     }
 
-    ListIteratorState *state = it->data_state;
+    ListIteratorState* state = it->data_state;
     if (!state->current)
     {
         return NULL;
     }
 
-    void *data = state->current->data;
+    void* data = state->current->data;
     if (state->start == state->list->head)
     {
         state->current = state->current->prev;
@@ -251,42 +251,42 @@ static void *dsc_dll_iterator_prev(const DSCIterator *it)
 /**
  * Reset iterator to starting position.
  */
-static void dsc_dll_iterator_reset(const DSCIterator *it)
+static void dsc_dll_iterator_reset(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return;
     }
 
-    ListIteratorState *state = it->data_state;
-    state->current = state->start;
+    ListIteratorState* state = it->data_state;
+    state->current           = state->start;
 }
 
 /**
  * Check if iterator is valid.
  */
-static int dsc_dll_iterator_is_valid(const DSCIterator *it)
+static int dsc_dll_iterator_is_valid(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return 0;
     }
 
-    const ListIteratorState *state = it->data_state;
+    const ListIteratorState* state = it->data_state;
     return state->list != NULL;
 }
 
 /**
  * Free resources used by iterator.
  */
-static void dsc_dll_iterator_destroy(DSCIterator *it)
+static void dsc_dll_iterator_destroy(DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return;
     }
 
-    const ListIteratorState *state = it->data_state;
+    const ListIteratorState* state = it->data_state;
     if (state && state->list)
     {
         state->list->alloc->dealloc_func(it->data_state);
@@ -297,14 +297,14 @@ static void dsc_dll_iterator_destroy(DSCIterator *it)
 /**
  * Get current element without advancing iterator.
  */
-static void *dsc_dll_iterator_get(const DSCIterator *it)
+static void* dsc_dll_iterator_get(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
         return NULL;
     }
 
-    const ListIteratorState *state = it->data_state;
+    const ListIteratorState* state = it->data_state;
     if (!state->current)
     {
         return NULL;
@@ -317,7 +317,7 @@ static void *dsc_dll_iterator_get(const DSCIterator *it)
 // Creation and destruction functions
 //==============================================================================
 
-DSCDoublyLinkedList *dsc_dll_create(DSCAlloc *alloc)
+DSCDoublyLinkedList* dsc_dll_create(DSCAlloc* alloc)
 {
     if (!alloc)
     {
@@ -339,21 +339,21 @@ DSCDoublyLinkedList *dsc_dll_create(DSCAlloc *alloc)
         alloc->data_free_func = free;
     }
 
-    DSCDoublyLinkedList *list = alloc->alloc_func(sizeof(DSCDoublyLinkedList));
+    DSCDoublyLinkedList* list = alloc->alloc_func(sizeof(DSCDoublyLinkedList));
     if (!list)
     {
         return NULL;
     }
 
-    list->head = NULL;
-    list->tail = NULL;
-    list->size = 0;
+    list->head  = NULL;
+    list->tail  = NULL;
+    list->size  = 0;
     list->alloc = alloc;
 
     return list;
 }
 
-void dsc_dll_destroy(DSCDoublyLinkedList *list, const bool should_free_data)
+void dsc_dll_destroy(DSCDoublyLinkedList* list, const bool should_free_data)
 {
     if (list)
     {
@@ -362,17 +362,17 @@ void dsc_dll_destroy(DSCDoublyLinkedList *list, const bool should_free_data)
     }
 }
 
-void dsc_dll_clear(DSCDoublyLinkedList *list, const bool should_free_data)
+void dsc_dll_clear(DSCDoublyLinkedList* list, const bool should_free_data)
 {
     if (!list)
     {
         return;
     }
 
-    DSCDoublyLinkedNode *node = list->head;
+    DSCDoublyLinkedNode* node = list->head;
     while (node)
     {
-        DSCDoublyLinkedNode *next = node->next;
+        DSCDoublyLinkedNode* next = node->next;
         if (should_free_data && node->data)
         {
             list->alloc->data_free_func(node->data);
@@ -391,7 +391,7 @@ void dsc_dll_clear(DSCDoublyLinkedList *list, const bool should_free_data)
 // Information functions
 //==============================================================================
 
-size_t dsc_dll_size(const DSCDoublyLinkedList *list)
+size_t dsc_dll_size(const DSCDoublyLinkedList* list)
 {
     if (!list)
     {
@@ -401,19 +401,19 @@ size_t dsc_dll_size(const DSCDoublyLinkedList *list)
     return list->size;
 }
 
-int dsc_dll_is_empty(const DSCDoublyLinkedList *list)
+int dsc_dll_is_empty(const DSCDoublyLinkedList* list)
 {
     return !list || list->size == 0;
 }
 
-DSCDoublyLinkedNode *dsc_dll_find(DSCDoublyLinkedList *list, const void *data, const cmp_func compare)
+DSCDoublyLinkedNode* dsc_dll_find(DSCDoublyLinkedList* list, const void* data, const cmp_func compare)
 {
     if (!list || !compare)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedNode *curr = list->head;
+    DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         if (compare(curr->data, data) == 0)
@@ -427,7 +427,7 @@ DSCDoublyLinkedNode *dsc_dll_find(DSCDoublyLinkedList *list, const void *data, c
     return NULL;
 }
 
-int dsc_dll_equals(const DSCDoublyLinkedList *list1, const DSCDoublyLinkedList *list2, const cmp_func compare)
+int dsc_dll_equals(const DSCDoublyLinkedList* list1, const DSCDoublyLinkedList* list2, const cmp_func compare)
 {
     if (!list1 || !list2 || !compare)
     {
@@ -447,8 +447,8 @@ int dsc_dll_equals(const DSCDoublyLinkedList *list1, const DSCDoublyLinkedList *
     }
 
     // Compare each node
-    const DSCDoublyLinkedNode *node1 = list1->head;
-    const DSCDoublyLinkedNode *node2 = list2->head;
+    const DSCDoublyLinkedNode* node1 = list1->head;
+    const DSCDoublyLinkedNode* node2 = list2->head;
 
     while (node1 && node2)
     {
@@ -468,14 +468,14 @@ int dsc_dll_equals(const DSCDoublyLinkedList *list1, const DSCDoublyLinkedList *
 // Insertion functions
 //==============================================================================
 
-int dsc_dll_insert_front(DSCDoublyLinkedList *list, void *data)
+int dsc_dll_insert_front(DSCDoublyLinkedList* list, void* data)
 {
     if (!list)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -501,14 +501,14 @@ int dsc_dll_insert_front(DSCDoublyLinkedList *list, void *data)
     return 0;
 }
 
-int dsc_dll_insert_back(DSCDoublyLinkedList *list, void *data)
+int dsc_dll_insert_back(DSCDoublyLinkedList* list, void* data)
 {
     if (!list)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -534,7 +534,7 @@ int dsc_dll_insert_back(DSCDoublyLinkedList *list, void *data)
     return 0;
 }
 
-int dsc_dll_insert_at(DSCDoublyLinkedList *list, const size_t pos, void *data)
+int dsc_dll_insert_at(DSCDoublyLinkedList* list, const size_t pos, void* data)
 {
     if (!list || pos > list->size)
     {
@@ -551,7 +551,7 @@ int dsc_dll_insert_at(DSCDoublyLinkedList *list, const size_t pos, void *data)
         return dsc_dll_insert_back(list, data);
     }
 
-    DSCDoublyLinkedNode *node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -563,30 +563,30 @@ int dsc_dll_insert_at(DSCDoublyLinkedList *list, const size_t pos, void *data)
     if (pos <= list->size / 2)
     {
         // Start from head and move forward
-        DSCDoublyLinkedNode *curr = list->head;
+        DSCDoublyLinkedNode* curr = list->head;
         for (size_t i = 0; i < pos - 1; ++i)
         {
             curr = curr->next;
         }
 
-        node->next = curr->next;
-        node->prev = curr;
+        node->next       = curr->next;
+        node->prev       = curr;
         curr->next->prev = node;
-        curr->next = node;
+        curr->next       = node;
     }
     else
     {
         // Start from tail and move backward
-        DSCDoublyLinkedNode *curr = list->tail;
+        DSCDoublyLinkedNode* curr = list->tail;
         for (size_t i = list->size - 1; i > pos; --i)
         {
             curr = curr->prev;
         }
 
-        node->prev = curr->prev;
-        node->next = curr;
+        node->prev       = curr->prev;
+        node->next       = curr;
         curr->prev->next = node;
-        curr->prev = node;
+        curr->prev       = node;
     }
 
     list->size++;
@@ -598,14 +598,14 @@ int dsc_dll_insert_at(DSCDoublyLinkedList *list, const size_t pos, void *data)
 // Removal functions
 //==============================================================================
 
-int dsc_dll_remove(DSCDoublyLinkedList *list, const void *data, const cmp_func compare, const bool should_free_data)
+int dsc_dll_remove(DSCDoublyLinkedList* list, const void* data, const cmp_func compare, const bool should_free_data)
 {
     if (!list || !compare || list->size == 0)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *curr = list->head;
+    DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         if (compare(curr->data, data) == 0)
@@ -643,23 +643,23 @@ int dsc_dll_remove(DSCDoublyLinkedList *list, const void *data, const cmp_func c
         curr = curr->next;
     }
 
-    return -1;  // Node not found
+    return -1; // Node not found
 }
 
-int dsc_dll_remove_at(DSCDoublyLinkedList *list, const size_t pos, const bool should_free_data)
+int dsc_dll_remove_at(DSCDoublyLinkedList* list, const size_t pos, const bool should_free_data)
 {
     if (!list || pos >= list->size)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *node_to_remove;
+    DSCDoublyLinkedNode* node_to_remove;
 
     if (pos == 0)
     {
         // Remove head
         node_to_remove = list->head;
-        list->head = node_to_remove->next;
+        list->head     = node_to_remove->next;
 
         if (list->head)
         {
@@ -674,8 +674,8 @@ int dsc_dll_remove_at(DSCDoublyLinkedList *list, const size_t pos, const bool sh
     else if (pos == list->size - 1)
     {
         // Remove tail
-        node_to_remove = list->tail;
-        list->tail = node_to_remove->prev;
+        node_to_remove   = list->tail;
+        list->tail       = node_to_remove->prev;
         list->tail->next = NULL;
     }
     else if (pos <= list->size / 2)
@@ -711,15 +711,15 @@ int dsc_dll_remove_at(DSCDoublyLinkedList *list, const size_t pos, const bool sh
     return 0;
 }
 
-int dsc_dll_remove_front(DSCDoublyLinkedList *list, const bool should_free_data)
+int dsc_dll_remove_front(DSCDoublyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *node_to_remove = list->head;
-    list->head = node_to_remove->next;
+    DSCDoublyLinkedNode* node_to_remove = list->head;
+    list->head                          = node_to_remove->next;
 
     if (list->head)
     {
@@ -742,15 +742,15 @@ int dsc_dll_remove_front(DSCDoublyLinkedList *list, const bool should_free_data)
     return 0;
 }
 
-int dsc_dll_remove_back(DSCDoublyLinkedList *list, const bool should_free_data)
+int dsc_dll_remove_back(DSCDoublyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->tail)
     {
         return -1;
     }
 
-    DSCDoublyLinkedNode *node_to_remove = list->tail;
-    list->tail = node_to_remove->prev;
+    DSCDoublyLinkedNode* node_to_remove = list->tail;
+    list->tail                          = node_to_remove->prev;
 
     if (list->tail)
     {
@@ -777,7 +777,7 @@ int dsc_dll_remove_back(DSCDoublyLinkedList *list, const bool should_free_data)
 // List manipulation functions
 //==============================================================================
 
-int dsc_dll_sort(DSCDoublyLinkedList *list, const cmp_func compare)
+int dsc_dll_sort(DSCDoublyLinkedList* list, const cmp_func compare)
 {
     if (!list || !compare || list->size <= 1)
     {
@@ -788,7 +788,7 @@ int dsc_dll_sort(DSCDoublyLinkedList *list, const cmp_func compare)
     list->head = dsc_dll_merge_sort(list->head, compare);
 
     // Update the tail pointer
-    DSCDoublyLinkedNode *current = list->head;
+    DSCDoublyLinkedNode* current = list->head;
     while (current && current->next)
     {
         current = current->next;
@@ -798,7 +798,7 @@ int dsc_dll_sort(DSCDoublyLinkedList *list, const cmp_func compare)
     return 0;
 }
 
-int dsc_dll_reverse(DSCDoublyLinkedList *list)
+int dsc_dll_reverse(DSCDoublyLinkedList* list)
 {
     if (!list)
     {
@@ -810,14 +810,14 @@ int dsc_dll_reverse(DSCDoublyLinkedList *list)
         return 0; // Empty or single-element list is already reversed
     }
 
-    DSCDoublyLinkedNode *current = list->head;
-    DSCDoublyLinkedNode *temp;
+    DSCDoublyLinkedNode* current = list->head;
+    DSCDoublyLinkedNode* temp;
 
     // Swap next and prev pointers for all nodes
     while (current)
     {
         // Swap next and prev pointers
-        temp = current->prev;
+        temp          = current->prev;
         current->prev = current->next;
         current->next = temp;
 
@@ -826,14 +826,14 @@ int dsc_dll_reverse(DSCDoublyLinkedList *list)
     }
 
     // Swap head and tail pointers
-    temp = list->head;
+    temp       = list->head;
     list->head = list->tail;
     list->tail = temp;
 
     return 0;
 }
 
-int dsc_dll_merge(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src)
+int dsc_dll_merge(DSCDoublyLinkedList* dest, DSCDoublyLinkedList* src)
 {
     if (!dest || !src)
     {
@@ -857,7 +857,7 @@ int dsc_dll_merge(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src)
     {
         // Connect dest's tail to src's head
         dest->tail->next = src->head;
-        src->head->prev = dest->tail;
+        src->head->prev  = dest->tail;
 
         // Update dest's tail
         dest->tail = src->tail;
@@ -874,7 +874,7 @@ int dsc_dll_merge(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src)
     return 0;
 }
 
-int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, const size_t pos)
+int dsc_dll_splice(DSCDoublyLinkedList* dest, DSCDoublyLinkedList* src, const size_t pos)
 {
     if (!dest || !src || pos > dest->size)
     {
@@ -897,22 +897,22 @@ int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, const si
         }
         else
         {
-            src->tail->next = dest->head;
+            src->tail->next  = dest->head;
             dest->head->prev = src->tail;
-            dest->head = src->head;
+            dest->head       = src->head;
         }
     }
     // If inserting at the end
     else if (pos == dest->size)
     {
         dest->tail->next = src->head;
-        src->head->prev = dest->tail;
-        dest->tail = src->tail;
+        src->head->prev  = dest->tail;
+        dest->tail       = src->tail;
     }
     // If inserting in the middle
     else
     {
-        DSCDoublyLinkedNode *curr;
+        DSCDoublyLinkedNode* curr;
 
         // Find the node at position pos
         if (pos <= dest->size / 2)
@@ -936,11 +936,11 @@ int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, const si
 
         // Connect the node at position pos-1 to src's first node
         curr->prev->next = src->head;
-        src->head->prev = curr->prev;
+        src->head->prev  = curr->prev;
 
         // Connect src's last node to the node at position pos
         src->tail->next = curr;
-        curr->prev = src->tail;
+        curr->prev      = src->tail;
     }
 
     // Update size
@@ -958,20 +958,20 @@ int dsc_dll_splice(DSCDoublyLinkedList *dest, DSCDoublyLinkedList *src, const si
 // Higher-order functions
 //==============================================================================
 
-DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, const pred_func pred)
+DSCDoublyLinkedList* dsc_dll_filter(const DSCDoublyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedList *filtered = dsc_dll_create(list->alloc);
+    DSCDoublyLinkedList* filtered = dsc_dll_create(list->alloc);
     if (!filtered)
     {
         return NULL;
     }
 
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         if (pred(curr->data))
@@ -988,26 +988,25 @@ DSCDoublyLinkedList *dsc_dll_filter(const DSCDoublyLinkedList *list, const pred_
     return filtered;
 }
 
-DSCDoublyLinkedList *dsc_dll_filter_deep(const DSCDoublyLinkedList *list, const pred_func pred)
+DSCDoublyLinkedList* dsc_dll_filter_deep(const DSCDoublyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred || !list->alloc->copy_func)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedList *filtered = dsc_dll_create(list->alloc);
+    DSCDoublyLinkedList* filtered = dsc_dll_create(list->alloc);
     if (!filtered)
     {
         return NULL;
     }
 
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         if (pred(curr->data))
         {
-
-            void *filtered_data = filtered->alloc->copy_func(curr->data);
+            void* filtered_data = filtered->alloc->copy_func(curr->data);
 
             if (dsc_dll_insert_back(filtered, filtered_data) != 0)
             {
@@ -1025,28 +1024,28 @@ DSCDoublyLinkedList *dsc_dll_filter_deep(const DSCDoublyLinkedList *list, const 
     return filtered;
 }
 
-DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, const transform_func transform, const bool should_free_data)
+DSCDoublyLinkedList* dsc_dll_transform(const DSCDoublyLinkedList* list, const transform_func transform, const bool should_free_data)
 {
     if (!list || !transform)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedList *transformed = dsc_dll_create(list->alloc);
+    DSCDoublyLinkedList* transformed = dsc_dll_create(list->alloc);
     if (!transformed)
     {
         return NULL;
     }
 
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
-        void *new_data = transform(curr->data);
+        void* new_data = transform(curr->data);
         if (dsc_dll_insert_back(transformed, new_data) != 0)
         {
             if (should_free_data && new_data)
             {
-                transformed->alloc->data_free_func(new_data);  // Free the transformed data if insertion fails
+                transformed->alloc->data_free_func(new_data); // Free the transformed data if insertion fails
             }
             // Free any data already successfully inserted into the new list
             dsc_dll_destroy(transformed, should_free_data);
@@ -1058,14 +1057,14 @@ DSCDoublyLinkedList *dsc_dll_transform(const DSCDoublyLinkedList *list, const tr
     return transformed;
 }
 
-void dsc_dll_for_each(const DSCDoublyLinkedList *list, const action_func action)
+void dsc_dll_for_each(const DSCDoublyLinkedList* list, const action_func action)
 {
     if (!list || !action)
     {
         return;
     }
 
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         action(curr->data);
@@ -1077,14 +1076,14 @@ void dsc_dll_for_each(const DSCDoublyLinkedList *list, const action_func action)
 // List copying functions
 //==============================================================================
 
-DSCDoublyLinkedList *dsc_dll_copy(const DSCDoublyLinkedList *list)
+DSCDoublyLinkedList* dsc_dll_copy(const DSCDoublyLinkedList* list)
 {
     if (!list)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedList *copy = dsc_dll_create(list->alloc);
+    DSCDoublyLinkedList* copy = dsc_dll_create(list->alloc);
     if (!copy)
     {
         return NULL;
@@ -1097,12 +1096,12 @@ DSCDoublyLinkedList *dsc_dll_copy(const DSCDoublyLinkedList *list)
     }
 
     // Copy nodes, sharing data pointers
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
         if (dsc_dll_insert_back(copy, curr->data) != 0)
         {
-            dsc_dll_destroy(copy, NULL);  // Don't free data - they're shared
+            dsc_dll_destroy(copy, NULL); // Don't free data - they're shared
             return NULL;
         }
         curr = curr->next;
@@ -1111,14 +1110,14 @@ DSCDoublyLinkedList *dsc_dll_copy(const DSCDoublyLinkedList *list)
     return copy;
 }
 
-DSCDoublyLinkedList *dsc_dll_copy_deep(const DSCDoublyLinkedList *list, const bool should_free_data)
+DSCDoublyLinkedList* dsc_dll_copy_deep(const DSCDoublyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->alloc->copy_func)
     {
         return NULL;
     }
 
-    DSCDoublyLinkedList *copy = dsc_dll_create(list->alloc);
+    DSCDoublyLinkedList* copy = dsc_dll_create(list->alloc);
     if (!copy)
     {
         return NULL;
@@ -1131,10 +1130,10 @@ DSCDoublyLinkedList *dsc_dll_copy_deep(const DSCDoublyLinkedList *list, const bo
     }
 
     // Copy nodes and clone data
-    const DSCDoublyLinkedNode *curr = list->head;
+    const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
-        void *data_copy = copy->alloc->copy_func(curr->data);
+        void* data_copy = copy->alloc->copy_func(curr->data);
         if (!data_copy)
         {
             // On failure, destroy the partially built clone, freeing any data it contains
@@ -1144,7 +1143,8 @@ DSCDoublyLinkedList *dsc_dll_copy_deep(const DSCDoublyLinkedList *list, const bo
         if (dsc_dll_insert_back(copy, data_copy) != 0)
         {
             // If insertion fails, free the orphaned copy and destroy the partial clone
-            if (should_free_data) {
+            if (should_free_data)
+            {
                 list->alloc->data_free_func(data_copy);
             }
             dsc_dll_destroy(copy, should_free_data);
@@ -1158,7 +1158,7 @@ DSCDoublyLinkedList *dsc_dll_copy_deep(const DSCDoublyLinkedList *list, const bo
 
 // Create a list from an iterator using a provided allocator. This function
 // matches the header declaration `dsc_dll_from_iterator_custom(Iterator*, Alloc*)`.
-DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
+DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
 {
     if (!it)
     {
@@ -1170,7 +1170,7 @@ DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
         return NULL;
     }
 
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     if (!list)
     {
         return NULL;
@@ -1178,13 +1178,13 @@ DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
 
     while (it->has_next(it))
     {
-        void *data = it->next(it);
+        void* data = it->next(it);
         if (!data)
         {
-            continue;  // Skip NULL entries
+            continue; // Skip NULL entries
         }
 
-        void *data_to_insert = data;
+        void* data_to_insert = data;
         if (alloc->copy_func)
         {
             data_to_insert = alloc->copy_func(data);
@@ -1199,7 +1199,7 @@ DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
         {
             if (alloc->copy_func && alloc->data_free_func)
             {
-                alloc->data_free_func(data_to_insert);  // Free the copy we just made
+                alloc->data_free_func(data_to_insert); // Free the copy we just made
             }
             dsc_dll_destroy(list, alloc->copy_func != NULL);
             return NULL;
@@ -1213,66 +1213,66 @@ DSCDoublyLinkedList *dsc_dll_from_iterator(DSCIterator *it, DSCAlloc *alloc)
 // Iterator functions
 //==============================================================================
 
-DSCIterator dsc_dll_iterator(const DSCDoublyLinkedList *list)
+DSCIterator dsc_dll_iterator(const DSCDoublyLinkedList* list)
 {
-    DSCIterator it = {0};  // Initialize all fields to NULL/0
+    DSCIterator it = {0}; // Initialize all fields to NULL/0
 
-    it.get = dsc_dll_iterator_get;
-    it.next = dsc_dll_iterator_next;
+    it.get      = dsc_dll_iterator_get;
+    it.next     = dsc_dll_iterator_next;
     it.has_next = dsc_dll_iterator_has_next;
-    it.prev = dsc_dll_iterator_prev;
+    it.prev     = dsc_dll_iterator_prev;
     it.has_prev = dsc_dll_iterator_has_prev;
-    it.reset = dsc_dll_iterator_reset;
+    it.reset    = dsc_dll_iterator_reset;
     it.is_valid = dsc_dll_iterator_is_valid;
-    it.destroy = dsc_dll_iterator_destroy;
+    it.destroy  = dsc_dll_iterator_destroy;
 
     if (!list)
     {
         return it;
     }
 
-    ListIteratorState *state = list->alloc->alloc_func(sizeof(ListIteratorState));
+    ListIteratorState* state = list->alloc->alloc_func(sizeof(ListIteratorState));
     if (!state)
     {
         return it;
     }
 
     state->current = list->head;
-    state->start = list->head;
-    state->list = list;
+    state->start   = list->head;
+    state->list    = list;
 
     it.data_state = state;
 
     return it;
 }
 
-DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList *list)
+DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList* list)
 {
-    DSCIterator it = {0};  // Initialize all fields to NULL/0
+    DSCIterator it = {0}; // Initialize all fields to NULL/0
 
-    it.get = dsc_dll_iterator_get;
-    it.next = dsc_dll_iterator_next;
+    it.get      = dsc_dll_iterator_get;
+    it.next     = dsc_dll_iterator_next;
     it.has_next = dsc_dll_iterator_has_next;
-    it.prev = dsc_dll_iterator_prev;
+    it.prev     = dsc_dll_iterator_prev;
     it.has_prev = dsc_dll_iterator_has_prev;
-    it.reset = dsc_dll_iterator_reset;
+    it.reset    = dsc_dll_iterator_reset;
     it.is_valid = dsc_dll_iterator_is_valid;
-    it.destroy = dsc_dll_iterator_destroy;
+    it.destroy  = dsc_dll_iterator_destroy;
 
     if (!list)
     {
         return it;
     }
 
-    ListIteratorState *state = list->alloc->alloc_func(sizeof(ListIteratorState));
+    ListIteratorState* state = list->alloc->alloc_func(sizeof(ListIteratorState));
     if (!state)
     {
         return it;
     }
 
     state->current = list->tail;
-    state->start = list->tail;
-    state->list = list;
+    state->start   = list->tail;
+    state->list    = list;
 
     it.data_state = state;
 

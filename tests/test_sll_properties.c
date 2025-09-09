@@ -8,16 +8,19 @@
 #include <stdlib.h>
 
 // Property: The size of the list should be consistent after a series of insertions and removals.
-int test_sll_size_after_insert_and_remove(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
+int test_sll_size_after_insert_and_remove(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
     ASSERT_EQ(dsc_sll_size(list), 0);
 
-    int *a = malloc(sizeof(int)); *a = 1;
+    int* a = malloc(sizeof(int));
+    *a     = 1;
     dsc_sll_insert_back(list, a);
     ASSERT_EQ(dsc_sll_size(list), 1);
 
-    int *b = malloc(sizeof(int)); *b = 2;
+    int* b = malloc(sizeof(int));
+    *b     = 2;
     dsc_sll_insert_back(list, b);
     ASSERT_EQ(dsc_sll_size(list), 2);
 
@@ -33,16 +36,19 @@ int test_sll_size_after_insert_and_remove(void) {
 }
 
 // Property: Sorting an already sorted list should not change it.
-int test_sll_sort_is_idempotent(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
-    for (int i = 0; i < 10; i++) {
-        int *val = malloc(sizeof(int)); *val = i;
+int test_sll_sort_is_idempotent(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    for (int i = 0; i < 10; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_sll_insert_back(list, val);
     }
 
     dsc_sll_sort(list, int_cmp); // First sort
-    DSCSinglyLinkedList *copy = dsc_sll_copy_deep(list, int_copy, true);
+    DSCSinglyLinkedList* copy = dsc_sll_copy_deep(list, int_copy, true);
 
     dsc_sll_sort(list, int_cmp); // Second sort
 
@@ -55,15 +61,18 @@ int test_sll_sort_is_idempotent(void) {
 }
 
 // Property: Reversing a list twice should return it to its original state.
-int test_sll_reverse_is_involution(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCSinglyLinkedList *list = dsc_sll_create(alloc);
-    for (int i = 0; i < 10; i++) {
-        int *val = malloc(sizeof(int)); *val = i;
+int test_sll_reverse_is_involution(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    for (int i = 0; i < 10; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_sll_insert_back(list, val);
     }
 
-    DSCSinglyLinkedList *copy = dsc_sll_copy_deep(list, int_copy, true);
+    DSCSinglyLinkedList* copy = dsc_sll_copy_deep(list, int_copy, true);
 
     dsc_sll_reverse(list);
     dsc_sll_reverse(list);
@@ -76,9 +85,10 @@ int test_sll_reverse_is_involution(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -87,18 +97,22 @@ TestCase tests[] = {
     {test_sll_reverse_is_involution, "test_sll_reverse_is_involution"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All SinglyLinkedList Property tests passed.\n");
         return 0;
     }

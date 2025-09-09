@@ -9,15 +9,17 @@
 #include <stdlib.h>
 
 // Test filter iterator functionality
-static int test_filter_iterator(void) {
-    DSCAlloc *alloc = create_std_allocator();
+static int test_filter_iterator(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements 1-10
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; i <= 10; i++)
+    {
         int* val = malloc(sizeof(int));
-        *val = i;
+        *val     = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -31,7 +33,8 @@ static int test_filter_iterator(void) {
     // Verify filter correctly returns only even numbers
     int idx = 0;
 
-    while (filter_it.has_next(&filter_it)) {
+    while (filter_it.has_next(&filter_it))
+    {
         const int expected_values[] = {2, 4, 6, 8, 10};
         const int* value            = filter_it.next(&filter_it);
         ASSERT_NOT_NULL(value);
@@ -42,7 +45,8 @@ static int test_filter_iterator(void) {
     ASSERT_EQ(idx, 5);
 
     // Cleanup
-    if (filter_it.destroy) {
+    if (filter_it.destroy)
+    {
         filter_it.destroy(&filter_it);
     }
     dsc_dll_destroy(list, true);
@@ -52,15 +56,17 @@ static int test_filter_iterator(void) {
 }
 
 // Test filter iterator with no matches
-static int test_filter_no_matches(void) {
-    DSCAlloc *alloc = create_std_allocator();
+static int test_filter_no_matches(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert odd numbers only
-    for (int i = 1; i <= 5; i += 2) {
+    for (int i = 1; i <= 5; i += 2)
+    {
         int* val = malloc(sizeof(int));
-        *val = i;
+        *val     = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -75,7 +81,8 @@ static int test_filter_no_matches(void) {
     ASSERT_NULL(filter_it.next(&filter_it));
 
     // Cleanup
-    if (filter_it.destroy) {
+    if (filter_it.destroy)
+    {
         filter_it.destroy(&filter_it);
     }
     dsc_dll_destroy(list, true);
@@ -85,7 +92,8 @@ static int test_filter_no_matches(void) {
 }
 
 // Test chaining multiple filters
-static int test_multiple_filters(void) {
+static int test_multiple_filters(void)
+{
     // Create range from 1 to 30, then keep only even numbers, then only those divisible by 3
     DSCIterator range_it = dsc_iterator_range(1, 30, 1);
     ASSERT_TRUE(range_it.is_valid(&range_it));
@@ -98,7 +106,8 @@ static int test_multiple_filters(void) {
 
     // Expected: [6,12,18,24] (even numbers from 1-29 that are also divisible by 3)
     int idx = 0;
-    while (div3_it.has_next(&div3_it)) {
+    while (div3_it.has_next(&div3_it))
+    {
         const int expected[] = {6, 12, 18, 24};
         int* value           = div3_it.next(&div3_it);
         ASSERT_NOT_NULL(value);
@@ -107,16 +116,17 @@ static int test_multiple_filters(void) {
         free(value);
     }
 
-    ASSERT_EQ(idx, 4);  // Should have 4 elements
+    ASSERT_EQ(idx, 4); // Should have 4 elements
 
     // Cleanup
     div3_it.destroy(&div3_it); // This should destroy all chained iterators
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -125,21 +135,27 @@ TestCase tests[] = {
     {test_multiple_filters, "test_multiple_filters"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed) {
+    if (failed)
+    {
         printf("%d test(s) failed.\n", failed);
         return 1;
-    } else {
+    }
+    else
+    {
         printf("All filter iterator tests passed!\n");
         return 0;
     }

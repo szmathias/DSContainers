@@ -57,6 +57,9 @@ add_library(DSContainers SHARED
         src/Iterator.c
         src/Mutex.c
         src/Threads.c
+        src/ArrayList.c
+        src/Stack.c
+        src/Queue.c
         include/DoublyLinkedList.h
         include/DynamicString.h
         include/Iterator.h
@@ -67,7 +70,8 @@ add_library(DSContainers SHARED
         include/Threads.h
         include/Mutex.h
         include/ArrayList.h
-        src/ArrayList.c
+        include/Stack.h
+        include/Queue.h
 )
 
 # Create an OBJECT library for test helpers. This compiles the sources once
@@ -290,3 +294,66 @@ target_link_libraries(test_arraylist_properties PRIVATE DSContainers test_helper
 add_test(NAME test_arraylist_properties
         COMMAND test_arraylist_properties
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add Stack test executables
+add_executable(test_stack_crud tests/test_stack_crud.c)
+target_link_libraries(test_stack_crud PRIVATE DSContainers test_helpers)
+add_test(NAME test_stack_crud
+        COMMAND test_stack_crud
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_stack_algorithms tests/test_stack_algorithms.c)
+target_link_libraries(test_stack_algorithms PRIVATE DSContainers test_helpers)
+add_test(NAME test_stack_algorithms
+        COMMAND test_stack_algorithms
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_stack_iterator tests/test_stack_iterator.c)
+target_link_libraries(test_stack_iterator PRIVATE DSContainers test_helpers)
+add_test(NAME test_stack_iterator
+        COMMAND test_stack_iterator
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_stack_memory tests/test_stack_memory.c)
+target_link_libraries(test_stack_memory PRIVATE DSContainers test_helpers)
+add_test(NAME test_stack_memory
+        COMMAND test_stack_memory
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_stack_properties tests/test_stack_properties.c)
+target_link_libraries(test_stack_properties PRIVATE DSContainers test_helpers)
+add_test(NAME test_stack_properties
+        COMMAND test_stack_properties
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add Queue test executables
+add_executable(test_queue_crud tests/test_queue_crud.c)
+target_link_libraries(test_queue_crud PRIVATE DSContainers test_helpers)
+add_test(NAME test_queue_crud
+        COMMAND test_queue_crud
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_queue_algorithms tests/test_queue_algorithms.c)
+target_link_libraries(test_queue_algorithms PRIVATE DSContainers test_helpers)
+add_test(NAME test_queue_algorithms
+        COMMAND test_queue_algorithms
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_queue_iterator tests/test_queue_iterator.c)
+target_link_libraries(test_queue_iterator PRIVATE DSContainers test_helpers)
+add_test(NAME test_queue_iterator
+        COMMAND test_queue_iterator
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_queue_memory tests/test_queue_memory.c)
+target_link_libraries(test_queue_memory PRIVATE DSContainers test_helpers)
+add_test(NAME test_queue_memory
+        COMMAND test_queue_memory
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_queue_properties tests/test_queue_properties.c)
+target_link_libraries(test_queue_properties PRIVATE DSContainers test_helpers)
+add_test(NAME test_queue_properties
+        COMMAND test_queue_properties
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+

@@ -9,7 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-int test_create_and_assign(void) {
+int test_create_and_assign(void)
+{
     DSCString str = dsc_str_create_empty(32);
     ASSERT_EQ(dsc_str_size(&str), 0);
     dsc_str_assign_cstring(&str, "Hello");
@@ -19,7 +20,8 @@ int test_create_and_assign(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_and_insert(void) {
+int test_append_and_insert(void)
+{
     DSCString str = dsc_str_create_empty(16);
     dsc_str_assign_cstring(&str, "abc");
     dsc_str_append_cstring(&str, "def");
@@ -30,7 +32,8 @@ int test_append_and_insert(void) {
     return TEST_SUCCESS;
 }
 
-int test_push_pop_erase(void) {
+int test_push_pop_erase(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_assign_cstring(&str, "hi");
     dsc_str_push_back(&str, '!');
@@ -43,7 +46,8 @@ int test_push_pop_erase(void) {
     return TEST_SUCCESS;
 }
 
-int test_empty_string(void) {
+int test_empty_string(void)
+{
     DSCString str = dsc_str_create_empty(0);
     ASSERT_EQ(dsc_str_size(&str), 0);
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -52,7 +56,8 @@ int test_empty_string(void) {
     return TEST_SUCCESS;
 }
 
-int test_assign_empty_cstring(void) {
+int test_assign_empty_cstring(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_assign_cstring(&str, "");
     ASSERT_EQ(dsc_str_size(&str), 0);
@@ -62,7 +67,8 @@ int test_assign_empty_cstring(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_empty_cstring(void) {
+int test_append_empty_cstring(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_append_cstring(&str, "");
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -71,7 +77,8 @@ int test_append_empty_cstring(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_at_bounds(void) {
+int test_insert_at_bounds(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_insert_cstring(&str, 0, "X");
     ASSERT_EQ_STR(dsc_str_data(&str), "Xabc");
@@ -81,7 +88,8 @@ int test_insert_at_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_erase_out_of_bounds(void) {
+int test_erase_out_of_bounds(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_erase(&str, 10); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -91,7 +99,8 @@ int test_erase_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_self_assign_and_append(void) {
+int test_self_assign_and_append(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_assign_string(&str, &str);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -101,7 +110,8 @@ int test_self_assign_and_append(void) {
     return TEST_SUCCESS;
 }
 
-int test_clear_non_empty(void) {
+int test_clear_non_empty(void)
+{
     DSCString str = dsc_str_create_from_cstring("not empty");
     dsc_str_clear(&str);
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -110,7 +120,8 @@ int test_clear_non_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_pop_back_empty(void) {
+int test_pop_back_empty(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_pop_back(&str); // Should not crash
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -118,7 +129,8 @@ int test_pop_back_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_erase_empty(void) {
+int test_erase_empty(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_erase(&str, 0); // Should not crash
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -126,7 +138,8 @@ int test_erase_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_assign_char(void) {
+int test_assign_char(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_assign_char(&str, 'A');
     ASSERT_EQ_STR(dsc_str_data(&str), "A");
@@ -137,7 +150,8 @@ int test_assign_char(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_char_positions(void) {
+int test_insert_char_positions(void)
+{
     DSCString str = dsc_str_create_from_cstring("ac");
     dsc_str_insert_char(&str, 1, 'b'); // Insert in middle
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -149,7 +163,8 @@ int test_insert_char_positions(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_char_multiple(void) {
+int test_append_char_multiple(void)
+{
     DSCString str = dsc_str_create_empty(4);
     dsc_str_append_char(&str, 'a');
     dsc_str_append_char(&str, 'b');
@@ -159,7 +174,8 @@ int test_append_char_multiple(void) {
     return TEST_SUCCESS;
 }
 
-int test_clear_already_empty(void) {
+int test_clear_already_empty(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_clear(&str);
     ASSERT_TRUE(dsc_str_empty(&str));
@@ -167,7 +183,8 @@ int test_clear_already_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_assign_string_different(void) {
+int test_assign_string_different(void)
+{
     DSCString str1 = dsc_str_create_from_cstring("foo");
     DSCString str2 = dsc_str_create_from_cstring("bar");
     dsc_str_assign_string(&str1, &str2);
@@ -177,7 +194,8 @@ int test_assign_string_different(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_cstring_empty(void) {
+int test_insert_cstring_empty(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_insert_cstring(&str, 1, "");
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -185,8 +203,9 @@ int test_insert_cstring_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_string_empty(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_insert_string_empty(void)
+{
+    DSCString str   = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     dsc_str_insert_string(&str, 1, &empty);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -195,8 +214,9 @@ int test_insert_string_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_string_empty(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_append_string_empty(void)
+{
+    DSCString str   = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     dsc_str_append_string(&str, &empty);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -205,7 +225,8 @@ int test_append_string_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_push_back_null_char(void) {
+int test_push_back_null_char(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_push_back(&str, '\0');
     ASSERT_EQ(dsc_str_size(&str), 1);
@@ -214,7 +235,8 @@ int test_push_back_null_char(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_char_null_char(void) {
+int test_append_char_null_char(void)
+{
     DSCString str = dsc_str_create_empty(8);
     dsc_str_append_char(&str, '\0');
     ASSERT_EQ(dsc_str_size(&str), 1);
@@ -223,7 +245,8 @@ int test_append_char_null_char(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_char_out_of_bounds(void) {
+int test_insert_char_out_of_bounds(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_insert_char(&str, 10, 'X'); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -231,7 +254,8 @@ int test_insert_char_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_cstring_out_of_bounds(void) {
+int test_insert_cstring_out_of_bounds(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_insert_cstring(&str, 10, "XYZ"); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -239,8 +263,9 @@ int test_insert_cstring_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_string_out_of_bounds(void) {
-    DSCString str = dsc_str_create_from_cstring("abc");
+int test_insert_string_out_of_bounds(void)
+{
+    DSCString str   = dsc_str_create_from_cstring("abc");
     DSCString other = dsc_str_create_from_cstring("XYZ");
     dsc_str_insert_string(&str, 10, &other); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -249,7 +274,8 @@ int test_insert_string_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_erase_at_size(void) {
+int test_erase_at_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("abc");
     dsc_str_erase(&str, dsc_str_size(&str)); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -257,7 +283,8 @@ int test_erase_at_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_assign_string_self(void) {
+int test_assign_string_self(void)
+{
     DSCString str = dsc_str_create_from_cstring("self");
     dsc_str_assign_string(&str, &str);
     ASSERT_EQ_STR(dsc_str_data(&str), "self");
@@ -265,7 +292,8 @@ int test_assign_string_self(void) {
     return TEST_SUCCESS;
 }
 
-int test_append_string_self(void) {
+int test_append_string_self(void)
+{
     DSCString str = dsc_str_create_from_cstring("dup");
     dsc_str_append_string(&str, &str);
     ASSERT_EQ_STR(dsc_str_data(&str), "dupdup");
@@ -273,7 +301,8 @@ int test_append_string_self(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_char_at_0_and_size(void) {
+int test_insert_char_at_0_and_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("bc");
     dsc_str_insert_char(&str, 0, 'A');
     ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
@@ -283,7 +312,8 @@ int test_insert_char_at_0_and_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_cstring_at_0_and_size(void) {
+int test_insert_cstring_at_0_and_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("bc");
     dsc_str_insert_cstring(&str, 0, "A");
     ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
@@ -293,10 +323,11 @@ int test_insert_cstring_at_0_and_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_string_at_0_and_size(void) {
+int test_insert_string_at_0_and_size(void)
+{
     DSCString str = dsc_str_create_from_cstring("bc");
-    DSCString sA = dsc_str_create_from_cstring("A");
-    DSCString sZ = dsc_str_create_from_cstring("Z");
+    DSCString sA  = dsc_str_create_from_cstring("A");
+    DSCString sZ  = dsc_str_create_from_cstring("Z");
     dsc_str_insert_string(&str, 0, &sA);
     ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
     dsc_str_insert_string(&str, dsc_str_size(&str), &sZ);
@@ -307,9 +338,10 @@ int test_insert_string_at_0_and_size(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -346,18 +378,22 @@ TestCase tests[] = {
     {test_insert_string_at_0_and_size, "test_insert_string_at_0_and_size"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DString CRUD tests passed.\n");
         return 0;
     }

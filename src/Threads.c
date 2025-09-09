@@ -26,8 +26,8 @@
 typedef struct thread_wrapper
 {
     dscthread_func func;
-    void *arg;
-    void *result;
+    void* arg;
+    void* result;
 } thread_wrapper;
 
 // Linked-list entry used to map native HANDLEs to our thread_wrapper so
@@ -35,15 +35,15 @@ typedef struct thread_wrapper
 typedef struct handle_entry
 {
     DSCThread thread;
-    thread_wrapper *w;
-    int done;       // set when thread finished
-    int detached;   // set when detach called
-    struct handle_entry *next;
+    thread_wrapper* w;
+    int done;     // set when thread finished
+    int detached; // set when detach called
+    struct handle_entry* next;
 } handle_entry;
 
 static CRITICAL_SECTION g_map_lock;
-static handle_entry *g_map_head = NULL;
-static int g_map_initialized = 0;
+static handle_entry* g_map_head = NULL;
+static int g_map_initialized    = 0;
 
 // Ensure the global map lock is initialized before use.
 static void ensure_map_init(void)
@@ -56,21 +56,21 @@ static void ensure_map_init(void)
 }
 
 // Add a mapping from a thread identifier to the wrapper.
-static void add_mapping(DSCThread thread, thread_wrapper *w)
+static void add_mapping(DSCThread thread, thread_wrapper* w)
 {
     ensure_map_init();
-    handle_entry *e = (handle_entry*)malloc(sizeof(handle_entry));
+    handle_entry* e = (handle_entry*)malloc(sizeof(handle_entry));
     if (!e)
     {
         return;
     }
 
-    e->thread = thread;
-    e->w = w;
-    e->done = 0;
+    e->thread   = thread;
+    e->w        = w;
+    e->done     = 0;
     e->detached = 0;
     EnterCriticalSection(&g_map_lock);
-    e->next = g_map_head;
+    e->next    = g_map_head;
     g_map_head = e;
     LeaveCriticalSection(&g_map_lock);
 }
@@ -80,8 +80,8 @@ static void add_mapping(DSCThread thread, thread_wrapper *w)
 static handle_entry* find_and_remove_mapping(DSCThread thread)
 {
     ensure_map_init();
-    handle_entry *prev = NULL;
-    handle_entry *cur = NULL;
+    handle_entry* prev = NULL;
+    handle_entry* cur  = NULL;
     EnterCriticalSection(&g_map_lock);
     cur = g_map_head;
     while (cur)
@@ -102,7 +102,7 @@ static handle_entry* find_and_remove_mapping(DSCThread thread)
             return cur;
         }
         prev = cur;
-        cur = cur->next;
+        cur  = cur->next;
     }
 
     LeaveCriticalSection(&g_map_lock);
@@ -114,7 +114,7 @@ static handle_entry* find_and_remove_mapping(DSCThread thread)
 static handle_entry* find_mapping(DSCThread thread)
 {
     ensure_map_init();
-    handle_entry *cur = NULL;
+    handle_entry* cur = NULL;
     EnterCriticalSection(&g_map_lock);
     cur = g_map_head;
     while (cur)
@@ -137,7 +137,7 @@ static handle_entry* find_mapping(DSCThread thread)
 static DWORD WINAPI thread_func_wrapper(LPVOID param)
 {
     ensure_map_init();
-    thread_wrapper *w = (thread_wrapper*)param;
+    thread_wrapper* w = (thread_wrapper*)param;
     if (!w)
     {
         return 0;
@@ -147,8 +147,8 @@ static DWORD WINAPI thread_func_wrapper(LPVOID param)
 
     // mark done and free if detached
     EnterCriticalSection(&g_map_lock);
-    handle_entry *e = g_map_head;
-    handle_entry *prev = NULL;
+    handle_entry* e    = g_map_head;
+    handle_entry* prev = NULL;
     while (e)
     {
         if (e->w == w)
@@ -157,7 +157,7 @@ static DWORD WINAPI thread_func_wrapper(LPVOID param)
         }
 
         prev = e;
-        e = e->next;
+        e    = e->next;
     }
 
     if (e)
@@ -177,8 +177,8 @@ static DWORD WINAPI thread_func_wrapper(LPVOID param)
 
             e->next = NULL;
             // capture pointers to free after leaving lock
-            thread_wrapper *to_free_w = e->w;
-            handle_entry *to_free_e = e;
+            thread_wrapper* to_free_w = e->w;
+            handle_entry* to_free_e   = e;
             LeaveCriticalSection(&g_map_lock);
             if (to_free_w)
             {
@@ -204,14 +204,14 @@ int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg)
         return -1;
     }
 
-    thread_wrapper *w = (thread_wrapper*)malloc(sizeof(thread_wrapper));
+    thread_wrapper* w = (thread_wrapper*)malloc(sizeof(thread_wrapper));
     if (!w)
     {
         return -1;
     }
 
-    w->func = func;
-    w->arg = arg;
+    w->func   = func;
+    w->arg    = arg;
     w->result = NULL;
 
     HANDLE h = CreateThread(NULL, 0, thread_func_wrapper, w, 0, NULL);
@@ -244,14 +244,15 @@ int dsc_thread_join(DSCThread thread, void** retval)
     }
 
     // find and remove mapping
-    handle_entry *e = find_and_remove_mapping(thread);
+    handle_entry* e = find_and_remove_mapping(thread);
     if (!e)
     {
         CloseHandle((HANDLE)thread);
         return -1;
     }
 
-    if (retval) *retval = e->w ? e->w->result : NULL;
+    if (retval)
+        *retval = e->w ? e->w->result : NULL;
 
     if (e->w)
     {
@@ -275,18 +276,18 @@ int dsc_thread_detach(DSCThread thread)
 
     ensure_map_init();
     EnterCriticalSection(&g_map_lock);
-    handle_entry *cur = g_map_head;
+    handle_entry* cur = g_map_head;
     while (cur)
     {
         if (cur->thread == thread)
         {
-            cur->detached = 1;
+            cur->detached    = 1;
             int already_done = cur->done;
             LeaveCriticalSection(&g_map_lock);
             // if already done, remove and free now
             if (already_done)
             {
-                handle_entry *e = find_and_remove_mapping(thread);
+                handle_entry* e = find_and_remove_mapping(thread);
                 if (e)
                 {
                     if (e->w)

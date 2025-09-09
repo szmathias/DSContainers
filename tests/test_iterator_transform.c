@@ -9,16 +9,18 @@
 #include <stdlib.h>
 
 // Test basic transform iterator functionality
-static int test_transform_iterator(void) {
+static int test_transform_iterator(void)
+{
     // Create a list with integers
-    DSCAlloc *alloc = create_std_allocator();
+    DSCAlloc* alloc           = create_std_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Add some elements
-    for (int i = 1; i <= 5; i++) {
+    for (int i = 1; i <= 5; i++)
+    {
         int* val = malloc(sizeof(int));
-        *val = i;
+        *val     = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -32,12 +34,13 @@ static int test_transform_iterator(void) {
 
     // Test that transform works correctly
     int expected = 2; // First element (1) doubled
-    while (transform_it.has_next(&transform_it)) {
+    while (transform_it.has_next(&transform_it))
+    {
         int* value = transform_it.next(&transform_it);
         ASSERT_NOT_NULL(value);
         ASSERT_EQ(*value, expected);
         expected += 2; // Next expected value
-        free(value); // Free the transformed value
+        free(value);   // Free the transformed value
     }
 
     // Verify we processed all elements
@@ -52,9 +55,10 @@ static int test_transform_iterator(void) {
 }
 
 // Test transform iterator with edge cases
-static int test_transform_edge_cases(void) {
+static int test_transform_edge_cases(void)
+{
     // Test with empty list
-    DSCAlloc *alloc = create_std_allocator();
+    DSCAlloc* alloc                 = create_std_allocator();
     DSCDoublyLinkedList* empty_list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(empty_list);
 
@@ -80,20 +84,22 @@ static int test_transform_edge_cases(void) {
 }
 
 // Test transform iterator chaining
-static int test_transform_chaining(void) {
-    DSCAlloc *alloc = create_std_allocator();
+static int test_transform_chaining(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
 
     // Add elements 1-3
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= 3; i++)
+    {
         int* val = malloc(sizeof(int));
-        *val = i;
+        *val     = i;
         dsc_dll_insert_back(list, val);
     }
 
     // First transformation: double the value
-    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator base_it   = dsc_dll_iterator(list);
     DSCIterator double_it = dsc_iterator_transform(&base_it, double_value);
 
     DSCIterator chain_it = dsc_iterator_transform(&double_it, add_one);
@@ -101,7 +107,8 @@ static int test_transform_chaining(void) {
     // Test the chained transformations (1->2->3, 2->4->5, 3->6->7)
     int idx = 0;
 
-    while (chain_it.has_next(&chain_it)) {
+    while (chain_it.has_next(&chain_it))
+    {
         const int expected_values[] = {3, 5, 7};
         int* value                  = chain_it.next(&chain_it);
         ASSERT_NOT_NULL(value);
@@ -121,7 +128,8 @@ static int test_transform_chaining(void) {
 }
 
 // Test multiple transform chaining (range -> transform -> transform)
-static int test_multiple_transforms(void) {
+static int test_multiple_transforms(void)
+{
     // Create range from 1 to 6, then double, then add 10
     DSCIterator range_it = dsc_iterator_range(1, 6, 1);
     ASSERT_TRUE(range_it.is_valid(&range_it));
@@ -135,7 +143,8 @@ static int test_multiple_transforms(void) {
     // Expected: [12,14,16,18,20] (double each element in range [1-5], then add 10)
     int idx = 0;
 
-    while (add_ten_it.has_next(&add_ten_it)) {
+    while (add_ten_it.has_next(&add_ten_it))
+    {
         const int expected[] = {12, 14, 16, 18, 20};
         int* value           = add_ten_it.next(&add_ten_it);
         ASSERT_NOT_NULL(value);
@@ -144,7 +153,7 @@ static int test_multiple_transforms(void) {
         free(value);
     }
 
-    ASSERT_EQ(idx, 5);  // Should have 5 elements
+    ASSERT_EQ(idx, 5); // Should have 5 elements
 
     // Cleanup
     add_ten_it.destroy(&add_ten_it); // This should destroy all chained iterators
@@ -152,9 +161,10 @@ static int test_multiple_transforms(void) {
 }
 
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -164,21 +174,27 @@ TestCase tests[] = {
     {test_multiple_transforms, "test_multiple_transforms"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed) {
+    if (failed)
+    {
         printf("%d test(s) failed.\n", failed);
         return 1;
-    } else {
+    }
+    else
+    {
         printf("All transform iterator tests passed!\n");
         return 0;
     }

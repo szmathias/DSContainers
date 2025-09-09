@@ -9,9 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-int test_create_destroy(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_create_destroy(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
@@ -21,12 +22,16 @@ int test_create_destroy(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_front_back_find(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
-    int *b = malloc(sizeof(int)); *b = 2;
-    int *c = malloc(sizeof(int)); *c = 3;
+int test_insert_front_back_find(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 2;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 3;
     ASSERT_EQ(dsc_dll_insert_front(list, a), 0);
     ASSERT_EQ(dsc_dll_insert_back(list, b), 0);
     ASSERT_EQ(dsc_dll_insert_back(list, c), 0);
@@ -42,8 +47,8 @@ int test_insert_front_back_find(void) {
     ASSERT_NOT_NULL(list->tail->prev);
     ASSERT_NULL(list->tail->next);
 
-    const int key = 2;
-    const DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key                    = 2;
+    const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
 
@@ -52,12 +57,16 @@ int test_insert_front_back_find(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
-    int *b = malloc(sizeof(int)); *b = 2;
-    int *c = malloc(sizeof(int)); *c = 3;
+int test_remove(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 2;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 3;
     dsc_dll_insert_back(list, a);
     dsc_dll_insert_back(list, b);
     dsc_dll_insert_back(list, c);
@@ -65,7 +74,7 @@ int test_remove(void) {
     const int key = 2;
     ASSERT_EQ(dsc_dll_remove(list, &key, int_cmp, true), 0);
     ASSERT_EQ(list->size, 2);
-    DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     // Verify links are properly maintained
@@ -79,10 +88,12 @@ int test_remove(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_not_found(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
+int test_remove_not_found(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
     dsc_dll_insert_back(list, a);
 
     const int key = 99;
@@ -93,7 +104,8 @@ int test_remove_not_found(void) {
     return TEST_SUCCESS;
 }
 
-int test_nullptr_handling(void) {
+int test_nullptr_handling(void)
+{
     ASSERT_EQ(dsc_dll_insert_back(NULL, NULL), -1);
     ASSERT_EQ(dsc_dll_insert_front(NULL, NULL), -1);
     ASSERT_EQ_PTR(dsc_dll_find(NULL, NULL, NULL), NULL);
@@ -102,19 +114,23 @@ int test_nullptr_handling(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_at(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
-    int *b = malloc(sizeof(int)); *b = 2;
-    int *c = malloc(sizeof(int)); *c = 3;
-    ASSERT_EQ(dsc_dll_insert_back(list, a), 0); // [1]
-    ASSERT_EQ(dsc_dll_insert_back(list, c), 0); // [1,3]
+int test_insert_at(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 2;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 3;
+    ASSERT_EQ(dsc_dll_insert_back(list, a), 0);  // [1]
+    ASSERT_EQ(dsc_dll_insert_back(list, c), 0);  // [1,3]
     ASSERT_EQ(dsc_dll_insert_at(list, 1, b), 0); // [1,2,3]
     ASSERT_EQ(list->size, 3);
 
-    const int key = 2;
-    const DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key                    = 2;
+    const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
 
@@ -129,12 +145,16 @@ int test_insert_at(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 10;
-    int *b = malloc(sizeof(int)); *b = 20;
-    int *c = malloc(sizeof(int)); *c = 30;
+int test_remove_at(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 10;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 20;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 30;
     dsc_dll_insert_back(list, a); // [10]
     dsc_dll_insert_back(list, b); // [10,20]
     dsc_dll_insert_back(list, c); // [10,20,30]
@@ -142,8 +162,8 @@ int test_remove_at(void) {
     ASSERT_EQ(dsc_dll_remove_at(list, 1, true), 0); // remove 20 (free data)
     ASSERT_EQ(list->size, 2);
 
-    const int key = 20;
-    DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key              = 20;
+    DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     // Check links
@@ -155,17 +175,21 @@ int test_remove_at(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_front(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_remove_front(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
 
     // Test on empty list
     ASSERT_EQ(dsc_dll_remove_front(list, true), -1);
 
     // Add elements
-    int *a = malloc(sizeof(int)); *a = 10;
-    int *b = malloc(sizeof(int)); *b = 20;
-    int *c = malloc(sizeof(int)); *c = 30;
+    int* a = malloc(sizeof(int));
+    *a     = 10;
+    int* b = malloc(sizeof(int));
+    *b     = 20;
+    int* c = malloc(sizeof(int));
+    *c     = 30;
     dsc_dll_insert_back(list, a);
     dsc_dll_insert_back(list, b);
     dsc_dll_insert_back(list, c);
@@ -195,15 +219,17 @@ int test_remove_front(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_back(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_remove_back(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
 
     // Test on empty list
     ASSERT_EQ(dsc_dll_remove_back(list, true), -1);
 
     // Test on single element list
-    int *a = malloc(sizeof(int)); *a = 10;
+    int* a = malloc(sizeof(int));
+    *a     = 10;
     dsc_dll_insert_back(list, a);
     ASSERT_EQ(dsc_dll_remove_back(list, true), 0);
     ASSERT_EQ(list->size, 0);
@@ -211,9 +237,12 @@ int test_remove_back(void) {
     ASSERT_NULL(list->tail);
 
     // Test with multiple elements
-    int *b = malloc(sizeof(int)); *b = 20;
-    int *c = malloc(sizeof(int)); *c = 30;
-    int *d = malloc(sizeof(int)); *d = 40;
+    int* b = malloc(sizeof(int));
+    *b     = 20;
+    int* c = malloc(sizeof(int));
+    *c     = 30;
+    int* d = malloc(sizeof(int));
+    *d     = 40;
     dsc_dll_insert_back(list, b);
     dsc_dll_insert_back(list, c);
     dsc_dll_insert_back(list, d);
@@ -236,11 +265,14 @@ int test_remove_back(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at_head(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 100;
-    int *b = malloc(sizeof(int)); *b = 200;
+int test_remove_at_head(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 100;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 200;
     dsc_dll_insert_back(list, a); // [100]
     dsc_dll_insert_back(list, b); // [100,200]
 
@@ -249,8 +281,8 @@ int test_remove_at_head(void) {
     ASSERT_EQ(*(int*)list->head->data, 200);
     ASSERT_EQ(list->head, list->tail);
 
-    const int key = 100;
-    DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key              = 100;
+    DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     dsc_dll_destroy(list, true);
@@ -258,12 +290,16 @@ int test_remove_at_head(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at_last(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
-    int *b = malloc(sizeof(int)); *b = 2;
-    int *c = malloc(sizeof(int)); *c = 3;
+int test_remove_at_last(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 2;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 3;
     dsc_dll_insert_back(list, a); // [1]
     dsc_dll_insert_back(list, b); // [1,2]
     dsc_dll_insert_back(list, c); // [1,2,3]
@@ -272,8 +308,8 @@ int test_remove_at_last(void) {
     ASSERT_EQ(list->size, 2);
     ASSERT_EQ(*(int*)list->tail->data, 2);
 
-    const int key = 3;
-    DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key              = 3;
+    DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     dsc_dll_destroy(list, true);
@@ -281,13 +317,15 @@ int test_remove_at_last(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at_invalid(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
+int test_remove_at_invalid(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
     dsc_dll_insert_back(list, a); // [1]
 
-    ASSERT_EQ(dsc_dll_remove_at(list, 5, true), -1); // invalid position
+    ASSERT_EQ(dsc_dll_remove_at(list, 5, true), -1);          // invalid position
     ASSERT_EQ(dsc_dll_remove_at(list, (size_t)-1, true), -1); // negative as size_t (very large)
 
     dsc_dll_destroy(list, true);
@@ -295,20 +333,23 @@ int test_remove_at_invalid(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at_empty(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_remove_at_empty(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_EQ(dsc_dll_remove_at(list, 0, true), -1); // nothing to remove
     dsc_dll_destroy(list, true);
     destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
-int test_remove_at_single_element(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 123;
-    dsc_dll_insert_back(list, a); // [123]
+int test_remove_at_single_element(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 123;
+    dsc_dll_insert_back(list, a);                   // [123]
     ASSERT_EQ(dsc_dll_remove_at(list, 0, true), 0); // remove only element
     ASSERT_EQ(list->size, 0);
     ASSERT_NULL(list->head);
@@ -318,11 +359,13 @@ int test_remove_at_single_element(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_at_single_element_invalid_pos(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 123;
-    dsc_dll_insert_back(list, a); // [123]
+int test_remove_at_single_element_invalid_pos(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 123;
+    dsc_dll_insert_back(list, a);                    // [123]
     ASSERT_EQ(dsc_dll_remove_at(list, 1, true), -1); // invalid position
     ASSERT_EQ(list->size, 1);
     dsc_dll_destroy(list, true);
@@ -330,11 +373,13 @@ int test_remove_at_single_element_invalid_pos(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_at_out_of_bounds(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 1;
-    ASSERT_EQ(dsc_dll_insert_at(list, 2, a), -1); // out of bounds (list size is 0)
+int test_insert_at_out_of_bounds(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 1;
+    ASSERT_EQ(dsc_dll_insert_at(list, 2, a), -1);          // out of bounds (list size is 0)
     ASSERT_EQ(dsc_dll_insert_at(list, (size_t)-1, a), -1); // very large index
     dsc_dll_destroy(list, true);
     destroy_allocator(alloc);
@@ -342,9 +387,10 @@ int test_insert_at_out_of_bounds(void) {
     return TEST_SUCCESS;
 }
 
-int test_insert_remove_null_data(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_insert_remove_null_data(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_EQ(dsc_dll_insert_back(list, NULL), 0); // allow NULL data
     ASSERT_EQ(list->size, 1);
     ASSERT_EQ(dsc_dll_remove_at(list, 0, false), 0); // remove node with NULL data, no free
@@ -354,13 +400,17 @@ int test_insert_remove_null_data(void) {
     return TEST_SUCCESS;
 }
 
-int test_mixed_operations_integrity(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
-    int *a = malloc(sizeof(int)); *a = 10;
-    int *b = malloc(sizeof(int)); *b = 20;
-    int *c = malloc(sizeof(int)); *c = 30;
-    dsc_dll_insert_back(list, a); // [10]
+int test_mixed_operations_integrity(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    int* a                    = malloc(sizeof(int));
+    *a                        = 10;
+    int* b                    = malloc(sizeof(int));
+    *b                        = 20;
+    int* c                    = malloc(sizeof(int));
+    *c                        = 30;
+    dsc_dll_insert_back(list, a);  // [10]
     dsc_dll_insert_front(list, b); // [20,10]
     dsc_dll_insert_at(list, 1, c); // [20,30,10]
     ASSERT_EQ(list->size, 3);
@@ -374,8 +424,8 @@ int test_mixed_operations_integrity(void) {
     ASSERT_EQ(*(int*)list->tail->prev->prev->data, 20);
 
     ASSERT_EQ(dsc_dll_remove_at(list, 1, true), 0); // remove 30, [20,10]
-    const int key = 30;
-    DSCDoublyLinkedNode *found = dsc_dll_find(list, &key, int_cmp);
+    const int key              = 30;
+    DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
     // Verify new links
@@ -391,13 +441,16 @@ int test_mixed_operations_integrity(void) {
     return TEST_SUCCESS;
 }
 
-int test_size(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_size(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_EQ(dsc_dll_size(list), 0);
 
-    int *a = malloc(sizeof(int)); *a = 10;
-    int *b = malloc(sizeof(int)); *b = 20;
+    int* a = malloc(sizeof(int));
+    *a     = 10;
+    int* b = malloc(sizeof(int));
+    *b     = 20;
     dsc_dll_insert_back(list, a);
     ASSERT_EQ(dsc_dll_size(list), 1);
     dsc_dll_insert_back(list, b);
@@ -411,12 +464,14 @@ int test_size(void) {
     return TEST_SUCCESS;
 }
 
-int test_is_empty(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_is_empty(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
     ASSERT_EQ(dsc_dll_is_empty(list), 1); // Empty list
 
-    int *a = malloc(sizeof(int)); *a = 10;
+    int* a = malloc(sizeof(int));
+    *a     = 10;
     dsc_dll_insert_back(list, a);
     ASSERT_EQ(dsc_dll_is_empty(list), 0); // Non-empty list
 
@@ -430,13 +485,14 @@ int test_is_empty(void) {
     return TEST_SUCCESS;
 }
 
-int test_complex_data_type(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_complex_data_type(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
 
-    Person *p1 = create_person("Alice", 30);
-    Person *p2 = create_person("Bob", 25);
-    Person *p3 = create_person("Charlie", 40);
+    Person* p1 = create_person("Alice", 30);
+    Person* p2 = create_person("Bob", 25);
+    Person* p3 = create_person("Charlie", 40);
 
     dsc_dll_insert_back(list, p1);
     dsc_dll_insert_back(list, p2);
@@ -447,9 +503,9 @@ int test_complex_data_type(void) {
     strcpy(search_key.name, "Bob");
     search_key.age = 0; // Age doesn't matter for comparison
 
-    const DSCDoublyLinkedNode *found = dsc_dll_find(list, &search_key, person_cmp);
+    const DSCDoublyLinkedNode* found = dsc_dll_find(list, &search_key, person_cmp);
     ASSERT_NOT_NULL(found);
-    const Person *found_person = found->data;
+    const Person* found_person = found->data;
     ASSERT_EQ(found_person->age, 25);
 
     // Clean up
@@ -458,20 +514,23 @@ int test_complex_data_type(void) {
     return TEST_SUCCESS;
 }
 
-int test_remove_all(void) {
-    DSCAlloc *alloc = create_std_allocator();
-    DSCDoublyLinkedList *list = dsc_dll_create(alloc);
+int test_remove_all(void)
+{
+    DSCAlloc* alloc           = create_std_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
 
     // Add 10 elements
-    for (int i = 0; i < 10; i++) {
-        int *val = malloc(sizeof(int));
-        *val = i;
+    for (int i = 0; i < 10; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val     = i;
         dsc_dll_insert_back(list, val);
     }
     ASSERT_EQ(list->size, 10);
 
     // Remove all elements one by one
-    while (!dsc_dll_is_empty(list)) {
+    while (!dsc_dll_is_empty(list))
+    {
         dsc_dll_remove_front(list, true);
     }
 
@@ -484,9 +543,10 @@ int test_remove_all(void) {
     return TEST_SUCCESS;
 }
 
-typedef struct {
+typedef struct
+{
     int (*func)(void);
-    const char *name;
+    const char* name;
 } TestCase;
 
 TestCase tests[] = {
@@ -514,18 +574,22 @@ TestCase tests[] = {
     {test_remove_back, "test_remove_back"},
 };
 
-int main(void) {
-    int failed = 0;
+int main(void)
+{
+    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
-        if (tests[i].func() != TEST_SUCCESS) {
+    for (int i = 0; i < num_tests; i++)
+    {
+        if (tests[i].func() != TEST_SUCCESS)
+        {
             printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
-    if (failed == 0) {
+    if (failed == 0)
+    {
         printf("All DoublyLinkedList CRUD tests passed.\n");
         return 0;
     }
