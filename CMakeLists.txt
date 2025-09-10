@@ -99,18 +99,20 @@ endif()
 # Define DLL export macros for Windows
 if(DSCONTAINERS_PLATFORM_WINDOWS)
   target_compile_definitions(DSContainers PRIVATE DSCONTAINERS_BUILDING_DLL)
-
-  # On Windows, copy the DLL to the bin directory so tests can find it
-  add_custom_command(TARGET DSContainers POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DSContainers> ${CMAKE_BINARY_DIR}/bin/
-    COMMENT "Copying DSContainers DLL to bin directory")
 endif()
 
 # Set output directory for binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# On Windows, place the shared library (DLL) in the same directory as the
+# executables. This ensures that the test executables can find the DLL at runtime.
+if(DSCONTAINERS_PLATFORM_WINDOWS)
+    set_target_properties(DSContainers PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+endif()
 
 enable_testing()
 
