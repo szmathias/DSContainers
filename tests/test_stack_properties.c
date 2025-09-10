@@ -14,7 +14,7 @@ int test_stack_lifo_property(void)
     DSCAlloc* alloc = create_std_allocator();
     DSCStack* stack = dsc_stack_create(alloc);
 
-    const int num_elements = 100;
+    #define num_elements 100
     int* values[num_elements];
 
     // Push elements in order

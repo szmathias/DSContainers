@@ -14,7 +14,7 @@ int test_queue_fifo_property(void)
     DSCAlloc* alloc = create_std_allocator();
     DSCQueue* queue = dsc_queue_create(alloc);
 
-    const int num_elements = 100;
+    #define num_elements 100
     int* values[num_elements];
 
     // Enqueue elements in order
