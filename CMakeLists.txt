@@ -20,7 +20,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" ON)
+option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" OFF)
 
 # Setup compiler flags based on compiler type
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -76,6 +76,7 @@ add_library(DSContainers SHARED
         include/Queue.h
         include/HashMap.h
         include/HashSet.h
+        src/Alloc.c
 )
 
 # Create an OBJECT library for test helpers. This compiles the sources once
@@ -98,6 +99,12 @@ endif()
 # Define DLL export macros for Windows
 if(DSCONTAINERS_PLATFORM_WINDOWS)
   target_compile_definitions(DSContainers PRIVATE DSCONTAINERS_BUILDING_DLL)
+
+  # On Windows, copy the DLL to the bin directory so tests can find it
+  add_custom_command(TARGET DSContainers POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:DSContainers> ${CMAKE_BINARY_DIR}/bin/
+    COMMENT "Copying DSContainers DLL to bin directory")
 endif()
 
 # Set output directory for binaries

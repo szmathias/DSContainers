@@ -45,7 +45,7 @@ typedef void* (*dscthread_func)(void*);
  * - On POSIX this returns the pthread_create return code (0 on success).
  * - On Windows this returns 0 on success and -1 on failure.
  */
-int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg);
+DSC_API int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg);
 
 /**
  * Join a thread, waiting for it to finish and retrieving its return value.
@@ -59,7 +59,7 @@ int dsc_thread_create(DSCThread* thread, dscthread_func func, void* arg);
  * - On Windows this waits for the thread to exit, retrieves a stored result
  *   (if available) and returns 0 on success; otherwise a non-zero value.
  */
-int dsc_thread_join(DSCThread thread, void** retval);
+DSC_API int dsc_thread_join(DSCThread thread, void** retval);
 
 /**
  * Detach a thread, allowing resources to be released when it exits.
@@ -73,6 +73,6 @@ int dsc_thread_join(DSCThread thread, void** retval);
  *   library attempts to clean up any stored thread wrapper resources once the
  *   thread exits.
  */
-int dsc_thread_detach(DSCThread thread);
+DSC_API int dsc_thread_detach(DSCThread thread);
 
 #endif // DSCONTAINERS_THREADS_H

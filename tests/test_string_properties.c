@@ -5,8 +5,14 @@
 #include "DynamicString.h"
 #include "TestAssert.h"
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
+
+#ifdef DSCONTAINERS_PLATFORM_WINDOWS
+#include <io.h>
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 
 // Property: The size of a string should never exceed its capacity.

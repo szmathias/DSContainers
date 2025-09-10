@@ -258,11 +258,6 @@ size_t dsc_hashmap_size(const DSCHashMap* map)
     return map ? map->size : 0;
 }
 
-int dsc_hashmap_is_empty(const DSCHashMap* map)
-{
-    return !map || map->size == 0;
-}
-
 double dsc_hashmap_load_factor(const DSCHashMap* map)
 {
     if (!map || map->bucket_count == 0)
@@ -270,6 +265,11 @@ double dsc_hashmap_load_factor(const DSCHashMap* map)
         return 0.0;
     }
     return (double)map->size / (double)map->bucket_count;
+}
+
+int dsc_hashmap_is_empty(const DSCHashMap* map)
+{
+    return !map || map->size == 0;
 }
 
 int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key)
@@ -281,6 +281,28 @@ int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key)
 // Hash map operations
 //==============================================================================
 
+void* dsc_hashmap_get(const DSCHashMap* map, const void* key)
+{
+    if (!map || !key)
+    {
+        return NULL;
+    }
+
+    const size_t index         = get_bucket_index(map, key);
+    const DSCHashMapNode* node = map->buckets[index];
+
+    while (node)
+    {
+        if (map->key_equals(node->key, key))
+        {
+            return node->value;
+        }
+        node = node->next;
+    }
+
+    return NULL;
+}
+
 int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
 {
     if (!map || !key)
@@ -288,7 +310,7 @@ int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
         return -1;
     }
 
-    const size_t index = get_bucket_index(map, key);
+    const size_t index   = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -311,7 +333,7 @@ int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
     }
 
     // Insert at beginning of bucket
-    new_node->next = map->buckets[index];
+    new_node->next      = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
@@ -328,7 +350,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
 
     *old_value_out = NULL;  // Initialize to NULL
 
-    const size_t index = get_bucket_index(map, key);
+    const size_t index   = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -338,7 +360,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
         {
             // Return the old value and update with new value
             *old_value_out = node->value;
-            node->value = value;
+            node->value    = value;
             return 0;
         }
         node = node->next;
@@ -352,7 +374,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
     }
 
     // Insert at beginning of bucket
-    new_node->next = map->buckets[index];
+    new_node->next      = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
@@ -367,7 +389,7 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, const boo
         return -1;
     }
 
-    const size_t index = get_bucket_index(map, key);
+    const size_t index   = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -396,34 +418,12 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, const boo
     }
 
     // Insert at beginning of bucket
-    new_node->next = map->buckets[index];
+    new_node->next      = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
     // Check if resize is needed
     return check_and_resize(map);
-}
-
-void* dsc_hashmap_get(const DSCHashMap* map, const void* key)
-{
-    if (!map || !key)
-    {
-        return NULL;
-    }
-
-    const size_t index = get_bucket_index(map, key);
-    const DSCHashMapNode* node = map->buckets[index];
-
-    while (node)
-    {
-        if (map->key_equals(node->key, key))
-        {
-            return node->value;
-        }
-        node = node->next;
-    }
-
-    return NULL;
 }
 
 int dsc_hashmap_remove(DSCHashMap* map, const void* key,
@@ -434,7 +434,7 @@ int dsc_hashmap_remove(DSCHashMap* map, const void* key,
         return -1;
     }
 
-    const size_t index = get_bucket_index(map, key);
+    const size_t index   = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
     DSCHashMapNode* prev = NULL;
 

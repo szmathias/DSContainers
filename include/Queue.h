@@ -54,7 +54,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Custom allocator (required)
  * @return Pointer to new Queue, or NULL on failure
  */
-DSCQueue* dsc_queue_create(DSCAlloc* alloc);
+DSC_API DSCQueue* dsc_queue_create(DSCAlloc* alloc);
 
 /**
  * Destroy the queue and free all nodes.
@@ -62,7 +62,7 @@ DSCQueue* dsc_queue_create(DSCAlloc* alloc);
  * @param queue The queue to destroy
  * @param should_free_data Whether to free the data elements using alloc->data_free_func
  */
-void dsc_queue_destroy(DSCQueue* queue, bool should_free_data);
+DSC_API void dsc_queue_destroy(DSCQueue* queue, bool should_free_data);
 
 /**
  * Clear all elements from the queue, but keep the structure intact.
@@ -70,7 +70,7 @@ void dsc_queue_destroy(DSCQueue* queue, bool should_free_data);
  * @param queue The queue to clear
  * @param should_free_data Whether to free the data elements
  */
-void dsc_queue_clear(DSCQueue* queue, bool should_free_data);
+DSC_API void dsc_queue_clear(DSCQueue* queue, bool should_free_data);
 
 //==============================================================================
 // Information functions
@@ -82,7 +82,7 @@ void dsc_queue_clear(DSCQueue* queue, bool should_free_data);
  * @param queue The queue to query
  * @return Number of elements, or 0 if queue is NULL
  */
-size_t dsc_queue_size(const DSCQueue* queue);
+DSC_API size_t dsc_queue_size(const DSCQueue* queue);
 
 /**
  * Check if the queue is empty.
@@ -90,7 +90,7 @@ size_t dsc_queue_size(const DSCQueue* queue);
  * @param queue The queue to check
  * @return 1 if queue is empty or NULL, 0 if it contains elements
  */
-int dsc_queue_is_empty(const DSCQueue* queue);
+DSC_API int dsc_queue_is_empty(const DSCQueue* queue);
 
 /**
  * Compare two queues for equality using the given comparison function.
@@ -100,7 +100,7 @@ int dsc_queue_is_empty(const DSCQueue* queue);
  * @param compare Function to compare elements
  * @return 1 if queues are equal, 0 if not equal, -1 on error
  */
-int dsc_queue_equals(const DSCQueue* queue1, const DSCQueue* queue2, cmp_func compare);
+DSC_API int dsc_queue_equals(const DSCQueue* queue1, const DSCQueue* queue2, cmp_func compare);
 
 //==============================================================================
 // Element access functions
@@ -112,7 +112,7 @@ int dsc_queue_equals(const DSCQueue* queue1, const DSCQueue* queue2, cmp_func co
  * @param queue The queue to access
  * @return Pointer to front element data, or NULL if empty or on error
  */
-void* dsc_queue_front(const DSCQueue* queue);
+DSC_API void* dsc_queue_front(const DSCQueue* queue);
 
 /**
  * Get the back element without removing it.
@@ -120,7 +120,7 @@ void* dsc_queue_front(const DSCQueue* queue);
  * @param queue The queue to access
  * @return Pointer to back element data, or NULL if empty or on error
  */
-void* dsc_queue_back(const DSCQueue* queue);
+DSC_API void* dsc_queue_back(const DSCQueue* queue);
 
 //==============================================================================
 // Queue operations
@@ -133,7 +133,7 @@ void* dsc_queue_back(const DSCQueue* queue);
  * @param data Pointer to the data to enqueue (ownership transferred to queue)
  * @return 0 on success, -1 on error
  */
-int dsc_queue_enqueue(DSCQueue* queue, void* data);
+DSC_API int dsc_queue_enqueue(DSCQueue* queue, void* data);
 
 /**
  * Remove the front element from the queue.
@@ -142,7 +142,7 @@ int dsc_queue_enqueue(DSCQueue* queue, void* data);
  * @param should_free_data Whether to free the dequeued data
  * @return 0 on success, -1 on error (e.g., empty queue)
  */
-int dsc_queue_dequeue(DSCQueue* queue, bool should_free_data);
+DSC_API int dsc_queue_dequeue(DSCQueue* queue, bool should_free_data);
 
 /**
  * Remove the front element and return its data pointer.
@@ -151,7 +151,7 @@ int dsc_queue_dequeue(DSCQueue* queue, bool should_free_data);
  * @param queue The queue to modify
  * @return Pointer to the dequeued data, or NULL if queue is empty or on error
  */
-void* dsc_queue_dequeue_data(DSCQueue* queue);
+DSC_API void* dsc_queue_dequeue_data(DSCQueue* queue);
 
 //==============================================================================
 // Higher-order functions
@@ -163,7 +163,7 @@ void* dsc_queue_dequeue_data(DSCQueue* queue);
  * @param queue The queue to process
  * @param action Function applied to each element
  */
-void dsc_queue_for_each(const DSCQueue* queue, action_func action);
+DSC_API void dsc_queue_for_each(const DSCQueue* queue, action_func action);
 
 //==============================================================================
 // Queue copying functions
@@ -175,7 +175,7 @@ void dsc_queue_for_each(const DSCQueue* queue, action_func action);
  * @param queue The queue to copy
  * @return A new queue with same structure but sharing data, or NULL on error
  */
-DSCQueue* dsc_queue_copy(const DSCQueue* queue);
+DSC_API DSCQueue* dsc_queue_copy(const DSCQueue* queue);
 
 /**
  * Create a deep copy of the queue (cloning data using the provided function).
@@ -184,7 +184,7 @@ DSCQueue* dsc_queue_copy(const DSCQueue* queue);
  * @param should_free_data Whether the copy function should handle data freeing
  * @return A new queue with copies of all data, or NULL on error
  */
-DSCQueue* dsc_queue_copy_deep(const DSCQueue* queue, bool should_free_data);
+DSC_API DSCQueue* dsc_queue_copy_deep(const DSCQueue* queue, bool should_free_data);
 
 //==============================================================================
 // Iterator functions
@@ -196,7 +196,7 @@ DSCQueue* dsc_queue_copy_deep(const DSCQueue* queue, bool should_free_data);
  * @param queue The queue to iterate over
  * @return An Iterator object for forward traversal
  */
-DSCIterator dsc_queue_iterator(const DSCQueue* queue);
+DSC_API DSCIterator dsc_queue_iterator(const DSCQueue* queue);
 
 /**
  * Create a new queue from an iterator with custom allocator.
@@ -205,6 +205,6 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue);
  * @param alloc The custom allocator to use
  * @return A new queue with elements from iterator, or NULL on error
  */
-DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAlloc* alloc);
 
 #endif //DSCONTAINERS_QUEUE_H

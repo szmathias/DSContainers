@@ -9,6 +9,7 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
+#include "PlatformDefs.h"
 
 //==============================================================================
 // Type definitions
@@ -53,7 +54,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Custom allocator (required)
  * @return Pointer to new Stack, or NULL on failure
  */
-DSCStack* dsc_stack_create(DSCAlloc* alloc);
+DSC_API DSCStack* dsc_stack_create(DSCAlloc* alloc);
 
 /**
  * Destroy the stack and free all nodes.
@@ -61,7 +62,7 @@ DSCStack* dsc_stack_create(DSCAlloc* alloc);
  * @param stack The stack to destroy
  * @param should_free_data Whether to free the data elements using alloc->data_free_func
  */
-void dsc_stack_destroy(DSCStack* stack, bool should_free_data);
+DSC_API void dsc_stack_destroy(DSCStack* stack, bool should_free_data);
 
 /**
  * Clear all elements from the stack, but keep the structure intact.
@@ -69,7 +70,7 @@ void dsc_stack_destroy(DSCStack* stack, bool should_free_data);
  * @param stack The stack to clear
  * @param should_free_data Whether to free the data elements
  */
-void dsc_stack_clear(DSCStack* stack, bool should_free_data);
+DSC_API void dsc_stack_clear(DSCStack* stack, bool should_free_data);
 
 //==============================================================================
 // Information functions
@@ -81,7 +82,7 @@ void dsc_stack_clear(DSCStack* stack, bool should_free_data);
  * @param stack The stack to query
  * @return Number of elements, or 0 if stack is NULL
  */
-size_t dsc_stack_size(const DSCStack* stack);
+DSC_API size_t dsc_stack_size(const DSCStack* stack);
 
 /**
  * Check if the stack is empty.
@@ -89,7 +90,7 @@ size_t dsc_stack_size(const DSCStack* stack);
  * @param stack The stack to check
  * @return 1 if stack is empty or NULL, 0 if it contains elements
  */
-int dsc_stack_is_empty(const DSCStack* stack);
+DSC_API int dsc_stack_is_empty(const DSCStack* stack);
 
 /**
  * Compare two stacks for equality using the given comparison function.
@@ -99,7 +100,7 @@ int dsc_stack_is_empty(const DSCStack* stack);
  * @param compare Function to compare elements
  * @return 1 if stacks are equal, 0 if not equal, -1 on error
  */
-int dsc_stack_equals(const DSCStack* stack1, const DSCStack* stack2, cmp_func compare);
+DSC_API int dsc_stack_equals(const DSCStack* stack1, const DSCStack* stack2, cmp_func compare);
 
 //==============================================================================
 // Element access functions
@@ -111,7 +112,7 @@ int dsc_stack_equals(const DSCStack* stack1, const DSCStack* stack2, cmp_func co
  * @param stack The stack to access
  * @return Pointer to top element data, or NULL if empty or on error
  */
-void* dsc_stack_peek(const DSCStack* stack);
+DSC_API void* dsc_stack_peek(const DSCStack* stack);
 
 /**
  * Get the top element without removing it (alias for peek).
@@ -119,7 +120,7 @@ void* dsc_stack_peek(const DSCStack* stack);
  * @param stack The stack to access
  * @return Pointer to top element data, or NULL if empty or on error
  */
-void* dsc_stack_top(const DSCStack* stack);
+DSC_API void* dsc_stack_top(const DSCStack* stack);
 
 //==============================================================================
 // Stack operations
@@ -132,7 +133,7 @@ void* dsc_stack_top(const DSCStack* stack);
  * @param data Pointer to the data to push (ownership transferred to stack)
  * @return 0 on success, -1 on error
  */
-int dsc_stack_push(DSCStack* stack, void* data);
+DSC_API int dsc_stack_push(DSCStack* stack, void* data);
 
 /**
  * Pop the top element from the stack.
@@ -141,7 +142,7 @@ int dsc_stack_push(DSCStack* stack, void* data);
  * @param should_free_data Whether to free the popped data
  * @return 0 on success, -1 on error (e.g., empty stack)
  */
-int dsc_stack_pop(DSCStack* stack, bool should_free_data);
+DSC_API int dsc_stack_pop(DSCStack* stack, bool should_free_data);
 
 /**
  * Pop the top element and return its data pointer.
@@ -150,7 +151,7 @@ int dsc_stack_pop(DSCStack* stack, bool should_free_data);
  * @param stack The stack to modify
  * @return Pointer to the popped data, or NULL if stack is empty or on error
  */
-void* dsc_stack_pop_data(DSCStack* stack);
+DSC_API void* dsc_stack_pop_data(DSCStack* stack);
 
 //==============================================================================
 // Higher-order functions
@@ -162,7 +163,7 @@ void* dsc_stack_pop_data(DSCStack* stack);
  * @param stack The stack to process
  * @param action Function applied to each element
  */
-void dsc_stack_for_each(const DSCStack* stack, action_func action);
+DSC_API void dsc_stack_for_each(const DSCStack* stack, action_func action);
 
 //==============================================================================
 // Stack copying functions
@@ -174,7 +175,7 @@ void dsc_stack_for_each(const DSCStack* stack, action_func action);
  * @param stack The stack to copy
  * @return A new stack with same structure but sharing data, or NULL on error
  */
-DSCStack* dsc_stack_copy(const DSCStack* stack);
+DSC_API DSCStack* dsc_stack_copy(const DSCStack* stack);
 
 /**
  * Create a deep copy of the stack (cloning data using the provided function).
@@ -183,7 +184,7 @@ DSCStack* dsc_stack_copy(const DSCStack* stack);
  * @param should_free_data Whether the copy function should handle data freeing
  * @return A new stack with copies of all data, or NULL on error
  */
-DSCStack* dsc_stack_copy_deep(const DSCStack* stack, bool should_free_data);
+DSC_API DSCStack* dsc_stack_copy_deep(const DSCStack* stack, bool should_free_data);
 
 //==============================================================================
 // Iterator functions
@@ -195,7 +196,7 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, bool should_free_data);
  * @param stack The stack to iterate over
  * @return An Iterator object for forward traversal
  */
-DSCIterator dsc_stack_iterator(const DSCStack* stack);
+DSC_API DSCIterator dsc_stack_iterator(const DSCStack* stack);
 
 /**
  * Create a new stack from an iterator with custom allocator.
@@ -204,6 +205,6 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack);
  * @param alloc The custom allocator to use
  * @return A new stack with elements from iterator, or NULL on error
  */
-DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAlloc* alloc);
 
 #endif //DSCONTAINERS_STACK_H

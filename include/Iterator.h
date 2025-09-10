@@ -8,6 +8,9 @@
 #ifndef DSCONTAINERS_ITERATOR_H
 #define DSCONTAINERS_ITERATOR_H
 
+#include "PlatformDefs.h"
+
+
 //==============================================================================
 // Iterator interface
 //==============================================================================
@@ -79,7 +82,7 @@ typedef int (*filter_func)(const void* element);
  * @param transform Function to apply to each element
  * @return A new iterator producing transformed elements
  */
-DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform);
+DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform);
 
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
@@ -92,7 +95,7 @@ DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform);
  * @param filter Predicate function that determines which elements to include
  * @return A new iterator yielding only elements that satisfy the predicate
  */
-DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
+DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
 
 /**
  * Create an iterator that yields integers in a specified range.
@@ -102,6 +105,6 @@ DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
  * @param step Step value (positive or negative, non-zero)
  * @return A new iterator yielding integers in the specified range
  */
-DSCIterator dsc_iterator_range(int start, int end, int step);
+DSC_API DSCIterator dsc_iterator_range(int start, int end, int step);
 
 #endif //DSCONTAINERS_ITERATOR_H

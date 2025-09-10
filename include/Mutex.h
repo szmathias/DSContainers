@@ -15,7 +15,12 @@
 
 #ifdef DSCONTAINERS_PLATFORM_WINDOWS
 #include <windows.h>
-typedef CRITICAL_SECTION DSCMutex;
+// Structure to wrap CRITICAL_SECTION with ownership tracking
+typedef struct {
+    CRITICAL_SECTION cs;
+    volatile DWORD owner_thread_id;
+    volatile LONG lock_count;
+} DSCMutex;
 #else
 #include <pthread.h>
 typedef pthread_mutex_t DSCMutex;
@@ -32,7 +37,7 @@ typedef pthread_mutex_t DSCMutex;
  * - On failure the value of *m is undefined and dsc_mutex_destroy must not be
  *   called on it.
  */
-int dsc_mutex_init(DSCMutex* mtx);
+DSC_API int dsc_mutex_init(DSCMutex* mtx);
 
 /**
  * Acquire (lock) the mutex. This call blocks until the mutex is available.
@@ -40,7 +45,7 @@ int dsc_mutex_init(DSCMutex* mtx);
  * @param mtx Pointer to an initialized DSCMutex.
  * @return 0 on success, non-zero on failure.
  */
-int dsc_mutex_lock(DSCMutex* mtx);
+DSC_API int dsc_mutex_lock(DSCMutex* mtx);
 
 /**
  * Attempt to acquire (trylock) the mutex without blocking.
@@ -53,7 +58,7 @@ int dsc_mutex_lock(DSCMutex* mtx);
  *   mutex is already locked, or another error code on failure).
  * - On Windows this returns 0 on success and 1 if the lock was not acquired.
  */
-int dsc_mutex_trylock(DSCMutex* mtx);
+DSC_API int dsc_mutex_trylock(DSCMutex* mtx);
 
 /**
  * Release (unlock) the mutex.
@@ -61,7 +66,7 @@ int dsc_mutex_trylock(DSCMutex* mtx);
  * @param mtx Pointer to an initialized DSCMutex.
  * @return 0 on success, non-zero on failure.
  */
-int dsc_mutex_unlock(DSCMutex* mtx);
+DSC_API int dsc_mutex_unlock(DSCMutex* mtx);
 
 /**
  * Destroy a mutex and free any underlying resources.
@@ -73,6 +78,6 @@ int dsc_mutex_unlock(DSCMutex* mtx);
  * - The mutex must be unlocked and not in use by any thread when calling
  *   dsc_mutex_destroy.
  */
-int dsc_mutex_destroy(DSCMutex* mtx);
+DSC_API int dsc_mutex_destroy(DSCMutex* mtx);
 
 #endif // DSCONTAINERS_MUTEX_H

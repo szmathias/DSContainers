@@ -79,7 +79,7 @@ typedef struct DSCKeyValuePair
  * @param initial_capacity Initial number of buckets (0 for default)
  * @return Pointer to new hash map, or NULL on failure
  */
-DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, hash_func hash,
+DSC_API DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, hash_func hash,
                                key_equals_func key_equals, size_t initial_capacity);
 
 /**
@@ -89,7 +89,7 @@ DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, hash_func hash,
  * @param should_free_keys Whether to free key data using alloc->data_free_func
  * @param should_free_values Whether to free value data using alloc->data_free_func
  */
-void dsc_hashmap_destroy(DSCHashMap* map, bool should_free_keys, bool should_free_values);
+DSC_API void dsc_hashmap_destroy(DSCHashMap* map, bool should_free_keys, bool should_free_values);
 
 /**
  * Clear all elements from the hash map, but keep the structure intact.
@@ -98,7 +98,7 @@ void dsc_hashmap_destroy(DSCHashMap* map, bool should_free_keys, bool should_fre
  * @param should_free_keys Whether to free key data
  * @param should_free_values Whether to free value data
  */
-void dsc_hashmap_clear(DSCHashMap* map, bool should_free_keys, bool should_free_values);
+DSC_API void dsc_hashmap_clear(DSCHashMap* map, bool should_free_keys, bool should_free_values);
 
 //==============================================================================
 // Information functions
@@ -110,7 +110,7 @@ void dsc_hashmap_clear(DSCHashMap* map, bool should_free_keys, bool should_free_
  * @param map The hash map to query
  * @return Number of pairs, or 0 if map is NULL
  */
-size_t dsc_hashmap_size(const DSCHashMap* map);
+DSC_API size_t dsc_hashmap_size(const DSCHashMap* map);
 
 /**
  * Check if the hash map is empty.
@@ -118,7 +118,7 @@ size_t dsc_hashmap_size(const DSCHashMap* map);
  * @param map The hash map to check
  * @return 1 if empty or NULL, 0 if it contains elements
  */
-int dsc_hashmap_is_empty(const DSCHashMap* map);
+DSC_API int dsc_hashmap_is_empty(const DSCHashMap* map);
 
 /**
  * Get the current load factor of the hash map.
@@ -126,7 +126,7 @@ int dsc_hashmap_is_empty(const DSCHashMap* map);
  * @param map The hash map to query
  * @return Load factor (size / bucket_count), or 0.0 if map is NULL
  */
-double dsc_hashmap_load_factor(const DSCHashMap* map);
+DSC_API double dsc_hashmap_load_factor(const DSCHashMap* map);
 
 /**
  * Check if the hash map contains a key.
@@ -135,7 +135,7 @@ double dsc_hashmap_load_factor(const DSCHashMap* map);
  * @param key The key to search for
  * @return 1 if key exists, 0 if not found or on error
  */
-int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key);
+DSC_API int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key);
 
 //==============================================================================
 // Hash map operations
@@ -149,7 +149,7 @@ int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key);
  * @param value Pointer to value data (ownership transferred to map)
  * @return 0 on success, -1 on error
  */
-int dsc_hashmap_put(DSCHashMap* map, void* key, void* value);
+DSC_API int dsc_hashmap_put(DSCHashMap* map, void* key, void* value);
 
 /**
  * Insert or update a key-value pair, returning the old value if key exists.
@@ -161,7 +161,7 @@ int dsc_hashmap_put(DSCHashMap* map, void* key, void* value);
  * @param old_value_out Pointer to store the old value (NULL if key didn't exist)
  * @return 0 on success, -1 on error
  */
-int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_value_out);
+DSC_API int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_value_out);
 
 /**
  * Insert or update a key-value pair, automatically freeing the old value if key exists.
@@ -173,7 +173,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
  * @param should_free_old_value Whether to free the old value using the allocator
  * @return 0 on success, -1 on error
  */
-int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, bool should_free_old_value);
+DSC_API int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, bool should_free_old_value);
 
 /**
  * Get the value associated with a key.
@@ -182,7 +182,7 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, bool shou
  * @param key The key to look up
  * @return Pointer to associated value, or NULL if not found or on error
  */
-void* dsc_hashmap_get(const DSCHashMap* map, const void* key);
+DSC_API void* dsc_hashmap_get(const DSCHashMap* map, const void* key);
 
 /**
  * Remove a key-value pair from the hash map.
@@ -193,7 +193,7 @@ void* dsc_hashmap_get(const DSCHashMap* map, const void* key);
  * @param should_free_value Whether to free the value data
  * @return 0 on success, -1 if key not found or on error
  */
-int dsc_hashmap_remove(DSCHashMap* map, const void* key,
+DSC_API int dsc_hashmap_remove(DSCHashMap* map, const void* key,
                        bool should_free_key, bool should_free_value);
 
 /**
@@ -204,7 +204,7 @@ int dsc_hashmap_remove(DSCHashMap* map, const void* key,
  * @param should_free_key Whether to free the key data
  * @return Pointer to the removed value, or NULL if not found or on error
  */
-void* dsc_hashmap_remove_get(DSCHashMap* map, const void* key, bool should_free_key);
+DSC_API void* dsc_hashmap_remove_get(DSCHashMap* map, const void* key, bool should_free_key);
 
 //==============================================================================
 // Bulk operations
@@ -218,7 +218,7 @@ void* dsc_hashmap_remove_get(DSCHashMap* map, const void* key, bool should_free_
  * @param count_out Pointer to size_t that will receive the number of keys
  * @return 0 on success, -1 on error
  */
-int dsc_hashmap_get_keys(const DSCHashMap* map, void*** keys_out, size_t* count_out);
+DSC_API int dsc_hashmap_get_keys(const DSCHashMap* map, void*** keys_out, size_t* count_out);
 
 /**
  * Get all values in the hash map.
@@ -228,7 +228,7 @@ int dsc_hashmap_get_keys(const DSCHashMap* map, void*** keys_out, size_t* count_
  * @param count_out Pointer to size_t that will receive the number of values
  * @return 0 on success, -1 on error
  */
-int dsc_hashmap_get_values(const DSCHashMap* map, void*** values_out, size_t* count_out);
+DSC_API int dsc_hashmap_get_values(const DSCHashMap* map, void*** values_out, size_t* count_out);
 
 /**
  * Apply an action function to each key-value pair in the hash map.
@@ -236,7 +236,7 @@ int dsc_hashmap_get_values(const DSCHashMap* map, void*** values_out, size_t* co
  * @param map The hash map to process
  * @param action Function applied to each key-value pair
  */
-void dsc_hashmap_for_each(const DSCHashMap* map, void (*action)(void* key, void* value));
+DSC_API void dsc_hashmap_for_each(const DSCHashMap* map, void (*action)(void* key, void* value));
 
 //==============================================================================
 // Hash map copying functions
@@ -248,7 +248,7 @@ void dsc_hashmap_for_each(const DSCHashMap* map, void (*action)(void* key, void*
  * @param map The hash map to copy
  * @return A new hash map with same structure but sharing data, or NULL on error
  */
-DSCHashMap* dsc_hashmap_copy(const DSCHashMap* map);
+DSC_API DSCHashMap* dsc_hashmap_copy(const DSCHashMap* map);
 
 /**
  * Create a deep copy of the hash map (cloning keys and values).
@@ -258,7 +258,7 @@ DSCHashMap* dsc_hashmap_copy(const DSCHashMap* map);
  * @param value_copy Function to copy value data (NULL for shallow copy of values)
  * @return A new hash map with copies of all data, or NULL on error
  */
-DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
+DSC_API DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
                                   copy_func key_copy, copy_func value_copy);
 
 //==============================================================================
@@ -272,7 +272,7 @@ DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
  * @param map The hash map to iterate over
  * @return An Iterator object for traversal
  */
-DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
+DSC_API DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
 
 /**
  * Create a new hash map from an iterator of key-value pairs.
@@ -283,7 +283,7 @@ DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
  * @param key_equals Key equality function
  * @return A new hash map with elements from iterator, or NULL on error
  */
-DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAlloc* alloc,
+DSC_API DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAlloc* alloc,
                                       hash_func hash, key_equals_func key_equals);
 
 //==============================================================================
@@ -296,7 +296,7 @@ DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAlloc* alloc,
  * @param key Pointer to null-terminated string
  * @return Hash value
  */
-size_t dsc_hash_string(const void* key);
+DSC_API size_t dsc_hash_string(const void* key);
 
 /**
  * Hash function for integer keys.
@@ -304,7 +304,7 @@ size_t dsc_hash_string(const void* key);
  * @param key Pointer to int
  * @return Hash value
  */
-size_t dsc_hash_int(const void* key);
+DSC_API size_t dsc_hash_int(const void* key);
 
 /**
  * Hash function for pointer keys (uses memory address).
@@ -312,7 +312,7 @@ size_t dsc_hash_int(const void* key);
  * @param key Pointer value
  * @return Hash value
  */
-size_t dsc_hash_pointer(const void* key);
+DSC_API size_t dsc_hash_pointer(const void* key);
 
 //==============================================================================
 // Utility equality functions
@@ -325,7 +325,7 @@ size_t dsc_hash_pointer(const void* key);
  * @param key2 Pointer to second null-terminated string
  * @return 1 if strings are equal, 0 otherwise
  */
-int dsc_key_equals_string(const void* key1, const void* key2);
+DSC_API int dsc_key_equals_string(const void* key1, const void* key2);
 
 /**
  * Equality function for integer keys.
@@ -334,7 +334,7 @@ int dsc_key_equals_string(const void* key1, const void* key2);
  * @param key2 Pointer to second int
  * @return 1 if integers are equal, 0 otherwise
  */
-int dsc_key_equals_int(const void* key1, const void* key2);
+DSC_API int dsc_key_equals_int(const void* key1, const void* key2);
 
 /**
  * Equality function for pointer keys.
@@ -343,6 +343,6 @@ int dsc_key_equals_int(const void* key1, const void* key2);
  * @param key2 Second pointer
  * @return 1 if pointers are equal, 0 otherwise
  */
-int dsc_key_equals_pointer(const void* key1, const void* key2);
+DSC_API int dsc_key_equals_pointer(const void* key1, const void* key2);
 
 #endif //DSCONTAINERS_HASHMAP_H

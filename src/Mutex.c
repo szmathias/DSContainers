@@ -27,7 +27,13 @@ int dsc_mutex_init(DSCMutex* mtx)
     {
         return -1;
     }
-    InitializeCriticalSection(mtx);
+
+    if (!InitializeCriticalSectionAndSpinCount(&mtx->cs, 4000))
+    {
+        return -1;
+    }
+    mtx->owner_thread_id = 0;
+    mtx->lock_count = 0;
     return 0;
 }
 
@@ -43,7 +49,10 @@ int dsc_mutex_lock(DSCMutex* mtx)
     {
         return -1;
     }
-    EnterCriticalSection(mtx);
+
+    EnterCriticalSection(&mtx->cs);
+    mtx->owner_thread_id = GetCurrentThreadId();
+    mtx->lock_count = 1;
     return 0;
 }
 
@@ -59,7 +68,29 @@ int dsc_mutex_trylock(DSCMutex* mtx)
     {
         return -1;
     }
-    return TryEnterCriticalSection(mtx) ? 0 : 1;
+
+    DWORD current_thread = GetCurrentThreadId();
+
+    // Check if this thread already owns the mutex (simulate non-recursive behavior)
+    // We need to check this BEFORE attempting TryEnterCriticalSection
+    if (mtx->owner_thread_id == current_thread && mtx->lock_count > 0)
+    {
+        // This thread already owns the mutex - return failure for non-recursive behavior
+        return 1; // Would block/already owned
+    }
+
+    // Try to acquire the critical section
+    BOOL acquired = TryEnterCriticalSection(&mtx->cs);
+    if (acquired)
+    {
+        // Successfully acquired - set ownership
+        mtx->owner_thread_id = current_thread;
+        mtx->lock_count = 1;
+        return 0; // Success
+    }
+
+    // Could not acquire the lock (another thread owns it)
+    return 1; // Would block
 }
 
 /**
@@ -74,7 +105,10 @@ int dsc_mutex_unlock(DSCMutex* mtx)
     {
         return -1;
     }
-    LeaveCriticalSection(mtx);
+
+    mtx->owner_thread_id = 0;
+    mtx->lock_count = 0;
+    LeaveCriticalSection(&mtx->cs);
     return 0;
 }
 
@@ -90,7 +124,10 @@ int dsc_mutex_destroy(DSCMutex* mtx)
     {
         return -1;
     }
-    DeleteCriticalSection(mtx);
+
+    DeleteCriticalSection(&mtx->cs);
+    mtx->owner_thread_id = 0;
+    mtx->lock_count = 0;
     return 0;
 }
 
