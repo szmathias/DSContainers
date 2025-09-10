@@ -111,6 +111,7 @@ static handle_entry* find_and_remove_mapping(DSCThread thread)
 
 // Find mapping without removing it. Returns pointer to entry while leaving
 // it owned by the global map (do not free the returned pointer).
+#ifdef _MSC_VER // Only include if used, or for debugging
 static handle_entry* find_mapping(DSCThread thread)
 {
     ensure_map_init();
@@ -130,6 +131,7 @@ static handle_entry* find_mapping(DSCThread thread)
     LeaveCriticalSection(&g_map_lock);
     return NULL;
 }
+#endif
 
 // Thread entry used with CreateThread. It invokes the user function and
 // stores the return value in the wrapper. If the thread has been detached

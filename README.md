@@ -56,50 +56,50 @@ ctest --output-on-failure
 #include "Queue.h"
 
 // Create a default allocator
-DSCAlloc* alloc = dsc_alloc_create();
+DSCAlloc alloc = dsc_alloc_create();
 
 // ========== Linked List Example ==========
-SinglyLinkedList *list = sll_create_custom(alloc);
-int *value = alloc->malloc_func(sizeof(int));
+DSCSinglyLinkedList *list = dsc_sll_create(&alloc);
+int *value = dsc_alloc_malloc(&alloc, sizeof(int));
 *value = 42;
 sll_insert_back(list, value);
 
 // ========== Dynamic String Example ==========
-String str = str_create("Hello, World!");
-str_append(&str, " from DSContainers!");
-printf("%s\n", str_data(&str));
+DSCString str = dsc_str_create("Hello, World!");
+dsc_str_append(&str, " from DSContainers!");
+printf("%s\n", dsc_str_data(&str));
 
 // ========== ArrayList Example ==========
-DSCArrayList *arr = dsc_arraylist_create(alloc);
-int *arr_value = alloc->malloc_func(sizeof(int));
+DSCArrayList *arr = dsc_arraylist_create(&alloc);
+int *arr_value = dsc_alloc_malloc(&alloc, sizeof(int));
 *arr_value = 100;
 dsc_arraylist_add(arr, arr_value);
 void *retrieved = dsc_arraylist_get(arr, 0);
 
 // ========== HashMap Example ==========
-DSCHashMap *map = dsc_hashmap_create(alloc, string_hash, string_equals, 0);
+DSCHashMap *map = dsc_hashmap_create(&alloc, string_hash, string_equals, 0);
 char *key = "example_key";
 char *map_value = "example_value";
 dsc_hashmap_put(map, key, map_value);
 char *found = dsc_hashmap_get(map, key);
 
 // ========== Stack Example ==========
-DSCStack *stack = dsc_stack_create(alloc);
-int *stack_value = alloc->malloc_func(sizeof(int));
+DSCStack *stack = dsc_stack_create(&alloc);
+int *stack_value = dsc_alloc_malloc(&alloc, sizeof(int));
 *stack_value = 200;
 dsc_stack_push(stack, stack_value);
 void *popped = dsc_stack_pop(stack);
 
 // ========== Queue Example ==========
-DSCQueue *queue = dsc_queue_create(alloc);
-int *queue_value = alloc->malloc_func(sizeof(int));
+DSCQueue *queue = dsc_queue_create(&alloc);
+int *queue_value = dsc_alloc_malloc(&alloc, sizeof(int));
 *queue_value = 300;
 dsc_queue_enqueue(queue, queue_value);
 void *dequeued = dsc_queue_dequeue(queue);
 
 // Cleanup
-sll_destroy(list, true);
-str_destroy(&str);
+dsc_sll_destroy(list, true);
+dsc_str_destroy(&str);
 dsc_arraylist_destroy(arr, true);
 dsc_hashmap_destroy(map, false, false); // keys/values not owned
 dsc_stack_destroy(stack, true);
@@ -114,15 +114,15 @@ All data structures support custom allocators and provide clear ownership semant
 
 ```c
 // Create custom allocator
-DSCAlloc* custom_alloc = dsc_alloc_create_custom(my_malloc, my_free, my_copy, my_data_free);
+DSCAlloc custom_alloc = dsc_alloc_create_custom(my_malloc, my_free, my_data_free, my_copy);
 
 // Use custom allocator with any data structure
-SinglyLinkedList *list = sll_create_custom(custom_alloc);
-DSCHashMap *map = dsc_hashmap_create(custom_alloc, hash_func, equals_func, 16);
+SinglyLinkedList *list = dsc_sll_create(&custom_alloc);
+DSCHashMap *map = dsc_hashmap_create(&custom_alloc, hash_func, equals_func, 16);
 
 // Library handles node allocation, user manages data
-sll_insert_back(list, user_data);
-sll_destroy(list, true); // true = free user data with custom allocator
+dsc_sll_insert_back(list, user_data);
+dsc_sll_destroy(list, true); // true = free user data with custom allocator
 ```
 
 ### Error Handling
@@ -136,17 +136,19 @@ Unified iteration with functional programming support across all containers:
 
 ```c
 // Create iterator from any container
-Iterator it = sll_iterator(list);           // Singly linked list
-Iterator arr_it = dsc_arraylist_iterator(arraylist);  // ArrayList
-Iterator map_it = dsc_hashmap_key_iterator(hashmap);  // HashMap keys
+DSCIterator sll_it = dsc_sll_iterator(list);            // Singly linked list
+DSCIterator arr_it = dsc_arraylist_iterator(arraylist); // ArrayList
+DSCIterator map_it = dsc_hashmap_iterator(hashmap);     // HashMap
 
 // Chain functional operations
-Iterator filtered = iterator_filter(&it, is_even_predicate);
-Iterator transformed = iterator_transform(&filtered, square_function);
+DSCIterator filtered = dsc_iterator_filter(&it, is_even_predicate);
+DSCIterator transformed = dsc_iterator_transform(&filtered, square_function);
 
-while (transformed.has_next(&transformed)) {
+while (transformed.has_next(&transformed))
+{
     int *value = transformed.next(&transformed);
     printf("%d ", *value);
+    free(value);
 }
 transformed.destroy(&transformed);
 ```
@@ -154,22 +156,25 @@ transformed.destroy(&transformed);
 ### Advanced HashMap Usage
 ```c
 // String hash function example
-size_t string_hash(const void* key) {
+size_t string_hash(const void* key)
+{
     const char* str = (const char*)key;
     size_t hash = 5381;
-    while (*str) {
+    while (*str) 
+    {
         hash = ((hash << 5) + hash) + *str++;
     }
     return hash;
 }
 
 // String equality function
-int string_equals(const void* key1, const void* key2) {
+int string_equals(const void* key1, const void* key2)
+{
     return strcmp((const char*)key1, (const char*)key2) == 0;
 }
 
 // Create and use HashMap
-DSCHashMap* user_db = dsc_hashmap_create(alloc, string_hash, string_equals, 64);
+DSCHashMap* user_db = dsc_hashmap_create(&alloc, string_hash, string_equals, 64);
 dsc_hashmap_put(user_db, "user123", user_data);
 User* user = dsc_hashmap_get(user_db, "user123");
 ```
@@ -196,24 +201,32 @@ dsc_mutex_unlock(mutex);
 dsc_mutex_destroy(mutex);
 
 // Thread creation and management
-DSCThread* worker = dsc_thread_create(worker_function, worker_data);
+DSCThread worker;
+dsc_thread_create(&worker, worker_function, worker_args);
 dsc_thread_join(worker);
-dsc_thread_destroy(worker);
 ```
 
 ## Testing
 
 The library includes comprehensive test suites with over 17,000 lines of test code:
 
-- **52 Test Suites** - Covering all data structures and utilities
+- **50+ Test Suites** - Covering all data structures and utilities
 - **CRUD Operations** - Create, Read, Update, Delete functionality
 - **Memory Management** - Allocation/deallocation correctness with sanitizers
 - **Algorithm Testing** - Sorting, searching, transformation operations
 - **Iterator Testing** - All iterator operations and edge cases
 - **Property Testing** - Invariant verification across operations
-- **Performance Testing** - Benchmarks for large dataset handling
-- **Threading Tests** - Concurrent access patterns and thread safety
-- **Memory Safety** - AddressSanitizer and UBSan integration
+``` c
+DSCThread thread;
+int result = dsc_thread_create(&thread, worker_function, worker_data);
+if (result == 0) 
+{
+    void* return_value;
+    dsc_thread_join(thread, &return_value);
+}
+// Or detach for fire-and-forget
+// dsc_thread_detach(thread);
+```
 
 ## Contributing
 
@@ -279,7 +292,6 @@ target_link_libraries(your_target DSContainers)
 See [TODO.md](TODO.md) for upcoming features:
 - **String View Library** - Lightweight string references for zero-copy operations
 - **I/O Library** - Formatted printing, file operations, and stream utilities
-- **Concurrent Data Structures** - Lock-free and thread-safe variants
 - **Advanced Algorithms** - Graph algorithms, advanced sorting, pattern matching
 
 ## License

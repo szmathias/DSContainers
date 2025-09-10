@@ -44,7 +44,7 @@ typedef struct
 
 static void* hold_thread(void* arg)
 {
-    hold_arg_t* ha = (hold_arg_t*)arg;
+    hold_arg_t* ha = arg;
     if (!ha || !ha->m)
         return NULL;
     dsc_mutex_lock(ha->m);
@@ -66,7 +66,7 @@ int test_mutex_trylock_contention(void)
     portable_sleep_ms(20);
 
     // trylock should fail (non-zero) while other thread holds it
-    int rc = dsc_mutex_trylock(&m);
+    const int rc = dsc_mutex_trylock(&m);
     ASSERT(rc != 0);
 
     ASSERT_EQ(dsc_thread_join(t, NULL), 0);
@@ -78,7 +78,7 @@ int test_thread_create_null(void)
 {
     DSCThread t;
     // NULL thread pointer
-    ASSERT(dsc_thread_create(NULL, (dscthread_func)hold_thread, NULL) != 0);
+    ASSERT(dsc_thread_create(NULL, hold_thread, NULL) != 0);
     // NULL function pointer
     ASSERT(dsc_thread_create(&t, NULL, NULL) != 0);
     return TEST_SUCCESS;
@@ -87,7 +87,7 @@ int test_thread_create_null(void)
 static void* retval_thread(void* arg)
 {
     (void)arg;
-    int* p = (int*)malloc(sizeof(int));
+    int* p = malloc(sizeof(int));
     if (!p)
         return NULL;
     *p = 12345;
@@ -127,7 +127,7 @@ int test_thread_detach_then_join_fails(void)
     return TEST_SUCCESS;
     #else
     // join after detach should fail (non-zero)
-    int rc = dsc_thread_join(t, NULL);
+    const int rc = dsc_thread_join(t, NULL);
     ASSERT(rc != 0);
     // platform implementations may close handles on detach; nothing further to cleanup
     return TEST_SUCCESS;
