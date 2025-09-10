@@ -76,6 +76,24 @@ void* int_copy(const void* data)
     return copy;
 }
 
+// Clone a string
+void* string_copy(const void* data)
+{
+    const char* original = (const char*)data;
+    if (!original)
+    {
+        return NULL;
+    }
+
+    size_t len = strlen(original) + 1;
+    char* copy = malloc(len);
+    if (copy)
+    {
+        strcpy(copy, original);
+    }
+    return copy;
+}
+
 // Clone a person
 void* person_copy(const void* data)
 {

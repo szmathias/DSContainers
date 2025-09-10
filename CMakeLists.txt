@@ -60,6 +60,8 @@ add_library(DSContainers SHARED
         src/ArrayList.c
         src/Stack.c
         src/Queue.c
+        src/HashMap.c
+        src/HashSet.c
         include/DoublyLinkedList.h
         include/DynamicString.h
         include/Iterator.h
@@ -72,6 +74,8 @@ add_library(DSContainers SHARED
         include/ArrayList.h
         include/Stack.h
         include/Queue.h
+        include/HashMap.h
+        include/HashSet.h
 )
 
 # Create an OBJECT library for test helpers. This compiles the sources once
@@ -357,3 +361,82 @@ add_test(NAME test_queue_properties
         COMMAND test_queue_properties
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
+# Add HashMap test executables
+add_executable(test_hashmap_crud tests/test_hashmap_crud.c)
+target_link_libraries(test_hashmap_crud PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_crud
+        COMMAND test_hashmap_crud
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_algorithms tests/test_hashmap_algorithms.c)
+target_link_libraries(test_hashmap_algorithms PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_algorithms
+        COMMAND test_hashmap_algorithms
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_iterator tests/test_hashmap_iterator.c)
+target_link_libraries(test_hashmap_iterator PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_iterator
+        COMMAND test_hashmap_iterator
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_memory tests/test_hashmap_memory.c)
+target_link_libraries(test_hashmap_memory PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_memory
+        COMMAND test_hashmap_memory
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_properties tests/test_hashmap_properties.c)
+target_link_libraries(test_hashmap_properties PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_properties
+        COMMAND test_hashmap_properties
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_memory_safe tests/test_hashmap_memory_safe.c)
+target_link_libraries(test_hashmap_memory_safe PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_memory_safe
+        COMMAND test_hashmap_memory_safe
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashmap_performance tests/test_hashmap_performance.c)
+target_link_libraries(test_hashmap_performance PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashmap_performance
+        COMMAND test_hashmap_performance
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+# Add HashSet test executables
+add_executable(test_hashset_crud tests/test_hashset_crud.c)
+target_link_libraries(test_hashset_crud PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_crud
+        COMMAND test_hashset_crud
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashset_algorithms tests/test_hashset_algorithms.c)
+target_link_libraries(test_hashset_algorithms PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_algorithms
+        COMMAND test_hashset_algorithms
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashset_iterator tests/test_hashset_iterator.c)
+target_link_libraries(test_hashset_iterator PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_iterator
+        COMMAND test_hashset_iterator
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashset_memory tests/test_hashset_memory.c)
+target_link_libraries(test_hashset_memory PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_memory
+        COMMAND test_hashset_memory
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashset_properties tests/test_hashset_properties.c)
+target_link_libraries(test_hashset_properties PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_properties
+        COMMAND test_hashset_properties
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_executable(test_hashset_performance tests/test_hashset_performance.c)
+target_link_libraries(test_hashset_performance PRIVATE DSContainers test_helpers)
+add_test(NAME test_hashset_performance
+        COMMAND test_hashset_performance
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)

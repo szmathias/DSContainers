@@ -35,6 +35,8 @@ Person* create_person(const char* name, int age);
 
 // Clone an integer
 void* int_copy(const void* data);
+// Clone a string
+void* string_copy(const void* data);
 // Clone a person
 void* person_copy(const void* data);
 
