@@ -100,7 +100,7 @@ int test_hashmap_uniqueness_property(void)
     // Clean up remaining value
     char* final_value = (char*)dsc_hashmap_get(map, key);
     dsc_hashmap_clear(map, false, false);
-    dsc_alloc_free(&alloc, final_value);
+    free(final_value);
 
     // Test 3: Automatic cleanup with put_with_free
     // Note: This test uses string literals since we can't easily test with malloc'd values
