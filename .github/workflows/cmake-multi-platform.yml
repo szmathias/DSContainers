@@ -2,6 +2,10 @@
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: CMake on multiple platforms
 
+permissions:
+  contents: read         # Needed to clone repo and read files
+  actions: read          # Needed for workflow operations (artifact upload/download)
+
 on:
   push:
     branches: [ "main" ]
