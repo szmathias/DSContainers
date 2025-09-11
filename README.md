@@ -56,7 +56,7 @@ ctest --output-on-failure
 #include "Queue.h"
 
 // Create a default allocator
-DSCAlloc alloc = dsc_alloc_create();
+DSCAlloc alloc = dsc_alloc_default();
 
 // ========== Linked List Example ==========
 DSCSinglyLinkedList *list = dsc_sll_create(&alloc);
@@ -104,7 +104,6 @@ dsc_arraylist_destroy(arr, true);
 dsc_hashmap_destroy(map, false, false); // keys/values not owned
 dsc_stack_destroy(stack, true);
 dsc_queue_destroy(queue, true);
-dsc_alloc_destroy(alloc);
 ```
 
 ## API Documentation
@@ -114,7 +113,7 @@ All data structures support custom allocators and provide clear ownership semant
 
 ```c
 // Create custom allocator
-DSCAlloc custom_alloc = dsc_alloc_create_custom(my_malloc, my_free, my_data_free, my_copy);
+DSCAlloc custom_alloc = dsc_alloc_custom(my_malloc, my_free, my_data_free, my_copy);
 
 // Use custom allocator with any data structure
 SinglyLinkedList *list = dsc_sll_create(&custom_alloc);
