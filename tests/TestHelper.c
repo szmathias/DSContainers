@@ -272,7 +272,7 @@ DSCAlloc create_int_allocator(void)
 
 DSCAlloc create_person_allocator(void)
 {
-    return dsc_alloc_custom(test_calloc, person_free, test_dealloc, person_copy);
+    return dsc_alloc_custom(test_calloc, test_dealloc, person_free, person_copy);
 }
 
 DSCAlloc create_string_allocator(void)
