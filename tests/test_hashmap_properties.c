@@ -12,7 +12,7 @@
 // Test hash map size property
 int test_hashmap_size_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAlloc alloc = create_string_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Declare arrays outside loops to avoid scope issues
