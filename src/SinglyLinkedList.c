@@ -958,6 +958,7 @@ DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list)
     state->current = list->head;
     state->list    = (DSCSinglyLinkedList*)list;
 
+    it.alloc = list->alloc;
     it.data_state = state;
 
     return it;

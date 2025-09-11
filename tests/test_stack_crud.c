@@ -7,16 +7,14 @@
 // Test basic stack creation and destruction
 int test_stack_create_destroy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    ASSERT_NOT_NULL(alloc);
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCStack* stack = dsc_stack_create(&alloc);
     ASSERT_NOT_NULL(stack);
     ASSERT_EQ(dsc_stack_size(stack), 0);
     ASSERT(dsc_stack_is_empty(stack));
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -45,8 +43,8 @@ int test_stack_null_parameters(void)
 // Test basic push and pop operations
 int test_stack_push_pop(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -87,15 +85,14 @@ int test_stack_push_pop(void)
     ASSERT_EQ(dsc_stack_pop(stack, false), -1);
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test pop_data function
 int test_stack_pop_data(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -123,15 +120,14 @@ int test_stack_pop_data(void)
     ASSERT_NULL(dsc_stack_pop_data(stack));
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test stack clear operation
 int test_stack_clear(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
@@ -157,16 +153,15 @@ int test_stack_clear(void)
     ASSERT_EQ(*(int*)dsc_stack_peek(stack), 999);
 
     dsc_stack_destroy(stack, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test stack equality
 int test_stack_equals(void)
 {
-    DSCAlloc* alloc  = create_std_allocator();
-    DSCStack* stack1 = dsc_stack_create(alloc);
-    DSCStack* stack2 = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack1 = dsc_stack_create(&alloc);
+    DSCStack* stack2 = dsc_stack_create(&alloc);
 
     // Empty stacks should be equal
     ASSERT_EQ(dsc_stack_equals(stack1, stack2, int_cmp), 1);
@@ -200,7 +195,6 @@ int test_stack_equals(void)
 
     dsc_stack_destroy(stack1, true);
     dsc_stack_destroy(stack2, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -223,7 +217,7 @@ int main(void)
 
     printf("Running Stack CRUD tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

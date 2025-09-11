@@ -13,29 +13,21 @@
 // Tests from test_sll.c that fit into memory/resource category
 int test_custom_allocator(void)
 {
-    DSCAlloc* alloc = malloc(sizeof(DSCAlloc));
-    if (!alloc)
-        return TEST_FAILURE;
-    alloc->alloc_func     = test_calloc;
-    alloc->dealloc_func   = test_dealloc;
-    alloc->data_free_func = free;
-    alloc->copy_func      = NULL;
-
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
     *a     = 42;
     ASSERT_EQ(dsc_sll_insert_back(list, a), 0);
     ASSERT_EQ(list->size, 1);
     dsc_sll_destroy(list, true);
-    free(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
@@ -61,14 +53,13 @@ int test_clear(void)
     ASSERT_EQ(list->size, 1);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Clear an already empty list
     dsc_sll_clear(list, true);
@@ -76,7 +67,6 @@ int test_clear_empty(void)
     ASSERT_EQ(list->size, 0);
 
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -89,8 +79,8 @@ int test_clear_null(void)
 
 int test_copy_shallow(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
@@ -127,15 +117,13 @@ int test_copy_shallow(void)
     // Cleanup - free each int only once since they're shared
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(clone, false);
-    destroy_allocator(alloc);
-
     return TEST_SUCCESS;
 }
 
 int test_copy_deep(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
@@ -172,16 +160,13 @@ int test_copy_deep(void)
     // Cleanup - each list has its own data
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(clone, true);
-    destroy_allocator(alloc);
-
     return TEST_SUCCESS;
 }
 
 int test_copy_complex_data(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    alloc->dealloc_func       = person_free;
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_person_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some people
     Person* p1 = create_person("Alice", 30);
@@ -224,15 +209,13 @@ int test_copy_complex_data(void)
     // Cleanup
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(clone, true);
-    destroy_allocator(alloc);
-
     return TEST_SUCCESS;
 }
 
 int test_copy_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Clone empty list
     DSCSinglyLinkedList* shallow_clone = dsc_sll_copy(list);
@@ -249,8 +232,6 @@ int test_copy_empty(void)
     dsc_sll_destroy(list, false);
     dsc_sll_destroy(shallow_clone, false);
     dsc_sll_destroy(deep_clone, false);
-    destroy_allocator(alloc);
-
     return TEST_SUCCESS;
 }
 
@@ -261,20 +242,18 @@ int test_copy_null(void)
     ASSERT_NULL(dsc_sll_copy_deep(NULL, int_copy, true));
 
     // Should require a valid copy function
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NULL(dsc_sll_copy_deep(list, NULL, NULL));
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
-
     return TEST_SUCCESS;
 }
 
 int test_transform_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1); // Ensure normal allocation for setup
-    DSCAlloc* alloc           = create_failing_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     for (int i = 0; i < 5; i++)
     {
@@ -300,17 +279,15 @@ int test_transform_allocation_failure(void)
     DSCSinglyLinkedList* mapped3 = dsc_sll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped3);
 
-    set_alloc_fail_countdown(-1);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_copy_deep_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* alloc           = create_failing_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -335,15 +312,14 @@ int test_copy_deep_allocation_failure(void)
 
     set_alloc_fail_countdown(-1); // Reset for cleanup
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* alloc           = create_failing_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     dsc_sll_insert_back(list, a);
@@ -363,7 +339,6 @@ int test_insert_allocation_failure(void)
     set_alloc_fail_countdown(-1);
     dsc_sll_destroy(list, true);
     free(b); // 'b' was never added to the list, so we must free it manually
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

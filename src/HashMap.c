@@ -845,6 +845,7 @@ DSCIterator dsc_hashmap_iterator(const DSCHashMap* map)
         }
     }
 
+    it.alloc = map->alloc;
     it.data_state = state;
     return it;
 }

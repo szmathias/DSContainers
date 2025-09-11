@@ -454,7 +454,6 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
 {
     DSCIterator it = {0};
 
-    it.data_state = NULL;
     it.get        = queue_iterator_get;
     it.has_next   = queue_iterator_has_next;
     it.next       = queue_iterator_next;
@@ -475,11 +474,12 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
         return it;
     }
 
-    it.data_state = state;
-
     state->queue   = queue;
     state->current = queue->front;
     state->start   = queue->front;
+
+    it.alloc = queue->alloc;
+    it.data_state = state;
 
     return it;
 }

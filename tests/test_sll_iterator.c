@@ -11,8 +11,8 @@
 // Tests from test_sll.c that fit into iterator category
 int test_iterator_basic(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -56,14 +56,13 @@ int test_iterator_basic(void)
 
     it.destroy(&it);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_empty_list(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     DSCIterator it = dsc_sll_iterator(list);
     ASSERT_NOT_NULL(it.data_state);
@@ -73,7 +72,6 @@ int test_iterator_empty_list(void)
 
     it.destroy(&it);
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -88,8 +86,8 @@ int test_iterator_null_list(void)
 
 int test_iterator_get(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -114,14 +112,13 @@ int test_iterator_get(void)
 
     it.destroy(&it);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_unsupported_ops(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     dsc_sll_insert_back(list, a);
@@ -134,14 +131,13 @@ int test_iterator_unsupported_ops(void)
 
     it.destroy(&it);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator_basic(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -155,9 +151,9 @@ int test_from_iterator_basic(void)
     DSCIterator it = dsc_sll_iterator(list);
 
     // Create new list from iterator (shallow copy)
-    DSCAlloc* new_alloc           = create_std_allocator();
-    new_alloc->copy_func          = NULL;
-    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, new_alloc);
+    DSCAlloc new_alloc = create_int_allocator();
+    new_alloc.copy_func = NULL;
+    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, &new_alloc);
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(new_list->size, 3);
 
@@ -182,15 +178,13 @@ int test_from_iterator_basic(void)
     it.destroy(&it);
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(new_list, false); // Don't free shared data
-    destroy_allocator(new_alloc);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator_deep_copy(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -204,10 +198,8 @@ int test_from_iterator_deep_copy(void)
     DSCIterator it = dsc_sll_iterator(list);
 
     // Create new list from iterator with deep copy
-    DSCAlloc* deep_alloc          = create_std_allocator();
-    deep_alloc->copy_func         = int_copy;
-    deep_alloc->data_free_func    = int_free;
-    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, deep_alloc);
+    DSCAlloc deep_alloc = create_int_allocator();
+    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, &deep_alloc);
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(new_list->size, 3);
 
@@ -238,22 +230,19 @@ int test_from_iterator_deep_copy(void)
     it.destroy(&it);
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(new_list, true); // Free independent copies
-    destroy_allocator(deep_alloc);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     DSCIterator it = dsc_sll_iterator(list);
 
     // Create new list from empty iterator
-    DSCAlloc* new_alloc           = create_std_allocator();
-    new_alloc->copy_func          = int_copy; // optional, doesn't matter for empty
-    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, new_alloc);
+    DSCAlloc new_alloc = create_int_allocator();
+    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, &new_alloc);
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(new_list->size, 0);
     ASSERT_NULL(new_list->head);
@@ -261,8 +250,6 @@ int test_from_iterator_empty(void)
     it.destroy(&it);
     dsc_sll_destroy(list, false);
     dsc_sll_destroy(new_list, false);
-    destroy_allocator(new_alloc);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -270,27 +257,25 @@ int test_from_iterator_null(void)
 {
     ASSERT_NULL(dsc_sll_from_iterator(NULL, NULL));
 
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     DSCIterator it            = dsc_sll_iterator(list);
 
     // Iterator should be valid but copy function is optional
-    DSCAlloc* new_alloc           = create_std_allocator();
-    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, new_alloc);
+    DSCAlloc new_alloc = create_int_allocator();
+    DSCSinglyLinkedList* new_list = dsc_sll_from_iterator(&it, &new_alloc);
     ASSERT_NOT_NULL(new_list);
 
     it.destroy(&it);
     dsc_sll_destroy(list, false);
     dsc_sll_destroy(new_list, false);
-    destroy_allocator(new_alloc);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_chaining(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
@@ -302,8 +287,8 @@ int test_iterator_chaining(void)
     DSCIterator it = dsc_sll_iterator(list);
 
     // Make a second list from the first 5 elements
-    DSCAlloc* alloc2           = create_std_allocator();
-    DSCSinglyLinkedList* list2 = dsc_sll_create(alloc2);
+    DSCAlloc alloc2 = create_int_allocator();
+    DSCSinglyLinkedList* list2 = dsc_sll_create(&alloc2);
     int count                  = 0;
     while (it.has_next(&it) && count < 5)
     {
@@ -320,10 +305,8 @@ int test_iterator_chaining(void)
     DSCIterator it2 = dsc_sll_iterator(list2);
 
     // Create a third list from iterator of second list
-    DSCAlloc* tmp_alloc        = create_std_allocator();
-    tmp_alloc->copy_func       = int_copy;
-    tmp_alloc->data_free_func  = int_free;
-    DSCSinglyLinkedList* list3 = dsc_sll_from_iterator(&it2, tmp_alloc);
+    DSCAlloc tmp_alloc = create_int_allocator();
+    DSCSinglyLinkedList* list3 = dsc_sll_from_iterator(&it2, &tmp_alloc);
     ASSERT_EQ(list3->size, 5);
 
     // Verify contents of third list
@@ -339,9 +322,6 @@ int test_iterator_chaining(void)
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(list2, true);
     dsc_sll_destroy(list3, true);
-    destroy_allocator(tmp_alloc);
-    destroy_allocator(alloc2);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -369,49 +349,37 @@ static int dummy_is_valid(const DSCIterator* it)
 int test_from_iterator_null_edge_cases(void)
 {
     // Test with NULL iterator
-    DSCAlloc* tmp1       = create_std_allocator();
-    tmp1->copy_func      = int_copy;
-    tmp1->data_free_func = int_free;
-    ASSERT_NULL(dsc_sll_from_iterator(NULL, tmp1));
-    destroy_allocator(tmp1);
+    DSCAlloc tmp1 = create_int_allocator();
+    ASSERT_NULL(dsc_sll_from_iterator(NULL, &tmp1));
 
-    DSCAlloc* tmp2 = create_std_allocator();
-    ASSERT_NULL(dsc_sll_from_iterator(NULL, tmp2));
-    destroy_allocator(tmp2);
+    DSCAlloc tmp2 = create_int_allocator();
+    ASSERT_NULL(dsc_sll_from_iterator(NULL, &tmp2));
 
     // Test with invalid iterator (manually created)
     DSCIterator invalid_it = {0}; // All fields set to NULL/0
-    DSCAlloc* tmp3         = create_std_allocator();
-    tmp3->copy_func        = int_copy;
-    tmp3->data_free_func   = int_free;
-    ASSERT_NULL(dsc_sll_from_iterator(&invalid_it, tmp3));
-    destroy_allocator(tmp3);
+    DSCAlloc tmp3 = create_int_allocator();
+    ASSERT_NULL(dsc_sll_from_iterator(&invalid_it, &tmp3));
 
     // Test with partially initialized iterator
     invalid_it.has_next  = dummy_has_next;
     invalid_it.next      = dummy_next;
     invalid_it.is_valid  = dummy_is_valid; // explicitly invalid
-    DSCAlloc* tmp4       = create_std_allocator();
-    tmp4->copy_func      = int_copy;
-    tmp4->data_free_func = int_free;
-    ASSERT_NULL(dsc_sll_from_iterator(&invalid_it, tmp4));
-    destroy_allocator(tmp4);
+    DSCAlloc tmp4 = create_int_allocator();
+    ASSERT_NULL(dsc_sll_from_iterator(&invalid_it, &tmp4));
 
     // Create a valid iterator but destroy it
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 42;
     dsc_sll_insert_back(list, a);
 
     DSCIterator it = dsc_sll_iterator(list);
     it.destroy(&it); // Destroy the iterator's state
-    DSCAlloc* tmp5 = create_std_allocator();
-    ASSERT_NULL(dsc_sll_from_iterator(&it, tmp5)); // Should handle destroyed iterator safely
-    destroy_allocator(tmp5);
+    DSCAlloc tmp5 = create_int_allocator();
+    ASSERT_NULL(dsc_sll_from_iterator(&it, &tmp5)); // Should handle destroyed iterator safely
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -440,8 +408,8 @@ int test_iterator_null_list_comprehensive(void)
 
 int test_multiple_iterators(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -471,14 +439,13 @@ int test_multiple_iterators(void)
     it1.destroy(&it1);
     it2.destroy(&it2);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_with_modification(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -510,15 +477,14 @@ int test_iterator_with_modification(void)
 
     it.destroy(&it);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* failAlloc       = create_failing_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(failAlloc);
+    DSCAlloc failAlloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&failAlloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     dsc_sll_insert_back(list, a);
@@ -533,15 +499,14 @@ int test_iterator_allocation_failure(void)
 
     set_alloc_fail_countdown(-1);
     dsc_sll_destroy(list, true);
-    destroy_allocator(failAlloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator_custom_alloc_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -552,35 +517,27 @@ int test_from_iterator_custom_alloc_failure(void)
 
     // Case 1: Fail on list creation
     set_alloc_fail_countdown(0);
-    DSCAlloc* failing = create_failing_allocator();
+    DSCAlloc failing = create_failing_int_allocator();
     // Fail on new list allocation
-    DSCSinglyLinkedList* new_list1 = dsc_sll_from_iterator(&it, failing);
+    DSCSinglyLinkedList* new_list1 = dsc_sll_from_iterator(&it, &failing);
     ASSERT_NULL(new_list1);
     it.reset(&it);
 
     // Case 2: Fail on data copy - use failing allocator but with copy func that fails
     set_alloc_fail_countdown(1);
-    DSCAlloc* failing_copy_alloc       = create_failing_allocator();
-    failing_copy_alloc->copy_func      = failing_int_copy;
-    failing_copy_alloc->data_free_func = failing_free;
-    DSCSinglyLinkedList* new_list2     = dsc_sll_from_iterator(&it, failing_copy_alloc);
+    DSCAlloc failing_copy_alloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* new_list2 = dsc_sll_from_iterator(&it, &failing_copy_alloc);
     ASSERT_NULL(new_list2);
     it.reset(&it);
 
     // Case 3: Fail on node insertion - set countdown accordingly
     set_alloc_fail_countdown(2);
-    DSCAlloc* failing_node_alloc       = create_failing_allocator();
-    failing_node_alloc->copy_func      = failing_int_copy;
-    failing_node_alloc->data_free_func = failing_free;
-    DSCSinglyLinkedList* new_list3     = dsc_sll_from_iterator(&it, failing_node_alloc);
+    DSCAlloc failing_node_alloc = create_failing_int_allocator();
+    DSCSinglyLinkedList* new_list3 = dsc_sll_from_iterator(&it, &failing_node_alloc);
     ASSERT_NULL(new_list3);
 
     it.destroy(&it);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
-    destroy_allocator(failing);
-    destroy_allocator(failing_copy_alloc);
-    destroy_allocator(failing_node_alloc);
     return TEST_SUCCESS;
 }
 

@@ -835,6 +835,15 @@ DSCIterator dsc_arraylist_iterator(const DSCArrayList* list)
 {
     DSCIterator iter = {0};
 
+    iter.next       = arraylist_iter_next;
+    iter.get        = arraylist_iter_get;
+    iter.has_next   = arraylist_iter_has_next;
+    iter.prev       = arraylist_iter_prev;
+    iter.has_prev   = arraylist_iter_has_prev;
+    iter.reset      = arraylist_iter_reset;
+    iter.is_valid   = arraylist_iter_is_valid;
+    iter.destroy    = arraylist_iter_destroy;
+
     if (!list || !list->alloc || !list->alloc->alloc_func)
     {
         return iter;
@@ -850,51 +859,45 @@ DSCIterator dsc_arraylist_iterator(const DSCArrayList* list)
     state->current_index = 0;
     state->reverse       = false;
 
+    iter.alloc = list->alloc;
     iter.data_state = state;
-    iter.next       = arraylist_iter_next;
-    iter.get        = arraylist_iter_get;
-    iter.has_next   = arraylist_iter_has_next;
-    iter.prev       = arraylist_iter_prev;
-    iter.has_prev   = arraylist_iter_has_prev;
-    iter.reset      = arraylist_iter_reset;
-    iter.is_valid   = arraylist_iter_is_valid;
-    iter.destroy    = arraylist_iter_destroy;
 
     return iter;
 }
 
 DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list)
 {
-    DSCIterator iter = {0};
+    DSCIterator it = {0};
 
-    iter.data_state = NULL;
-    iter.next       = arraylist_iter_next;
-    iter.get        = arraylist_iter_get;
-    iter.has_next   = arraylist_iter_has_next;
-    iter.prev       = arraylist_iter_prev;
-    iter.has_prev   = arraylist_iter_has_prev;
-    iter.reset      = arraylist_iter_reset;
-    iter.is_valid   = arraylist_iter_is_valid;
-    iter.destroy    = arraylist_iter_destroy;
+    it.data_state = NULL;
+    it.next       = arraylist_iter_next;
+    it.get        = arraylist_iter_get;
+    it.has_next   = arraylist_iter_has_next;
+    it.prev       = arraylist_iter_prev;
+    it.has_prev   = arraylist_iter_has_prev;
+    it.reset      = arraylist_iter_reset;
+    it.is_valid   = arraylist_iter_is_valid;
+    it.destroy    = arraylist_iter_destroy;
 
     if (!list || !list->alloc || !list->alloc->alloc_func)
     {
-        return iter;
+        return it;
     }
 
     ArrayListIterState* state = dsc_alloc_malloc(list->alloc, sizeof(ArrayListIterState));
     if (!state)
     {
-        return iter;
+        return it;
     }
 
     state->list          = list;
     state->current_index = (list->size > 0) ? list->size - 1 : SIZE_MAX;
     state->reverse       = true;
 
-    iter.data_state = state;
+    it.alloc = list->alloc;
+    it.data_state = state;
 
-    return iter;
+    return it;
 }
 
 DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAlloc* alloc)

@@ -11,8 +11,8 @@
 
 int test_reserve(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test reserve on empty list
     ASSERT_EQ(dsc_arraylist_reserve(list, 100), 0);
@@ -27,7 +27,7 @@ int test_reserve(void)
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
 
-    size_t old_capacity = dsc_arraylist_capacity(list);
+    const size_t old_capacity = dsc_arraylist_capacity(list);
 
     // Reserve smaller capacity (should not shrink)
     ASSERT_EQ(dsc_arraylist_reserve(list, 5), 0);
@@ -44,14 +44,13 @@ int test_reserve(void)
     ASSERT_EQ(*(int*)dsc_arraylist_get(list, 1), 2);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_shrink_to_fit(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 100);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
 
     // Add some elements (less than capacity)
     for (int i = 0; i < 10; i++)
@@ -75,14 +74,13 @@ int test_shrink_to_fit(void)
     }
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_shrink_empty_list(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 100);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
 
     // Shrink empty list
     ASSERT_EQ(dsc_arraylist_shrink_to_fit(list), 0);
@@ -90,14 +88,13 @@ int test_shrink_empty_list(void)
     ASSERT_EQ(dsc_arraylist_size(list), 0);
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_growth_pattern(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     size_t last_capacity = 0;
 
@@ -108,7 +105,7 @@ int test_growth_pattern(void)
         *val     = i;
         dsc_arraylist_push_back(list, val);
 
-        size_t current_capacity = dsc_arraylist_capacity(list);
+        const size_t current_capacity = dsc_arraylist_capacity(list);
         if (current_capacity != last_capacity)
         {
             // Capacity should grow by at least 1.5x (our growth factor)
@@ -129,7 +126,6 @@ int test_growth_pattern(void)
     }
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -144,8 +140,8 @@ int test_memory_allocation_failure(void)
 
 int test_large_capacity(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 1000);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 1000);
 
     ASSERT_NOT_NULL(list);
     ASSERT_GTE(dsc_arraylist_capacity(list), 1000);
@@ -167,14 +163,13 @@ int test_large_capacity(void)
     ASSERT_EQ(*(int*)dsc_arraylist_get(list, 999), 999);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_memory_cleanup_on_destroy(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 10);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
 
     // Add elements
     for (int i = 0; i < 5; i++)
@@ -186,7 +181,6 @@ int test_memory_cleanup_on_destroy(void)
 
     // Destroy with data cleanup
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
 
     // If we get here without crash, memory was properly cleaned up
     return TEST_SUCCESS;
@@ -194,8 +188,8 @@ int test_memory_cleanup_on_destroy(void)
 
 int test_memory_cleanup_on_clear(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 10);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
 
     // Add elements
     for (int i = 0; i < 5; i++)
@@ -205,7 +199,7 @@ int test_memory_cleanup_on_clear(void)
         dsc_arraylist_push_back(list, val);
     }
 
-    size_t capacity_before = dsc_arraylist_capacity(list);
+    const size_t capacity_before = dsc_arraylist_capacity(list);
 
     // Clear with data cleanup
     dsc_arraylist_clear(list, true);
@@ -214,14 +208,13 @@ int test_memory_cleanup_on_clear(void)
     ASSERT_EQ(dsc_arraylist_capacity(list), capacity_before); // Capacity preserved
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_capacity_consistency(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Capacity should always be >= size
     for (int i = 0; i < 50; i++)
@@ -241,7 +234,6 @@ int test_capacity_consistency(void)
     }
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -253,7 +245,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_reserve, "test_reserve"},
         {test_shrink_to_fit, "test_shrink_to_fit"},
         {test_shrink_empty_list, "test_shrink_empty_list"},

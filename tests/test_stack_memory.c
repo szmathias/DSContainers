@@ -11,28 +11,27 @@
 // Test stack with failing allocator
 int test_stack_failing_allocator(void)
 {
-    DSCAlloc* failing_alloc = create_failing_allocator();
+    DSCAlloc failing_alloc = create_failing_int_allocator();
 
     // Set to fail immediately
     set_alloc_fail_countdown(0);
 
     // Stack creation should fail
-    DSCStack* stack = dsc_stack_create(failing_alloc);
+    DSCStack* stack = dsc_stack_create(&failing_alloc);
     ASSERT_NULL(stack);
 
-    destroy_allocator(failing_alloc);
     return TEST_SUCCESS;
 }
 
 // Test push with failing allocator
 int test_stack_push_memory_failure(void)
 {
-    DSCAlloc* failing_alloc = create_failing_allocator();
+    DSCAlloc failing_alloc = create_failing_int_allocator();
 
     // Allow stack creation but fail on first push
     set_alloc_fail_countdown(1);
 
-    DSCStack* stack = dsc_stack_create(failing_alloc);
+    DSCStack* stack = dsc_stack_create(&failing_alloc);
     ASSERT_NOT_NULL(stack);
 
     int* data = malloc(sizeof(int));
@@ -44,15 +43,14 @@ int test_stack_push_memory_failure(void)
 
     free(data);
     dsc_stack_destroy(stack, false);
-    destroy_allocator(failing_alloc);
     return TEST_SUCCESS;
 }
 
 // Test copy with failing allocator
 int test_stack_copy_memory_failure(void)
 {
-    DSCAlloc* std_alloc = create_std_allocator();
-    DSCStack* original = dsc_stack_create(std_alloc);
+    DSCAlloc std_alloc = create_int_allocator();
+    DSCStack* original = dsc_stack_create(&std_alloc);
 
     // Add some data
     for (int i = 0; i < 3; i++)
@@ -63,8 +61,8 @@ int test_stack_copy_memory_failure(void)
     }
 
     // Replace allocator with failing one
-    DSCAlloc* failing_alloc = create_failing_allocator();
-    original->alloc = failing_alloc;
+    DSCAlloc failing_alloc = create_failing_int_allocator();
+    original->alloc = &failing_alloc;
 
     // Set to fail on copy creation
     set_alloc_fail_countdown(0);
@@ -73,10 +71,8 @@ int test_stack_copy_memory_failure(void)
     ASSERT_NULL(copy);
 
     // Restore original allocator for cleanup
-    original->alloc = std_alloc;
+    original->alloc = &std_alloc;
     dsc_stack_destroy(original, true);
-    destroy_allocator(std_alloc);
-    destroy_allocator(failing_alloc);
     return TEST_SUCCESS;
 }
 
@@ -84,8 +80,8 @@ int test_stack_copy_memory_failure(void)
 int test_stack_deep_copy_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* failing_alloc = create_failing_allocator();
-    DSCStack* original = dsc_stack_create(failing_alloc);
+    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCStack* original = dsc_stack_create(&failing_alloc);
 
     // Add some data
     for (int i = 0; i < 3; i++)
@@ -102,15 +98,14 @@ int test_stack_deep_copy_failure(void)
     ASSERT_NULL(copy);
 
     dsc_stack_destroy(original, true);
-    destroy_allocator(failing_alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory usage with large number of elements
 int test_stack_large_memory_usage(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     const int num_elements = 10000;
 
@@ -136,15 +131,14 @@ int test_stack_large_memory_usage(void)
     ASSERT(dsc_stack_is_empty(stack));
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory leaks with clear operations
 int test_stack_clear_memory(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add elements multiple times and clear
     for (int cycle = 0; cycle < 5; cycle++)
@@ -166,7 +160,6 @@ int test_stack_clear_memory(void)
     }
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -174,8 +167,8 @@ int test_stack_clear_memory(void)
 int test_stack_iterator_memory_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc* failing_alloc = create_failing_allocator();
-    DSCStack* stack = dsc_stack_create(failing_alloc);
+    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCStack* stack = dsc_stack_create(&failing_alloc);
 
     // Add some data
     int* data = malloc(sizeof(int));
@@ -189,7 +182,6 @@ int test_stack_iterator_memory_failure(void)
     ASSERT(!it.is_valid(&it));
 
     dsc_stack_destroy(stack, true);
-    destroy_allocator(failing_alloc);
     return TEST_SUCCESS;
 }
 
@@ -213,7 +205,7 @@ int main(void)
 
     printf("Running Stack memory tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

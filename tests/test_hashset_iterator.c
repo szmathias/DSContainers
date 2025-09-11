@@ -12,8 +12,8 @@
 // Test basic iterator functionality
 int test_hashset_iterator_basic(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
     {
@@ -36,15 +36,14 @@ int test_hashset_iterator_basic(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty set
 int test_hashset_iterator_empty(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     DSCIterator it = dsc_hashset_iterator(set);
     ASSERT(it.is_valid(&it));
@@ -55,15 +54,14 @@ int test_hashset_iterator_empty(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator reset functionality
 int test_hashset_iterator_reset(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
     ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
@@ -91,15 +89,14 @@ int test_hashset_iterator_reset(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator get current element
 int test_hashset_iterator_get(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
     ASSERT_EQ(dsc_hashset_add(set, key), 0);
@@ -120,15 +117,14 @@ int test_hashset_iterator_get(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator backward operations (should not be supported)
 int test_hashset_iterator_backward(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key"), 0);
 
@@ -140,7 +136,6 @@ int test_hashset_iterator_backward(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -161,11 +156,11 @@ int test_hashset_iterator_null_set(void)
 // Test from_iterator functionality
 int test_hashset_from_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
     // Set the copy function to string_copy for proper string handling
-    alloc->copy_func = string_copy;
+    alloc.copy_func = string_copy;
 
-    DSCHashSet* original_set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* original_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* elements[] = {"one", "two", "three"};
     for (int i = 0; i < 3; i++)
@@ -175,7 +170,7 @@ int test_hashset_from_iterator(void)
 
     // Create iterator and new set from it
     DSCIterator it = dsc_hashset_iterator(original_set);
-    DSCHashSet* new_set = dsc_hashset_from_iterator(&it, alloc, dsc_hash_string, dsc_key_equals_string);
+    DSCHashSet* new_set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string);
 
     ASSERT_NOT_NULL(new_set);
     ASSERT_EQ(dsc_hashset_size(new_set), 3);
@@ -189,40 +184,38 @@ int test_hashset_from_iterator(void)
     it.destroy(&it);
     dsc_hashset_destroy(original_set, false);
     dsc_hashset_destroy(new_set, true);  // Free the copied string keys
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test from_iterator with NULL parameters
 int test_hashset_from_iterator_null_params(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCIterator it = dsc_hashset_iterator(set);
 
     // Test NULL iterator
-    ASSERT_NULL(dsc_hashset_from_iterator(NULL, alloc, dsc_hash_string, dsc_key_equals_string));
+    ASSERT_NULL(dsc_hashset_from_iterator(NULL, &alloc, dsc_hash_string, dsc_key_equals_string));
 
     // Test NULL allocator
     ASSERT_NULL(dsc_hashset_from_iterator(&it, NULL, dsc_hash_string, dsc_key_equals_string));
 
     // Test NULL hash function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, alloc, NULL, dsc_key_equals_string));
+    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, NULL, dsc_key_equals_string));
 
     // Test NULL key_equals function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, alloc, dsc_hash_string, NULL));
+    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, NULL));
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator multiple instances
 int test_hashset_iterator_multiple(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
     ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
@@ -263,7 +256,6 @@ int test_hashset_iterator_multiple(void)
     it1.destroy(&it1);
     it2.destroy(&it2);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

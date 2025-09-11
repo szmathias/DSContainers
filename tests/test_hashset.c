@@ -12,23 +12,22 @@
 // Test basic HashSet creation and destruction
 int test_hashset_create_destroy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(set);
     ASSERT_EQ(dsc_hashset_size(set), 0);
     ASSERT(dsc_hashset_is_empty(set));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test basic add and contains operations
 int test_hashset_add_contains(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "apple";
     char* key2 = "banana";
@@ -59,15 +58,14 @@ int test_hashset_add_contains(void)
     ASSERT(dsc_hashset_contains(set, key3));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test duplicate handling
 int test_hashset_duplicates(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "duplicate";
 
@@ -84,15 +82,14 @@ int test_hashset_duplicates(void)
     ASSERT(dsc_hashset_contains(set, key));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test add_check function
 int test_hashset_add_check(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
     bool was_added;
@@ -108,15 +105,14 @@ int test_hashset_add_check(void)
     ASSERT_EQ(dsc_hashset_size(set), 1);
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test remove operations
 int test_hashset_remove(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "first";
     char* key2 = "second";
@@ -146,16 +142,15 @@ int test_hashset_remove(void)
     ASSERT(dsc_hashset_is_empty(set));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test set union operation
 int test_hashset_union(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Populate sets with some overlap
     dsc_hashset_add(set1, "a");
@@ -178,16 +173,15 @@ int test_hashset_union(void)
     dsc_hashset_destroy(set1, false);
     dsc_hashset_destroy(set2, false);
     dsc_hashset_destroy(union_set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test set intersection operation
 int test_hashset_intersection(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Populate sets with some overlap
     dsc_hashset_add(set1, "a");
@@ -210,16 +204,15 @@ int test_hashset_intersection(void)
     dsc_hashset_destroy(set1, false);
     dsc_hashset_destroy(set2, false);
     dsc_hashset_destroy(intersection_set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test set difference operation
 int test_hashset_difference(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Populate sets
     dsc_hashset_add(set1, "a");
@@ -241,17 +234,16 @@ int test_hashset_difference(void)
     dsc_hashset_destroy(set1, false);
     dsc_hashset_destroy(set2, false);
     dsc_hashset_destroy(difference_set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test subset operation
 int test_hashset_is_subset(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set3 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set3 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // set1: {a, b}
     dsc_hashset_add(set1, "a");
@@ -283,15 +275,14 @@ int test_hashset_is_subset(void)
     dsc_hashset_destroy(set1, false);
     dsc_hashset_destroy(set2, false);
     dsc_hashset_destroy(set3, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator functionality
 int test_hashset_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* keys[] = {"alpha", "beta", "gamma", "delta"};
     const int num_keys = 4;
@@ -333,15 +324,14 @@ int test_hashset_iterator(void)
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test clear operation
 int test_hashset_clear(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
     dsc_hashset_add(set, "one");
@@ -360,15 +350,14 @@ int test_hashset_clear(void)
     ASSERT(dsc_hashset_contains(set, "new"));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test copy operations
 int test_hashset_copy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* original = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
     dsc_hashset_add(original, "x");
@@ -392,7 +381,6 @@ int test_hashset_copy(void)
 
     dsc_hashset_destroy(original, false);
     dsc_hashset_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

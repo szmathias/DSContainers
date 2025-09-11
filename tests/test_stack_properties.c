@@ -11,8 +11,8 @@
 // Test LIFO property extensively
 int test_stack_lifo_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     #define num_elements 100
     int* values[num_elements];
@@ -38,15 +38,14 @@ int test_stack_lifo_property(void)
     ASSERT(dsc_stack_is_empty(stack));
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test stack size consistency
 int test_stack_size_consistency(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Size should start at 0
     ASSERT_EQ(dsc_stack_size(stack), 0);
@@ -79,15 +78,14 @@ int test_stack_size_consistency(void)
     }
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test peek invariant (peek doesn't modify stack)
 int test_stack_peek_invariant(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -116,15 +114,14 @@ int test_stack_peek_invariant(void)
     }
 
     dsc_stack_destroy(stack, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test copy preserves order
 int test_stack_copy_preserves_order(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* original = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* original = dsc_stack_create(&alloc);
 
     const int values[] = {1, 3, 5, 7, 9, 11, 13};
     const int num_values = sizeof(values) / sizeof(values[0]);
@@ -175,15 +172,14 @@ int test_stack_copy_preserves_order(void)
     dsc_stack_destroy(original, false);
     dsc_stack_destroy(shallow_copy, false);
     dsc_stack_destroy(deep_copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test clear preserves stack structure
 int test_stack_clear_preserves_structure(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add elements
     for (int i = 0; i < 10; i++)
@@ -211,15 +207,14 @@ int test_stack_clear_preserves_structure(void)
     ASSERT_EQ(*(int*)dsc_stack_peek(stack), 999);
 
     dsc_stack_destroy(stack, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test for_each preserves stack contents
 int test_stack_for_each_preserves_contents(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     const int original_values[] = {5, 10, 15, 20, 25};
     const int num_values = sizeof(original_values) / sizeof(original_values[0]);
@@ -250,7 +245,6 @@ int test_stack_for_each_preserves_contents(void)
     }
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -273,7 +267,7 @@ int main(void)
 
     printf("Running Stack property tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

@@ -500,6 +500,7 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
     state->current = stack->top;
     state->start   = stack->top;
 
+    it.alloc = stack->alloc;
     it.data_state = state;
 
     return it;
