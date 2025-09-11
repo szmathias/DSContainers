@@ -3,6 +3,7 @@
 //
 
 #include "TestAssert.h"
+#include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 // Test the new dsc_hashmap_put_replace function
 int test_hashmap_put_replace(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAlloc alloc = create_string_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";

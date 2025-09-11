@@ -330,7 +330,6 @@ typedef struct
 
 int main(void)
 {
-    printf("Starting ArrayList algorithm tests...\n");
     const TestCase tests[] = {
         {test_sort, "test_sort"},
         {test_sort_empty, "test_sort_empty"},

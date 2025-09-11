@@ -6,12 +6,13 @@
 #include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Test hash map size property
 int test_hashmap_size_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAlloc alloc = create_string_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Declare arrays outside loops to avoid scope issues
@@ -75,8 +76,8 @@ int test_hashmap_uniqueness_property(void)
     dsc_hashmap_clear(map, false, false);
 
     // Test 2: Memory-safe replacement with put_replace
-    char* heap_value1 = dsc_alloc_malloc(&alloc, 20);
-    char* heap_value2 = dsc_alloc_malloc(&alloc, 20);
+    char* heap_value1 = malloc(20);
+    char* heap_value2 = malloc(20);
     strcpy(heap_value1, "heap_first");
     strcpy(heap_value2, "heap_second");
 
@@ -99,7 +100,7 @@ int test_hashmap_uniqueness_property(void)
     // Clean up remaining value
     char* final_value = (char*)dsc_hashmap_get(map, key);
     dsc_hashmap_clear(map, false, false);
-    dsc_alloc_free(&alloc, final_value);
+    free(final_value);
 
     // Test 3: Automatic cleanup with put_with_free
     // Note: This test uses string literals since we can't easily test with malloc'd values

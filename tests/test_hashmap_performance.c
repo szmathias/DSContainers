@@ -3,6 +3,7 @@
 //
 
 #include "TestAssert.h"
+#include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>

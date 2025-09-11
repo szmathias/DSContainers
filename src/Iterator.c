@@ -110,7 +110,7 @@ static void* transform_get(const DSCIterator* it)
     // This is critical to avoid leaks in nested transform chains
     if (state->base_iterator->get == transform_get || state->base_iterator->get == range_get)
     {
-        dsc_alloc_free(state->base_iterator->alloc, element);
+        dsc_alloc_free(it->alloc, element);
         element = NULL;
     }
 

@@ -125,7 +125,6 @@ int test_iterator_prev(void)
     }
 
     DSCIterator iter = dsc_arraylist_iterator(list);
-
     iter.next(&iter); // 2
     iter.next(&iter); // 3
     iter.next(&iter); // Null
