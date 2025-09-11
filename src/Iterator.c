@@ -268,7 +268,6 @@ static void transform_destroy(DSCIterator* it)
 DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transform, const DSCAlloc* alloc)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
-    new_it.alloc = alloc;
 
     new_it.get      = transform_get;
     new_it.has_next = transform_has_next;
@@ -306,6 +305,9 @@ DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transfo
     state->base_iterator = it;
     state->transform     = transform;
     state->has_owner     = (it->get != range_get && has_owner);
+
+    new_it.alloc = alloc;
+
     new_it.data_state    = state;
 
     return new_it;
@@ -548,7 +550,6 @@ static void filter_destroy(DSCIterator* it)
 DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter, const DSCAlloc* alloc)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
-    new_it.alloc = alloc;
 
     new_it.get      = filter_get;
     new_it.has_next = filter_has_next;
@@ -588,6 +589,8 @@ DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter, const
     state->next_element       = NULL;
     state->has_cached_element = 0;
     state->has_owner          = (it->get != range_get && has_owner);
+
+    new_it.alloc = alloc;
 
     new_it.data_state = state;
 
@@ -818,7 +821,6 @@ static void range_destroy(DSCIterator* it)
 DSCIterator dsc_iterator_range(const int start, const int end, const int step, const DSCAlloc* alloc)
 {
     DSCIterator it = {0}; // Initialize all fields to NULL/0
-    it.alloc = alloc;
 
     it.get      = range_get;
     it.has_next = range_has_next;
@@ -848,6 +850,7 @@ DSCIterator dsc_iterator_range(const int start, const int end, const int step, c
     state->step       = step;
     state->is_forward = 1;
 
+    it.alloc = alloc;
 
     it.data_state = state;
 
