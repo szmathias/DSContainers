@@ -4,7 +4,7 @@ name: CMake on multiple platforms
 
 permissions:
   contents: read         # Needed to clone repo and read files
-  actions: read          # Needed for workflow operations (artifact upload/download)
+  actions: read          # Needed for workflow operations
 
 on:
   push:
