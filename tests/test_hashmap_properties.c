@@ -6,6 +6,7 @@
 #include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Test hash map size property
