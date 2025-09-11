@@ -45,7 +45,7 @@ DSCHashSet* dsc_hashset_create(DSCAlloc* alloc, const hash_func hash,
         return NULL;
     }
 
-    DSCHashSet* set = alloc->alloc_func(sizeof(DSCHashSet));
+    DSCHashSet* set = dsc_alloc_malloc(alloc, sizeof(DSCHashSet));
     if (!set)
     {
         return NULL;
@@ -54,7 +54,7 @@ DSCHashSet* dsc_hashset_create(DSCAlloc* alloc, const hash_func hash,
     set->map = dsc_hashmap_create(alloc, hash, key_equals, initial_capacity);
     if (!set->map)
     {
-        alloc->dealloc_func(set);
+        dsc_alloc_free(alloc, set);
         return NULL;
     }
 
@@ -75,10 +75,7 @@ void dsc_hashset_destroy(DSCHashSet* set, const bool should_free_keys)
         // Never free values (they're just sentinels), but optionally free keys
         dsc_hashmap_destroy(set->map, should_free_keys, false);
 
-        if (alloc && alloc->dealloc_func)
-        {
-            alloc->dealloc_func(set);
-        }
+        dsc_alloc_free(alloc, set);
     }
 }
 
@@ -194,7 +191,7 @@ void* dsc_hashset_remove_get(DSCHashSet* set, const void* key)
     }
 
     // Free the keys array
-    set->map->alloc->dealloc_func(keys);
+    dsc_alloc_free(set->map->alloc, keys);
 
     if (!found_key)
     {
@@ -445,9 +442,9 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
             void* copied_key = key_copy ? key_copy(pair->key) : pair->key;
             if ((key_copy && !copied_key) || dsc_hashset_add(copy, copied_key) != 0)
             {
-                if (key_copy && copied_key && set->map->alloc->data_free_func)
+                if (key_copy && copied_key)
                 {
-                    set->map->alloc->data_free_func(copied_key);
+                    dsc_alloc_data_free(set->map->alloc, copied_key);
                 }
                 it.destroy(&it);
                 dsc_hashset_destroy(copy, key_copy != NULL);
@@ -560,10 +557,7 @@ static void hashset_iterator_destroy(DSCIterator* it)
     state->map_iterator.destroy(&state->map_iterator);
 
     // Free the state using the stored allocator
-    if (state->alloc && state->alloc->dealloc_func)
-    {
-        state->alloc->dealloc_func(state);
-    }
+    dsc_alloc_free(state->alloc, state);
 
     it->data_state = NULL;
 }
@@ -643,7 +637,7 @@ DSCIterator dsc_hashset_iterator(const DSCHashSet* set)
     it.is_valid = hashset_iterator_is_valid;
     it.destroy = hashset_iterator_destroy;
 
-    HashSetIteratorState* state = set->map->alloc->alloc_func(sizeof(HashSetIteratorState));
+    HashSetIteratorState* state = dsc_alloc_malloc(set->map->alloc, sizeof(HashSetIteratorState));
     if (!state)
     {
         return it;

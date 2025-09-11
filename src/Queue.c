@@ -15,12 +15,12 @@
  */
 static DSCQueueNode* create_node(DSCQueue* queue, void* data)
 {
-    if (!queue || !queue->alloc || !queue->alloc->alloc_func)
+    if (!queue || !queue->alloc)
     {
         return NULL;
     }
 
-    DSCQueueNode* node = queue->alloc->alloc_func(sizeof(DSCQueueNode));
+    DSCQueueNode* node = dsc_alloc_malloc(queue->alloc, sizeof(DSCQueueNode));
     if (!node)
     {
         return NULL;
@@ -41,15 +41,12 @@ static void free_node(DSCQueue* queue, DSCQueueNode* node, const bool should_fre
         return;
     }
 
-    if (should_free_data && node->data && queue->alloc && queue->alloc->data_free_func)
+    if (should_free_data && node->data)
     {
-        queue->alloc->data_free_func(node->data);
+        dsc_alloc_data_free(queue->alloc, node->data);
     }
 
-    if (queue->alloc && queue->alloc->dealloc_func)
-    {
-        queue->alloc->dealloc_func(node);
-    }
+    dsc_alloc_free(queue->alloc, node);
 }
 
 //==============================================================================
@@ -58,12 +55,12 @@ static void free_node(DSCQueue* queue, DSCQueueNode* node, const bool should_fre
 
 DSCQueue* dsc_queue_create(DSCAlloc* alloc)
 {
-    if (!alloc || !alloc->alloc_func || !alloc->dealloc_func)
+    if (!alloc)
     {
         return NULL;
     }
 
-    DSCQueue* queue = alloc->alloc_func(sizeof(DSCQueue));
+    DSCQueue* queue = dsc_alloc_malloc(alloc, sizeof(DSCQueue));
     if (!queue)
     {
         return NULL;
@@ -86,10 +83,7 @@ void dsc_queue_destroy(DSCQueue* queue, const bool should_free_data)
 
     dsc_queue_clear(queue, should_free_data);
 
-    if (queue->alloc && queue->alloc->dealloc_func)
-    {
-        queue->alloc->dealloc_func(queue);
-    }
+    dsc_alloc_free(queue->alloc, queue);
 }
 
 void dsc_queue_clear(DSCQueue* queue, const bool should_free_data)
@@ -348,9 +342,9 @@ DSCQueue* dsc_queue_copy_deep(const DSCQueue* queue, const bool should_free_data
 
         if (dsc_queue_enqueue(new_queue, copied_data) != 0)
         {
-            if (should_free_data && queue->alloc->data_free_func)
+            if (should_free_data)
             {
-                queue->alloc->data_free_func(copied_data);
+                dsc_alloc_data_free(queue->alloc, copied_data);
             }
             dsc_queue_destroy(new_queue, should_free_data);
             return NULL;
@@ -452,10 +446,7 @@ static void queue_iterator_destroy(DSCIterator* it)
     if (it->data_state)
     {
         QueueIteratorState* state = it->data_state;
-        if (state->queue && state->queue->alloc && state->queue->alloc->dealloc_func)
-        {
-            state->queue->alloc->dealloc_func(state);
-        }
+        dsc_alloc_free(state->queue->alloc, state);
     }
 }
 
@@ -473,12 +464,12 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
     it.is_valid   = queue_iterator_is_valid;
     it.destroy    = queue_iterator_destroy;
 
-    if (!queue || !queue->alloc || !queue->alloc->alloc_func)
+    if (!queue || !queue->alloc)
     {
         return it;
     }
 
-    QueueIteratorState* state = queue->alloc->alloc_func(sizeof(QueueIteratorState));
+    QueueIteratorState* state = dsc_alloc_malloc(queue->alloc, sizeof(QueueIteratorState));
     if (!state)
     {
         return it;

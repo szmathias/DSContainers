@@ -26,12 +26,12 @@
  */
 static DSCHashMapNode* create_node(DSCHashMap* map, void* key, void* value)
 {
-    if (!map || !map->alloc || !map->alloc->alloc_func)
+    if (!map || !map->alloc)
     {
         return NULL;
     }
 
-    DSCHashMapNode* node = map->alloc->alloc_func(sizeof(DSCHashMapNode));
+    DSCHashMapNode* node = dsc_alloc_malloc(map->alloc, sizeof(DSCHashMapNode));
     if (!node)
     {
         return NULL;
@@ -54,20 +54,17 @@ static void free_node(DSCHashMap* map, DSCHashMapNode* node,
         return;
     }
 
-    if (should_free_key && node->key && map->alloc && map->alloc->data_free_func)
+    if (should_free_key && node->key)
     {
-        map->alloc->data_free_func(node->key);
+        dsc_alloc_data_free(map->alloc, node->key);
     }
 
-    if (should_free_value && node->value && map->alloc && map->alloc->data_free_func)
+    if (should_free_value && node->value)
     {
-        map->alloc->data_free_func(node->value);
+        dsc_alloc_data_free(map->alloc, node->value);
     }
 
-    if (map->alloc && map->alloc->dealloc_func)
-    {
-        map->alloc->dealloc_func(node);
-    }
+    dsc_alloc_free(map->alloc, node);
 }
 
 /**
@@ -93,7 +90,7 @@ static int resize_map(DSCHashMap* map, const size_t new_bucket_count)
     }
 
     // Allocate new bucket array
-    DSCHashMapNode** new_buckets = map->alloc->alloc_func(
+    DSCHashMapNode** new_buckets = dsc_alloc_malloc(map->alloc,
         new_bucket_count * sizeof(DSCHashMapNode*));
     if (!new_buckets)
     {
@@ -132,7 +129,7 @@ static int resize_map(DSCHashMap* map, const size_t new_bucket_count)
     }
 
     // Free old bucket array
-    map->alloc->dealloc_func(old_buckets);
+    dsc_alloc_free(map->alloc, old_buckets);
     return 0;
 }
 
@@ -171,12 +168,7 @@ DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, const hash_func hash,
         return NULL;
     }
 
-    if (!alloc->alloc_func || !alloc->dealloc_func)
-    {
-        return NULL;
-    }
-
-    DSCHashMap* map = alloc->alloc_func(sizeof(DSCHashMap));
+    DSCHashMap* map = dsc_alloc_malloc(alloc, sizeof(DSCHashMap));
     if (!map)
     {
         return NULL;
@@ -184,10 +176,10 @@ DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, const hash_func hash,
 
     const size_t capacity = initial_capacity > 0 ? initial_capacity : DEFAULT_INITIAL_CAPACITY;
 
-    map->buckets = alloc->alloc_func(capacity * sizeof(DSCHashMapNode*));
+    map->buckets = dsc_alloc_malloc(alloc, capacity * sizeof(DSCHashMapNode*));
     if (!map->buckets)
     {
-        alloc->dealloc_func(map);
+        dsc_alloc_free(alloc, map);
         return NULL;
     }
 
@@ -216,15 +208,8 @@ void dsc_hashmap_destroy(DSCHashMap* map, const bool should_free_keys, const boo
 
     dsc_hashmap_clear(map, should_free_keys, should_free_values);
 
-    if (map->buckets && map->alloc && map->alloc->dealloc_func)
-    {
-        map->alloc->dealloc_func(map->buckets);
-    }
-
-    if (map->alloc && map->alloc->dealloc_func)
-    {
-        map->alloc->dealloc_func(map);
-    }
+    dsc_alloc_free(map->alloc, map->buckets);
+    dsc_alloc_free(map->alloc, map);
 }
 
 void dsc_hashmap_clear(DSCHashMap* map, const bool should_free_keys, const bool should_free_values)
@@ -258,6 +243,11 @@ size_t dsc_hashmap_size(const DSCHashMap* map)
     return map ? map->size : 0;
 }
 
+int dsc_hashmap_is_empty(const DSCHashMap* map)
+{
+    return !map || map->size == 0;
+}
+
 double dsc_hashmap_load_factor(const DSCHashMap* map)
 {
     if (!map || map->bucket_count == 0)
@@ -265,11 +255,6 @@ double dsc_hashmap_load_factor(const DSCHashMap* map)
         return 0.0;
     }
     return (double)map->size / (double)map->bucket_count;
-}
-
-int dsc_hashmap_is_empty(const DSCHashMap* map)
-{
-    return !map || map->size == 0;
 }
 
 int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key)
@@ -280,28 +265,6 @@ int dsc_hashmap_contains_key(const DSCHashMap* map, const void* key)
 //==============================================================================
 // Hash map operations
 //==============================================================================
-
-void* dsc_hashmap_get(const DSCHashMap* map, const void* key)
-{
-    if (!map || !key)
-    {
-        return NULL;
-    }
-
-    const size_t index         = get_bucket_index(map, key);
-    const DSCHashMapNode* node = map->buckets[index];
-
-    while (node)
-    {
-        if (map->key_equals(node->key, key))
-        {
-            return node->value;
-        }
-        node = node->next;
-    }
-
-    return NULL;
-}
 
 int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
 {
@@ -426,6 +389,28 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, const boo
     return check_and_resize(map);
 }
 
+void* dsc_hashmap_get(const DSCHashMap* map, const void* key)
+{
+    if (!map || !key)
+    {
+        return NULL;
+    }
+
+    const size_t index         = get_bucket_index(map, key);
+    const DSCHashMapNode* node = map->buckets[index];
+
+    while (node)
+    {
+        if (map->key_equals(node->key, key))
+        {
+            return node->value;
+        }
+        node = node->next;
+    }
+
+    return NULL;
+}
+
 int dsc_hashmap_remove(DSCHashMap* map, const void* key,
                        const bool should_free_key, const bool should_free_value)
 {
@@ -470,7 +455,7 @@ void* dsc_hashmap_remove_get(DSCHashMap* map, const void* key, const bool should
         return NULL;
     }
 
-    const size_t index = get_bucket_index(map, key);
+    const size_t index   = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
     DSCHashMapNode* prev = NULL;
 
@@ -518,7 +503,7 @@ int dsc_hashmap_get_keys(const DSCHashMap* map, void*** keys_out, size_t* count_
         return 0;
     }
 
-    void** keys = map->alloc->alloc_func(map->size * sizeof(void*));
+    void** keys = dsc_alloc_malloc(map->alloc, map->size * sizeof(void*));
     if (!keys)
     {
         return -1;
@@ -554,7 +539,7 @@ int dsc_hashmap_get_values(const DSCHashMap* map, void*** values_out, size_t* co
         return 0;
     }
 
-    void** values = map->alloc->alloc_func(map->size * sizeof(void*));
+    void** values = dsc_alloc_malloc(map->alloc, map->size * sizeof(void*));
     if (!values)
     {
         return -1;
@@ -662,13 +647,13 @@ DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
             if ((key_copy && !copied_key) || (value_copy && !copied_value))
             {
                 // Clean up any successful copies
-                if (key_copy && copied_key && map->alloc->data_free_func)
+                if (key_copy && copied_key)
                 {
-                    map->alloc->data_free_func(copied_key);
+                    dsc_alloc_data_free(map->alloc, copied_key);
                 }
-                if (value_copy && copied_value && map->alloc->data_free_func)
+                if (value_copy && copied_value)
                 {
-                    map->alloc->data_free_func(copied_value);
+                    dsc_alloc_data_free(map->alloc, copied_value);
                 }
                 dsc_hashmap_destroy(copy, key_copy != NULL, value_copy != NULL);
                 return NULL;
@@ -677,7 +662,7 @@ DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
             if (dsc_hashmap_put(copy, copied_key, copied_value) != 0)
             {
                 // Clean up on failure
-                if (key_copy && copied_key && map->alloc->data_free_func)
+                if (key_copy && copied_key)
                 {
                     map->alloc->data_free_func(copied_key);
                 }
@@ -814,9 +799,9 @@ static void hashmap_iterator_destroy(DSCIterator* it)
     }
 
     HashMapIteratorState* state = it->data_state;
-    if (state->map && state->map->alloc && state->map->alloc->dealloc_func)
+    if (state->map)
     {
-        state->map->alloc->dealloc_func(state);
+        dsc_alloc_free(state->map->alloc, state);
     }
     it->data_state = NULL;
 }
@@ -834,12 +819,12 @@ DSCIterator dsc_hashmap_iterator(const DSCHashMap* map)
     it.is_valid = hashmap_iterator_is_valid;
     it.destroy = hashmap_iterator_destroy;
 
-    if (!map || !map->alloc || !map->alloc->alloc_func)
+    if (!map || !map->alloc)
     {
         return it;
     }
 
-    HashMapIteratorState* state = map->alloc->alloc_func(sizeof(HashMapIteratorState));
+    HashMapIteratorState* state = dsc_alloc_malloc(map->alloc, sizeof(HashMapIteratorState));
     if (!state)
     {
         return it;
@@ -971,7 +956,7 @@ size_t dsc_hash_pointer(const void* key)
 {
     // Hash the pointer value itself
     const uintptr_t addr = (uintptr_t)key;
-    size_t hash = (size_t)addr;
+    size_t hash = addr;
     hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
     hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
     hash = (hash >> 16) ^ hash;
@@ -988,7 +973,7 @@ int dsc_key_equals_string(const void* key1, const void* key2)
     {
         return key1 == key2;
     }
-    return strcmp((const char*)key1, (const char*)key2) == 0;
+    return strcmp(key1, key2) == 0;
 }
 
 int dsc_key_equals_int(const void* key1, const void* key2)

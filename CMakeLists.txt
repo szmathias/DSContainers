@@ -19,6 +19,14 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 # Configure library
 add_library(DSContainers SHARED ${SOURCES})
 
+if(WIN32)
+    add_custom_command(TARGET DSContainers POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:DSContainers>
+            ${CMAKE_BINARY_DIR}/tests/
+    )
+endif()
+
 # Use target_include_directories for better encapsulation.
 # This applies include paths to a specific target.
 target_include_directories(DSContainers PUBLIC

@@ -1,6 +1,3 @@
-# Set the output directory for test executables to be the root of the build directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
 # Automatically find all test source files
 file(GLOB TEST_SOURCES "test_*.c")
 

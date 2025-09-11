@@ -22,7 +22,7 @@
  */
 static int ensure_capacity(DSCArrayList* list, const size_t min_capacity)
 {
-    if (!list || !list->alloc || !list->alloc->alloc_func)
+    if (!list)
     {
         return -1;
     }
@@ -52,7 +52,7 @@ static int ensure_capacity(DSCArrayList* list, const size_t min_capacity)
     }
 
     // Reallocate the data array
-    void** new_data = list->alloc->alloc_func(new_capacity * sizeof(void*));
+    void** new_data = dsc_alloc_malloc(list->alloc, new_capacity * sizeof(void*));
     if (!new_data)
     {
         return -1;
@@ -65,10 +65,7 @@ static int ensure_capacity(DSCArrayList* list, const size_t min_capacity)
     }
 
     // Free old data array
-    if (list->data && list->alloc->dealloc_func)
-    {
-        list->alloc->dealloc_func(list->data);
-    }
+    dsc_alloc_free(list->alloc, list->data);
 
     list->data     = new_data;
     list->capacity = new_capacity;
@@ -127,12 +124,12 @@ static void merge_sort_recursive(void** arr, void** temp, const size_t left, con
 
 DSCArrayList* dsc_arraylist_create(DSCAlloc* alloc, const size_t initial_capacity)
 {
-    if (!alloc || !alloc->alloc_func)
+    if (!alloc)
     {
         return NULL;
     }
 
-    DSCArrayList* list = alloc->alloc_func(sizeof(DSCArrayList));
+    DSCArrayList* list = dsc_alloc_malloc(alloc, sizeof(DSCArrayList));
     if (!list)
     {
         return NULL;
@@ -147,10 +144,7 @@ DSCArrayList* dsc_arraylist_create(DSCAlloc* alloc, const size_t initial_capacit
     {
         if (ensure_capacity(list, initial_capacity) != 0)
         {
-            if (alloc->dealloc_func)
-            {
-                alloc->dealloc_func(list);
-            }
+            dsc_alloc_free(alloc, list);
             return NULL;
         }
     }
@@ -167,15 +161,8 @@ void dsc_arraylist_destroy(DSCArrayList* list, const bool should_free_data)
 
     dsc_arraylist_clear(list, should_free_data);
 
-    if (list->data && list->alloc && list->alloc->dealloc_func)
-    {
-        list->alloc->dealloc_func(list->data);
-    }
-
-    if (list->alloc && list->alloc->dealloc_func)
-    {
-        list->alloc->dealloc_func(list);
-    }
+    dsc_alloc_free(list->alloc, list->data);
+    dsc_alloc_free(list->alloc, list);
 }
 
 void dsc_arraylist_clear(DSCArrayList* list, const bool should_free_data)
@@ -185,13 +172,13 @@ void dsc_arraylist_clear(DSCArrayList* list, const bool should_free_data)
         return;
     }
 
-    if (should_free_data && list->alloc && list->alloc->data_free_func)
+    if (should_free_data)
     {
         for (size_t i = 0; i < list->size; i++)
         {
             if (list->data[i])
             {
-                list->alloc->data_free_func(list->data[i]);
+                dsc_alloc_data_free(list->alloc, list->data[i]);
             }
         }
     }
@@ -280,9 +267,9 @@ int dsc_arraylist_set(DSCArrayList* list, const size_t index, void* data, const 
         return -1;
     }
 
-    if (should_free_old && list->alloc && list->alloc->data_free_func && list->data[index])
+    if (should_free_old && list->data[index])
     {
-        list->alloc->data_free_func(list->data[index]);
+        dsc_alloc_data_free(list->alloc, list->data[index]);
     }
 
     list->data[index] = data;
@@ -378,9 +365,9 @@ int dsc_arraylist_remove_at(DSCArrayList* list, const size_t index, const bool s
         return -1;
     }
 
-    if (should_free_data && list->alloc && list->alloc->data_free_func && list->data[index])
+    if (should_free_data && list->data[index])
     {
-        list->alloc->data_free_func(list->data[index]);
+        dsc_alloc_data_free(list->alloc, list->data[index]);
     }
 
     // Shift elements to the left
@@ -433,16 +420,16 @@ int dsc_arraylist_shrink_to_fit(DSCArrayList* list)
     if (list->size == 0)
     {
         // Free the data array if empty
-        if (list->data && list->alloc->dealloc_func)
+        if (list->data)
         {
-            list->alloc->dealloc_func(list->data);
+            dsc_alloc_free(list->alloc, list->data);
         }
         list->data     = NULL;
         list->capacity = 0;
         return 0;
     }
 
-    void** new_data = list->alloc->alloc_func(list->size * sizeof(void*));
+    void** new_data = dsc_alloc_malloc(list->alloc, list->size * sizeof(void*));
     if (!new_data)
     {
         return -1;
@@ -450,9 +437,9 @@ int dsc_arraylist_shrink_to_fit(DSCArrayList* list)
 
     memcpy(new_data, list->data, list->size * sizeof(void*));
 
-    if (list->data && list->alloc->dealloc_func)
+    if (list->data)
     {
-        list->alloc->dealloc_func(list->data);
+        dsc_alloc_free(list->alloc, list->data);
     }
 
     list->data     = new_data;
@@ -472,7 +459,7 @@ int dsc_arraylist_sort(DSCArrayList* list, const cmp_func compare)
     }
 
     // Allocate temporary array for merge sort
-    void** temp = list->alloc->alloc_func(list->size * sizeof(void*));
+    void** temp = dsc_alloc_malloc(list->alloc, list->size * sizeof(void*));
     if (!temp)
     {
         return -1;
@@ -480,10 +467,7 @@ int dsc_arraylist_sort(DSCArrayList* list, const cmp_func compare)
 
     merge_sort_recursive(list->data, temp, 0, list->size - 1, compare);
 
-    if (list->alloc->dealloc_func)
-    {
-        list->alloc->dealloc_func(temp);
-    }
+    dsc_alloc_free(list->alloc, temp);
 
     return 0;
 }
@@ -559,12 +543,12 @@ DSCArrayList* dsc_arraylist_filter_deep(const DSCArrayList* list, const pred_fun
     {
         if (pred(list->data[i]))
         {
-            void* filtered_data = filtered->alloc->copy_func(list->data[i]);
+            void* filtered_data = dsc_alloc_copy(filtered->alloc, list->data[i]);
             if (dsc_arraylist_push_back(filtered, filtered_data) != 0)
             {
-                if (filtered_data && filtered->alloc->data_free_func)
+                if (filtered_data)
                 {
-                    filtered->alloc->data_free_func(filtered_data);
+                    dsc_alloc_data_free(filtered->alloc, filtered_data);
                 }
                 dsc_arraylist_destroy(filtered, true);
                 return NULL;
@@ -593,9 +577,9 @@ DSCArrayList* dsc_arraylist_transform(const DSCArrayList* list, const transform_
         void* new_data = transform(list->data[i]);
         if (dsc_arraylist_push_back(transformed, new_data) != 0)
         {
-            if (new_data && should_free_data && transformed->alloc->data_free_func)
+            if (new_data && should_free_data)
             {
-                transformed->alloc->data_free_func(new_data);
+                dsc_alloc_data_free(transformed->alloc, new_data);
             }
             dsc_arraylist_destroy(transformed, should_free_data);
             return NULL;
@@ -662,10 +646,10 @@ DSCArrayList* dsc_arraylist_copy_deep(const DSCArrayList* list, const bool shoul
 
     for (size_t i = 0; i < list->size; i++)
     {
-        void* copied_data = list->alloc->copy_func(list->data[i]);
+        void* copied_data = dsc_alloc_copy(list->alloc, list->data[i]);
         if (dsc_arraylist_push_back(copy, copied_data) != 0)
         {
-            copy->alloc->data_free_func(copied_data);
+            dsc_alloc_data_free(copy->alloc, copied_data);
             dsc_arraylist_destroy(copy, should_free_data);
             return NULL;
         }
@@ -760,9 +744,9 @@ static void arraylist_iter_destroy(DSCIterator* iter)
     if (iter->data_state)
     {
         const ArrayListIterState* state = iter->data_state;
-        if (state->list && state->list->alloc && state->list->alloc->dealloc_func)
+        if (state->list)
         {
-            state->list->alloc->dealloc_func(iter->data_state);
+            dsc_alloc_free(state->list->alloc, iter->data_state);
         }
     }
 }
@@ -799,7 +783,6 @@ static void* arraylist_iter_prev(const DSCIterator* iter)
         return NULL;
     }
 
-    // Cast away const to modify state - this is safe for prev() operation
     ArrayListIterState* state = iter->data_state;
 
     if (!state->reverse)
@@ -857,7 +840,7 @@ DSCIterator dsc_arraylist_iterator(const DSCArrayList* list)
         return iter;
     }
 
-    ArrayListIterState* state = list->alloc->alloc_func(sizeof(ArrayListIterState));
+    ArrayListIterState* state = dsc_alloc_malloc(list->alloc, sizeof(ArrayListIterState));
     if (!state)
     {
         return iter;
@@ -884,12 +867,22 @@ DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list)
 {
     DSCIterator iter = {0};
 
+    iter.data_state = NULL;
+    iter.next       = arraylist_iter_next;
+    iter.get        = arraylist_iter_get;
+    iter.has_next   = arraylist_iter_has_next;
+    iter.prev       = arraylist_iter_prev;
+    iter.has_prev   = arraylist_iter_has_prev;
+    iter.reset      = arraylist_iter_reset;
+    iter.is_valid   = arraylist_iter_is_valid;
+    iter.destroy    = arraylist_iter_destroy;
+
     if (!list || !list->alloc || !list->alloc->alloc_func)
     {
         return iter;
     }
 
-    ArrayListIterState* state = list->alloc->alloc_func(sizeof(ArrayListIterState));
+    ArrayListIterState* state = dsc_alloc_malloc(list->alloc, sizeof(ArrayListIterState));
     if (!state)
     {
         return iter;
@@ -900,14 +893,6 @@ DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list)
     state->reverse       = true;
 
     iter.data_state = state;
-    iter.next       = arraylist_iter_next;
-    iter.get        = arraylist_iter_get;
-    iter.has_next   = arraylist_iter_has_next;
-    iter.prev       = arraylist_iter_prev;
-    iter.has_prev   = arraylist_iter_has_prev;
-    iter.reset      = arraylist_iter_reset;
-    iter.is_valid   = arraylist_iter_is_valid;
-    iter.destroy    = arraylist_iter_destroy;
 
     return iter;
 }

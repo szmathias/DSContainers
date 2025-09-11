@@ -14,12 +14,12 @@
  */
 static DSCStackNode* create_node(DSCStack* stack, void* data)
 {
-    if (!stack || !stack->alloc || !stack->alloc->alloc_func)
+    if (!stack || !stack->alloc)
     {
         return NULL;
     }
 
-    DSCStackNode* node = stack->alloc->alloc_func(sizeof(DSCStackNode));
+    DSCStackNode* node = dsc_alloc_malloc(stack->alloc, sizeof(DSCStackNode));
     if (!node)
     {
         return NULL;
@@ -40,14 +40,14 @@ static void free_node(DSCStack* stack, DSCStackNode* node, const bool should_fre
         return;
     }
 
-    if (should_free_data && node->data && stack->alloc && stack->alloc->data_free_func)
+    if (should_free_data && node->data && stack->alloc)
     {
-        stack->alloc->data_free_func(node->data);
+        dsc_alloc_data_free(stack->alloc, node->data);
     }
 
-    if (stack->alloc && stack->alloc->dealloc_func)
+    if (stack->alloc)
     {
-        stack->alloc->dealloc_func(node);
+        dsc_alloc_free(stack->alloc, node);
     }
 }
 
@@ -57,12 +57,12 @@ static void free_node(DSCStack* stack, DSCStackNode* node, const bool should_fre
 
 DSCStack* dsc_stack_create(DSCAlloc* alloc)
 {
-    if (!alloc || !alloc->alloc_func || !alloc->dealloc_func)
+    if (!alloc)
     {
         return NULL;
     }
 
-    DSCStack* stack = alloc->alloc_func(sizeof(DSCStack));
+    DSCStack* stack = dsc_alloc_malloc(alloc, sizeof(DSCStack));
     if (!stack)
     {
         return NULL;
@@ -84,10 +84,7 @@ void dsc_stack_destroy(DSCStack* stack, const bool should_free_data)
 
     dsc_stack_clear(stack, should_free_data);
 
-    if (stack->alloc && stack->alloc->dealloc_func)
-    {
-        stack->alloc->dealloc_func(stack);
-    }
+    dsc_alloc_free(stack->alloc, stack);
 }
 
 void dsc_stack_clear(DSCStack* stack, const bool should_free_data)
@@ -273,7 +270,7 @@ DSCStack* dsc_stack_copy(const DSCStack* stack)
     }
 
     // Build a temporary array to reverse the order
-    void** temp_array = stack->alloc->alloc_func(stack->size * sizeof(void*));
+    void** temp_array = dsc_alloc_malloc(stack->alloc, stack->size * sizeof(void*));
     if (!temp_array)
     {
         dsc_stack_destroy(new_stack, false);
@@ -294,19 +291,19 @@ DSCStack* dsc_stack_copy(const DSCStack* stack)
     {
         if (dsc_stack_push(new_stack, temp_array[i - 1]) != 0)
         {
-            stack->alloc->dealloc_func(temp_array);
+            dsc_alloc_free(stack->alloc, temp_array);
             dsc_stack_destroy(new_stack, false);
             return NULL;
         }
     }
 
-    stack->alloc->dealloc_func(temp_array);
+    dsc_alloc_free(stack->alloc, temp_array);
     return new_stack;
 }
 
 DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data)
 {
-    if (!stack || !stack->alloc || !stack->alloc->copy_func)
+    if (!stack || !stack->alloc)
     {
         return NULL;
     }
@@ -323,7 +320,7 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data
     }
 
     // Build a temporary array to reverse the order
-    void** temp_array = stack->alloc->alloc_func(stack->size * sizeof(void*));
+    void** temp_array = dsc_alloc_malloc(stack->alloc, stack->size * sizeof(void*));
     if (!temp_array)
     {
         dsc_stack_destroy(new_stack, false);
@@ -335,18 +332,18 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data
     size_t index                = 0;
     while (current && index < stack->size)
     {
-        void* copied_data = stack->alloc->copy_func(current->data);
+        void* copied_data = dsc_alloc_copy(stack->alloc, current->data);
         if (!copied_data)
         {
             // Clean up any copied data on failure
-            if (should_free_data && stack->alloc->data_free_func)
+            if (should_free_data)
             {
                 for (size_t j = 0; j < index; j++)
                 {
-                    stack->alloc->data_free_func(temp_array[j]);
+                    dsc_alloc_data_free(stack->alloc, temp_array[j]);
                 }
             }
-            stack->alloc->dealloc_func(temp_array);
+            dsc_alloc_free(stack->alloc, temp_array);
             dsc_stack_destroy(new_stack, false);
             return NULL;
         }
@@ -360,20 +357,20 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data
         if (dsc_stack_push(new_stack, temp_array[i - 1]) != 0)
         {
             // Clean up on failure
-            if (should_free_data && stack->alloc->data_free_func)
+            if (should_free_data)
             {
                 for (size_t j = 0; j < index; j++)
                 {
-                    stack->alloc->data_free_func(temp_array[j]);
+                    dsc_alloc_data_free(stack->alloc, temp_array[j]);
                 }
             }
-            stack->alloc->dealloc_func(temp_array);
+            dsc_alloc_free(stack->alloc, temp_array);
             dsc_stack_destroy(new_stack, false);
             return NULL;
         }
     }
 
-    stack->alloc->dealloc_func(temp_array);
+    dsc_alloc_free(stack->alloc, temp_array);
     return new_stack;
 }
 
@@ -468,9 +465,9 @@ static void stack_iterator_destroy(DSCIterator* it)
     if (it->data_state)
     {
         StackIteratorState* state = it->data_state;
-        if (state->stack && state->stack->alloc && state->stack->alloc->dealloc_func)
+        if (state->stack && state->stack->alloc)
         {
-            state->stack->alloc->dealloc_func(state);
+            dsc_alloc_free(state->stack->alloc, state);
         }
     }
 }
@@ -479,7 +476,6 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
 {
     DSCIterator it = {0};
 
-    it.data_state = NULL;
     it.get        = stack_iterator_get;
     it.has_next   = stack_iterator_has_next;
     it.next       = stack_iterator_next;
@@ -489,12 +485,12 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
     it.is_valid   = stack_iterator_is_valid;
     it.destroy    = stack_iterator_destroy;
 
-    if (!stack || !stack->alloc || !stack->alloc->alloc_func)
+    if (!stack || !stack->alloc)
     {
         return it;
     }
 
-    StackIteratorState* state = stack->alloc->alloc_func(sizeof(StackIteratorState));
+    StackIteratorState* state = dsc_alloc_malloc(stack->alloc, sizeof(StackIteratorState));
     if (!state)
     {
         return it;

@@ -289,7 +289,7 @@ static void dsc_dll_iterator_destroy(DSCIterator* it)
     const ListIteratorState* state = it->data_state;
     if (state && state->list)
     {
-        state->list->alloc->dealloc_func(it->data_state);
+        dsc_alloc_free(state->list->alloc, it->data_state);
     }
     it->data_state = NULL;
 }
@@ -324,22 +324,7 @@ DSCDoublyLinkedList* dsc_dll_create(DSCAlloc* alloc)
         return NULL;
     }
 
-    if (!alloc->alloc_func)
-    {
-        alloc->alloc_func = malloc;
-    }
-
-    if (!alloc->dealloc_func)
-    {
-        alloc->dealloc_func = free;
-    }
-
-    if (!alloc->data_free_func)
-    {
-        alloc->data_free_func = free;
-    }
-
-    DSCDoublyLinkedList* list = alloc->alloc_func(sizeof(DSCDoublyLinkedList));
+    DSCDoublyLinkedList* list = dsc_alloc_malloc(alloc, sizeof(DSCDoublyLinkedList));
     if (!list)
     {
         return NULL;
@@ -358,7 +343,7 @@ void dsc_dll_destroy(DSCDoublyLinkedList* list, const bool should_free_data)
     if (list)
     {
         dsc_dll_clear(list, should_free_data);
-        list->alloc->dealloc_func(list);
+        dsc_alloc_free(list->alloc, list);
     }
 }
 
@@ -375,10 +360,10 @@ void dsc_dll_clear(DSCDoublyLinkedList* list, const bool should_free_data)
         DSCDoublyLinkedNode* next = node->next;
         if (should_free_data && node->data)
         {
-            list->alloc->data_free_func(node->data);
+            dsc_alloc_data_free(list->alloc, node->data);
         }
 
-        list->alloc->dealloc_func(node);
+        dsc_alloc_free(list->alloc, node);
         node = next;
     }
 
@@ -475,7 +460,7 @@ int dsc_dll_insert_front(DSCDoublyLinkedList* list, void* data)
         return -1;
     }
 
-    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = dsc_alloc_malloc(list->alloc, sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -508,7 +493,7 @@ int dsc_dll_insert_back(DSCDoublyLinkedList* list, void* data)
         return -1;
     }
 
-    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = dsc_alloc_malloc(list->alloc, sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -551,7 +536,7 @@ int dsc_dll_insert_at(DSCDoublyLinkedList* list, const size_t pos, void* data)
         return dsc_dll_insert_back(list, data);
     }
 
-    DSCDoublyLinkedNode* node = list->alloc->alloc_func(sizeof(DSCDoublyLinkedNode));
+    DSCDoublyLinkedNode* node = dsc_alloc_malloc(list->alloc, sizeof(DSCDoublyLinkedNode));
     if (!node)
     {
         return -1;
@@ -633,9 +618,9 @@ int dsc_dll_remove(DSCDoublyLinkedList* list, const void* data, const cmp_func c
 
             if (should_free_data && curr->data)
             {
-                list->alloc->data_free_func(curr->data);
+                dsc_alloc_data_free(list->alloc, curr->data);
             }
-            list->alloc->dealloc_func(curr);
+            dsc_alloc_free(list->alloc, curr);
             list->size--;
 
             return 0;
@@ -703,9 +688,9 @@ int dsc_dll_remove_at(DSCDoublyLinkedList* list, const size_t pos, const bool sh
 
     if (should_free_data && node_to_remove->data)
     {
-        list->alloc->data_free_func(node_to_remove->data);
+        dsc_alloc_data_free(list->alloc, node_to_remove->data);
     }
-    list->alloc->dealloc_func(node_to_remove);
+    dsc_alloc_free(list->alloc, node_to_remove);
     list->size--;
 
     return 0;
@@ -733,10 +718,10 @@ int dsc_dll_remove_front(DSCDoublyLinkedList* list, const bool should_free_data)
 
     if (should_free_data && node_to_remove->data)
     {
-        list->alloc->data_free_func(node_to_remove->data);
+        dsc_alloc_data_free(list->alloc, node_to_remove->data);
     }
 
-    list->alloc->dealloc_func(node_to_remove);
+    dsc_alloc_free(list->alloc, node_to_remove);
     list->size--;
 
     return 0;
@@ -764,11 +749,11 @@ int dsc_dll_remove_back(DSCDoublyLinkedList* list, const bool should_free_data)
 
     if (should_free_data && node_to_remove->data)
     {
-        list->alloc->data_free_func(node_to_remove->data);
+        dsc_alloc_data_free(list->alloc, node_to_remove->data);
     }
 
     // Free the node memory using the allocator's dealloc function
-    list->alloc->dealloc_func(node_to_remove);
+    dsc_alloc_free(list->alloc, node_to_remove);
     list->size--;
     return 0;
 }
@@ -1006,13 +991,13 @@ DSCDoublyLinkedList* dsc_dll_filter_deep(const DSCDoublyLinkedList* list, const 
     {
         if (pred(curr->data))
         {
-            void* filtered_data = filtered->alloc->copy_func(curr->data);
+            void* filtered_data = dsc_alloc_copy(filtered->alloc, curr->data);
 
             if (dsc_dll_insert_back(filtered, filtered_data) != 0)
             {
-                if (filtered_data && filtered->alloc->data_free_func)
+                if (filtered_data)
                 {
-                    filtered->alloc->data_free_func(filtered_data);
+                    dsc_alloc_data_free(filtered->alloc, filtered_data);
                 }
                 dsc_dll_destroy(filtered, true);
                 return NULL;
@@ -1045,7 +1030,7 @@ DSCDoublyLinkedList* dsc_dll_transform(const DSCDoublyLinkedList* list, const tr
         {
             if (should_free_data && new_data)
             {
-                transformed->alloc->data_free_func(new_data); // Free the transformed data if insertion fails
+                dsc_alloc_data_free(transformed->alloc, new_data); // Free the transformed data if insertion fails
             }
             // Free any data already successfully inserted into the new list
             dsc_dll_destroy(transformed, should_free_data);
@@ -1133,7 +1118,7 @@ DSCDoublyLinkedList* dsc_dll_copy_deep(const DSCDoublyLinkedList* list, const bo
     const DSCDoublyLinkedNode* curr = list->head;
     while (curr)
     {
-        void* data_copy = copy->alloc->copy_func(curr->data);
+        void* data_copy = dsc_alloc_copy(copy->alloc, curr->data);
         if (!data_copy)
         {
             // On failure, destroy the partially built clone, freeing any data it contains
@@ -1145,7 +1130,7 @@ DSCDoublyLinkedList* dsc_dll_copy_deep(const DSCDoublyLinkedList* list, const bo
             // If insertion fails, free the orphaned copy and destroy the partial clone
             if (should_free_data)
             {
-                list->alloc->data_free_func(data_copy);
+                dsc_alloc_data_free(list->alloc, data_copy);
             }
             dsc_dll_destroy(copy, should_free_data);
             return NULL;
@@ -1187,7 +1172,7 @@ DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
         void* data_to_insert = data;
         if (alloc->copy_func)
         {
-            data_to_insert = alloc->copy_func(data);
+            data_to_insert = dsc_alloc_copy(alloc, data);
             if (!data_to_insert)
             {
                 dsc_dll_destroy(list, true);
@@ -1197,9 +1182,9 @@ DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
 
         if (dsc_dll_insert_back(list, data_to_insert) != 0)
         {
-            if (alloc->copy_func && alloc->data_free_func)
+            if (alloc->copy_func)
             {
-                alloc->data_free_func(data_to_insert); // Free the copy we just made
+                dsc_alloc_data_free(alloc, data_to_insert); // Free the copy we just made
             }
             dsc_dll_destroy(list, alloc->copy_func != NULL);
             return NULL;
@@ -1231,7 +1216,7 @@ DSCIterator dsc_dll_iterator(const DSCDoublyLinkedList* list)
         return it;
     }
 
-    ListIteratorState* state = list->alloc->alloc_func(sizeof(ListIteratorState));
+    ListIteratorState* state = dsc_alloc_malloc(list->alloc, sizeof(ListIteratorState));
     if (!state)
     {
         return it;
@@ -1264,7 +1249,7 @@ DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList* list)
         return it;
     }
 
-    ListIteratorState* state = list->alloc->alloc_func(sizeof(ListIteratorState));
+    ListIteratorState* state = dsc_alloc_malloc(list->alloc, sizeof(ListIteratorState));
     if (!state)
     {
         return it;
