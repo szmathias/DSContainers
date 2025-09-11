@@ -237,7 +237,7 @@ int test_hashmap_from_iterator(void)
 
     it.destroy(&it);
     dsc_hashmap_destroy(original, false, false);
-    dsc_hashmap_destroy(new_map, false, false);
+    dsc_hashmap_destroy(new_map, true, true);
     return TEST_SUCCESS;
 }
 

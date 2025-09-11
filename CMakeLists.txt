@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(DSContainers C)
+project(DSContainers
+        LANGUAGES C
+        VERSION 0.6.3)
 
 # Set default build type to Debug if not specified
 if(NOT CMAKE_BUILD_TYPE)
@@ -52,12 +54,12 @@ elseif(UNIX AND NOT APPLE)
 endif()
 
 # Sanitizers option
-option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" OFF)
+option(ENABLE_SANITIZERS "Enable Address/Undefined sanitizers in Debug builds" ON)
 if(ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE MATCHES "Debug" AND (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang"))
     message(STATUS "Configuring sanitizers for Debug build")
-    target_compile_options(DSContainers PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer)
-    target_link_libraries(DSContainers PRIVATE -fsanitize=address,undefined)
-    target_compile_definitions(DSContainers PRIVATE DSC_SANITIZERS_ENABLED)
+    target_compile_options(DSContainers PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+    target_link_libraries(DSContainers PUBLIC -fsanitize=address,undefined)
+    target_compile_definitions(DSContainers PUBLIC DSC_SANITIZERS_ENABLED)
 endif()
 
 enable_testing()

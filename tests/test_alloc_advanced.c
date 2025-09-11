@@ -168,7 +168,7 @@ int test_pool_allocator_integration(void) {
     pool_reset();
 
     // Use separate allocators: default for ArrayList structure, pool for data
-    DSCAllocator pool_data_alloc = dsc_alloc_custom(pool_alloc, pool_free, NULL, int_copy);
+    const DSCAllocator pool_data_alloc = dsc_alloc_custom(pool_alloc, pool_free, NULL, int_copy);
     DSCAllocator default_alloc = dsc_alloc_default();
 
     // Test with ArrayList using default allocator for structure
@@ -302,7 +302,7 @@ int test_allocator_with_linked_list(void) {
     debug_reset();
 
     // Use debug allocator only for data, regular allocator for structure
-    DSCAllocator data_alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
+    const DSCAllocator data_alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
     DSCAllocator regular_alloc = dsc_alloc_default();
 
     // Create linked list with regular allocator for structure
@@ -320,12 +320,13 @@ int test_allocator_with_linked_list(void) {
     ASSERT_EQ(dsc_sll_size(list), 5);
 
     // Verify elements using iterator
-    const DSCIterator iter = dsc_sll_iterator(list);
+    DSCIterator iter = dsc_sll_iterator(list);
     int expected = 1;
     while (iter.has_next(&iter)) {
         const int* value = iter.next(&iter);
         ASSERT_EQ(*value, expected++);
     }
+    iter.destroy(&iter);
 
     // Test find functionality
     const int search_value = 3;
@@ -334,11 +335,12 @@ int test_allocator_with_linked_list(void) {
     ASSERT_EQ(*(int*)found_node->data, 3);
 
     // Clean up manually: iterate through list and free each data element
-    const DSCIterator cleanup_iter = dsc_sll_iterator(list);
+    DSCIterator cleanup_iter = dsc_sll_iterator(list);
     while (cleanup_iter.has_next(&cleanup_iter)) {
         int* value = cleanup_iter.next(&cleanup_iter);
         dsc_alloc_free(&data_alloc, value);
     }
+    cleanup_iter.destroy(&cleanup_iter);
 
     // Destroy list structure without auto-freeing data since we freed it manually
     dsc_sll_destroy(list, false);
