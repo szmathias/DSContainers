@@ -356,7 +356,7 @@ int test_allocator_stress_test(void) {
     const DSCAllocator alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, string_copy);
 
     const int num_operations = 100;
-    void* ptrs[num_operations];
+    void* ptrs[100]; // Fixed size array instead of VLA
     int active_ptrs = 0;
 
     // Perform mixed allocation/deallocation operations

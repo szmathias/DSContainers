@@ -244,7 +244,7 @@ int test_copy_null(void)
     // Should require a valid copy function
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    ASSERT_NULL(dsc_sll_copy_deep(list, NULL, NULL));
+    ASSERT_NULL(dsc_sll_copy_deep(list, NULL, false));
     dsc_sll_destroy(list, false);
     return TEST_SUCCESS;
 }

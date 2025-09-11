@@ -88,7 +88,7 @@ int test_NULL_handling(void)
     ASSERT_EQ(dsc_sll_insert_back(NULL, NULL), -1);
     ASSERT_EQ(dsc_sll_insert_front(NULL, NULL), -1);
     ASSERT_EQ_PTR(dsc_sll_find(NULL, NULL, NULL), NULL);
-    ASSERT_EQ(dsc_sll_remove(NULL, NULL, NULL, NULL), -1);
+    ASSERT_EQ(dsc_sll_remove(NULL, NULL, NULL, false), -1);
     dsc_sll_destroy(NULL, false); // Should not crash
     return TEST_SUCCESS;
 }

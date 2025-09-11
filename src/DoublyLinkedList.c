@@ -1086,7 +1086,7 @@ DSCDoublyLinkedList* dsc_dll_copy(const DSCDoublyLinkedList* list)
     {
         if (dsc_dll_insert_back(copy, curr->data) != 0)
         {
-            dsc_dll_destroy(copy, NULL); // Don't free data - they're shared
+            dsc_dll_destroy(copy, false); // Don't free data - they're shared
             return NULL;
         }
         curr = curr->next;

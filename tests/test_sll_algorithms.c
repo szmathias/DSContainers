@@ -661,7 +661,7 @@ int test_transform(void)
 
     // Test null cases
     ASSERT_NULL(dsc_sll_transform(NULL, double_value, true));
-    ASSERT_NULL(dsc_sll_transform(list, NULL, NULL));
+    ASSERT_NULL(dsc_sll_transform(list, NULL, false));
 
     dsc_sll_destroy(list, true);
     dsc_sll_destroy(mapped, true);
