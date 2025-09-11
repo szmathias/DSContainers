@@ -6,14 +6,13 @@
 #include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 // Test hash map size property
 int test_hashmap_size_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Declare arrays outside loops to avoid scope issues
     char keys[10][10], values[10][10];
@@ -46,15 +45,14 @@ int test_hashmap_size_property(void)
     ASSERT(dsc_hashmap_is_empty(map));
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map uniqueness property
 int test_hashmap_uniqueness_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "duplicate_key";
     char* value1 = "first_value";
@@ -77,8 +75,8 @@ int test_hashmap_uniqueness_property(void)
     dsc_hashmap_clear(map, false, false);
 
     // Test 2: Memory-safe replacement with put_replace
-    char* heap_value1 = malloc(20);
-    char* heap_value2 = malloc(20);
+    char* heap_value1 = dsc_alloc_malloc(&alloc, 20);
+    char* heap_value2 = dsc_alloc_malloc(&alloc, 20);
     strcpy(heap_value1, "heap_first");
     strcpy(heap_value2, "heap_second");
 
@@ -96,12 +94,12 @@ int test_hashmap_uniqueness_property(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "heap_second");
 
     // Clean up the old value (no memory leak!)
-    free(old_value);
+    dsc_alloc_free(&alloc, old_value);
 
     // Clean up remaining value
     char* final_value = (char*)dsc_hashmap_get(map, key);
     dsc_hashmap_clear(map, false, false);
-    free(final_value);
+    dsc_alloc_free(&alloc, final_value);
 
     // Test 3: Automatic cleanup with put_with_free
     // Note: This test uses string literals since we can't easily test with malloc'd values
@@ -115,15 +113,14 @@ int test_hashmap_uniqueness_property(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "auto_second");
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map load factor property
 int test_hashmap_load_factor_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 8);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 8);
 
     // Declare arrays outside loop to avoid scope issues
     char keys[4][10], values[4][10];
@@ -149,15 +146,14 @@ int test_hashmap_load_factor_property(void)
     ASSERT(lf >= 0.49 && lf <= 0.51);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map automatic resizing property
 int test_hashmap_resize_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 4);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);
 
     // Declare arrays outside loops to avoid scope issues
     char keys[4][10], values[4][10];
@@ -196,15 +192,14 @@ int test_hashmap_resize_property(void)
     ASSERT_NOT_NULL(dsc_hashmap_get(map, "trigger"));
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map key equality property
 int test_hashmap_key_equality_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // String literals might have different addresses but same content
     char* key1 = "test_key";
@@ -225,15 +220,14 @@ int test_hashmap_key_equality_property(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key2), value2);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map contains property
 int test_hashmap_contains_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* keys[] = {"apple", "banana", "cherry"};
     char* values[] = {"red", "yellow", "red"};
@@ -281,15 +275,14 @@ int test_hashmap_contains_property(void)
     }
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map iterator completeness property
 int test_hashmap_iterator_completeness(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 20;
     char keys[20][10];
@@ -344,28 +337,27 @@ int test_hashmap_iterator_completeness(void)
 
     it.destroy(&it);
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map with different hash functions
 int test_hashmap_hash_function_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = dsc_alloc_default();
 
     // Test with string hash
-    DSCHashMap* str_map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashMap* str_map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_EQ(dsc_hashmap_put(str_map, "test", "value"), 0);
     ASSERT_EQ_STR((char*)dsc_hashmap_get(str_map, "test"), "value");
 
     // Test with integer hash
-    DSCHashMap* int_map = dsc_hashmap_create(alloc, dsc_hash_int, dsc_key_equals_int, 0);
+    DSCHashMap* int_map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
     int key = 42;
     ASSERT_EQ(dsc_hashmap_put(int_map, &key, "forty-two"), 0);
     ASSERT_EQ_STR((char*)dsc_hashmap_get(int_map, &key), "forty-two");
 
     // Test with pointer hash
-    DSCHashMap* ptr_map = dsc_hashmap_create(alloc, dsc_hash_pointer, dsc_key_equals_pointer, 0);
+    DSCHashMap* ptr_map = dsc_hashmap_create(&alloc, dsc_hash_pointer, dsc_key_equals_pointer, 0);
     void* ptr_key = (void*)0x12345678;
     ASSERT_EQ(dsc_hashmap_put(ptr_map, ptr_key, "pointer_value"), 0);
     ASSERT_EQ_STR((char*)dsc_hashmap_get(ptr_map, ptr_key), "pointer_value");
@@ -373,7 +365,6 @@ int test_hashmap_hash_function_property(void)
     dsc_hashmap_destroy(str_map, false, false);
     dsc_hashmap_destroy(int_map, false, false);
     dsc_hashmap_destroy(ptr_map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

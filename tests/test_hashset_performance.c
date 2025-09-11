@@ -17,15 +17,15 @@
 // Test performance of add operations
 int test_hashset_add_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const clock_t start = clock();
 
     // Add a large number of elements
     for (int i = 0; i < LARGE_SET_SIZE; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, key), 0);
     }
@@ -37,21 +37,20 @@ int test_hashset_add_performance(void)
     ASSERT_EQ(dsc_hashset_size(set), LARGE_SET_SIZE);
 
     dsc_hashset_destroy(set, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test performance of contains operations
 int test_hashset_contains_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
-    char** keys = alloc->alloc_func(MEDIUM_SET_SIZE * sizeof(char*));
+    char** keys = malloc(MEDIUM_SET_SIZE * sizeof(char*));
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
-        keys[i] = alloc->alloc_func(32);
+        keys[i] = malloc(32);
         sprintf(keys[i], "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, keys[i]), 0);
     }
@@ -78,22 +77,21 @@ int test_hashset_contains_performance(void)
     ASSERT_EQ(found_count, MEDIUM_SET_SIZE * 10);
 
     dsc_hashset_destroy(set, true);
-    alloc->dealloc_func(keys);
-    destroy_allocator(alloc);
+    free(keys);
     return TEST_SUCCESS;
 }
 
 // Test performance of remove operations
 int test_hashset_remove_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
-    char** keys = alloc->alloc_func(MEDIUM_SET_SIZE * sizeof(char*));
+    char** keys = malloc(MEDIUM_SET_SIZE * sizeof(char*));
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
-        keys[i] = alloc->alloc_func(32);
+        keys[i] = malloc(32);
         sprintf(keys[i], "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, keys[i]), 0);
     }
@@ -112,25 +110,24 @@ int test_hashset_remove_performance(void)
     printf("Removed %d elements in %f seconds\n", MEDIUM_SET_SIZE, time_taken);
     ASSERT_EQ(dsc_hashset_size(set), 0);
 
-    alloc->dealloc_func(keys);
+    free(keys);
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test performance of set operations
 int test_hashset_set_operations_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements to both sets with some overlap
     for (int i = 0; i < SMALL_SET_SIZE; i++)
     {
-        char* key1 = alloc->alloc_func(32);
-        char* key2 = alloc->alloc_func(32);
+        char* key1 = malloc(32);
+        char* key2 = malloc(32);
         sprintf(key1, "set1_key_%d", i);
         sprintf(key2, "set2_key_%d", i);
 
@@ -140,8 +137,8 @@ int test_hashset_set_operations_performance(void)
         // Add some overlapping elements
         if (i % 3 == 0)
         {
-            char* common_key1 = alloc->alloc_func(32);
-            char* common_key2 = alloc->alloc_func(32);
+            char* common_key1 = malloc(32);
+            char* common_key2 = malloc(32);
             sprintf(common_key1, "common_key_%d", i);
             sprintf(common_key2, "common_key_%d", i);
             ASSERT_EQ(dsc_hashset_add(set1, common_key1), 0);
@@ -170,20 +167,19 @@ int test_hashset_set_operations_performance(void)
     dsc_hashset_destroy(union_set, false);
     dsc_hashset_destroy(intersection_set, false);
     dsc_hashset_destroy(difference_set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test performance of iterator operations
 int test_hashset_iterator_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, key), 0);
     }
@@ -211,20 +207,19 @@ int test_hashset_iterator_performance(void)
     printf("Performed 10 full iterations in %f seconds\n", time_taken);
 
     dsc_hashset_destroy(set, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test performance of copy operations
 int test_hashset_copy_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashSet* original = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(original, key), 0);
     }
@@ -255,22 +250,21 @@ int test_hashset_copy_performance(void)
     dsc_hashset_destroy(original, true);
     dsc_hashset_destroy(shallow_copy, false);
     dsc_hashset_destroy(deep_copy, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test load factor impact on performance
 int test_hashset_load_factor_performance(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
     // Test with small initial capacity (high load factor)
-    DSCHashSet* high_load_set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 4);
+    DSCHashSet* high_load_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);
 
     clock_t start = clock();
     for (int i = 0; i < SMALL_SET_SIZE; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "high_load_key_%d", i);
         ASSERT_EQ(dsc_hashset_add(high_load_set, key), 0);
     }
@@ -278,12 +272,12 @@ int test_hashset_load_factor_performance(void)
     const double high_load_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     // Test with large initial capacity (low load factor)
-    DSCHashSet* low_load_set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 1024);
+    DSCHashSet* low_load_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 1024);
 
     start = clock();
     for (int i = 0; i < SMALL_SET_SIZE; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "low_load_key_%d", i);
         ASSERT_EQ(dsc_hashset_add(low_load_set, key), 0);
     }
@@ -299,7 +293,6 @@ int test_hashset_load_factor_performance(void)
 
     dsc_hashset_destroy(high_load_set, true);
     dsc_hashset_destroy(low_load_set, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

@@ -20,10 +20,24 @@ int int_cmp_desc(const void* a, const void* b)
     return (*(int*)b) - (*(int*)a);
 }
 
+// Person comparison function
+int person_cmp(const void* a, const void* b)
+{
+    const Person* p1 = a;
+    const Person* p2 = b;
+    return strcmp(p1->name, p2->name);
+}
+
 // Integer free function
 void int_free(void* a)
 {
     free(a);
+}
+
+// Person free function
+void person_free(void* p)
+{
+    free(p);
 }
 
 // Custom allocator for testing
@@ -35,33 +49,6 @@ void* test_calloc(const size_t size)
 void test_dealloc(void* ptr)
 {
     free(ptr);
-}
-
-// Person comparison function
-int person_cmp(const void* a, const void* b)
-{
-    const Person* p1 = a;
-    const Person* p2 = b;
-    return strcmp(p1->name, p2->name);
-}
-
-// Person free function
-void person_free(void* p)
-{
-    free(p);
-}
-
-// Helper to create a person
-Person* create_person(const char* name, const int age)
-{
-    Person* p = malloc(sizeof(Person));
-    if (p)
-    {
-        strncpy(p->name, name, 49);
-        p->name[49] = '\0';
-        p->age      = age;
-    }
-    return p;
 }
 
 // Clone an integer
@@ -79,13 +66,13 @@ void* int_copy(const void* data)
 // Clone a string
 void* string_copy(const void* data)
 {
-    const char* original = (const char*)data;
+    const char* original = data;
     if (!original)
     {
         return NULL;
     }
 
-    size_t len = strlen(original) + 1;
+    const size_t len = strlen(original) + 1;
     char* copy = malloc(len);
     if (copy)
     {
@@ -102,27 +89,23 @@ void* person_copy(const void* data)
     return copy;
 }
 
+// Helper to create a person
+Person* create_person(const char* name, const int age)
+{
+    Person* p = malloc(sizeof(Person));
+    if (p)
+    {
+        strncpy(p->name, name, 49);
+        p->name[49] = '\0';
+        p->age      = age;
+    }
+    return p;
+}
+
 // Predicate function that returns non-zero for even numbers
 int is_even(const void* data)
 {
     return (*(int*)data % 2 == 0) ? 1 : 0;
-}
-
-// Transform function that doubles a number
-void* double_value(const void* data)
-{
-    int* result = malloc(sizeof(int));
-    if (result)
-    {
-        *result = *(int*)data * 2;
-    }
-    return result;
-}
-
-// Action function that increments a number
-void increment(void* data)
-{
-    (*(int*)data)++;
 }
 
 // Predicate: is odd
@@ -158,6 +141,17 @@ int is_divisible_by_six(const void* data)
 {
     const int* value = data;
     return (*value % 6 == 0);
+}
+
+// Transform function that doubles a number
+void* double_value(const void* data)
+{
+    int* result = malloc(sizeof(int));
+    if (result)
+    {
+        *result = *(int*)data * 2;
+    }
+    return result;
 }
 
 // Transform: square a number
@@ -206,6 +200,12 @@ void* multiply_by_three(const void* data)
     int* result         = malloc(sizeof(int));
     *result             = (*original) * 3;
     return result;
+}
+
+// Action function that increments a number
+void increment(void* data)
+{
+    (*(int*)data)++;
 }
 
 // State for the failing allocator
@@ -260,37 +260,22 @@ void set_alloc_fail_countdown(const int count)
     alloc_fail_countdown = count;
 }
 
-// Allocator helper functions
-DSCAlloc* create_std_allocator(void)
+DSCAlloc create_failing_int_allocator(void)
 {
-    DSCAlloc* alloc = malloc(sizeof(DSCAlloc));
-    if (alloc)
-    {
-        alloc->alloc_func     = malloc;
-        alloc->dealloc_func   = free;
-        alloc->data_free_func = free;
-        alloc->copy_func      = int_copy;
-    }
-    return alloc;
+    return dsc_alloc_custom(failing_alloc, failing_free, failing_free, failing_int_copy);
 }
 
-DSCAlloc* create_failing_allocator(void)
+DSCAlloc create_int_allocator(void)
 {
-    DSCAlloc* alloc = malloc(sizeof(DSCAlloc));
-    if (alloc)
-    {
-        alloc->alloc_func     = failing_alloc;
-        alloc->dealloc_func   = failing_free;
-        alloc->data_free_func = failing_free;
-        alloc->copy_func      = failing_int_copy;
-    }
-    return alloc;
+    return dsc_alloc_custom(test_calloc, test_dealloc, int_free, int_copy);
 }
 
-void destroy_allocator(DSCAlloc* alloc)
+DSCAlloc create_person_allocator(void)
 {
-    if (alloc)
-    {
-        free(alloc);
-    }
+    return dsc_alloc_custom(test_calloc, person_free, test_dealloc, person_copy);
+}
+
+DSCAlloc create_string_allocator(void)
+{
+    return dsc_alloc_custom(test_calloc, test_dealloc, free, string_copy);
 }

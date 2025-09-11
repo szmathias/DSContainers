@@ -11,8 +11,8 @@
 
 int test_forward_iterator(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -40,14 +40,13 @@ int test_forward_iterator(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_reverse_iterator(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -75,14 +74,13 @@ int test_reverse_iterator(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_get(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
@@ -110,14 +108,13 @@ int test_iterator_get(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_prev(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
@@ -128,7 +125,6 @@ int test_iterator_prev(void)
     }
 
     DSCIterator iter = dsc_arraylist_iterator(list);
-
 
     iter.next(&iter); // 2
     iter.next(&iter); // 3
@@ -151,14 +147,13 @@ int test_iterator_prev(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_reset(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
@@ -182,14 +177,13 @@ int test_iterator_reset(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_empty_list(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     DSCIterator iter = dsc_arraylist_iterator(list);
     ASSERT(iter.is_valid(&iter));
@@ -200,14 +194,13 @@ int test_iterator_empty_list(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_iterator_single_element(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* val = malloc(sizeof(int));
     *val     = 42;
@@ -226,14 +219,13 @@ int test_iterator_single_element(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_from_iterator(void)
 {
-    DSCAlloc* alloc        = create_std_allocator();
-    DSCArrayList* original = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -245,7 +237,7 @@ int test_from_iterator(void)
 
     // Create iterator and new list from it
     DSCIterator iter       = dsc_arraylist_iterator(original);
-    DSCArrayList* new_list = dsc_arraylist_from_iterator(&iter, alloc);
+    DSCArrayList* new_list = dsc_arraylist_from_iterator(&iter, &alloc);
 
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(dsc_arraylist_size(new_list), 5);
@@ -259,14 +251,13 @@ int test_from_iterator(void)
     iter.destroy(&iter);
     dsc_arraylist_destroy(new_list, false); // Don't free shared data
     dsc_arraylist_destroy(original, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_bidirectional_iteration(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -296,7 +287,6 @@ int test_bidirectional_iteration(void)
 
     iter.destroy(&iter);
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

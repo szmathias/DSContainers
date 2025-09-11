@@ -3,7 +3,6 @@
 //
 
 #include "TestAssert.h"
-#include "TestHelpers.h"
 #include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +11,8 @@
 // Test the new dsc_hashmap_put_replace function
 int test_hashmap_put_replace(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
 
@@ -57,15 +56,15 @@ int test_hashmap_put_replace(void)
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
 
-    destroy_allocator(alloc);
+    
     return TEST_SUCCESS;
 }
 
 // Test the new dsc_hashmap_put_with_free function
 int test_hashmap_put_with_free(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "auto_free_key";
 
@@ -88,15 +87,15 @@ int test_hashmap_put_with_free(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, "new_key"), "new_value");
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
+    
     return TEST_SUCCESS;
 }
 
 // Test memory leak prevention comparison
 int test_memory_leak_prevention(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "leak_test_key";
 
@@ -126,15 +125,15 @@ int test_memory_leak_prevention(void)
     // In real usage with malloc'd values, we would: free(retrieved_old);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
+    
     return TEST_SUCCESS;
 }
 
 // Test multiple key updates with proper cleanup
 int test_multiple_updates_cleanup(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = dsc_alloc_default();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "multi_update_key";
 
@@ -169,7 +168,7 @@ int test_multiple_updates_cleanup(void)
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
 
-    destroy_allocator(alloc);
+    
     return TEST_SUCCESS;
 }
 

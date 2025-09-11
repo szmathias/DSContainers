@@ -11,9 +11,9 @@
 
 int test_equals(void)
 {
-    DSCAlloc* alloc     = create_std_allocator();
-    DSCArrayList* list1 = dsc_arraylist_create(alloc, 0);
-    DSCArrayList* list2 = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list1 = dsc_arraylist_create(&alloc, 0);
+    DSCArrayList* list2 = dsc_arraylist_create(&alloc, 0);
 
     // Test empty lists
     ASSERT_EQ(dsc_arraylist_equals(list1, list2, int_cmp), 1);
@@ -40,15 +40,14 @@ int test_equals(void)
 
     dsc_arraylist_destroy(list1, true);
     dsc_arraylist_destroy(list2, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_equals_different_sizes(void)
 {
-    DSCAlloc* alloc     = create_std_allocator();
-    DSCArrayList* list1 = dsc_arraylist_create(alloc, 0);
-    DSCArrayList* list2 = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list1 = dsc_arraylist_create(&alloc, 0);
+    DSCArrayList* list2 = dsc_arraylist_create(&alloc, 0);
 
     int* val1 = malloc(sizeof(int));
     *val1     = 1;
@@ -65,14 +64,13 @@ int test_equals_different_sizes(void)
 
     dsc_arraylist_destroy(list1, true);
     dsc_arraylist_destroy(list2, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_copy_shallow(void)
 {
-    DSCAlloc* alloc        = create_std_allocator();
-    DSCArrayList* original = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
@@ -95,14 +93,13 @@ int test_copy_shallow(void)
 
     dsc_arraylist_destroy(copy, false); // Don't free shared data
     dsc_arraylist_destroy(original, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_copy_deep(void)
 {
-    DSCAlloc* alloc        = create_std_allocator();
-    DSCArrayList* original = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
@@ -126,14 +123,13 @@ int test_copy_deep(void)
 
     dsc_arraylist_destroy(copy, true); // Free copied data
     dsc_arraylist_destroy(original, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_boundary_conditions(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test operations on empty list
     ASSERT_NULL(dsc_arraylist_get(list, 0));
@@ -154,14 +150,13 @@ int test_boundary_conditions(void)
     ASSERT_EQ(dsc_arraylist_insert(list, 2, val), -1); // Can insert at size, but not size+1
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_null_parameters(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test NULL list parameter
     ASSERT_EQ(dsc_arraylist_size(NULL), 0);
@@ -175,14 +170,13 @@ int test_null_parameters(void)
     ASSERT_NULL(null_alloc_list);
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_size_consistency(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     ASSERT_EQ(dsc_arraylist_size(list), 0);
     ASSERT(dsc_arraylist_is_empty(list));
@@ -213,14 +207,13 @@ int test_size_consistency(void)
     }
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_data_integrity_after_operations(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add initial data
     for (int i = 0; i < 10; i++)
@@ -256,14 +249,13 @@ int test_data_integrity_after_operations(void)
     }
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_large_data_set(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     const int NUM_ELEMENTS = 10000;
 
@@ -292,7 +284,6 @@ int test_large_data_set(void)
     ASSERT_EQ(*(int*)dsc_arraylist_back(list), NUM_ELEMENTS / 2 - 1);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -304,7 +295,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_equals, "test_equals"},
         {test_equals_different_sizes, "test_equals_different_sizes"},
         {test_copy_shallow, "test_copy_shallow"},

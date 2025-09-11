@@ -12,8 +12,8 @@
 // Test basic iterator functionality
 static int test_basic_iteration(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements
@@ -49,15 +49,14 @@ static int test_basic_iteration(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty list
 static int test_empty_list_iterator(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     DSCIterator it = dsc_dll_iterator(list);
@@ -70,15 +69,14 @@ static int test_empty_list_iterator(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator with modifications
 static int test_iterator_with_modifications(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert initial elements
@@ -122,15 +120,14 @@ static int test_iterator_with_modifications(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test multiple iterators
 static int test_multiple_iterators(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements
@@ -167,15 +164,14 @@ static int test_multiple_iterators(void)
     if (it2.destroy)
         it2.destroy(&it2);
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator reset functionality if available
 static int test_iterator_reset(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     for (int i = 1; i <= 3; i++)
@@ -206,15 +202,14 @@ static int test_iterator_reset(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test reverse iterator functionality
 static int test_reverse_iteration(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     for (int i = 1; i <= 5; i++)
@@ -243,15 +238,14 @@ static int test_reverse_iteration(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test empty list with reverse iterator
 static int test_empty_list_reverse_iterator(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     DSCIterator it = dsc_dll_iterator_reverse(list);
@@ -261,7 +255,6 @@ static int test_empty_list_reverse_iterator(void)
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -289,8 +282,8 @@ static int int_compare(const void* a, const void* b)
 // Test converting a basic iterator to a list with dsc_dll_from_iterator_custom
 static int test_from_iterator_basic(void)
 {
-    DSCAlloc* src_alloc           = create_std_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(src_alloc);
+    DSCAlloc src_alloc = create_int_allocator();
+    DSCDoublyLinkedList* src_list = dsc_dll_create(&src_alloc);
     ASSERT_NOT_NULL(src_list);
 
     for (int i = 1; i <= 5; i++)
@@ -337,7 +330,6 @@ static int test_from_iterator_basic(void)
 
     dsc_dll_destroy(new_list, false); // Don't free data - shared with src_list
     dsc_dll_destroy(src_list, true);  // Free the data
-    destroy_allocator(src_alloc);
 
     return TEST_SUCCESS;
 }
@@ -345,8 +337,8 @@ static int test_from_iterator_basic(void)
 // Test deep copying with dsc_dll_from_iterator_custom using a copy function
 static int test_from_iterator_with_copy(void)
 {
-    DSCAlloc* alloc               = create_std_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* src_list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(src_list);
 
     for (int i = 1; i <= 5; i++)
@@ -359,10 +351,8 @@ static int test_from_iterator_with_copy(void)
     DSCIterator it = dsc_dll_iterator(src_list);
     ASSERT_TRUE(it.has_next(&it));
 
-    DSCAlloc* alloc_copy          = create_std_allocator();
-    alloc_copy->copy_func         = copy_int;
-    alloc_copy->data_free_func    = free;
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, alloc_copy);
+    DSCAlloc alloc_copy = create_int_allocator();
+    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, &alloc_copy);
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(dsc_dll_size(new_list), 5);
 
@@ -385,22 +375,20 @@ static int test_from_iterator_with_copy(void)
 
     dsc_dll_destroy(new_list, true);
     dsc_dll_destroy(src_list, true);
-    destroy_allocator(alloc_copy);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test dsc_dll_from_iterator_custom with an empty list
 static int test_from_iterator_empty(void)
 {
-    DSCAlloc* alloc               = create_std_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* src_list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(src_list);
 
     DSCIterator it = dsc_dll_iterator(src_list);
     ASSERT_FALSE(it.has_next(&it));
 
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, alloc);
+    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, &alloc);
     ASSERT_NOT_NULL(new_list);
     ASSERT_EQ(dsc_dll_size(new_list), 0);
     ASSERT_TRUE(dsc_dll_is_empty(new_list));
@@ -409,7 +397,6 @@ static int test_from_iterator_empty(void)
         it.destroy(&it);
     dsc_dll_destroy(new_list, false);
     dsc_dll_destroy(src_list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -419,17 +406,16 @@ static int test_from_iterator_invalid(void)
     DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(NULL, NULL);
     ASSERT_NULL(new_list);
 
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
-    DSCIterator it            = dsc_dll_iterator(list);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    DSCIterator it = dsc_dll_iterator(list);
     if (it.destroy)
         it.destroy(&it);
 
-    new_list = dsc_dll_from_iterator(&it, alloc);
+    new_list = dsc_dll_from_iterator(&it, &alloc);
     ASSERT_NULL(new_list);
 
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

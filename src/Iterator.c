@@ -5,9 +5,6 @@
 
 #include "Iterator.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 //==============================================================================
 // Iterator implementation state structures
 //==============================================================================
@@ -113,7 +110,7 @@ static void* transform_get(const DSCIterator* it)
     // This is critical to avoid leaks in nested transform chains
     if (state->base_iterator->get == transform_get || state->base_iterator->get == range_get)
     {
-        free(element);
+        dsc_alloc_free(state->base_iterator->alloc, element);
         element = NULL;
     }
 
@@ -122,7 +119,7 @@ static void* transform_get(const DSCIterator* it)
         const FilterState* next_it = state->base_iterator->data_state;
         if (!next_it->has_owner && element)
         {
-            free(element);
+            dsc_alloc_free(state->base_iterator->alloc, element);
         }
     }
 
@@ -182,7 +179,7 @@ static void* transform_next(const DSCIterator* it)
     // Always free elements coming from another transform
     if (base_it->next == transform_next || base_it->next == range_next || !state->has_owner)
     {
-        free(element);
+        dsc_alloc_free(base_it->alloc, element);
         element = NULL;
     }
 
@@ -191,7 +188,7 @@ static void* transform_next(const DSCIterator* it)
         const FilterState* next_it = base_it->data_state;
         if (!next_it->has_owner && element)
         {
-            free(element);
+            dsc_alloc_free(base_it->alloc, element);
         }
     }
 
@@ -261,16 +258,17 @@ static void transform_destroy(DSCIterator* it)
         state->base_iterator->destroy(state->base_iterator);
     }
 
-    free(state);
+    dsc_alloc_free(it->alloc, state);
     it->data_state = NULL;
 }
 
 /**
  * Create a transforming iterator that applies a function to each element.
  */
-DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transform)
+DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transform, const DSCAlloc* alloc)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
+    new_it.alloc = alloc;
 
     new_it.get      = transform_get;
     new_it.has_next = transform_has_next;
@@ -281,12 +279,12 @@ DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transfo
     new_it.is_valid = transform_is_valid;
     new_it.destroy  = transform_destroy;
 
-    if (!it || !transform)
+    if (!it || !transform || !alloc)
     {
         return new_it;
     }
 
-    TransformState* state = calloc(1, sizeof(TransformState));
+    TransformState* state = dsc_alloc_malloc(alloc, sizeof(TransformState));
     if (!state)
     {
         return new_it;
@@ -390,11 +388,11 @@ static int filter_has_next(const DSCIterator* it)
         // Element doesn't match filter, free it if it came from transform or range
         if (base_it->get == transform_get || base_it->get == range_get)
         {
-            free(element);
+            dsc_alloc_free(base_it->alloc, element);
             int* next_elem = base_it->next(base_it);
             if (next_elem)
             {
-                free(next_elem);
+                dsc_alloc_free(base_it->alloc, next_elem);
             }
         }
         else
@@ -404,7 +402,7 @@ static int filter_has_next(const DSCIterator* it)
                 const FilterState* next_it = base_it->data_state;
                 if (!next_it->has_owner)
                 {
-                    free(base_it->next(base_it));
+                    dsc_alloc_free(base_it->alloc, base_it->next(base_it));
                 }
                 else
                 {
@@ -450,18 +448,8 @@ static void* filter_next(const DSCIterator* it)
             void* next_elem = base_it->next(base_it);
             if (next_elem)
             {
-                free(next_elem);
+                dsc_alloc_free(base_it->alloc, next_elem);
             }
-            // if (base_it->next == transform_next)
-            // {
-            //     const TransformState *next_it = base_it->data_state;
-            //     if (!next_it->has_owner)
-            //     {
-            //         free(result);
-            //         result = NULL;
-            //     }
-            //
-            // }
         }
         else
         {
@@ -539,7 +527,7 @@ static void filter_destroy(DSCIterator* it)
             (state->base_iterator->next == transform_next ||
              state->base_iterator->get == transform_get))
         {
-            free(state->next_element);
+            dsc_alloc_free(state->base_iterator->alloc, state->next_element);
         }
         state->next_element       = NULL;
         state->has_cached_element = 0;
@@ -550,16 +538,17 @@ static void filter_destroy(DSCIterator* it)
         state->base_iterator->destroy(state->base_iterator);
     }
 
-    free(state);
+    dsc_alloc_free(it->alloc, state);
     it->data_state = NULL;
 }
 
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
  */
-DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter)
+DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter, const DSCAlloc* alloc)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
+    new_it.alloc = alloc;
 
     new_it.get      = filter_get;
     new_it.has_next = filter_has_next;
@@ -570,12 +559,12 @@ DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter)
     new_it.is_valid = filter_is_valid;
     new_it.destroy  = filter_destroy;
 
-    if (!it || !filter)
+    if (!it || !filter || !alloc)
     {
         return new_it;
     }
 
-    FilterState* state = calloc(1, sizeof(FilterState));
+    FilterState* state = dsc_alloc_malloc(alloc, sizeof(FilterState));
     if (!state)
     {
         return new_it;
@@ -625,7 +614,7 @@ static void* range_get(const DSCIterator* it)
     if ((state->step > 0 && state->current < state->end) ||
         (state->step < 0 && state->current > state->end))
     {
-        int* value = malloc(sizeof(int));
+        int* value = dsc_alloc_malloc(it->alloc, sizeof(int));
         if (!value)
         {
             return NULL;
@@ -679,7 +668,7 @@ static void* range_next(const DSCIterator* it)
         return NULL;
     }
 
-    int* value = malloc(sizeof(int));
+    int* value = dsc_alloc_malloc(it->alloc, sizeof(int));
     if (!value)
     {
         return NULL;
@@ -696,7 +685,7 @@ static void* range_next(const DSCIterator* it)
         state->current += state->step;
         if (!it->has_next(it))
         {
-            free(value);
+            dsc_alloc_free(it->alloc, value);
             return NULL;
         }
         state->current += state->step;
@@ -749,7 +738,7 @@ static void* range_prev(const DSCIterator* it)
 
     RangeState* state = it->data_state;
 
-    int* value = malloc(sizeof(int));
+    int* value = dsc_alloc_malloc(it->alloc, sizeof(int));
     if (!value)
     {
         return NULL;
@@ -766,7 +755,7 @@ static void* range_prev(const DSCIterator* it)
         state->current -= state->step;
         if (!it->has_prev(it))
         {
-            free(value);
+            dsc_alloc_free(it->alloc, value);
             return NULL;
         }
         state->current -= state->step;
@@ -813,7 +802,7 @@ static void range_destroy(DSCIterator* it)
         return;
     }
 
-    free(it->data_state);
+    dsc_alloc_free(it->alloc, it->data_state);
     it->data_state = NULL;
 }
 
@@ -823,11 +812,13 @@ static void range_destroy(DSCIterator* it)
  * @param start Starting value (inclusive)
  * @param end Ending value (exclusive)
  * @param step Step value (positive or negative)
+ * @param alloc The allocator to use for the new iterator's state.
  * @return A new iterator yielding integers in the specified range
  */
-DSCIterator dsc_iterator_range(const int start, const int end, const int step)
+DSCIterator dsc_iterator_range(const int start, const int end, const int step, const DSCAlloc* alloc)
 {
     DSCIterator it = {0}; // Initialize all fields to NULL/0
+    it.alloc = alloc;
 
     it.get      = range_get;
     it.has_next = range_has_next;
@@ -839,13 +830,13 @@ DSCIterator dsc_iterator_range(const int start, const int end, const int step)
     it.destroy  = range_destroy;
 
     // Handle invalid step
-    if (step == 0 ||
+    if (step == 0 || !alloc ||
         (start < end && step < 0) ||
         (start > end && step > 0))
     {
         return it; // Return invalid iterator with NULL data_state
     }
-    RangeState* state = calloc(1, sizeof(RangeState));
+    RangeState* state = dsc_alloc_malloc(alloc, sizeof(RangeState));
     if (!state)
     {
         return it;

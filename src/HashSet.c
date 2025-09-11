@@ -647,6 +647,7 @@ DSCIterator dsc_hashset_iterator(const DSCHashSet* set)
     state->current_key = NULL;
     state->alloc = set->map->alloc; // Set the allocator reference
 
+    it.alloc = set->map->alloc;
     it.data_state = state;
     return it;
 }

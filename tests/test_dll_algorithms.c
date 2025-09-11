@@ -12,19 +12,18 @@
 
 int test_sort_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_EQ(dsc_dll_sort(list, int_cmp), 0); // Empty list is already sorted
     ASSERT_EQ(list->size, 0);
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_already_sorted(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -43,14 +42,13 @@ int test_sort_already_sorted(void)
     }
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_reverse_order(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 4; i >= 0; i--)
     {
         int* val = malloc(sizeof(int));
@@ -77,14 +75,13 @@ int test_sort_reverse_order(void)
     }
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_with_duplicates(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     const int values[]        = {5, 2, 9, 5, 7, 2, 9, 5};
     const size_t count        = sizeof(values) / sizeof(values[0]);
 
@@ -116,14 +113,13 @@ int test_sort_with_duplicates(void)
     }
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_large_list(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     const int SIZE            = 1000;
 
     // Insert in reverse order
@@ -161,14 +157,13 @@ int test_sort_large_list(void)
     ASSERT_EQ(*(int*)list->tail->data, SIZE - 1);
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_custom_compare(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
@@ -188,25 +183,23 @@ int test_sort_custom_compare(void)
     }
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_null_args(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_EQ(dsc_dll_sort(NULL, int_cmp), -1); // NULL list
     ASSERT_EQ(dsc_dll_sort(list, NULL), -1);    // NULL compare function
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_sort_stability(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_person_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Person structs with same name (for comparison) but different ages
     Person* p1 = create_person("Alice", 30);
@@ -244,14 +237,13 @@ int test_sort_stability(void)
     ASSERT_EQ(person->age, 35);
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_reverse(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Test empty list
     ASSERT_EQ(dsc_dll_reverse(list), 0);
@@ -309,15 +301,14 @@ int test_reverse(void)
     ASSERT_EQ(node, list->head);
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_merge(void)
 {
-    DSCAlloc* alloc            = create_std_allocator();
-    DSCDoublyLinkedList* list1 = dsc_dll_create(alloc);
-    DSCDoublyLinkedList* list2 = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list1 = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* list2 = dsc_dll_create(&alloc);
 
     // Test merging empty lists
     ASSERT_EQ(dsc_dll_merge(list1, list2), 0);
@@ -347,7 +338,7 @@ int test_merge(void)
     ASSERT_EQ(list1->tail->prev, list1->head);
 
     // Test merging two non-empty lists
-    DSCDoublyLinkedList* list3 = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* list3 = dsc_dll_create(&alloc);
     int* a2                    = malloc(sizeof(int));
     *a2                        = 30;
     int* b2                    = malloc(sizeof(int));
@@ -380,16 +371,15 @@ int test_merge(void)
     dsc_dll_destroy(list1, true);
     dsc_dll_destroy(list2, false); // Already empty
     dsc_dll_destroy(list3, false); // Already empty
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_splice(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
     // Test splicing at the beginning
-    DSCDoublyLinkedList* dest1 = dsc_dll_create(alloc);
-    DSCDoublyLinkedList* src1  = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* dest1 = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src1  = dsc_dll_create(&alloc);
 
     int* a1 = malloc(sizeof(int));
     *a1     = 10;
@@ -426,8 +416,8 @@ int test_splice(void)
     ASSERT_NULL(dest1->tail->next);
 
     // Test splicing in the middle
-    DSCDoublyLinkedList* dest2 = dsc_dll_create(alloc);
-    DSCDoublyLinkedList* src2  = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* dest2 = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src2  = dsc_dll_create(&alloc);
 
     int* a2 = malloc(sizeof(int));
     *a2     = 10;
@@ -464,8 +454,8 @@ int test_splice(void)
     ASSERT_NULL(dest2->tail->next);
 
     // Test splicing at the end
-    DSCDoublyLinkedList* dest3 = dsc_dll_create(alloc);
-    DSCDoublyLinkedList* src3  = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* dest3 = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src3  = dsc_dll_create(&alloc);
 
     int* a3 = malloc(sizeof(int));
     *a3     = 10;
@@ -502,7 +492,7 @@ int test_splice(void)
     ASSERT_NULL(dest3->tail->next);
 
     // Test splicing with empty source
-    DSCDoublyLinkedList* empty = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* empty = dsc_dll_create(&alloc);
     ASSERT_EQ(dsc_dll_splice(dest1, empty, 2), 0);
     ASSERT_EQ(dest1->size, 5); // Should be unchanged
 
@@ -516,16 +506,15 @@ int test_splice(void)
     dsc_dll_destroy(dest3, true);
     dsc_dll_destroy(src3, false);
     dsc_dll_destroy(empty, false);
-    destroy_allocator(alloc);
 
     return TEST_SUCCESS;
 }
 
 int test_equals(void)
 {
-    DSCAlloc* alloc            = create_std_allocator();
-    DSCDoublyLinkedList* list1 = dsc_dll_create(alloc);
-    DSCDoublyLinkedList* list2 = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list1 = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* list2 = dsc_dll_create(&alloc);
 
     // Empty lists should be equal
     ASSERT_EQ(dsc_dll_equals(list1, list2, int_cmp), 1);
@@ -554,7 +543,7 @@ int test_equals(void)
     ASSERT_EQ(dsc_dll_equals(list1, list2, int_cmp), 0);
 
     // Lists with same size but different elements should not be equal
-    DSCDoublyLinkedList* list3 = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* list3 = dsc_dll_create(&alloc);
     int* a3                    = malloc(sizeof(int));
     *a3                        = 10;
     int* b3                    = malloc(sizeof(int));
@@ -572,14 +561,13 @@ int test_equals(void)
     dsc_dll_destroy(list1, true);
     dsc_dll_destroy(list2, true);
     dsc_dll_destroy(list3, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_filter(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add numbers 0-9
     for (int i = 0; i < 10; i++)
@@ -607,7 +595,7 @@ int test_filter(void)
     ASSERT_EQ(list->size, 10);
 
     // Test empty list
-    DSCDoublyLinkedList* empty_list     = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* empty_list     = dsc_dll_create(&alloc);
     DSCDoublyLinkedList* filtered_empty = dsc_dll_filter(empty_list, is_even);
     ASSERT_NOT_NULL(filtered_empty);
     ASSERT_EQ(filtered_empty->size, 0);
@@ -620,14 +608,13 @@ int test_filter(void)
     dsc_dll_destroy(filtered, false);
     dsc_dll_destroy(empty_list, false);
     dsc_dll_destroy(filtered_empty, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_filter_deep(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add numbers 0-9
     for (int i = 0; i < 10; i++)
@@ -671,14 +658,13 @@ int test_filter_deep(void)
 
     dsc_dll_destroy(list, true);
     dsc_dll_destroy(filtered, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_transform(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -721,7 +707,7 @@ int test_transform(void)
     }
 
     // Test empty list
-    DSCDoublyLinkedList* empty_list        = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* empty_list        = dsc_dll_create(&alloc);
     DSCDoublyLinkedList* transformed_empty = dsc_dll_transform(empty_list, double_value, true);
     ASSERT_NOT_NULL(transformed_empty);
     ASSERT_EQ(transformed_empty->size, 0);
@@ -734,14 +720,13 @@ int test_transform(void)
     dsc_dll_destroy(transformed, true);
     dsc_dll_destroy(empty_list, false);
     dsc_dll_destroy(transformed_empty, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_for_each(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
@@ -763,7 +748,7 @@ int test_for_each(void)
     }
 
     // Test empty list
-    DSCDoublyLinkedList* empty_list = dsc_dll_create(alloc);
+    DSCDoublyLinkedList* empty_list = dsc_dll_create(&alloc);
     dsc_dll_for_each(empty_list, increment); // Should do nothing
 
     // Test null cases
@@ -772,7 +757,6 @@ int test_for_each(void)
 
     dsc_dll_destroy(list, true);
     dsc_dll_destroy(empty_list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

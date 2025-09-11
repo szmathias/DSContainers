@@ -7,32 +7,33 @@
 
 #include "../include/Alloc.h"
 
-// Complex data type for testing
+// --- Types ---
 typedef struct
 {
     char name[50];
     int age;
 } Person;
 
+// --- Comparison Functions ---
 int int_cmp(const void* a, const void* b);
 
 // Custom comparison function for descending order
 int int_cmp_desc(const void* a, const void* b);
 
-// Integer free function
+// Person comparison function
+int person_cmp(const void* a, const void* b);
+
+// --- Memory Management ---
 void int_free(void* a);
+
+// Person free function
+void person_free(void* p);
 
 // Custom allocator for testing
 void* test_calloc(size_t size);
 void test_dealloc(void* ptr);
 
-// Person comparison function
-int person_cmp(const void* a, const void* b);
-// Person free function
-void person_free(void* p);
-// Helper to create a person
-Person* create_person(const char* name, int age);
-
+// --- Copy/Clone Helpers ---
 // Clone an integer
 void* int_copy(const void* data);
 // Clone a string
@@ -40,14 +41,13 @@ void* string_copy(const void* data);
 // Clone a person
 void* person_copy(const void* data);
 
+// --- Person Helpers ---
+// Helper to create a person
+Person* create_person(const char* name, int age);
+
+// --- Predicate Functions ---
 // Predicate function that returns non-zero for even numbers
 int is_even(const void* data);
-
-// Transform function that doubles a number
-void* double_value(const void* data);
-
-// Action function that increments a number
-void increment(void* data);
 
 // Predicate: is odd
 int is_odd(const void* data);
@@ -64,6 +64,10 @@ int is_divisible_by_3(const void* data);
 // Predicate: is divisible by 6
 int is_divisible_by_six(const void* data);
 
+// --- Transform Functions ---
+// Transform function that doubles a number
+void* double_value(const void* data);
+
 // Transform: square a number
 void* square_func(const void* data);
 
@@ -79,6 +83,11 @@ void* add_ten_func(const void* data);
 // Transform: multiply by 3
 void* multiply_by_three(const void* data);
 
+// --- Action Functions ---
+// Action function that increments a number
+void increment(void* data);
+
+// --- Failing Allocator Helpers ---
 // A custom allocator that will fail after a certain number of calls
 void* failing_alloc(size_t size);
 
@@ -93,9 +102,9 @@ void* double_value_failing(const void* data);
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(int count);
 
-// Allocator helper functions
-DSCAlloc* create_std_allocator(void);
-DSCAlloc* create_failing_allocator(void);
-void destroy_allocator(DSCAlloc * alloc);
+DSCAlloc create_failing_int_allocator(void);
+DSCAlloc create_int_allocator(void);
+DSCAlloc create_person_allocator(void);
+DSCAlloc create_string_allocator(void);
 
 #endif //DSCONTAINERS_TESTHELPERS_H

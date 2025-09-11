@@ -12,29 +12,28 @@
 // Test memory allocation and deallocation
 int test_hashset_memory_basic(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(set);
     ASSERT_EQ(dsc_hashset_size(set), 0);
     ASSERT(dsc_hashset_is_empty(set));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with key freeing
 int test_hashset_memory_with_key_freeing(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some dynamically allocated keys
     for (int i = 0; i < 5; i++)
     {
-        char* key = alloc->alloc_func(32);
+        char* key = malloc(32);
         sprintf(key, "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, key), 0);
     }
@@ -47,16 +46,15 @@ int test_hashset_memory_with_key_freeing(void)
     ASSERT(dsc_hashset_is_empty(set));
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with copy operations
 int test_hashset_memory_copy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* original = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some keys
     ASSERT_EQ(dsc_hashset_add(original, "key1"), 0);
@@ -73,20 +71,19 @@ int test_hashset_memory_copy(void)
 
     dsc_hashset_destroy(original, false);
     dsc_hashset_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with deep copy operations
 int test_hashset_memory_deep_copy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* original = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some dynamically allocated keys
-    char* key1 = alloc->alloc_func(32);
-    char* key2 = alloc->alloc_func(32);
+    char* key1 = malloc(32);
+    char* key2 = malloc(32);
     strcpy(key1, "dynamic_key1");
     strcpy(key2, "dynamic_key2");
 
@@ -107,16 +104,15 @@ int test_hashset_memory_deep_copy(void)
     ASSERT_EQ(dsc_hashset_size(copy), 2);
 
     dsc_hashset_destroy(copy, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with get_elements operation
 int test_hashset_memory_get_elements(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
     ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
@@ -130,19 +126,18 @@ int test_hashset_memory_get_elements(void)
     ASSERT_NOT_NULL(keys);
 
     // Free the allocated array
-    alloc->dealloc_func(keys);
+    free(keys);
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with iterator operations
 int test_hashset_memory_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
     ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
@@ -164,17 +159,16 @@ int test_hashset_memory_iterator(void)
     it.destroy(&it);
 
     dsc_hashset_destroy(set, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory with set operations
 int test_hashset_memory_set_operations(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashSet* set1 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set1, "a"), 0);
     ASSERT_EQ(dsc_hashset_add(set1, "b"), 0);
@@ -202,23 +196,22 @@ int test_hashset_memory_set_operations(void)
     dsc_hashset_destroy(intersection_set, false);
     dsc_hashset_destroy(difference_set, false);
 
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test memory operations without leaks
 int test_hashset_memory_no_leaks(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
     // Perform various operations
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 16);
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 16);
 
     // Add and remove elements using dynamically allocated keys
-    char** keys = alloc->alloc_func(10 * sizeof(char*));
+    char** keys = malloc(10 * sizeof(char*));
     for (int i = 0; i < 10; i++)
     {
-        keys[i] = alloc->alloc_func(32);
+        keys[i] = malloc(32);
         sprintf(keys[i], "key_%d", i);
         ASSERT_EQ(dsc_hashset_add(set, keys[i]), 0);
     }
@@ -233,7 +226,7 @@ int test_hashset_memory_no_leaks(void)
     dsc_hashset_clear(set, true);  // Free remaining keys
     ASSERT_EQ(dsc_hashset_size(set), 0);
 
-    char* final_key = alloc->alloc_func(32);
+    char* final_key = malloc(32);
     strcpy(final_key, "final_key");
     ASSERT_EQ(dsc_hashset_add(set, final_key), 0);
     ASSERT_EQ(dsc_hashset_size(set), 1);
@@ -250,8 +243,7 @@ int test_hashset_memory_no_leaks(void)
     it.destroy(&it);
 
     dsc_hashset_destroy(set, true);  // Free final key
-    alloc->dealloc_func(keys);
-    destroy_allocator(alloc);
+    free(keys);
     return TEST_SUCCESS;
 }
 

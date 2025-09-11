@@ -12,19 +12,18 @@
 // Tests from test_sll.c that fit into CRUD category
 int test_create_destroy(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(list->size, 0);
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_front_back_find(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     int* b                    = malloc(sizeof(int));
@@ -42,14 +41,13 @@ int test_insert_front_back_find(void)
     ASSERT_EQ(*(int*)found->data, 2);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     int* b                    = malloc(sizeof(int));
@@ -67,14 +65,13 @@ int test_remove(void)
     ASSERT_NULL(found);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_not_found(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     dsc_sll_insert_back(list, a);
@@ -83,7 +80,6 @@ int test_remove_not_found(void)
     ASSERT_EQ(dsc_sll_remove(list, &key, int_cmp, true), -1);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -99,8 +95,8 @@ int test_NULL_handling(void)
 
 int test_insert_at(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     int* b                    = malloc(sizeof(int));
@@ -118,14 +114,13 @@ int test_insert_at(void)
     ASSERT_EQ(*(int*)found->data, 2);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -144,14 +139,13 @@ int test_remove_at(void)
     ASSERT_NULL(found);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_head(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 100;
     int* b                    = malloc(sizeof(int));
@@ -167,14 +161,13 @@ int test_remove_at_head(void)
     ASSERT_NULL(found);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_last(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     int* b                    = malloc(sizeof(int));
@@ -193,14 +186,13 @@ int test_remove_at_last(void)
     ASSERT_NULL(found);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_invalid(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     dsc_sll_insert_back(list, a); // [1]
@@ -209,79 +201,73 @@ int test_remove_at_invalid(void)
     ASSERT_EQ(dsc_sll_remove_at(list, (size_t)-1, true), -1); // negative as size_t (very large)
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_remove_at(list, 0, true), -1); // nothing to remove
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 123;
     dsc_sll_insert_back(list, a);                   // [123]
     ASSERT_EQ(dsc_sll_remove_at(list, 0, true), 0); // remove only element
     ASSERT_EQ(list->size, 0);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at_single_element_invalid_pos(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 123;
     dsc_sll_insert_back(list, a);                    // [123]
     ASSERT_EQ(dsc_sll_remove_at(list, 1, true), -1); // invalid position
     ASSERT_EQ(list->size, 1);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_at_out_of_bounds(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
     ASSERT_EQ(dsc_sll_insert_at(list, 2, a), -1);          // out of bounds (list size is 0)
     ASSERT_EQ(dsc_sll_insert_at(list, (size_t)-1, a), -1); // very large index
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     free(a);
     return TEST_SUCCESS;
 }
 
 int test_insert_remove_null_data(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_insert_back(list, NULL), 0); // allow nullptr data
     ASSERT_EQ(list->size, 1);
     ASSERT_EQ(dsc_sll_remove_at(list, 0, false), 0); // remove node with nullptr data, no free_func
     ASSERT_EQ(list->size, 0);
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_mixed_operations_integrity(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
     int* b                    = malloc(sizeof(int));
@@ -307,14 +293,13 @@ int test_mixed_operations_integrity(void)
     ASSERT_NOT_NULL(found);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_size(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_size(list), 0);
 
     int* a = malloc(sizeof(int));
@@ -330,14 +315,13 @@ int test_size(void)
     ASSERT_EQ(dsc_sll_size(list), 1);
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_is_empty(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_is_empty(list), 1); // Empty list
 
     int* a = malloc(sizeof(int));
@@ -351,14 +335,13 @@ int test_is_empty(void)
     ASSERT_EQ(dsc_sll_is_empty(NULL), 1); // NULL list should be considered empty
 
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_complex_data_type(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_person_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     Person* p1 = create_person("Alice", 30);
     Person* p2 = create_person("Bob", 25);
@@ -380,14 +363,13 @@ int test_complex_data_type(void)
 
     // Clean up
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_all(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add 10 elements
     for (int i = 0; i < 10; i++)
@@ -408,14 +390,13 @@ int test_remove_all(void)
     ASSERT_NULL(list->head);
 
     dsc_sll_destroy(list, false); // Already freed all data
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_front(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Test on empty list
     ASSERT_EQ(dsc_sll_remove_front(list, true), -1);
@@ -449,14 +430,13 @@ int test_remove_front(void)
     ASSERT_NULL(list->head);
 
     dsc_sll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_back(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Test on empty list
     ASSERT_EQ(dsc_sll_remove_back(list, true), -1);
@@ -492,7 +472,6 @@ int test_remove_back(void)
     ASSERT_NOT_NULL(dsc_sll_find(list, &key, int_cmp));
 
     dsc_sll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

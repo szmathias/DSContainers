@@ -11,14 +11,15 @@
 // Test chaining filter and transform iterators
 static int test_filter_then_transform(void)
 {
+    DSCAlloc alloc = create_int_allocator();
     // Create range from 1 to 15, keep only even numbers, then square them
-    DSCIterator range_it = dsc_iterator_range(1, 15, 1);
+    DSCIterator range_it = dsc_iterator_range(1, 15, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
-    DSCIterator even_it = dsc_iterator_filter(&range_it, is_even);
+    DSCIterator even_it = dsc_iterator_filter(&range_it, is_even, &alloc);
     ASSERT_TRUE(even_it.is_valid(&even_it));
 
-    DSCIterator square_it = dsc_iterator_transform(&even_it, square_func);
+    DSCIterator square_it = dsc_iterator_transform(&even_it, square_func, &alloc);
     ASSERT_TRUE(square_it.is_valid(&square_it));
 
     // Expected: [4,16,36,64,100,144,196] (squares of even numbers from 1-14: 2,4,6,8,10,12,14)
@@ -44,14 +45,15 @@ static int test_filter_then_transform(void)
 // Test chaining transform and filter iterators (opposite order)
 static int test_transform_then_filter(void)
 {
+    DSCAlloc alloc = create_int_allocator();
     // Create range from 1 to 10, add 10 to each, then keep only values divisible by 3
-    DSCIterator range_it = dsc_iterator_range(1, 10, 1);
+    DSCIterator range_it = dsc_iterator_range(1, 10, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
-    DSCIterator add_ten_it = dsc_iterator_transform(&range_it, add_ten_func);
+    DSCIterator add_ten_it = dsc_iterator_transform(&range_it, add_ten_func, &alloc);
     ASSERT_TRUE(add_ten_it.is_valid(&add_ten_it));
 
-    DSCIterator div3_it = dsc_iterator_filter(&add_ten_it, is_divisible_by_3);
+    DSCIterator div3_it = dsc_iterator_filter(&add_ten_it, is_divisible_by_3, &alloc);
     ASSERT_TRUE(div3_it.is_valid(&div3_it));
 
     // Expected: [12,15,18] (values from [11-19] that are divisible by 3)
@@ -77,17 +79,18 @@ static int test_transform_then_filter(void)
 // Test complex chaining of filters and transforms
 static int test_complex_chain(void)
 {
+    DSCAlloc alloc = create_int_allocator();
     // Create range from 1 to 20, double each, keep values > 10, then square
-    DSCIterator range_it = dsc_iterator_range(6, 20, 1);
+    DSCIterator range_it = dsc_iterator_range(6, 20, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
-    DSCIterator double_it = dsc_iterator_transform(&range_it, double_value);
+    DSCIterator double_it = dsc_iterator_transform(&range_it, double_value, &alloc);
     ASSERT_TRUE(double_it.is_valid(&double_it));
 
-    DSCIterator gt10_it = dsc_iterator_filter(&double_it, is_greater_than_10);
+    DSCIterator gt10_it = dsc_iterator_filter(&double_it, is_greater_than_10, &alloc);
     ASSERT_TRUE(gt10_it.is_valid(&gt10_it));
 
-    DSCIterator square_it = dsc_iterator_transform(&gt10_it, square_func);
+    DSCIterator square_it = dsc_iterator_transform(&gt10_it, square_func, &alloc);
     ASSERT_TRUE(square_it.is_valid(&square_it));
 
     // Expected: Values 12,14,16,...,38 (doubled from 6-19) squared
@@ -113,9 +116,10 @@ static int test_complex_chain(void)
 // Test premature get/next operations
 static int test_premature_operations(void)
 {
+    DSCAlloc alloc = create_int_allocator();
     // Create a chain of transformations
-    DSCIterator range_it  = dsc_iterator_range(0, 5, 1);
-    DSCIterator double_it = dsc_iterator_transform(&range_it, double_value);
+    DSCIterator range_it  = dsc_iterator_range(0, 5, 1, &alloc);
+    DSCIterator double_it = dsc_iterator_transform(&range_it, double_value, &alloc);
 
     // Call get() before starting iteration
     int* value = double_it.get(&double_it);
@@ -146,8 +150,9 @@ static int test_premature_operations(void)
 // Test interleaved has_next/get/next calls
 static int test_interleaved_operations(void)
 {
-    DSCIterator range_it  = dsc_iterator_range(0, 5, 1);
-    DSCIterator square_it = dsc_iterator_transform(&range_it, square_func);
+    DSCAlloc alloc = create_int_allocator();
+    DSCIterator range_it  = dsc_iterator_range(0, 5, 1, &alloc);
+    DSCIterator square_it = dsc_iterator_transform(&range_it, square_func, &alloc);
 
     // Pattern: has_next, get, next, get, has_next, next, ...
     ASSERT_TRUE(square_it.has_next(&square_it));

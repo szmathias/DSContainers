@@ -9,7 +9,7 @@
 #define DSCONTAINERS_ITERATOR_H
 
 #include "PlatformDefs.h"
-
+#include "Alloc.h"
 
 //==============================================================================
 // Iterator interface
@@ -27,6 +27,7 @@ typedef struct DSCIterator DSCIterator;
 struct DSCIterator
 {
     void* data_state; // Implementation-specific state data
+    const DSCAlloc* alloc; // Allocator for memory management
 
     // Element access
     void*(*get)(const DSCIterator* it); // Get current element without advancing
@@ -80,9 +81,10 @@ typedef int (*filter_func)(const void* element);
  *
  * @param it Base iterator to transform (ownership transferred)
  * @param transform Function to apply to each element
+ * @param alloc The allocator to use for the new iterator's state.
  * @return A new iterator producing transformed elements
  */
-DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform);
+DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func transform, const DSCAlloc* alloc);
 
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
@@ -93,9 +95,10 @@ DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, transform_func trans
  *
  * @param it Base iterator to filter (ownership transferred)
  * @param filter Predicate function that determines which elements to include
+ * @param alloc The allocator to use for the new iterator's state.
  * @return A new iterator yielding only elements that satisfy the predicate
  */
-DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
+DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter, const DSCAlloc* alloc);
 
 /**
  * Create an iterator that yields integers in a specified range.
@@ -103,8 +106,9 @@ DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, filter_func filter);
  * @param start Starting value (inclusive)
  * @param end Ending value (exclusive)
  * @param step Step value (positive or negative, non-zero)
+ * @param alloc The allocator to use for the new iterator's state.
  * @return A new iterator yielding integers in the specified range
  */
-DSC_API DSCIterator dsc_iterator_range(int start, int end, int step);
+DSC_API DSCIterator dsc_iterator_range(int start, int end, int step, const DSCAlloc* alloc);
 
 #endif //DSCONTAINERS_ITERATOR_H

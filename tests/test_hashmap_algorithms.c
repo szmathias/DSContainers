@@ -12,8 +12,8 @@
 // Test hash map copying (shallow)
 int test_hashmap_copy_shallow(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* original = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some test data
     const char* keys[] = {"apple", "banana", "cherry", "date"};
@@ -40,16 +40,14 @@ int test_hashmap_copy_shallow(void)
 
     dsc_hashmap_destroy(original, false, false);
     dsc_hashmap_destroy(copy, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test hash map copying (deep)
 int test_hashmap_copy_deep(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    alloc->copy_func = int_copy;
-    DSCHashMap* original = dsc_hashmap_create(alloc, dsc_hash_int, dsc_key_equals_int, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     // Add some test data
     for (int i = 0; i < 3; i++)
@@ -78,7 +76,6 @@ int test_hashmap_copy_deep(void)
 
     dsc_hashmap_destroy(original, true, true);
     dsc_hashmap_destroy(copy, true, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -92,8 +89,8 @@ static void increment_value(void* key, void* value) {
 // Test for_each functionality
 int test_hashmap_for_each(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_int, dsc_key_equals_int, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     // Add some test data
     for (int i = 1; i <= 5; i++)
@@ -120,15 +117,14 @@ int test_hashmap_for_each(void)
     dsc_hashmap_for_each(map, NULL);           // Should be safe
 
     dsc_hashmap_destroy(map, true, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test get_keys functionality
 int test_hashmap_get_keys(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"alpha", "beta", "gamma"};
     const char* values[] = {"1", "2", "3"};
@@ -161,17 +157,16 @@ int test_hashmap_get_keys(void)
     }
     ASSERT_EQ(found_count, 3);
 
-    alloc->dealloc_func(retrieved_keys);
+    free(retrieved_keys);
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test get_values functionality
 int test_hashmap_get_values(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"x", "y", "z"};
     const char* values[] = {"10", "20", "30"};
@@ -204,22 +199,16 @@ int test_hashmap_get_values(void)
     }
     ASSERT_EQ(found_count, 3);
 
-    alloc->dealloc_func(retrieved_values);
+    free(retrieved_values);
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test from_iterator functionality
 int test_hashmap_from_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-
-    // Reset copy_func to NULL since we're working with string literals
-    // (it might have been set to int_copy in a previous test)
-    alloc->copy_func = NULL;
-
-    DSCHashMap* original = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_string_allocator();
+    DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3"};
     const char* values[] = {"val1", "val2", "val3"};
@@ -234,7 +223,7 @@ int test_hashmap_from_iterator(void)
     DSCIterator it = dsc_hashmap_iterator(original);
 
     // Create new map from iterator
-    DSCHashMap* new_map = dsc_hashmap_from_iterator(&it, alloc, dsc_hash_string, dsc_key_equals_string);
+    DSCHashMap* new_map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string);
     ASSERT_NOT_NULL(new_map);
     ASSERT_EQ(dsc_hashmap_size(new_map), 3);
 
@@ -249,7 +238,6 @@ int test_hashmap_from_iterator(void)
     it.destroy(&it);
     dsc_hashmap_destroy(original, false, false);
     dsc_hashmap_destroy(new_map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

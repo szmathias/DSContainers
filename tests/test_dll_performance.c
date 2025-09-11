@@ -11,8 +11,8 @@
 
 int test_stress(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     const int NUM_ELEMENTS    = 10000;
 
     // Add many elements
@@ -42,7 +42,6 @@ int test_stress(void)
     ASSERT_EQ(*(int*)list->head->data, key);
 
     dsc_dll_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -54,9 +53,9 @@ int test_performance(void)
     printf("\nDLL Performance tests:\n");
     for (size_t s = 0; s < NUM_SIZES; s++)
     {
-        const int SIZE            = SIZES[s];
-        DSCAlloc* alloc           = create_std_allocator();
-        DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+        const int SIZE = SIZES[s];
+        DSCAlloc alloc = create_int_allocator();
+        DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
         // Measure insertion time
         clock_t start = clock();
@@ -81,7 +80,6 @@ int test_performance(void)
 
         // Cleanup
         dsc_dll_destroy(list, true);
-        destroy_allocator(alloc);
     }
 
     return TEST_SUCCESS;

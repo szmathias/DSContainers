@@ -1226,6 +1226,7 @@ DSCIterator dsc_dll_iterator(const DSCDoublyLinkedList* list)
     state->start   = list->head;
     state->list    = list;
 
+    it.alloc = list->alloc;
     it.data_state = state;
 
     return it;
@@ -1259,6 +1260,7 @@ DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList* list)
     state->start   = list->tail;
     state->list    = list;
 
+    it.alloc = list->alloc;
     it.data_state = state;
 
     return it;

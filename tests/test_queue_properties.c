@@ -11,8 +11,8 @@
 // Test FIFO property extensively
 int test_queue_fifo_property(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     #define num_elements 100
     int* values[num_elements];
@@ -38,15 +38,14 @@ int test_queue_fifo_property(void)
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test queue size consistency
 int test_queue_size_consistency(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Size should start at 0
     ASSERT_EQ(dsc_queue_size(queue), 0);
@@ -79,15 +78,14 @@ int test_queue_size_consistency(void)
     }
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test front/back access invariants
 int test_queue_front_back_invariants(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -116,15 +114,14 @@ int test_queue_front_back_invariants(void)
     }
 
     dsc_queue_destroy(queue, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test copy preserves order
 int test_queue_copy_preserves_order(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* original = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* original = dsc_queue_create(&alloc);
 
     const int values[] = {1, 3, 5, 7, 9, 11, 13};
     const int num_values = sizeof(values) / sizeof(values[0]);
@@ -175,15 +172,14 @@ int test_queue_copy_preserves_order(void)
     dsc_queue_destroy(original, false);
     dsc_queue_destroy(shallow_copy, false);
     dsc_queue_destroy(deep_copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test clear preserves queue structure
 int test_queue_clear_preserves_structure(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add elements
     for (int i = 0; i < 10; i++)
@@ -213,15 +209,14 @@ int test_queue_clear_preserves_structure(void)
     ASSERT_EQ(*(int*)dsc_queue_back(queue), 999);
 
     dsc_queue_destroy(queue, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test for_each preserves queue contents
 int test_queue_for_each_preserves_contents(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     const int original_values[] = {5, 10, 15, 20, 25};
     const int num_values = sizeof(original_values) / sizeof(original_values[0]);
@@ -252,15 +247,14 @@ int test_queue_for_each_preserves_contents(void)
     }
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test mixed operations maintain FIFO property
 int test_queue_mixed_operations_fifo(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Pattern: enqueue some, dequeue some, enqueue more
     const int sequence[] = {100, 200, 300};
@@ -300,7 +294,6 @@ int test_queue_mixed_operations_fifo(void)
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

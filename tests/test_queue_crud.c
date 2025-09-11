@@ -7,16 +7,14 @@
 // Test basic queue creation and destruction
 int test_queue_create_destroy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    ASSERT_NOT_NULL(alloc);
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCQueue* queue = dsc_queue_create(&alloc);
     ASSERT_NOT_NULL(queue);
     ASSERT_EQ(dsc_queue_size(queue), 0);
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -45,8 +43,8 @@ int test_queue_null_parameters(void)
 // Test basic enqueue and dequeue operations
 int test_queue_enqueue_dequeue(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -92,15 +90,14 @@ int test_queue_enqueue_dequeue(void)
     ASSERT_EQ(dsc_queue_dequeue(queue, false), -1);
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test dequeue_data function
 int test_queue_dequeue_data(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -128,15 +125,14 @@ int test_queue_dequeue_data(void)
     ASSERT_NULL(dsc_queue_dequeue_data(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test queue clear operation
 int test_queue_clear(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
@@ -163,16 +159,15 @@ int test_queue_clear(void)
     ASSERT_EQ(*(int*)dsc_queue_front(queue), 999);
 
     dsc_queue_destroy(queue, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test queue equality
 int test_queue_equals(void)
 {
-    DSCAlloc* alloc  = create_std_allocator();
-    DSCQueue* queue1 = dsc_queue_create(alloc);
-    DSCQueue* queue2 = dsc_queue_create(alloc);
+    DSCAlloc alloc  = create_int_allocator();
+    DSCQueue* queue1 = dsc_queue_create(&alloc);
+    DSCQueue* queue2 = dsc_queue_create(&alloc);
 
     // Empty queues should be equal
     ASSERT_EQ(dsc_queue_equals(queue1, queue2, int_cmp), 1);
@@ -206,15 +201,14 @@ int test_queue_equals(void)
 
     dsc_queue_destroy(queue1, true);
     dsc_queue_destroy(queue2, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test FIFO behavior specifically
 int test_queue_fifo_behavior(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Enqueue numbers 0-9
     for (int i = 0; i < 10; i++)
@@ -236,7 +230,6 @@ int test_queue_fifo_behavior(void)
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

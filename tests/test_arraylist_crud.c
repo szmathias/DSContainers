@@ -11,34 +11,32 @@
 
 int test_create_destroy(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(dsc_arraylist_size(list), 0);
     ASSERT_EQ(dsc_arraylist_capacity(list), 0);
     ASSERT(dsc_arraylist_is_empty(list));
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_create_with_capacity(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 10);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(dsc_arraylist_size(list), 0);
     ASSERT_GT(dsc_arraylist_capacity(list), 0);
     ASSERT(dsc_arraylist_is_empty(list));
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_push_back(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -61,14 +59,13 @@ int test_push_back(void)
     ASSERT_EQ(*(int*)dsc_arraylist_get(list, 2), 3);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_push_front(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -88,14 +85,13 @@ int test_push_front(void)
     ASSERT_EQ(*(int*)dsc_arraylist_get(list, 2), 1);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_insert_at(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -130,14 +126,13 @@ int test_insert_at(void)
     ASSERT_EQ(*(int*)dsc_arraylist_get(list, 1), 1);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_get_set(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -164,14 +159,13 @@ int test_get_set(void)
     ASSERT_EQ(dsc_arraylist_set(list, 5, d, false), -1); // Out of bounds
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_front_back(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Empty list
     ASSERT_NULL(dsc_arraylist_front(list));
@@ -196,14 +190,13 @@ int test_front_back(void)
     ASSERT_EQ(*(int*)dsc_arraylist_back(list), 3);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove_at(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -241,14 +234,13 @@ int test_remove_at(void)
     ASSERT_EQ(dsc_arraylist_remove_at(list, 5, false), -1);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_pop_back_front(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -281,14 +273,13 @@ int test_pop_back_front(void)
     ASSERT_EQ(dsc_arraylist_pop_front(list, false), -1);
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_find(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -310,14 +301,13 @@ int test_find(void)
     ASSERT_EQ(index, SIZE_MAX);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_remove(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -340,14 +330,13 @@ int test_remove(void)
     ASSERT_EQ(dsc_arraylist_remove(list, &not_found, int_cmp, false), -1);
 
     dsc_arraylist_destroy(list, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 int test_clear(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCArrayList* list = dsc_arraylist_create(alloc, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
     *a     = 1;
@@ -366,7 +355,6 @@ int test_clear(void)
     ASSERT_GT(dsc_arraylist_capacity(list), 0); // Capacity should remain
 
     dsc_arraylist_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -378,7 +366,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_create_destroy, "test_create_destroy"},
         {test_create_with_capacity, "test_create_with_capacity"},
         {test_push_back, "test_push_back"},

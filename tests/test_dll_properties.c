@@ -10,8 +10,8 @@
 // Property: The size of the list should be consistent after a series of insertions and removals.
 int test_dsc_dll_size_after_insert_and_remove(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_EQ(dsc_dll_size(list), 0);
 
     int* a = malloc(sizeof(int));
@@ -31,15 +31,14 @@ int test_dsc_dll_size_after_insert_and_remove(void)
     ASSERT_EQ(dsc_dll_size(list), 0);
 
     dsc_dll_destroy(list, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Property: Sorting an already sorted list should not change it.
 int test_dsc_dll_sort_is_idempotent(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
@@ -56,15 +55,14 @@ int test_dsc_dll_sort_is_idempotent(void)
 
     dsc_dll_destroy(list, true);
     dsc_dll_destroy(copy, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Property: Reversing a list twice should return it to its original state.
 int test_dsc_dll_reverse_is_involution(void)
 {
-    DSCAlloc* alloc           = create_std_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
@@ -81,7 +79,6 @@ int test_dsc_dll_reverse_is_involution(void)
 
     dsc_dll_destroy(list, true);
     dsc_dll_destroy(copy, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

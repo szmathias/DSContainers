@@ -12,23 +12,22 @@
 // Test basic hash map creation and destruction
 int test_hashmap_create_destroy(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(map);
     ASSERT_EQ(dsc_hashmap_size(map), 0);
     ASSERT(dsc_hashmap_is_empty(map));
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test basic put and get operations
 int test_hashmap_put_get(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "hello";
     char* value1 = "world";
@@ -57,15 +56,14 @@ int test_hashmap_put_get(void)
     ASSERT_NULL(retrieved);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test updating existing keys
 int test_hashmap_update(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
     char* value1 = "original";
@@ -86,15 +84,14 @@ int test_hashmap_update(void)
     ASSERT_EQ_STR((char*)retrieved, value2);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test remove operations
 int test_hashmap_remove(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "key1";
     char* value1 = "value1";
@@ -117,15 +114,14 @@ int test_hashmap_remove(void)
     ASSERT_EQ(dsc_hashmap_size(map), 1);
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test remove_get operation
 int test_hashmap_remove_get(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
     char* value = "value";
@@ -140,15 +136,14 @@ int test_hashmap_remove_get(void)
     ASSERT_NULL(dsc_hashmap_get(map, key));
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test contains_key operation
 int test_hashmap_contains(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
     char* value = "value";
@@ -162,15 +157,14 @@ int test_hashmap_contains(void)
     ASSERT(!dsc_hashmap_contains_key(map, key));
 
     dsc_hashmap_destroy(map, false, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test with integer keys
 int test_hashmap_int_keys(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_int, dsc_key_equals_int, 0);
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     int* key1 = malloc(sizeof(int));
     int* key2 = malloc(sizeof(int));
@@ -190,15 +184,14 @@ int test_hashmap_int_keys(void)
     ASSERT_EQ_STR((char*)retrieved, value2);
 
     dsc_hashmap_destroy(map, true, false); // Free the integer keys
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test load factor and resizing
 int test_hashmap_resize(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCHashMap* map = dsc_hashmap_create(alloc, dsc_hash_int, dsc_key_equals_int, 4); // Small initial size
+    DSCAlloc alloc = create_int_allocator();
+    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 4); // Small initial size
 
     // Add enough items to trigger resize
     for (int i = 0; i < 10; i++)
@@ -222,7 +215,6 @@ int test_hashmap_resize(void)
     }
 
     dsc_hashmap_destroy(map, true, true); // Free keys and values
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

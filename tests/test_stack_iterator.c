@@ -11,8 +11,8 @@
 // Test stack with iterator
 int test_stack_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some test data
     for (int i = 0; i < 5; i++)
@@ -54,20 +54,19 @@ int test_stack_iterator(void)
 
     it.destroy(&it);
     dsc_stack_destroy(stack, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test creating stack from iterator
 int test_stack_from_iterator(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
+    DSCAlloc alloc = create_int_allocator();
 
     // Create a range iterator (0, 1, 2, 3, 4)
-    DSCIterator range_it = dsc_iterator_range(0, 5, 1);
+    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
 
     // Create stack from iterator
-    DSCStack* stack = dsc_stack_from_iterator(&range_it, alloc);
+    DSCStack* stack = dsc_stack_from_iterator(&range_it, &alloc);
     ASSERT_NOT_NULL(stack);
     ASSERT_EQ(dsc_stack_size(stack), 5);
 
@@ -85,15 +84,14 @@ int test_stack_from_iterator(void)
     }
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty stack
 int test_stack_iterator_empty(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     DSCIterator it = dsc_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
@@ -103,7 +101,6 @@ int test_stack_iterator_empty(void)
 
     it.destroy(&it);
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
@@ -118,8 +115,8 @@ int test_stack_iterator_invalid(void)
 // Test iterator state after stack modifications
 int test_stack_iterator_modification(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add initial data
     for (int i = 0; i < 3; i++)
@@ -146,7 +143,6 @@ int test_stack_iterator_modification(void)
 
     it.destroy(&it);
     dsc_stack_destroy(stack, true);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

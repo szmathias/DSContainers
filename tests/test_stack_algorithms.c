@@ -7,8 +7,8 @@
 // Test stack copying (shallow)
 int test_stack_copy_shallow(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCStack* original = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* original = dsc_stack_create(&alloc);
 
     // Add some test data
     const int original_values[] = {10, 20, 30, 40, 50};
@@ -46,15 +46,14 @@ int test_stack_copy_shallow(void)
 
     dsc_stack_destroy(original, false);
     dsc_stack_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test stack copying (deep)
 int test_stack_copy_deep(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCStack* original = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* original = dsc_stack_create(&alloc);
 
     // Add some test data
     const int original_values[] = {10, 20, 30};
@@ -87,15 +86,14 @@ int test_stack_copy_deep(void)
 
     dsc_stack_destroy(original, false);
     dsc_stack_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test for_each functionality
 int test_stack_for_each(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some test data
     for (int i = 1; i <= 5; i++)
@@ -122,18 +120,14 @@ int test_stack_for_each(void)
     dsc_stack_for_each(stack, NULL);     // Should be safe
 
     dsc_stack_destroy(stack, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test stack with Person objects
 int test_stack_with_persons(void)
 {
-    DSCAlloc* alloc       = create_std_allocator();
-    alloc->copy_func      = person_copy;
-    alloc->data_free_func = person_free;
-
-    DSCStack* stack = dsc_stack_create(alloc);
+    DSCAlloc alloc = create_person_allocator();
+    DSCStack* stack = dsc_stack_create(&alloc);
 
     // Create and push some persons
     Person* alice   = create_person("Alice", 25);
@@ -169,7 +163,6 @@ int test_stack_with_persons(void)
 
     dsc_stack_destroy(stack, true);
     dsc_stack_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 

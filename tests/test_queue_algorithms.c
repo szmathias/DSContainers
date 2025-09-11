@@ -7,8 +7,8 @@
 // Test queue copying (shallow)
 int test_queue_copy_shallow(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCQueue* original = dsc_queue_create(alloc);
+    DSCAlloc alloc    = create_int_allocator();
+    DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
     const int original_values[] = {10, 20, 30, 40, 50};
@@ -46,15 +46,14 @@ int test_queue_copy_shallow(void)
 
     dsc_queue_destroy(original, false);
     dsc_queue_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test queue copying (deep)
 int test_queue_copy_deep(void)
 {
-    DSCAlloc* alloc    = create_std_allocator();
-    DSCQueue* original = dsc_queue_create(alloc);
+    DSCAlloc alloc    = create_int_allocator();
+    DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
     const int original_values[] = {10, 20, 30};
@@ -87,15 +86,14 @@ int test_queue_copy_deep(void)
 
     dsc_queue_destroy(original, false);
     dsc_queue_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test for_each functionality
 int test_queue_for_each(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add some test data
     for (int i = 1; i <= 5; i++)
@@ -122,18 +120,15 @@ int test_queue_for_each(void)
     dsc_queue_for_each(queue, NULL);     // Should be safe
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test queue with Person objects
 int test_queue_with_persons(void)
 {
-    DSCAlloc* alloc       = create_std_allocator();
-    alloc->copy_func      = person_copy;
-    alloc->data_free_func = person_free;
+    DSCAlloc alloc = create_person_allocator();
 
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Create and enqueue some persons
     Person* alice   = create_person("Alice", 25);
@@ -175,15 +170,14 @@ int test_queue_with_persons(void)
 
     dsc_queue_destroy(queue, true);
     dsc_queue_destroy(copy, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
 // Test mixed enqueue/dequeue operations
 int test_queue_mixed_operations(void)
 {
-    DSCAlloc* alloc = create_std_allocator();
-    DSCQueue* queue = dsc_queue_create(alloc);
+    DSCAlloc alloc = create_int_allocator();
+    DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Mix enqueue and dequeue operations
     for (int i = 0; i < 3; i++)
@@ -220,7 +214,6 @@ int test_queue_mixed_operations(void)
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    destroy_allocator(alloc);
     return TEST_SUCCESS;
 }
 
