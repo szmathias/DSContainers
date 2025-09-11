@@ -27,7 +27,7 @@ typedef struct DSCIterator DSCIterator;
 struct DSCIterator
 {
     void* data_state; // Implementation-specific state data
-    const DSCAlloc* alloc; // Allocator for memory management
+    DSCAlloc* alloc; // Allocator for memory management
 
     // Element access
     void*(*get)(const DSCIterator* it); // Get current element without advancing
