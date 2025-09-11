@@ -76,8 +76,8 @@ int test_hashmap_uniqueness_property(void)
     dsc_hashmap_clear(map, false, false);
 
     // Test 2: Memory-safe replacement with put_replace
-    char* heap_value1 = dsc_alloc_malloc(&alloc, 20);
-    char* heap_value2 = dsc_alloc_malloc(&alloc, 20);
+    char* heap_value1 = malloc(20);
+    char* heap_value2 = malloc(20);
     strcpy(heap_value1, "heap_first");
     strcpy(heap_value2, "heap_second");
 
