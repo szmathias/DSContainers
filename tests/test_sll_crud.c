@@ -12,7 +12,7 @@
 // Tests from test_sll.c that fit into CRUD category
 int test_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(list->size, 0);
@@ -22,7 +22,7 @@ int test_create_destroy(void)
 
 int test_insert_front_back_find(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -46,7 +46,7 @@ int test_insert_front_back_find(void)
 
 int test_remove(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -70,7 +70,7 @@ int test_remove(void)
 
 int test_remove_not_found(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -95,7 +95,7 @@ int test_NULL_handling(void)
 
 int test_insert_at(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -119,7 +119,7 @@ int test_insert_at(void)
 
 int test_remove_at(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
@@ -144,7 +144,7 @@ int test_remove_at(void)
 
 int test_remove_at_head(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 100;
@@ -166,7 +166,7 @@ int test_remove_at_head(void)
 
 int test_remove_at_last(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -191,7 +191,7 @@ int test_remove_at_last(void)
 
 int test_remove_at_invalid(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -206,7 +206,7 @@ int test_remove_at_invalid(void)
 
 int test_remove_at_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_remove_at(list, 0, true), -1); // nothing to remove
     dsc_sll_destroy(list, true);
@@ -215,7 +215,7 @@ int test_remove_at_empty(void)
 
 int test_remove_at_single_element(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 123;
@@ -228,7 +228,7 @@ int test_remove_at_single_element(void)
 
 int test_remove_at_single_element_invalid_pos(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 123;
@@ -241,7 +241,7 @@ int test_remove_at_single_element_invalid_pos(void)
 
 int test_insert_at_out_of_bounds(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -254,7 +254,7 @@ int test_insert_at_out_of_bounds(void)
 
 int test_insert_remove_null_data(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_insert_back(list, NULL), 0); // allow nullptr data
     ASSERT_EQ(list->size, 1);
@@ -266,7 +266,7 @@ int test_insert_remove_null_data(void)
 
 int test_mixed_operations_integrity(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 10;
@@ -298,7 +298,7 @@ int test_mixed_operations_integrity(void)
 
 int test_size(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_size(list), 0);
 
@@ -320,7 +320,7 @@ int test_size(void)
 
 int test_is_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_EQ(dsc_sll_is_empty(list), 1); // Empty list
 
@@ -340,7 +340,7 @@ int test_is_empty(void)
 
 int test_complex_data_type(void)
 {
-    DSCAlloc alloc = create_person_allocator();
+    DSCAllocator alloc = create_person_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     Person* p1 = create_person("Alice", 30);
@@ -368,7 +368,7 @@ int test_complex_data_type(void)
 
 int test_remove_all(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add 10 elements
@@ -395,7 +395,7 @@ int test_remove_all(void)
 
 int test_remove_front(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Test on empty list
@@ -435,7 +435,7 @@ int test_remove_front(void)
 
 int test_remove_back(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Test on empty list

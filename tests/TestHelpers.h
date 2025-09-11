@@ -102,9 +102,9 @@ void* double_value_failing(const void* data);
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(int count);
 
-DSCAlloc create_failing_int_allocator(void);
-DSCAlloc create_int_allocator(void);
-DSCAlloc create_person_allocator(void);
-DSCAlloc create_string_allocator(void);
+DSCAllocator create_failing_int_allocator(void);
+DSCAllocator create_int_allocator(void);
+DSCAllocator create_person_allocator(void);
+DSCAllocator create_string_allocator(void);
 
 #endif //DSCONTAINERS_TESTHELPERS_H

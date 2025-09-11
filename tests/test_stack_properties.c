@@ -11,7 +11,7 @@
 // Test LIFO property extensively
 int test_stack_lifo_property(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     #define num_elements 100
@@ -44,7 +44,7 @@ int test_stack_lifo_property(void)
 // Test stack size consistency
 int test_stack_size_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Size should start at 0
@@ -84,7 +84,7 @@ int test_stack_size_consistency(void)
 // Test peek invariant (peek doesn't modify stack)
 int test_stack_peek_invariant(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -120,7 +120,7 @@ int test_stack_peek_invariant(void)
 // Test copy preserves order
 int test_stack_copy_preserves_order(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* original = dsc_stack_create(&alloc);
 
     const int values[] = {1, 3, 5, 7, 9, 11, 13};
@@ -178,7 +178,7 @@ int test_stack_copy_preserves_order(void)
 // Test clear preserves stack structure
 int test_stack_clear_preserves_structure(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add elements
@@ -213,7 +213,7 @@ int test_stack_clear_preserves_structure(void)
 // Test for_each preserves stack contents
 int test_stack_for_each_preserves_contents(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     const int original_values[] = {5, 10, 15, 20, 25};

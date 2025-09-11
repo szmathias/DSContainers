@@ -12,7 +12,7 @@
 // Test hash map with failing allocator
 int test_hashmap_failing_allocator(void)
 {
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
 
     // Set to fail on first allocation
     set_alloc_fail_countdown(1);
@@ -25,7 +25,7 @@ int test_hashmap_failing_allocator(void)
 // Test hash map node allocation failure
 int test_hashmap_node_alloc_failure(void)
 {
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
 
     // Allow map creation but fail on node allocation
     set_alloc_fail_countdown(2); // Let map and bucket array allocate, fail on node
@@ -45,7 +45,7 @@ int test_hashmap_node_alloc_failure(void)
 // Test hash map resize allocation failure
 int test_hashmap_resize_failure(void)
 {
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
 
     set_alloc_fail_countdown(-1);
     // Create small map that will need to resize
@@ -74,7 +74,7 @@ int test_hashmap_resize_failure(void)
 // Test memory management with data freeing
 int test_hashmap_memory_freeing(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     // Add dynamically allocated keys and values
@@ -108,7 +108,7 @@ int test_hashmap_memory_freeing(void)
 // Test hash map copy with allocation failure
 int test_hashmap_copy_failure(void)
 {
-    DSCAlloc good_alloc = create_int_allocator();
+    DSCAllocator good_alloc = create_int_allocator();
     DSCHashMap* original = dsc_hashmap_create(&good_alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some data
@@ -116,11 +116,11 @@ int test_hashmap_copy_failure(void)
     ASSERT_EQ(dsc_hashmap_put(original, "key2", "value2"), 0);
 
     // Try to copy with failing allocator
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     set_alloc_fail_countdown(1);
 
     // Temporarily replace allocator for copy test
-    DSCAlloc* orig_alloc = original->alloc;
+    DSCAllocator* orig_alloc = original->alloc;
     original->alloc = &failing_alloc;
 
     DSCHashMap* copy = dsc_hashmap_copy(original);
@@ -137,7 +137,7 @@ int test_hashmap_copy_failure(void)
 // Test deep copy with allocation failure
 int test_hashmap_deep_copy_failure(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
@@ -163,7 +163,7 @@ int test_hashmap_deep_copy_failure(void)
 int test_hashmap_get_keys_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(map);
 
@@ -187,7 +187,7 @@ int test_hashmap_get_keys_failure(void)
 // Test hash map with NULL key/value handling
 int test_hashmap_null_handling(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Test NULL key
@@ -208,7 +208,7 @@ int test_hashmap_null_handling(void)
 // Test hash map with extreme sizes
 int test_hashmap_extreme_sizes(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Test with size 1 (minimal)
     DSCHashMap* small_map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 1);

@@ -33,7 +33,7 @@ typedef struct DSCStack
 {
     DSCStackNode* top; // Pointer to top node
     size_t size;       // Number of elements in stack
-    DSCAlloc* alloc;   // Custom allocator
+    DSCAllocator* alloc;   // Custom allocator
 } DSCStack;
 
 /**
@@ -54,7 +54,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Custom allocator (required)
  * @return Pointer to new Stack, or NULL on failure
  */
-DSC_API DSCStack* dsc_stack_create(DSCAlloc* alloc);
+DSC_API DSCStack* dsc_stack_create(DSCAllocator* alloc);
 
 /**
  * Destroy the stack and free all nodes.
@@ -205,6 +205,6 @@ DSC_API DSCIterator dsc_stack_iterator(const DSCStack* stack);
  * @param alloc The custom allocator to use
  * @return A new stack with elements from iterator, or NULL on error
  */
-DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc);
 
 #endif //DSCONTAINERS_STACK_H

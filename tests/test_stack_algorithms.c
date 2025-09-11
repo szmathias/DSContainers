@@ -7,7 +7,7 @@
 // Test stack copying (shallow)
 int test_stack_copy_shallow(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* original = dsc_stack_create(&alloc);
 
     // Add some test data
@@ -52,7 +52,7 @@ int test_stack_copy_shallow(void)
 // Test stack copying (deep)
 int test_stack_copy_deep(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* original = dsc_stack_create(&alloc);
 
     // Add some test data
@@ -92,7 +92,7 @@ int test_stack_copy_deep(void)
 // Test for_each functionality
 int test_stack_for_each(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some test data
@@ -126,7 +126,7 @@ int test_stack_for_each(void)
 // Test stack with Person objects
 int test_stack_with_persons(void)
 {
-    DSCAlloc alloc = create_person_allocator();
+    DSCAllocator alloc = create_person_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Create and push some persons

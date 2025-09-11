@@ -7,7 +7,7 @@
 // Test basic queue creation and destruction
 int test_queue_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCQueue* queue = dsc_queue_create(&alloc);
     ASSERT_NOT_NULL(queue);
@@ -43,7 +43,7 @@ int test_queue_null_parameters(void)
 // Test basic enqueue and dequeue operations
 int test_queue_enqueue_dequeue(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -96,7 +96,7 @@ int test_queue_enqueue_dequeue(void)
 // Test dequeue_data function
 int test_queue_dequeue_data(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -131,7 +131,7 @@ int test_queue_dequeue_data(void)
 // Test queue clear operation
 int test_queue_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add some elements
@@ -165,7 +165,7 @@ int test_queue_clear(void)
 // Test queue equality
 int test_queue_equals(void)
 {
-    DSCAlloc alloc  = create_int_allocator();
+    DSCAllocator alloc  = create_int_allocator();
     DSCQueue* queue1 = dsc_queue_create(&alloc);
     DSCQueue* queue2 = dsc_queue_create(&alloc);
 
@@ -207,7 +207,7 @@ int test_queue_equals(void)
 // Test FIFO behavior specifically
 int test_queue_fifo_behavior(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Enqueue numbers 0-9

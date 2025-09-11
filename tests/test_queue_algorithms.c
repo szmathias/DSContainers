@@ -7,7 +7,7 @@
 // Test queue copying (shallow)
 int test_queue_copy_shallow(void)
 {
-    DSCAlloc alloc    = create_int_allocator();
+    DSCAllocator alloc    = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -52,7 +52,7 @@ int test_queue_copy_shallow(void)
 // Test queue copying (deep)
 int test_queue_copy_deep(void)
 {
-    DSCAlloc alloc    = create_int_allocator();
+    DSCAllocator alloc    = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -92,7 +92,7 @@ int test_queue_copy_deep(void)
 // Test for_each functionality
 int test_queue_for_each(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -126,7 +126,7 @@ int test_queue_for_each(void)
 // Test queue with Person objects
 int test_queue_with_persons(void)
 {
-    DSCAlloc alloc = create_person_allocator();
+    DSCAllocator alloc = create_person_allocator();
 
     DSCQueue* queue = dsc_queue_create(&alloc);
 
@@ -176,7 +176,7 @@ int test_queue_with_persons(void)
 // Test mixed enqueue/dequeue operations
 int test_queue_mixed_operations(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Mix enqueue and dequeue operations

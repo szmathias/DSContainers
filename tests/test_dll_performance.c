@@ -11,7 +11,7 @@
 
 int test_stress(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     const int NUM_ELEMENTS    = 10000;
 
@@ -54,7 +54,7 @@ int test_performance(void)
     for (size_t s = 0; s < NUM_SIZES; s++)
     {
         const int SIZE = SIZES[s];
-        DSCAlloc alloc = create_int_allocator();
+        DSCAllocator alloc = create_int_allocator();
         DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
         // Measure insertion time

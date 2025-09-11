@@ -12,7 +12,7 @@
 // Test load factor properties
 int test_hashset_load_factor(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);
 
     // Empty set should have 0.0 load factor
@@ -40,7 +40,7 @@ int test_hashset_load_factor(void)
 // Test size consistency
 int test_hashset_size_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Initially empty
@@ -76,7 +76,7 @@ int test_hashset_size_consistency(void)
 // Test uniqueness property
 int test_hashset_uniqueness(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "unique_key";
@@ -117,7 +117,7 @@ static void count_action(void* key)
 // Test for_each functionality
 int test_hashset_for_each(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
@@ -139,7 +139,7 @@ int test_hashset_for_each(void)
 // Test get_elements completeness
 int test_hashset_get_elements_completeness(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* original_keys[] = {"first", "second", "third", "fourth"};
@@ -176,7 +176,7 @@ int test_hashset_get_elements_completeness(void)
 // Test copy preservation of properties
 int test_hashset_copy_properties(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements to original
@@ -214,7 +214,7 @@ int test_hashset_copy_properties(void)
 // Test set operation result properties
 int test_hashset_operation_properties(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -255,7 +255,7 @@ int test_hashset_operation_properties(void)
 // Test iterator consistency
 int test_hashset_iterator_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     for (int i = 0; i < 5; i++)

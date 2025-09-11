@@ -11,7 +11,7 @@
 // Test queue with failing allocator
 int test_queue_failing_allocator(void)
 {
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
 
     // Set to fail immediately
     set_alloc_fail_countdown(0);
@@ -26,7 +26,7 @@ int test_queue_failing_allocator(void)
 // Test enqueue with failing allocator
 int test_queue_enqueue_memory_failure(void)
 {
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
 
     // Allow queue creation but fail on first enqueue
     set_alloc_fail_countdown(1);
@@ -49,7 +49,7 @@ int test_queue_enqueue_memory_failure(void)
 // Test copy with failing allocator
 int test_queue_copy_memory_failure(void)
 {
-    DSCAlloc std_alloc = create_int_allocator();
+    DSCAllocator std_alloc = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&std_alloc);
 
     // Add some data
@@ -61,7 +61,7 @@ int test_queue_copy_memory_failure(void)
     }
 
     // Replace allocator with failing one
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     original->alloc = &failing_alloc;
 
     // Set to fail on copy creation
@@ -81,7 +81,7 @@ int test_queue_copy_memory_failure(void)
 int test_queue_deep_copy_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     DSCQueue* original = dsc_queue_create(&failing_alloc);
 
     // Add some data
@@ -106,7 +106,7 @@ int test_queue_deep_copy_failure(void)
 // Test memory usage with large number of elements
 int test_queue_large_memory_usage(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     const int num_elements = 10000;
@@ -140,7 +140,7 @@ int test_queue_large_memory_usage(void)
 // Test memory leaks with clear operations
 int test_queue_clear_memory(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add elements multiple times and clear
@@ -171,7 +171,7 @@ int test_queue_clear_memory(void)
 int test_queue_iterator_memory_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     DSCQueue* queue = dsc_queue_create(&failing_alloc);
 
     // Add some data
@@ -193,7 +193,7 @@ int test_queue_iterator_memory_failure(void)
 // Test front/back pointer consistency under memory pressure
 int test_queue_front_back_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Test single element case

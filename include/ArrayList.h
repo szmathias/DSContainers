@@ -25,7 +25,7 @@ typedef struct DSCArrayList
     void** data;     // Array of pointers to user data
     size_t size;     // Current number of elements
     size_t capacity; // Maximum number of elements before reallocation
-    DSCAlloc* alloc; // Custom allocator
+    DSCAllocator* alloc; // Custom allocator
 } DSCArrayList;
 
 /**
@@ -65,7 +65,7 @@ typedef void (*action_func)(void* data);
  * @param initial_capacity Initial capacity (0 uses default)
  * @return Pointer to new ArrayList, or NULL on failure
  */
-DSC_API DSCArrayList* dsc_arraylist_create(DSCAlloc* alloc, size_t initial_capacity);
+DSC_API DSCArrayList* dsc_arraylist_create(DSCAllocator* alloc, size_t initial_capacity);
 
 /**
  * Destroy the ArrayList and free all elements.
@@ -378,7 +378,7 @@ DSC_API DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list);
  * @param alloc The custom allocator to use
  * @return A new ArrayList with elements from iterator, or NULL on error
  */
-DSC_API DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAllocator* alloc);
 
 #endif //DSCONTAINERS_ARRAYLIST_H
 

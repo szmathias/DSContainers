@@ -12,7 +12,7 @@
 static int test_transform_iterator(void)
 {
     // Create a list with integers
-    DSCAlloc alloc           = create_int_allocator();
+    DSCAllocator alloc           = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
@@ -29,7 +29,7 @@ static int test_transform_iterator(void)
     ASSERT_TRUE(base_it.has_next(&base_it));
 
     // Create a transform iterator that doubles each value
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, double_value, &alloc);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value);
     ASSERT_TRUE(transform_it.has_next(&transform_it));
 
     // Test that transform works correctly
@@ -57,14 +57,14 @@ static int test_transform_iterator(void)
 static int test_transform_edge_cases(void)
 {
     // Test with empty list
-    DSCAlloc alloc                 = create_int_allocator();
+    DSCAllocator alloc                 = create_int_allocator();
     DSCDoublyLinkedList* empty_list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(empty_list);
 
     DSCIterator empty_it = dsc_dll_iterator(empty_list);
     ASSERT_FALSE(empty_it.has_next(&empty_it));
 
-    DSCIterator transform_empty = dsc_iterator_transform(&empty_it, double_value, &alloc);
+    DSCIterator transform_empty = dsc_iterator_transform(&empty_it, &alloc, double_value);
     ASSERT_FALSE(transform_empty.has_next(&transform_empty));
     ASSERT_NULL(transform_empty.next(&transform_empty));
 
@@ -72,7 +72,7 @@ static int test_transform_edge_cases(void)
     dsc_dll_destroy(empty_list, false);
 
     // Test with NULL base iterator (should handle gracefully)
-    DSCIterator null_transform = dsc_iterator_transform(NULL, double_value, &alloc);
+    DSCIterator null_transform = dsc_iterator_transform(NULL, &alloc, double_value);
     ASSERT_FALSE(null_transform.has_next(&null_transform));
     ASSERT_NULL(null_transform.next(&null_transform));
 
@@ -84,7 +84,7 @@ static int test_transform_edge_cases(void)
 // Test transform iterator chaining
 static int test_transform_chaining(void)
 {
-    DSCAlloc alloc           = create_int_allocator();
+    DSCAllocator alloc           = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
@@ -98,9 +98,9 @@ static int test_transform_chaining(void)
 
     // First transformation: double the value
     DSCIterator base_it   = dsc_dll_iterator(list);
-    DSCIterator double_it = dsc_iterator_transform(&base_it, double_value, &alloc);
+    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value);
 
-    DSCIterator chain_it = dsc_iterator_transform(&double_it, add_one, &alloc);
+    DSCIterator chain_it = dsc_iterator_transform(&double_it, &alloc, add_one);
 
     // Test the chained transformations (1->2->3, 2->4->5, 3->6->7)
     int idx = 0;
@@ -127,15 +127,15 @@ static int test_transform_chaining(void)
 // Test multiple transform chaining (range -> transform -> transform)
 static int test_multiple_transforms(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range from 1 to 6, then double, then add 10
     DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
-    DSCIterator double_it = dsc_iterator_transform(&range_it, double_value, &alloc);
+    DSCIterator double_it = dsc_iterator_transform(&range_it, &alloc, double_value);
     ASSERT_TRUE(double_it.is_valid(&double_it));
 
-    DSCIterator add_ten_it = dsc_iterator_transform(&double_it, add_ten_func, &alloc);
+    DSCIterator add_ten_it = dsc_iterator_transform(&double_it, &alloc, add_ten_func);
     ASSERT_TRUE(add_ten_it.is_valid(&add_ten_it));
 
     // Expected: [12,14,16,18,20] (double each element in range [1-5], then add 10)

@@ -37,7 +37,7 @@ static void* const HASHSET_PRESENT = (void*)1;
 // Creation and destruction functions
 //==============================================================================
 
-DSCHashSet* dsc_hashset_create(DSCAlloc* alloc, const hash_func hash,
+DSCHashSet* dsc_hashset_create(DSCAllocator* alloc, const hash_func hash,
                                const key_equals_func key_equals, const size_t initial_capacity)
 {
     if (!alloc || !hash || !key_equals)
@@ -70,7 +70,7 @@ void dsc_hashset_destroy(DSCHashSet* set, const bool should_free_keys)
 
     if (set->map)
     {
-        const DSCAlloc* alloc = set->map->alloc;
+        const DSCAllocator* alloc = set->map->alloc;
 
         // Never free values (they're just sentinels), but optionally free keys
         dsc_hashmap_destroy(set->map, should_free_keys, false);
@@ -466,7 +466,7 @@ typedef struct HashSetIteratorState
 {
     DSCIterator map_iterator;  // Underlying HashMap iterator
     void* current_key;         // Current key to return
-    DSCAlloc* alloc;          // Allocator for freeing this state
+    DSCAllocator* alloc;          // Allocator for freeing this state
 } HashSetIteratorState;
 
 static void* hashset_iterator_get(const DSCIterator* it)
@@ -652,7 +652,7 @@ DSCIterator dsc_hashset_iterator(const DSCHashSet* set)
     return it;
 }
 
-DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAlloc* alloc,
+DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
                                       const hash_func hash, const key_equals_func key_equals)
 {
     if (!it || !alloc || !hash || !key_equals)

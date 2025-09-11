@@ -11,7 +11,7 @@
 
 int test_equals(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list1 = dsc_arraylist_create(&alloc, 0);
     DSCArrayList* list2 = dsc_arraylist_create(&alloc, 0);
 
@@ -45,7 +45,7 @@ int test_equals(void)
 
 int test_equals_different_sizes(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list1 = dsc_arraylist_create(&alloc, 0);
     DSCArrayList* list2 = dsc_arraylist_create(&alloc, 0);
 
@@ -69,7 +69,7 @@ int test_equals_different_sizes(void)
 
 int test_copy_shallow(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
@@ -98,7 +98,7 @@ int test_copy_shallow(void)
 
 int test_copy_deep(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
@@ -128,7 +128,7 @@ int test_copy_deep(void)
 
 int test_boundary_conditions(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test operations on empty list
@@ -155,7 +155,7 @@ int test_boundary_conditions(void)
 
 int test_null_parameters(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test NULL list parameter
@@ -175,7 +175,7 @@ int test_null_parameters(void)
 
 int test_size_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     ASSERT_EQ(dsc_arraylist_size(list), 0);
@@ -212,7 +212,7 @@ int test_size_consistency(void)
 
 int test_data_integrity_after_operations(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add initial data
@@ -254,7 +254,7 @@ int test_data_integrity_after_operations(void)
 
 int test_large_data_set(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     const int NUM_ELEMENTS = 10000;

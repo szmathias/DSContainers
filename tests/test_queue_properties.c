@@ -11,7 +11,7 @@
 // Test FIFO property extensively
 int test_queue_fifo_property(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     #define num_elements 100
@@ -44,7 +44,7 @@ int test_queue_fifo_property(void)
 // Test queue size consistency
 int test_queue_size_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Size should start at 0
@@ -84,7 +84,7 @@ int test_queue_size_consistency(void)
 // Test front/back access invariants
 int test_queue_front_back_invariants(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -120,7 +120,7 @@ int test_queue_front_back_invariants(void)
 // Test copy preserves order
 int test_queue_copy_preserves_order(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&alloc);
 
     const int values[] = {1, 3, 5, 7, 9, 11, 13};
@@ -178,7 +178,7 @@ int test_queue_copy_preserves_order(void)
 // Test clear preserves queue structure
 int test_queue_clear_preserves_structure(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add elements
@@ -215,7 +215,7 @@ int test_queue_clear_preserves_structure(void)
 // Test for_each preserves queue contents
 int test_queue_for_each_preserves_contents(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     const int original_values[] = {5, 10, 15, 20, 25};
@@ -253,7 +253,7 @@ int test_queue_for_each_preserves_contents(void)
 // Test mixed operations maintain FIFO property
 int test_queue_mixed_operations_fifo(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Pattern: enqueue some, dequeue some, enqueue more

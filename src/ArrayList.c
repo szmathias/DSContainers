@@ -122,7 +122,7 @@ static void merge_sort_recursive(void** arr, void** temp, const size_t left, con
 // Creation and destruction functions
 //==============================================================================
 
-DSCArrayList* dsc_arraylist_create(DSCAlloc* alloc, const size_t initial_capacity)
+DSCArrayList* dsc_arraylist_create(DSCAllocator* alloc, const size_t initial_capacity)
 {
     if (!alloc)
     {
@@ -900,7 +900,7 @@ DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list)
     return it;
 }
 
-DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAlloc* alloc)
+DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAllocator* alloc)
 {
     if (!it || !alloc)
     {

@@ -12,7 +12,7 @@
 // Test basic iterator functionality
 int test_hashmap_iterator_basic(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3", "key4", "key5"};
@@ -69,7 +69,7 @@ int test_hashmap_iterator_basic(void)
 // Test iterator with empty map
 int test_hashmap_iterator_empty(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     DSCIterator it = dsc_hashmap_iterator(map);
@@ -86,7 +86,7 @@ int test_hashmap_iterator_empty(void)
 // Test iterator reset functionality
 int test_hashmap_iterator_reset(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
@@ -126,7 +126,7 @@ int test_hashmap_iterator_reset(void)
 // Test iterator with single item
 int test_hashmap_iterator_single(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "single";
@@ -153,7 +153,7 @@ int test_hashmap_iterator_single(void)
 // Test iterator get method
 int test_hashmap_iterator_get(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -182,7 +182,7 @@ int test_hashmap_iterator_get(void)
 // Test iterator backward operations (should not be supported)
 int test_hashmap_iterator_backward(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashmap_put(map, "key", "value"), 0);

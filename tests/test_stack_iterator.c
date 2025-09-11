@@ -11,7 +11,7 @@
 // Test stack with iterator
 int test_stack_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some test data
@@ -60,7 +60,7 @@ int test_stack_iterator(void)
 // Test creating stack from iterator
 int test_stack_from_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Create a range iterator (0, 1, 2, 3, 4)
     DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
@@ -90,7 +90,7 @@ int test_stack_from_iterator(void)
 // Test iterator with empty stack
 int test_stack_iterator_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     DSCIterator it = dsc_stack_iterator(stack);
@@ -115,7 +115,7 @@ int test_stack_iterator_invalid(void)
 // Test iterator state after stack modifications
 int test_stack_iterator_modification(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add initial data

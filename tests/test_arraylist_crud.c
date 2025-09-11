@@ -11,7 +11,7 @@
 
 int test_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(dsc_arraylist_size(list), 0);
@@ -23,7 +23,7 @@ int test_create_destroy(void)
 
 int test_create_with_capacity(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
     ASSERT_NOT_NULL(list);
     ASSERT_EQ(dsc_arraylist_size(list), 0);
@@ -35,7 +35,7 @@ int test_create_with_capacity(void)
 
 int test_push_back(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -64,7 +64,7 @@ int test_push_back(void)
 
 int test_push_front(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -90,7 +90,7 @@ int test_push_front(void)
 
 int test_insert_at(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -131,7 +131,7 @@ int test_insert_at(void)
 
 int test_get_set(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -164,7 +164,7 @@ int test_get_set(void)
 
 int test_front_back(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Empty list
@@ -195,7 +195,7 @@ int test_front_back(void)
 
 int test_remove_at(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -239,7 +239,7 @@ int test_remove_at(void)
 
 int test_pop_back_front(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -278,7 +278,7 @@ int test_pop_back_front(void)
 
 int test_find(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -306,7 +306,7 @@ int test_find(void)
 
 int test_remove(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
@@ -335,7 +335,7 @@ int test_remove(void)
 
 int test_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));

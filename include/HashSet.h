@@ -42,7 +42,7 @@ typedef struct DSCHashSet
  * @param initial_capacity Initial number of buckets (0 for default)
  * @return Pointer to new hash set, or NULL on failure
  */
-DSC_API DSCHashSet* dsc_hashset_create(DSCAlloc* alloc, hash_func hash,
+DSC_API DSCHashSet* dsc_hashset_create(DSCAllocator* alloc, hash_func hash,
                                key_equals_func key_equals, size_t initial_capacity);
 
 /**
@@ -246,7 +246,7 @@ DSC_API DSCIterator dsc_hashset_iterator(const DSCHashSet* set);
  * @param key_equals Key equality function
  * @return A new hash set with elements from iterator, or NULL on error
  */
-DSC_API DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAlloc* alloc,
+DSC_API DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
                                       hash_func hash, key_equals_func key_equals);
 
 #endif //DSCONTAINERS_HASHSET_H

@@ -13,7 +13,7 @@
 // Tests from test_sll.c that fit into memory/resource category
 int test_custom_allocator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
@@ -26,7 +26,7 @@ int test_custom_allocator(void)
 
 int test_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
@@ -58,7 +58,7 @@ int test_clear(void)
 
 int test_clear_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Clear an already empty list
@@ -79,7 +79,7 @@ int test_clear_null(void)
 
 int test_copy_shallow(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
@@ -122,7 +122,7 @@ int test_copy_shallow(void)
 
 int test_copy_deep(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some elements
@@ -165,7 +165,7 @@ int test_copy_deep(void)
 
 int test_copy_complex_data(void)
 {
-    DSCAlloc alloc = create_person_allocator();
+    DSCAllocator alloc = create_person_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Add some people
@@ -214,7 +214,7 @@ int test_copy_complex_data(void)
 
 int test_copy_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
     // Clone empty list
@@ -242,7 +242,7 @@ int test_copy_null(void)
     ASSERT_NULL(dsc_sll_copy_deep(NULL, int_copy, true));
 
     // Should require a valid copy function
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NULL(dsc_sll_copy_deep(list, NULL, NULL));
     dsc_sll_destroy(list, false);
@@ -252,7 +252,7 @@ int test_copy_null(void)
 int test_transform_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1); // Ensure normal allocation for setup
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     for (int i = 0; i < 5; i++)
@@ -286,7 +286,7 @@ int test_transform_allocation_failure(void)
 int test_copy_deep_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
@@ -318,7 +318,7 @@ int test_copy_deep_allocation_failure(void)
 int test_insert_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;

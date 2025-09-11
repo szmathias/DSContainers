@@ -265,7 +265,7 @@ static void transform_destroy(DSCIterator* it)
 /**
  * Create a transforming iterator that applies a function to each element.
  */
-DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transform, const DSCAlloc* alloc)
+DSCIterator dsc_iterator_transform(DSCIterator* it, const DSCAllocator* alloc, const transform_func transform)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -547,7 +547,7 @@ static void filter_destroy(DSCIterator* it)
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
  */
-DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter, const DSCAlloc* alloc)
+DSCIterator dsc_iterator_filter(DSCIterator* it, const DSCAllocator* alloc, const filter_func filter)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -818,7 +818,7 @@ static void range_destroy(DSCIterator* it)
  * @param alloc The allocator to use for the new iterator's state.
  * @return A new iterator yielding integers in the specified range
  */
-DSCIterator dsc_iterator_range(const int start, const int end, const int step, const DSCAlloc* alloc)
+DSCIterator dsc_iterator_range(const int start, const int end, const int step, const DSCAllocator* alloc)
 {
     DSCIterator it = {0}; // Initialize all fields to NULL/0
 

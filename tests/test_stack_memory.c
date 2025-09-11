@@ -11,7 +11,7 @@
 // Test stack with failing allocator
 int test_stack_failing_allocator(void)
 {
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
 
     // Set to fail immediately
     set_alloc_fail_countdown(0);
@@ -26,7 +26,7 @@ int test_stack_failing_allocator(void)
 // Test push with failing allocator
 int test_stack_push_memory_failure(void)
 {
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
 
     // Allow stack creation but fail on first push
     set_alloc_fail_countdown(1);
@@ -49,7 +49,7 @@ int test_stack_push_memory_failure(void)
 // Test copy with failing allocator
 int test_stack_copy_memory_failure(void)
 {
-    DSCAlloc std_alloc = create_int_allocator();
+    DSCAllocator std_alloc = create_int_allocator();
     DSCStack* original = dsc_stack_create(&std_alloc);
 
     // Add some data
@@ -61,7 +61,7 @@ int test_stack_copy_memory_failure(void)
     }
 
     // Replace allocator with failing one
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     original->alloc = &failing_alloc;
 
     // Set to fail on copy creation
@@ -80,7 +80,7 @@ int test_stack_copy_memory_failure(void)
 int test_stack_deep_copy_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     DSCStack* original = dsc_stack_create(&failing_alloc);
 
     // Add some data
@@ -104,7 +104,7 @@ int test_stack_deep_copy_failure(void)
 // Test memory usage with large number of elements
 int test_stack_large_memory_usage(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     const int num_elements = 10000;
@@ -137,7 +137,7 @@ int test_stack_large_memory_usage(void)
 // Test memory leaks with clear operations
 int test_stack_clear_memory(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add elements multiple times and clear
@@ -167,7 +167,7 @@ int test_stack_clear_memory(void)
 int test_stack_iterator_memory_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc failing_alloc = create_failing_int_allocator();
+    DSCAllocator failing_alloc = create_failing_int_allocator();
     DSCStack* stack = dsc_stack_create(&failing_alloc);
 
     // Add some data

@@ -53,7 +53,7 @@ static void free_node(DSCQueue* queue, DSCQueueNode* node, const bool should_fre
 // Creation and destruction functions
 //==============================================================================
 
-DSCQueue* dsc_queue_create(DSCAlloc* alloc)
+DSCQueue* dsc_queue_create(DSCAllocator* alloc)
 {
     if (!alloc)
     {
@@ -484,7 +484,7 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
     return it;
 }
 
-DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAlloc* alloc)
+DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc)
 {
     if (!it || !alloc || !it->is_valid(it))
     {

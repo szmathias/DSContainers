@@ -317,7 +317,7 @@ static void* dsc_dll_iterator_get(const DSCIterator* it)
 // Creation and destruction functions
 //==============================================================================
 
-DSCDoublyLinkedList* dsc_dll_create(DSCAlloc* alloc)
+DSCDoublyLinkedList* dsc_dll_create(DSCAllocator* alloc)
 {
     if (!alloc)
     {
@@ -1143,7 +1143,7 @@ DSCDoublyLinkedList* dsc_dll_copy_deep(const DSCDoublyLinkedList* list, const bo
 
 // Create a list from an iterator using a provided allocator. This function
 // matches the header declaration `dsc_dll_from_iterator_custom(Iterator*, Alloc*)`.
-DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
+DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAllocator* alloc)
 {
     if (!it)
     {

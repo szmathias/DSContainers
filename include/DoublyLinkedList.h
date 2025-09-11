@@ -33,7 +33,7 @@ typedef struct DSCDoublyLinkedList
     DSCDoublyLinkedNode* tail; // Pointer to last node
     size_t size;               // Number of nodes in list
 
-    DSCAlloc* alloc;
+    DSCAllocator* alloc;
 } DSCDoublyLinkedList;
 
 /**
@@ -71,7 +71,7 @@ typedef void (*action_func)(void* data);
  *
  * @return Pointer to new DoublyLinkedList, or NULL on failure.
  */
-DSC_API DSCDoublyLinkedList* dsc_dll_create(DSCAlloc* alloc);
+DSC_API DSCDoublyLinkedList* dsc_dll_create(DSCAllocator* alloc);
 
 /**
  * Destroy the list and free all nodes.
@@ -337,7 +337,7 @@ DSC_API DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList* list);
  * @param alloc The custom allocator to use
  * @return A new list with elements from iterator, or NULL on error
  */
-DSC_API DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAllocator* alloc);
 
 
 #endif //DSCONTAINERS_DOUBLYLINKEDLIST_H

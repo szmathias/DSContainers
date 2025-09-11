@@ -11,7 +11,7 @@
 // Test queue with iterator
 int test_queue_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -60,7 +60,7 @@ int test_queue_iterator(void)
 // Test creating queue from iterator
 int test_queue_from_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Create a range iterator (0, 1, 2, 3, 4)
     DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
@@ -89,7 +89,7 @@ int test_queue_from_iterator(void)
 // Test iterator with empty queue
 int test_queue_iterator_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     DSCIterator it = dsc_queue_iterator(queue);
@@ -114,7 +114,7 @@ int test_queue_iterator_invalid(void)
 // Test iterator state after queue modifications
 int test_queue_iterator_modification(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Add initial data
@@ -148,7 +148,7 @@ int test_queue_iterator_modification(void)
 // Test iterator traversal order
 int test_queue_iterator_order(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Enqueue elements with specific pattern

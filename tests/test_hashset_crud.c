@@ -12,7 +12,7 @@
 // Test basic hash set creation and destruction
 int test_hashset_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(set);
@@ -26,7 +26,7 @@ int test_hashset_create_destroy(void)
 // Test basic add and contains operations
 int test_hashset_add_contains(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "hello";
@@ -54,7 +54,7 @@ int test_hashset_add_contains(void)
 // Test adding duplicate keys
 int test_hashset_duplicate_add(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -76,7 +76,7 @@ int test_hashset_duplicate_add(void)
 // Test add_check function
 int test_hashset_add_check(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -99,7 +99,7 @@ int test_hashset_add_check(void)
 // Test remove operations
 int test_hashset_remove(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "key1";
@@ -132,7 +132,7 @@ int test_hashset_remove(void)
 // Test remove_get operations
 int test_hashset_remove_get(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "key1";
@@ -160,7 +160,7 @@ int test_hashset_remove_get(void)
 // Test clear operations
 int test_hashset_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some elements
@@ -186,7 +186,7 @@ int test_hashset_clear(void)
 // Test NULL parameter handling
 int test_hashset_null_params(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Test NULL set parameters
@@ -215,7 +215,7 @@ int test_hashset_null_params(void)
 // Test invalid creation parameters
 int test_hashset_invalid_creation(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Test NULL allocator
     ASSERT_NULL(dsc_hashset_create(NULL, dsc_hash_string, dsc_key_equals_string, 0));

@@ -12,7 +12,7 @@
 // Test basic hash map creation and destruction
 int test_hashmap_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(map);
@@ -26,7 +26,7 @@ int test_hashmap_create_destroy(void)
 // Test basic put and get operations
 int test_hashmap_put_get(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "hello";
@@ -62,7 +62,7 @@ int test_hashmap_put_get(void)
 // Test updating existing keys
 int test_hashmap_update(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -90,7 +90,7 @@ int test_hashmap_update(void)
 // Test remove operations
 int test_hashmap_remove(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key1 = "key1";
@@ -120,7 +120,7 @@ int test_hashmap_remove(void)
 // Test remove_get operation
 int test_hashmap_remove_get(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -142,7 +142,7 @@ int test_hashmap_remove_get(void)
 // Test contains_key operation
 int test_hashmap_contains(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test";
@@ -163,7 +163,7 @@ int test_hashmap_contains(void)
 // Test with integer keys
 int test_hashmap_int_keys(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     int* key1 = malloc(sizeof(int));
@@ -190,7 +190,7 @@ int test_hashmap_int_keys(void)
 // Test load factor and resizing
 int test_hashmap_resize(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 4); // Small initial size
 
     // Add enough items to trigger resize

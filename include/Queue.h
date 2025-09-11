@@ -33,7 +33,7 @@ typedef struct DSCQueue
     DSCQueueNode* front; // Pointer to front node (first to be dequeued)
     DSCQueueNode* back;  // Pointer to back node (last enqueued)
     size_t size;         // Number of elements in queue
-    DSCAlloc* alloc;     // Custom allocator
+    DSCAllocator* alloc;     // Custom allocator
 } DSCQueue;
 
 /**
@@ -54,7 +54,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Custom allocator (required)
  * @return Pointer to new Queue, or NULL on failure
  */
-DSC_API DSCQueue* dsc_queue_create(DSCAlloc* alloc);
+DSC_API DSCQueue* dsc_queue_create(DSCAllocator* alloc);
 
 /**
  * Destroy the queue and free all nodes.
@@ -205,6 +205,6 @@ DSC_API DSCIterator dsc_queue_iterator(const DSCQueue* queue);
  * @param alloc The custom allocator to use
  * @return A new queue with elements from iterator, or NULL on error
  */
-DSC_API DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAlloc* alloc);
+DSC_API DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc);
 
 #endif //DSCONTAINERS_QUEUE_H

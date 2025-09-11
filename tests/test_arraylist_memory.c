@@ -11,7 +11,7 @@
 
 int test_reserve(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Test reserve on empty list
@@ -49,7 +49,7 @@ int test_reserve(void)
 
 int test_shrink_to_fit(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
 
     // Add some elements (less than capacity)
@@ -79,7 +79,7 @@ int test_shrink_to_fit(void)
 
 int test_shrink_empty_list(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
 
     // Shrink empty list
@@ -93,7 +93,7 @@ int test_shrink_empty_list(void)
 
 int test_growth_pattern(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     size_t last_capacity = 0;
@@ -140,7 +140,7 @@ int test_memory_allocation_failure(void)
 
 int test_large_capacity(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 1000);
 
     ASSERT_NOT_NULL(list);
@@ -168,7 +168,7 @@ int test_large_capacity(void)
 
 int test_memory_cleanup_on_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
 
     // Add elements
@@ -188,7 +188,7 @@ int test_memory_cleanup_on_destroy(void)
 
 int test_memory_cleanup_on_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
 
     // Add elements
@@ -213,7 +213,7 @@ int test_memory_cleanup_on_clear(void)
 
 int test_capacity_consistency(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Capacity should always be >= size

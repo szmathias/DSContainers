@@ -55,7 +55,7 @@ static void free_node(DSCStack* stack, DSCStackNode* node, const bool should_fre
 // Creation and destruction functions
 //==============================================================================
 
-DSCStack* dsc_stack_create(DSCAlloc* alloc)
+DSCStack* dsc_stack_create(DSCAllocator* alloc)
 {
     if (!alloc)
     {
@@ -506,7 +506,7 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
     return it;
 }
 
-DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAlloc* alloc)
+DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc)
 {
     if (!it || !alloc || !it->is_valid(it))
     {

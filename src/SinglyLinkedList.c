@@ -3,7 +3,7 @@
 // Implementation of singly linked list functions.
 //
 // This file implements a lightweight singly linked list with support for a
-// customizable allocator (DSCAlloc). The API mirrors the doubly-linked list
+// customizable allocator (DSCAllocator). The API mirrors the doubly-linked list
 // style used in DoublyLinkedList.c: creation/destruction, insertion,
 // removal, higher-order operations, copying, and iterator helpers. Public
 // functions return 0 on success or non-zero on failure when applicable.
@@ -59,7 +59,7 @@ static DSCSinglyLinkedNode* sll_sort_helper_merge(DSCSinglyLinkedNode* left, DSC
  * Create a new singly linked list using the provided allocator.
  * The allocator's function pointers are defaulted to malloc/free when NULL.
  */
-DSCSinglyLinkedList* dsc_sll_create(DSCAlloc* alloc)
+DSCSinglyLinkedList* dsc_sll_create(DSCAllocator* alloc)
 {
     if (!alloc)
     {
@@ -964,7 +964,7 @@ DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list)
     return it;
 }
 
-DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAlloc* alloc)
+DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAllocator* alloc)
 {
     if (!it)
     {

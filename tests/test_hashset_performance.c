@@ -17,7 +17,7 @@
 // Test performance of add operations
 int test_hashset_add_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const clock_t start = clock();
@@ -43,7 +43,7 @@ int test_hashset_add_performance(void)
 // Test performance of contains operations
 int test_hashset_contains_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
@@ -84,7 +84,7 @@ int test_hashset_contains_performance(void)
 // Test performance of remove operations
 int test_hashset_remove_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
@@ -118,7 +118,7 @@ int test_hashset_remove_performance(void)
 // Test performance of set operations
 int test_hashset_set_operations_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -173,7 +173,7 @@ int test_hashset_set_operations_performance(void)
 // Test performance of iterator operations
 int test_hashset_iterator_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
@@ -213,7 +213,7 @@ int test_hashset_iterator_performance(void)
 // Test performance of copy operations
 int test_hashset_copy_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add elements
@@ -256,7 +256,7 @@ int test_hashset_copy_performance(void)
 // Test load factor impact on performance
 int test_hashset_load_factor_performance(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Test with small initial capacity (high load factor)
     DSCHashSet* high_load_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);

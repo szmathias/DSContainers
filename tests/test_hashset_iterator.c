@@ -12,7 +12,7 @@
 // Test basic iterator functionality
 int test_hashset_iterator_basic(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
@@ -42,7 +42,7 @@ int test_hashset_iterator_basic(void)
 // Test iterator with empty set
 int test_hashset_iterator_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     DSCIterator it = dsc_hashset_iterator(set);
@@ -60,7 +60,7 @@ int test_hashset_iterator_empty(void)
 // Test iterator reset functionality
 int test_hashset_iterator_reset(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
@@ -95,7 +95,7 @@ int test_hashset_iterator_reset(void)
 // Test iterator get current element
 int test_hashset_iterator_get(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
@@ -123,7 +123,7 @@ int test_hashset_iterator_get(void)
 // Test iterator backward operations (should not be supported)
 int test_hashset_iterator_backward(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key"), 0);
@@ -156,7 +156,7 @@ int test_hashset_iterator_null_set(void)
 // Test from_iterator functionality
 int test_hashset_from_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     // Set the copy function to string_copy for proper string handling
     alloc.copy_func = string_copy;
 
@@ -190,7 +190,7 @@ int test_hashset_from_iterator(void)
 // Test from_iterator with NULL parameters
 int test_hashset_from_iterator_null_params(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCIterator it = dsc_hashset_iterator(set);
 
@@ -214,7 +214,7 @@ int test_hashset_from_iterator_null_params(void)
 // Test iterator multiple instances
 int test_hashset_iterator_multiple(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);

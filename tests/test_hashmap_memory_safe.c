@@ -12,7 +12,7 @@
 // Test the new dsc_hashmap_put_replace function
 int test_hashmap_put_replace(void)
 {
-    DSCAlloc alloc = create_string_allocator();
+    DSCAllocator alloc = create_string_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
@@ -64,7 +64,7 @@ int test_hashmap_put_replace(void)
 // Test the new dsc_hashmap_put_with_free function
 int test_hashmap_put_with_free(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "auto_free_key";
@@ -95,7 +95,7 @@ int test_hashmap_put_with_free(void)
 // Test memory leak prevention comparison
 int test_memory_leak_prevention(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "leak_test_key";
@@ -133,7 +133,7 @@ int test_memory_leak_prevention(void)
 // Test multiple key updates with proper cleanup
 int test_multiple_updates_cleanup(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "multi_update_key";

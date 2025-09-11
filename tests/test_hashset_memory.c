@@ -12,7 +12,7 @@
 // Test memory allocation and deallocation
 int test_hashset_memory_basic(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NOT_NULL(set);
@@ -26,7 +26,7 @@ int test_hashset_memory_basic(void)
 // Test memory with key freeing
 int test_hashset_memory_with_key_freeing(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -52,7 +52,7 @@ int test_hashset_memory_with_key_freeing(void)
 // Test memory with copy operations
 int test_hashset_memory_copy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -77,7 +77,7 @@ int test_hashset_memory_copy(void)
 // Test memory with deep copy operations
 int test_hashset_memory_deep_copy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -110,7 +110,7 @@ int test_hashset_memory_deep_copy(void)
 // Test memory with get_elements operation
 int test_hashset_memory_get_elements(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -135,7 +135,7 @@ int test_hashset_memory_get_elements(void)
 // Test memory with iterator operations
 int test_hashset_memory_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -165,7 +165,7 @@ int test_hashset_memory_iterator(void)
 // Test memory with set operations
 int test_hashset_memory_set_operations(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -202,7 +202,7 @@ int test_hashset_memory_set_operations(void)
 // Test memory operations without leaks
 int test_hashset_memory_no_leaks(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     // Perform various operations
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 16);

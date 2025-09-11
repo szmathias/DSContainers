@@ -12,7 +12,7 @@
 // Test hash map size property
 int test_hashmap_size_property(void)
 {
-    DSCAlloc alloc = create_string_allocator();
+    DSCAllocator alloc = create_string_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Declare arrays outside loops to avoid scope issues
@@ -52,7 +52,7 @@ int test_hashmap_size_property(void)
 // Test hash map uniqueness property
 int test_hashmap_uniqueness_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "duplicate_key";
@@ -120,7 +120,7 @@ int test_hashmap_uniqueness_property(void)
 // Test hash map load factor property
 int test_hashmap_load_factor_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 8);
 
     // Declare arrays outside loop to avoid scope issues
@@ -153,7 +153,7 @@ int test_hashmap_load_factor_property(void)
 // Test hash map automatic resizing property
 int test_hashmap_resize_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);
 
     // Declare arrays outside loops to avoid scope issues
@@ -199,7 +199,7 @@ int test_hashmap_resize_property(void)
 // Test hash map key equality property
 int test_hashmap_key_equality_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // String literals might have different addresses but same content
@@ -227,7 +227,7 @@ int test_hashmap_key_equality_property(void)
 // Test hash map contains property
 int test_hashmap_contains_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* keys[] = {"apple", "banana", "cherry"};
@@ -282,7 +282,7 @@ int test_hashmap_contains_property(void)
 // Test hash map iterator completeness property
 int test_hashmap_iterator_completeness(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 20;
@@ -344,7 +344,7 @@ int test_hashmap_iterator_completeness(void)
 // Test hash map with different hash functions
 int test_hashmap_hash_function_property(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
 
     // Test with string hash
     DSCHashMap* str_map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);

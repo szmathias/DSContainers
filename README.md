@@ -56,7 +56,7 @@ ctest --output-on-failure
 #include "Queue.h"
 
 // Create a default allocator
-DSCAlloc alloc = dsc_alloc_default();
+DSCAllocator alloc = dsc_alloc_default();
 
 // ========== Linked List Example ==========
 DSCSinglyLinkedList *list = dsc_sll_create(&alloc);
@@ -113,7 +113,7 @@ All data structures support custom allocators and provide clear ownership semant
 
 ```c
 // Create custom allocator
-DSCAlloc custom_alloc = dsc_alloc_custom(my_malloc, my_free, my_data_free, my_copy);
+DSCAllocator custom_alloc = dsc_alloc_custom(my_malloc, my_free, my_data_free, my_copy);
 
 // Use custom allocator with any data structure
 SinglyLinkedList *list = dsc_sll_create(&custom_alloc);
@@ -140,8 +140,9 @@ DSCIterator arr_it = dsc_arraylist_iterator(arraylist); // ArrayList
 DSCIterator map_it = dsc_hashmap_iterator(hashmap);     // HashMap
 
 // Chain functional operations
-DSCIterator filtered = dsc_iterator_filter(&it, is_even_predicate);
-DSCIterator transformed = dsc_iterator_transform(&filtered, square_function);
+DSCAllocator alloc = dsc_alloc_default();
+DSCIterator filtered = dsc_iterator_filter(&it, &alloc, is_even_predicate);
+DSCIterator transformed = dsc_iterator_transform(&filtered, &alloc, square_function);
 
 while (transformed.has_next(&transformed))
 {
@@ -299,9 +300,9 @@ This project is released under an open source license. Please refer to the licen
 
 ## Changelog
 
-### v1.0.0 (Current)
+### v0.6.0 (Current)
 - ✅ Complete implementation of 8 core data structures
-- ✅ Comprehensive test suite (52 test modules, 17,000+ lines)
+- ✅ Comprehensive test suite (50+ test modules, 17,000+ lines)
 - ✅ Cross-platform build system with CI/CD
 - ✅ Memory safety with sanitizer integration
 - ✅ Threading utilities and mutex support

@@ -2,7 +2,7 @@
 // Created by zack on 8/23/25.
 //
 // This header defines a small, generic singly linked list implementation
-// with support for a custom allocator (DSCAlloc). The API provides creation
+// with support for a custom allocator (DSCAllocator). The API provides creation
 // and destruction, insertion/removal, higher-order operations (filter,
 // transform, for_each), copying utilities, and iterator helpers. Functions
 // return 0 on success and non-zero on failure where applicable. When
@@ -44,7 +44,7 @@ typedef struct DSCSinglyLinkedList
     DSCSinglyLinkedNode* tail; // Pointer to last node
     size_t size;               // Number of nodes in list
 
-    DSCAlloc* alloc; // Custom allocator
+    DSCAllocator* alloc; // Custom allocator
 } DSCSinglyLinkedList;
 
 /**
@@ -82,7 +82,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Allocator to use (alloc->alloc_func/ dealloc_func must be valid)
  * @return Pointer to new list, or NULL on failure
  */
-DSC_API DSCSinglyLinkedList* dsc_sll_create(DSCAlloc * alloc);
+DSC_API DSCSinglyLinkedList* dsc_sll_create(DSCAllocator * alloc);
 
 /**
  * Destroy the list and free all nodes.
@@ -343,7 +343,7 @@ DSC_API DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list);
  * @param alloc Allocator to use for the new list
  * @return New list with elements from iterator, or NULL on error
  */
-DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator * it, DSCAlloc * alloc);
+DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator * it, DSCAllocator * alloc);
 
 #endif //DSCONTAINERS_SINGLYLINKEDLIST_H
 

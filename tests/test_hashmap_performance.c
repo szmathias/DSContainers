@@ -13,7 +13,7 @@
 // Test insertion performance
 int test_hashmap_performance_insertion(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 1000;
@@ -49,7 +49,7 @@ int test_hashmap_performance_insertion(void)
 // Test lookup performance
 int test_hashmap_performance_lookup(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 1000;
@@ -87,7 +87,7 @@ int test_hashmap_performance_lookup(void)
 // Test removal performance
 int test_hashmap_performance_removal(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 1000;
@@ -124,7 +124,7 @@ int test_hashmap_performance_removal(void)
 // Test copy performance
 int test_hashmap_performance_copy(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 1000;
@@ -159,7 +159,7 @@ int test_hashmap_performance_copy(void)
 // Test iteration performance
 int test_hashmap_performance_iteration(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const int num_items = 1000;
@@ -201,7 +201,7 @@ int test_hashmap_performance_iteration(void)
 // Test resize performance under heavy load
 int test_hashmap_performance_resize(void)
 {
-    DSCAlloc alloc = dsc_alloc_default();
+    DSCAllocator alloc = dsc_alloc_default();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4); // Small initial size
 
     const int num_items = 1000;

@@ -12,7 +12,7 @@
 
 int test_custom_allocator(void)
 {
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
@@ -25,7 +25,7 @@ int test_custom_allocator(void)
 
 int test_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add some elements
@@ -58,7 +58,7 @@ int test_clear(void)
 
 int test_clear_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Clear an already empty list
@@ -80,7 +80,7 @@ int test_clear_null(void)
 
 int test_copy_shallow(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add some elements
@@ -148,7 +148,7 @@ int test_copy_shallow(void)
 
 int test_copy_deep(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add some elements
@@ -208,7 +208,7 @@ int test_copy_deep(void)
 
 int test_copy_complex_data(void)
 {
-    DSCAlloc alloc = create_person_allocator();
+    DSCAllocator alloc = create_person_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Add some people
@@ -259,7 +259,7 @@ int test_copy_complex_data(void)
 
 int test_copy_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
 
     // Clone empty list
@@ -295,7 +295,7 @@ int test_copy_null(void)
 int test_insert_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     int* a                    = malloc(sizeof(int));
     *a                        = 1;
@@ -323,7 +323,7 @@ int test_insert_allocation_failure(void)
 int test_copy_deep_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
@@ -355,7 +355,7 @@ int test_copy_deep_allocation_failure(void)
 int test_transform_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc alloc = create_failing_int_allocator();
+    DSCAllocator alloc = create_failing_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
@@ -387,7 +387,7 @@ int test_transform_allocation_failure(void)
 int test_from_iterator_custom_alloc_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAlloc src_alloc = create_failing_int_allocator();
+    DSCAllocator src_alloc = create_failing_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&src_alloc);
     for (int i = 0; i < 5; i++)
     {
@@ -399,7 +399,7 @@ int test_from_iterator_custom_alloc_failure(void)
 
     // Case 1: Fail on list creation
     set_alloc_fail_countdown(0);
-    DSCAlloc alloc_for_new = create_failing_int_allocator();
+    DSCAllocator alloc_for_new = create_failing_int_allocator();
     DSCDoublyLinkedList* new_list1 = dsc_dll_from_iterator(&it, &alloc_for_new);
     ASSERT_NULL(new_list1);
     it.reset(&it);

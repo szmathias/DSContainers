@@ -54,7 +54,7 @@ typedef struct DSCHashMap
     double max_load_factor;          // Maximum load factor before resize
     hash_func hash;                  // Hash function for keys
     key_equals_func key_equals;      // Key equality function
-    DSCAlloc* alloc;                 // Custom allocator
+    DSCAllocator* alloc;                 // Custom allocator
 } DSCHashMap;
 
 /**
@@ -79,7 +79,7 @@ typedef struct DSCKeyValuePair
  * @param initial_capacity Initial number of buckets (0 for default)
  * @return Pointer to new hash map, or NULL on failure
  */
-DSC_API DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, hash_func hash,
+DSC_API DSCHashMap* dsc_hashmap_create(DSCAllocator* alloc, hash_func hash,
                                key_equals_func key_equals, size_t initial_capacity);
 
 /**
@@ -283,7 +283,7 @@ DSC_API DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
  * @param key_equals Key equality function
  * @return A new hash map with elements from iterator, or NULL on error
  */
-DSC_API DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAlloc* alloc,
+DSC_API DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
                                       hash_func hash, key_equals_func key_equals);
 
 //==============================================================================

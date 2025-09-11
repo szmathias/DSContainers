@@ -11,7 +11,7 @@
 
 int test_forward_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
@@ -45,7 +45,7 @@ int test_forward_iterator(void)
 
 int test_reverse_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
@@ -79,7 +79,7 @@ int test_reverse_iterator(void)
 
 int test_iterator_get(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
@@ -113,7 +113,7 @@ int test_iterator_get(void)
 
 int test_iterator_prev(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
@@ -151,7 +151,7 @@ int test_iterator_prev(void)
 
 int test_iterator_reset(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-3
@@ -181,7 +181,7 @@ int test_iterator_reset(void)
 
 int test_iterator_empty_list(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     DSCIterator iter = dsc_arraylist_iterator(list);
@@ -198,7 +198,7 @@ int test_iterator_empty_list(void)
 
 int test_iterator_single_element(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* val = malloc(sizeof(int));
@@ -223,7 +223,7 @@ int test_iterator_single_element(void)
 
 int test_from_iterator(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* original = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
@@ -255,7 +255,7 @@ int test_from_iterator(void)
 
 int test_bidirectional_iteration(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5

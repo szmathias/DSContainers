@@ -12,7 +12,7 @@
 // Test hash map copying (shallow)
 int test_hashmap_copy_shallow(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Add some test data
@@ -46,7 +46,7 @@ int test_hashmap_copy_shallow(void)
 // Test hash map copying (deep)
 int test_hashmap_copy_deep(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     // Add some test data
@@ -89,7 +89,7 @@ static void increment_value(void* key, void* value) {
 // Test for_each functionality
 int test_hashmap_for_each(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_int, dsc_key_equals_int, 0);
 
     // Add some test data
@@ -123,7 +123,7 @@ int test_hashmap_for_each(void)
 // Test get_keys functionality
 int test_hashmap_get_keys(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"alpha", "beta", "gamma"};
@@ -165,7 +165,7 @@ int test_hashmap_get_keys(void)
 // Test get_values functionality
 int test_hashmap_get_values(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"x", "y", "z"};
@@ -207,7 +207,7 @@ int test_hashmap_get_values(void)
 // Test from_iterator functionality
 int test_hashmap_from_iterator(void)
 {
-    DSCAlloc alloc = create_string_allocator();
+    DSCAllocator alloc = create_string_allocator();
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3"};

@@ -8,13 +8,13 @@
 #include <stddef.h>
 #include "PlatformDefs.h"
 
-typedef struct DSCAlloc
+typedef struct DSCAllocator
 {
     void* (*alloc_func)(size_t size);
     void (*dealloc_func)(void* ptr);
     void (*data_free_func)(void* ptr);
     void* (*copy_func)(const void* data);
-} DSCAlloc;
+} DSCAllocator;
 
 //==============================================================================
 // Function pointer types
@@ -70,7 +70,7 @@ typedef int (*cmp_func)(const void* a, const void* b);
 typedef void*(*copy_func)(const void* data);
 
 //==============================================================================
-// Utility functions for DSCAlloc
+// Utility functions for DSCAllocator
 //==============================================================================
 
 /**
@@ -78,9 +78,9 @@ typedef void*(*copy_func)(const void* data);
  * Uses malloc and free for allocation. The default copy function
  * just returns the pointer provided to it.
  *
- * @return DSCAlloc struct with default functions
+ * @return DSCAllocator struct with default functions
  */
-DSC_API DSCAlloc dsc_alloc_default(void);
+DSC_API DSCAllocator dsc_alloc_default(void);
 
 /**
  * Create a custom allocator with user-provided functions.
@@ -89,46 +89,46 @@ DSC_API DSCAlloc dsc_alloc_default(void);
  * @param dealloc_func Memory deallocation function (required)
  * @param data_free_func User data cleanup function (can be NULL)
  * @param copy_func Data copying function (can be NULL)
- * @return DSCAlloc struct with custom functions
+ * @return DSCAllocator struct with custom functions
  */
-DSC_API DSCAlloc dsc_alloc_custom(alloc_func alloc_func, dealloc_func dealloc_func,
+DSC_API DSCAllocator dsc_alloc_custom(alloc_func alloc_func, dealloc_func dealloc_func,
                           data_free_func data_free_func, copy_func copy_func);
 
 /**
  * Allocate memory using the allocator's allocation function.
  *
- * @param alloc Pointer to DSCAlloc struct
+ * @param alloc Pointer to DSCAllocator struct
  * @param size Number of bytes to allocate
  * @return Pointer to allocated memory, or NULL on failure
  */
-DSC_API void* dsc_alloc_malloc(const DSCAlloc* alloc, size_t size);
+DSC_API void* dsc_alloc_malloc(const DSCAllocator* alloc, size_t size);
 
 /**
  * Free memory using the allocator's deallocation function.
  *
- * @param alloc Pointer to DSCAlloc struct
+ * @param alloc Pointer to DSCAllocator struct
  * @param ptr Pointer to memory to free
  */
-DSC_API void dsc_alloc_free(const DSCAlloc* alloc, void* ptr);
+DSC_API void dsc_alloc_free(const DSCAllocator* alloc, void* ptr);
 
 /**
  * Free user data using the allocator's data free function.
  * Does nothing if data_free_func is NULL.
  *
- * @param alloc Pointer to DSCAlloc struct
+ * @param alloc Pointer to DSCAllocator struct
  * @param ptr Pointer to user data to free
  */
-DSC_API void dsc_alloc_data_free(const DSCAlloc* alloc, void* ptr);
+DSC_API void dsc_alloc_data_free(const DSCAllocator* alloc, void* ptr);
 
 /**
  * Copy data using the allocator's copy function.
  * Returns NULL if copy_func is NULL.
  *
- * @param alloc Pointer to DSCAlloc struct
+ * @param alloc Pointer to DSCAllocator struct
  * @param data Pointer to data to copy
  * @return Pointer to copied data, or NULL if copy_func is NULL or on failure
  */
-DSC_API void* dsc_alloc_copy(const DSCAlloc* alloc, const void* data);
+DSC_API void* dsc_alloc_copy(const DSCAllocator* alloc, const void* data);
 
 
 

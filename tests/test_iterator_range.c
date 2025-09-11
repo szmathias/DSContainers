@@ -13,7 +13,7 @@
 // Test basic range iteration with positive step
 static int test_range_positive_step(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 0 to 5 with step 1
     DSCIterator it = dsc_iterator_range(0, 5, 1, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -39,7 +39,7 @@ static int test_range_positive_step(void)
 // Test range iterator with negative step
 static int test_range_negative_step(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 10 down to 5 with step -1
     DSCIterator it = dsc_iterator_range(10, 5, -1, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -65,7 +65,7 @@ static int test_range_negative_step(void)
 // Test range iterator with larger step
 static int test_range_larger_step(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 1 to 20 with step 3
     DSCIterator it = dsc_iterator_range(1, 20, 3, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -93,7 +93,7 @@ static int test_range_larger_step(void)
 // Test range iterator with invalid steps
 static int test_range_invalid_step(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator with step 0 (invalid)
     DSCIterator it1 = dsc_iterator_range(0, 5, 0, &alloc);
     ASSERT_FALSE(it1.is_valid(&it1));
@@ -123,7 +123,7 @@ static int test_range_invalid_step(void)
 // Test range iterator empty ranges
 static int test_range_empty(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator where start equals end
     DSCIterator it = dsc_iterator_range(5, 5, 1, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -137,7 +137,7 @@ static int test_range_empty(void)
 // Test range reset functionality
 static int test_range_reset(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 0 to 10 with step 2
     DSCIterator it = dsc_iterator_range(0, 10, 2, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -180,13 +180,13 @@ static int test_range_reset(void)
 // Test chaining range with transform
 static int test_range_transform_chain(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 1 to 6 with step 1
     DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Chain with transform iterator that squares each value
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, square_func, &alloc);
+    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, square_func);
 
     // Expected: [1,4,9,16,25] (squares of 1,2,3,4,5)
     int idx = 0;
@@ -211,13 +211,13 @@ static int test_range_transform_chain(void)
 // Test chaining range with filter
 static int test_range_filter_chain(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 1 to 11 with step 1
     DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Chain with filter iterator that only keeps odd values
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, is_odd, &alloc);
+    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_odd);
 
     // Expected: [1,3,5,7,9] (odd numbers from 1-10)
     int idx = 0;
@@ -242,7 +242,7 @@ static int test_range_filter_chain(void)
 // Test range iterator with extreme values
 static int test_range_extreme_values(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Test with very large positive values
     DSCIterator it1 = dsc_iterator_range(INT_MAX - 10, INT_MAX, 1, &alloc);
     ASSERT_TRUE(it1.is_valid(&it1));
@@ -285,7 +285,7 @@ static int test_range_extreme_values(void)
 // Test complex iteration patterns with range iterator
 static int test_complex_iteration_patterns(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator from 0 to 10 with step 1
     DSCIterator it = dsc_iterator_range(0, 10, 1, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
@@ -338,7 +338,7 @@ static int test_complex_iteration_patterns(void)
 // Test boundary iteration with bidirectional movement
 static int test_bidirectional_iteration(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
@@ -391,7 +391,7 @@ static int test_bidirectional_iteration(void)
 // Test zigzag traversal (alternating forward and backward)
 static int test_zigzag_traversal(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     DSCIterator range_it = dsc_iterator_range(0, 10, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
@@ -441,7 +441,7 @@ static int test_zigzag_traversal(void)
 // Stress test with large number of iterations
 static int test_range_stress(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    const DSCAllocator alloc = create_int_allocator();
     // Create range iterator with large number of elements
     const int SIZE = 100000;
     DSCIterator it = dsc_iterator_range(0, SIZE, 1, &alloc);

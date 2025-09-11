@@ -7,7 +7,7 @@
 // Test basic stack creation and destruction
 int test_stack_create_destroy(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCStack* stack = dsc_stack_create(&alloc);
     ASSERT_NOT_NULL(stack);
@@ -43,7 +43,7 @@ int test_stack_null_parameters(void)
 // Test basic push and pop operations
 int test_stack_push_pop(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -91,7 +91,7 @@ int test_stack_push_pop(void)
 // Test pop_data function
 int test_stack_pop_data(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
@@ -126,7 +126,7 @@ int test_stack_pop_data(void)
 // Test stack clear operation
 int test_stack_clear(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Add some elements
@@ -159,7 +159,7 @@ int test_stack_clear(void)
 // Test stack equality
 int test_stack_equals(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCStack* stack1 = dsc_stack_create(&alloc);
     DSCStack* stack2 = dsc_stack_create(&alloc);
 

@@ -160,7 +160,7 @@ static int check_and_resize(DSCHashMap* map)
 // Creation and destruction functions
 //==============================================================================
 
-DSCHashMap* dsc_hashmap_create(DSCAlloc* alloc, const hash_func hash,
+DSCHashMap* dsc_hashmap_create(DSCAllocator* alloc, const hash_func hash,
                                const key_equals_func key_equals, const size_t initial_capacity)
 {
     if (!alloc || !hash || !key_equals)
@@ -850,7 +850,7 @@ DSCIterator dsc_hashmap_iterator(const DSCHashMap* map)
     return it;
 }
 
-DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAlloc* alloc,
+DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
                                       const hash_func hash, const key_equals_func key_equals)
 {
     if (!it || !alloc || !hash || !key_equals)

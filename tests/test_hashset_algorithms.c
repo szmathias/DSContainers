@@ -10,7 +10,7 @@
 #include <string.h>
 
 // Helper function to create a set with string elements
-DSCHashSet* create_string_set(DSCAlloc* alloc, char** elements, const size_t count)
+DSCHashSet* create_string_set(DSCAllocator* alloc, char** elements, const size_t count)
 {
     DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
     if (!set) return NULL;
@@ -29,7 +29,7 @@ DSCHashSet* create_string_set(DSCAlloc* alloc, char** elements, const size_t cou
 // Test union operation
 int test_hashset_union(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c"};
     char* set2_elements[] = {"c", "d", "e"};
@@ -57,7 +57,7 @@ int test_hashset_union(void)
 // Test intersection operation
 int test_hashset_intersection(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c", "d"};
     char* set2_elements[] = {"c", "d", "e", "f"};
@@ -86,7 +86,7 @@ int test_hashset_intersection(void)
 // Test difference operation
 int test_hashset_difference(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c", "d"};
     char* set2_elements[] = {"c", "d", "e", "f"};
@@ -115,7 +115,7 @@ int test_hashset_difference(void)
 // Test subset operation
 int test_hashset_is_subset(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     char* superset_elements[] = {"a", "b", "c", "d", "e"};
     char* subset_elements[] = {"b", "d"};
@@ -149,7 +149,7 @@ int test_hashset_is_subset(void)
 // Test empty set operations
 int test_hashset_empty_operations(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     DSCHashSet* empty1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCHashSet* empty2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -190,7 +190,7 @@ int test_hashset_empty_operations(void)
 // Test NULL parameter handling for set operations
 int test_hashset_operations_null_params(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     // Test NULL parameters
@@ -220,7 +220,7 @@ int test_hashset_operations_null_params(void)
 // Test set operations with identical sets
 int test_hashset_identical_operations(void)
 {
-    DSCAlloc alloc = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
 
     char* elements[] = {"a", "b", "c"};
     DSCHashSet* set1 = create_string_set(&alloc, elements, 3);

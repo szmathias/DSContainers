@@ -22,9 +22,9 @@ static void* default_copy_func(const void* data)
 // Utility function implementations
 //==============================================================================
 
-DSCAlloc dsc_alloc_default(void)
+DSCAllocator dsc_alloc_default(void)
 {
-    const DSCAlloc alloc = {
+    const DSCAllocator alloc = {
         .alloc_func = malloc,
         .dealloc_func = free,
         .data_free_func = free,
@@ -33,10 +33,10 @@ DSCAlloc dsc_alloc_default(void)
     return alloc;
 }
 
-DSCAlloc dsc_alloc_custom(const alloc_func alloc_func, const dealloc_func dealloc_func,
+DSCAllocator dsc_alloc_custom(const alloc_func alloc_func, const dealloc_func dealloc_func,
                           const data_free_func data_free_func, const copy_func copy_func)
 {
-    DSCAlloc alloc = {
+    DSCAllocator alloc = {
         .alloc_func = alloc_func,
         .dealloc_func = dealloc_func,
         .data_free_func = data_free_func,
@@ -45,7 +45,7 @@ DSCAlloc dsc_alloc_custom(const alloc_func alloc_func, const dealloc_func deallo
     return alloc;
 }
 
-void* dsc_alloc_malloc(const DSCAlloc* alloc, const size_t size)
+void* dsc_alloc_malloc(const DSCAllocator* alloc, const size_t size)
 {
     if (!alloc || !alloc->alloc_func)
     {
@@ -54,7 +54,7 @@ void* dsc_alloc_malloc(const DSCAlloc* alloc, const size_t size)
     return alloc->alloc_func(size);
 }
 
-void dsc_alloc_free(const DSCAlloc* alloc, void* ptr)
+void dsc_alloc_free(const DSCAllocator* alloc, void* ptr)
 {
     if (alloc && alloc->dealloc_func && ptr)
     {
@@ -62,7 +62,7 @@ void dsc_alloc_free(const DSCAlloc* alloc, void* ptr)
     }
 }
 
-void dsc_alloc_data_free(const DSCAlloc* alloc, void* ptr)
+void dsc_alloc_data_free(const DSCAllocator* alloc, void* ptr)
 {
     if (alloc && alloc->data_free_func && ptr)
     {
@@ -70,7 +70,7 @@ void dsc_alloc_data_free(const DSCAlloc* alloc, void* ptr)
     }
 }
 
-void* dsc_alloc_copy(const DSCAlloc* alloc, const void* data)
+void* dsc_alloc_copy(const DSCAllocator* alloc, const void* data)
 {
     if (!alloc || !alloc->copy_func || !data)
     {
