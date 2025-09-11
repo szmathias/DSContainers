@@ -306,10 +306,7 @@ DSCIterator dsc_iterator_transform(DSCIterator* it, const transform_func transfo
     state->transform     = transform;
     state->has_owner     = (it->get != range_get && has_owner);
 
-    new_it.alloc->alloc_func = alloc->alloc_func;
-    new_it.alloc->dealloc_func  = alloc->dealloc_func;
-    new_it.alloc->data_free_func = alloc->data_free_func;
-    new_it.alloc->copy_func = alloc->copy_func;
+    new_it.alloc = alloc;
 
     new_it.data_state    = state;
 
@@ -593,10 +590,7 @@ DSCIterator dsc_iterator_filter(DSCIterator* it, const filter_func filter, const
     state->has_cached_element = 0;
     state->has_owner          = (it->get != range_get && has_owner);
 
-    new_it.alloc->alloc_func = alloc->alloc_func;
-    new_it.alloc->dealloc_func  = alloc->dealloc_func;
-    new_it.alloc->data_free_func = alloc->data_free_func;
-    new_it.alloc->copy_func = alloc->copy_func;
+    new_it.alloc = alloc;
 
     new_it.data_state = state;
 
@@ -856,10 +850,7 @@ DSCIterator dsc_iterator_range(const int start, const int end, const int step, c
     state->step       = step;
     state->is_forward = 1;
 
-    it.alloc->alloc_func = alloc->alloc_func;
-    it.alloc->dealloc_func  = alloc->dealloc_func;
-    it.alloc->data_free_func = alloc->data_free_func;
-    it.alloc->copy_func = alloc->copy_func;
+    it.alloc = alloc;
 
     it.data_state = state;
 
