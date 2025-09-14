@@ -275,7 +275,7 @@ static int test_copy_empty_input(void)
 static int test_copy_large_dataset(void)
 {
     DSCAllocator alloc = create_int_allocator();
-    const int SIZE = 100;
+    #define SIZE 100
 
     DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
@@ -312,6 +312,8 @@ static int test_copy_large_dataset(void)
 
     copy_it.destroy(&copy_it);
     dsc_dll_destroy(list, true);
+
+    #undef SIZE
     return TEST_SUCCESS;
 }
 
@@ -849,7 +851,7 @@ static int test_copy_strings(void)
 static int test_copy_performance(void)
 {
     DSCAllocator alloc = create_int_allocator();
-    const int SIZE = 1000;
+    #define SIZE 1000
 
     DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
@@ -881,6 +883,8 @@ static int test_copy_performance(void)
 
     copy_it.destroy(&copy_it);
     dsc_dll_destroy(list, true);
+
+    #undef SIZE
     return TEST_SUCCESS;
 }
 

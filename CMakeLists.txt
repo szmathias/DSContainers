@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(DSContainers
         LANGUAGES C
-        VERSION 0.7.0)
+        VERSION 0.7.1)
 
 # Set default build type to Debug if not specified
 if (NOT CMAKE_BUILD_TYPE)
