@@ -57,7 +57,7 @@ int test_hashmap_put_replace(void)
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
 
-    
+
     return TEST_SUCCESS;
 }
 
@@ -88,7 +88,7 @@ int test_hashmap_put_with_free(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, "new_key"), "new_value");
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -126,7 +126,7 @@ int test_memory_leak_prevention(void)
     // In real usage with malloc'd values, we would: free(retrieved_old);
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -140,7 +140,8 @@ int test_multiple_updates_cleanup(void)
 
     // Allocate multiple heap values
     char* values[5];
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         values[i] = malloc(20);
         sprintf(values[i], "value_%d", i);
     }
@@ -152,10 +153,11 @@ int test_multiple_updates_cleanup(void)
     ASSERT_EQ(old_value, NULL);
 
     // Update multiple times, cleaning up each old value
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; i++)
+    {
         ASSERT_EQ(dsc_hashmap_put_replace(map, key, values[i], &old_value), 0);
         ASSERT_NOT_NULL(old_value);
-        ASSERT_EQ(old_value, values[i-1]);
+        ASSERT_EQ(old_value, values[i - 1]);
         free(old_value); // Clean up previous value
 
         char expected[20];
@@ -169,7 +171,7 @@ int test_multiple_updates_cleanup(void)
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
 
-    
+
     return TEST_SUCCESS;
 }
 

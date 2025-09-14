@@ -39,11 +39,11 @@ int test_push_back(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     ASSERT_EQ(dsc_arraylist_push_back(list, a), 0);
     ASSERT_EQ(dsc_arraylist_size(list), 1);
@@ -68,11 +68,11 @@ int test_push_front(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     ASSERT_EQ(dsc_arraylist_push_front(list, a), 0);
     ASSERT_EQ(dsc_arraylist_push_front(list, b), 0);
@@ -94,13 +94,13 @@ int test_insert_at(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
     int* d = malloc(sizeof(int));
-    *d     = 4;
+    *d = 4;
 
     // Insert at beginning (empty list)
     ASSERT_EQ(dsc_arraylist_insert(list, 0, a), 0);
@@ -135,13 +135,13 @@ int test_get_set(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
     int* d = malloc(sizeof(int));
-    *d     = 42;
+    *d = 42;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
@@ -172,11 +172,11 @@ int test_front_back(void)
     ASSERT_NULL(dsc_arraylist_back(list));
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     // Single element
     dsc_arraylist_push_back(list, a);
@@ -199,13 +199,13 @@ int test_remove_at(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
     int* d = malloc(sizeof(int));
-    *d     = 4;
+    *d = 4;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
@@ -243,11 +243,11 @@ int test_pop_back_front(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
@@ -282,22 +282,22 @@ int test_find(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
     dsc_arraylist_push_back(list, c);
 
     const int key = 2;
-    size_t index  = dsc_arraylist_find(list, &key, int_cmp);
+    size_t index = dsc_arraylist_find(list, &key, int_cmp);
     ASSERT_EQ(index, 1);
 
     const int not_found = 42;
-    index               = dsc_arraylist_find(list, &not_found, int_cmp);
+    index = dsc_arraylist_find(list, &not_found, int_cmp);
     ASSERT_EQ(index, SIZE_MAX);
 
     dsc_arraylist_destroy(list, true);
@@ -310,11 +310,11 @@ int test_remove(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
@@ -339,11 +339,11 @@ int test_clear(void)
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     int* c = malloc(sizeof(int));
-    *c     = 3;
+    *c = 3;
 
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
@@ -381,7 +381,7 @@ int main(void)
         {test_clear, "test_clear"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

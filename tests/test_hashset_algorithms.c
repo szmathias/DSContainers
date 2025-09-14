@@ -13,7 +13,8 @@
 DSCHashSet* create_string_set(DSCAllocator* alloc, char** elements, const size_t count)
 {
     DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    if (!set) return NULL;
+    if (!set)
+        return NULL;
 
     for (size_t i = 0; i < count; i++)
     {

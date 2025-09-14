@@ -10,7 +10,7 @@
 
 int test_reserve_and_shrink(void)
 {
-    DSCString str             = dsc_str_create_empty(4);
+    DSCString str = dsc_str_create_empty(4);
     const size_t old_capacity = dsc_str_capacity(&str);
     ASSERT_TRUE(dsc_str_reserve(&str, 128));
     ASSERT_GT(dsc_str_capacity(&str), old_capacity);
@@ -23,7 +23,7 @@ int test_reserve_and_shrink(void)
 
 int test_buffer_growth(void)
 {
-    DSCString str                 = dsc_str_create_empty(4);
+    DSCString str = dsc_str_create_empty(4);
     const size_t initial_capacity = dsc_str_capacity(&str);
     // Append enough characters to force buffer growth
     for (int i = 0; i < 100; ++i)
@@ -51,7 +51,7 @@ int test_large_string(void)
 
 int test_reserve_and_shrink_optimal(void)
 {
-    DSCString str    = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     const size_t cap = dsc_str_capacity(&str);
     ASSERT_FALSE(dsc_str_reserve(&str, cap));
     ASSERT_TRUE(dsc_str_shrink_to_fit(&str));
@@ -74,7 +74,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

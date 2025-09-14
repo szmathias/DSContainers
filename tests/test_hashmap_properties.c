@@ -91,7 +91,7 @@ int test_hashmap_uniqueness_property(void)
     // Replace with second value - get old value back for proper cleanup
     ASSERT_EQ(dsc_hashmap_put_replace(map, key, heap_value2, &old_value), 0);
     ASSERT_EQ(dsc_hashmap_size(map), 1); // Size should remain 1
-    ASSERT_EQ(old_value, heap_value1); // Should return the old value
+    ASSERT_EQ(old_value, heap_value1);   // Should return the old value
     ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "heap_second");
 
     // Clean up the old value (no memory leak!)
@@ -279,7 +279,8 @@ int test_hashmap_contains_property(void)
     return TEST_SUCCESS;
 }
 
-// Test hash map iterator completeness property
+// Test hash map iterator completeness property - verifies that iteration
+// visits every element exactly once (mathematical property, not API behavior)
 int test_hashmap_iterator_completeness(void)
 {
     DSCAllocator alloc = dsc_alloc_default();
@@ -304,27 +305,28 @@ int test_hashmap_iterator_completeness(void)
 
     while (it.has_next(&it))
     {
-        DSCKeyValuePair* pair = (DSCKeyValuePair*)it.next(&it);
+        DSCKeyValuePair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
 
         // Find which item this is
         int found_index = -1;
         for (int i = 0; i < num_items; i++)
         {
-            if (strcmp((char*)pair->key, keys[i]) == 0)
+            if (strcmp(pair->key, keys[i]) == 0)
             {
                 found_index = i;
                 break;
             }
         }
 
-        ASSERT(found_index >= 0); // Should find the key
+        ASSERT(found_index >= 0);          // Should find the key
         ASSERT(!found_flags[found_index]); // Should not have seen it before
         found_flags[found_index] = 1;
 
         // Verify value matches
         ASSERT_EQ_STR((char*)pair->value, values[found_index]);
         visited_count++;
+        it.next(&it);
     }
 
     // Should have visited exactly all items

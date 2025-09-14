@@ -42,7 +42,7 @@ int test_hashmap_performance_insertion(void)
     ASSERT_EQ(dsc_hashmap_size(map), (size_t)num_items);
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -80,7 +80,7 @@ int test_hashmap_performance_lookup(void)
     printf("Performed %d lookups in %f seconds\n", num_items, time_taken);
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -117,7 +117,7 @@ int test_hashmap_performance_removal(void)
     ASSERT_EQ(dsc_hashmap_size(map), 0);
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -152,7 +152,7 @@ int test_hashmap_performance_copy(void)
 
     dsc_hashmap_destroy(original, false, false);
     dsc_hashmap_destroy(copy, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -181,9 +181,10 @@ int test_hashmap_performance_iteration(void)
     int visited_count = 0;
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
         visited_count++;
+        it.next(&it);
     }
 
     const clock_t end = clock();
@@ -194,7 +195,7 @@ int test_hashmap_performance_iteration(void)
 
     it.destroy(&it);
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -237,7 +238,7 @@ int test_hashmap_performance_resize(void)
     }
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 

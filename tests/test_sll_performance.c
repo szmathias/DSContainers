@@ -19,13 +19,13 @@ int test_stress(void)
     for (size_t i = 0; i < NUM_ELEMENTS; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = (int)i;
+        *val = (int)i;
         ASSERT_EQ(dsc_sll_insert_back(list, val), 0);
     }
     ASSERT_EQ(list->size, NUM_ELEMENTS);
 
     // Find an element in the middle
-    const size_t key                 = NUM_ELEMENTS / 2;
+    const size_t key = NUM_ELEMENTS / 2;
     const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, (int)key);
@@ -48,8 +48,8 @@ int test_performance(void)
     printf("\nSLL Performance tests:\n");
     for (int s = 0; s < NUM_SIZES; s++)
     {
-        const int SIZES[]         = {100, 1000, 10000};
-        const int SIZE            = SIZES[s];
+        const int SIZES[] = {100, 1000, 10000};
+        const int SIZE = SIZES[s];
         DSCAllocator alloc = create_int_allocator();
         DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
 
@@ -58,7 +58,7 @@ int test_performance(void)
         for (int i = 0; i < SIZE; i++)
         {
             int* val = malloc(sizeof(int));
-            *val     = i;
+            *val = i;
             dsc_sll_insert_back(list, val);
         }
         clock_t end = clock();
@@ -66,10 +66,10 @@ int test_performance(void)
                (double)(end - start) / CLOCKS_PER_SEC);
 
         // Measure search time for last element
-        start                            = clock();
-        int key                          = SIZE - 1;
+        start = clock();
+        int key = SIZE - 1;
         const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
-        end                              = clock();
+        end = clock();
         printf("Find last element in %d elements: %.6f seconds\n", SIZE,
                (double)(end - start) / CLOCKS_PER_SEC);
         ASSERT_NOT_NULL(found);
@@ -94,7 +94,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

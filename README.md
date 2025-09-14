@@ -1,12 +1,14 @@
 # DSContainers - Advanced C Data Structures Library
 
-A comprehensive, production-ready C library implementing essential data structures with a focus on memory safety, performance, and usability. Built with modern C11 standards and extensive testing.
+A comprehensive, production-ready C library implementing essential data structures with a focus on memory safety,
+performance, and usability. Built with modern C11 standards and extensive testing.
 
 ## Features
 
 ### Core Data Structures
+
 - **Singly Linked List** - Efficient forward-only list with O(1) insertions
-- **Doubly Linked List** - Bidirectional list with O(1) insertions/deletions at both ends  
+- **Doubly Linked List** - Bidirectional list with O(1) insertions/deletions at both ends
 - **Dynamic String** - Growable string with small string optimization
 - **ArrayList** - Dynamic array with O(1) amortized insertion and O(1) random access
 - **Stack** - LIFO container with O(1) push/pop operations
@@ -16,10 +18,12 @@ A comprehensive, production-ready C library implementing essential data structur
 - **Generic Iterator** - Unified iteration interface with filter/transform support
 
 ### Threading and Concurrency
+
 - **Mutex** - Cross-platform mutex implementation
 - **Threads** - Portable threading utilities with C11 threads support
 
 ### Key Capabilities
+
 - ✅ Custom memory allocators support
 - ✅ Generic design with function pointers
 - ✅ Comprehensive error handling
@@ -109,6 +113,7 @@ dsc_queue_destroy(queue, true);
 ## API Documentation
 
 ### Memory Management
+
 All data structures support custom allocators and provide clear ownership semantics:
 
 ```c
@@ -125,12 +130,15 @@ dsc_sll_destroy(list, true); // true = free user data with custom allocator
 ```
 
 ### Error Handling
+
 Functions return consistent error codes:
+
 - Pointer-returning functions return `NULL` on failure
 - Status functions return `-1` on error, `0` on success
 - Boolean functions return `false` on failure
 
 ### Iterator Support
+
 Unified iteration with functional programming support across all containers:
 
 ```c
@@ -154,6 +162,7 @@ transformed.destroy(&transformed);
 ```
 
 ### Advanced HashMap Usage
+
 ```c
 // String hash function example
 size_t string_hash(const void* key)
@@ -182,12 +191,14 @@ User* user = dsc_hashmap_get(user_db, "user123");
 ## Architecture
 
 ### Design Principles
+
 1. **Memory Safety** - No buffer overflows, proper allocation failure handling
 2. **Generic Design** - Function pointers enable type-agnostic operations
 3. **Zero-cost Abstractions** - Minimal overhead over manual implementation
 4. **Clear Ownership** - Well-defined memory management responsibilities
 
 ### Thread Safety
+
 - Data structures are **not** thread-safe by default for performance reasons
 - Use external synchronization for concurrent access
 - Built-in threading utilities available:
@@ -216,6 +227,7 @@ The library includes comprehensive test suites with over 17,000 lines of test co
 - **Algorithm Testing** - Sorting, searching, transformation operations
 - **Iterator Testing** - All iterator operations and edge cases
 - **Property Testing** - Invariant verification across operations
+
 ``` c
 DSCThread thread;
 int result = dsc_thread_create(&thread, worker_function, worker_data);
@@ -231,6 +243,7 @@ if (result == 0)
 ## Contributing
 
 ### Code Quality Standards
+
 - C11 standard compliance
 - AddressSanitizer/UBSan clean
 - Comprehensive documentation
@@ -275,21 +288,22 @@ target_link_libraries(your_target DSContainers)
 
 ## Performance Characteristics
 
-| Operation    | Singly Linked List | Doubly Linked List | ArrayList | Dynamic String | Stack | Queue | HashMap | HashSet |
-|--------------|--------------------|--------------------|-----------|----------------|-------|-------|---------|---------|
-| Insert Front | O(1)               | O(1)               | O(n)      | O(n)           | O(1)  | N/A   | N/A     | N/A     |
-| Insert Back  | O(n)               | O(1)               | O(1)*     | O(1)*          | N/A   | O(1)  | N/A     | N/A     |
-| Remove Front | O(1)               | O(1)               | O(n)      | O(n)           | O(1)  | O(1)  | N/A     | N/A     |
-| Remove Back  | O(n)               | O(1)               | O(1)      | O(1)           | N/A   | N/A   | N/A     | N/A     |
-| Random Access| O(n)               | O(n)               | O(1)      | O(1)           | N/A   | N/A   | O(1)*   | N/A     |
-| Search       | O(n)               | O(n)               | O(n)      | O(n)           | O(n)  | O(n)  | O(1)*   | O(1)*   |
-| Sort         | O(n log n)         | O(n log n)         | O(n log n)| O(n log n)     | N/A   | N/A   | N/A     | N/A     |
+| Operation     | Singly Linked List | Doubly Linked List | ArrayList  | Dynamic String | Stack | Queue | HashMap | HashSet |
+|---------------|--------------------|--------------------|------------|----------------|-------|-------|---------|---------|
+| Insert Front  | O(1)               | O(1)               | O(n)       | O(n)           | O(1)  | N/A   | N/A     | N/A     |
+| Insert Back   | O(n)               | O(1)               | O(1)*      | O(1)*          | N/A   | O(1)  | N/A     | N/A     |
+| Remove Front  | O(1)               | O(1)               | O(n)       | O(n)           | O(1)  | O(1)  | N/A     | N/A     |
+| Remove Back   | O(n)               | O(1)               | O(1)       | O(1)           | N/A   | N/A   | N/A     | N/A     |
+| Random Access | O(n)               | O(n)               | O(1)       | O(1)           | N/A   | N/A   | O(1)*   | N/A     |
+| Search        | O(n)               | O(n)               | O(n)       | O(n)           | O(n)  | O(n)  | O(1)*   | O(1)*   |
+| Sort          | O(n log n)         | O(n log n)         | O(n log n) | O(n log n)     | N/A   | N/A   | N/A     | N/A     |
 
 *Amortized time complexity, **Average case for hash-based structures
 
 ## Planned Features
 
 See [TODO.md](TODO.md) for upcoming features:
+
 - **String View Library** - Lightweight string references for zero-copy operations
 - **I/O Library** - Formatted printing, file operations, and stream utilities
 - **Advanced Algorithms** - Graph algorithms, advanced sorting, pattern matching
@@ -300,7 +314,8 @@ This project is released under an open source license. Please refer to the licen
 
 ## Changelog
 
-### v0.6.0 (Current)
+### v0.7.1 (Current)
+
 - ✅ Complete implementation of 8 core data structures
 - ✅ Comprehensive test suite (50+ test modules, 17,000+ lines)
 - ✅ Cross-platform build system with CI/CD

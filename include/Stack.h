@@ -31,9 +31,9 @@ typedef struct DSCStackNode
  */
 typedef struct DSCStack
 {
-    DSCStackNode* top; // Pointer to top node
-    size_t size;       // Number of elements in stack
-    DSCAllocator* alloc;   // Custom allocator
+    DSCStackNode* top;   // Pointer to top node
+    size_t size;         // Number of elements in stack
+    DSCAllocator* alloc; // Custom allocator
 } DSCStack;
 
 /**
@@ -54,7 +54,7 @@ typedef void (*action_func)(void* data);
  * @param alloc Custom allocator (required)
  * @return Pointer to new Stack, or NULL on failure
  */
-DSC_API DSCStack* dsc_stack_create(DSCAllocator* alloc);
+DSC_API DSCStack* dsc_stack_create(DSCAllocator * alloc);
 
 /**
  * Destroy the stack and free all nodes.
@@ -201,10 +201,24 @@ DSC_API DSCIterator dsc_stack_iterator(const DSCStack* stack);
 /**
  * Create a new stack from an iterator with custom allocator.
  *
- * @param it The source iterator (must be valid)
- * @param alloc The custom allocator to use
+ * This function consumes all elements from the provided iterator and creates
+ * a new stack containing those elements. The iteration follows the standard
+ * get()/next() pattern, filtering out any NULL elements returned by the iterator.
+ *
+ * @param it The source iterator (must be valid and support has_next/get/next)
+ * @param alloc The custom allocator to use for the new stack
+ * @param should_copy If true, creates deep copies of all elements using alloc->copy_func.
+ *                    If false, uses elements directly from iterator.
+ *                    When true, alloc->copy_func must not be NULL.
  * @return A new stack with elements from iterator, or NULL on error
+ *
+ * @note NULL elements from the iterator are always filtered out as they indicate
+ *       iterator issues rather than valid data.
+ * @note The iterator is consumed during this operation - it will be at the end
+ *       position after the function completes.
+ * @note If should_copy is true and copying fails for any element, the function
+ *       cleans up and returns NULL.
  */
-DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc);
+DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
 
 #endif //DSCONTAINERS_STACK_H

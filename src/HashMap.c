@@ -91,7 +91,7 @@ static int resize_map(DSCHashMap* map, const size_t new_bucket_count)
 
     // Allocate new bucket array
     DSCHashMapNode** new_buckets = dsc_alloc_malloc(map->alloc,
-        new_bucket_count * sizeof(DSCHashMapNode*));
+                                                    new_bucket_count * sizeof(DSCHashMapNode*));
     if (!new_buckets)
     {
         return -1;
@@ -273,7 +273,7 @@ int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
         return -1;
     }
 
-    const size_t index   = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -296,7 +296,7 @@ int dsc_hashmap_put(DSCHashMap* map, void* key, void* value)
     }
 
     // Insert at beginning of bucket
-    new_node->next      = map->buckets[index];
+    new_node->next = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
@@ -311,9 +311,9 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
         return -1;
     }
 
-    *old_value_out = NULL;  // Initialize to NULL
+    *old_value_out = NULL; // Initialize to NULL
 
-    const size_t index   = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -323,7 +323,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
         {
             // Return the old value and update with new value
             *old_value_out = node->value;
-            node->value    = value;
+            node->value = value;
             return 0;
         }
         node = node->next;
@@ -337,7 +337,7 @@ int dsc_hashmap_put_replace(DSCHashMap* map, void* key, void* value, void** old_
     }
 
     // Insert at beginning of bucket
-    new_node->next      = map->buckets[index];
+    new_node->next = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
@@ -352,7 +352,7 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, const boo
         return -1;
     }
 
-    const size_t index   = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
 
     // Check if key already exists
@@ -381,7 +381,7 @@ int dsc_hashmap_put_with_free(DSCHashMap* map, void* key, void* value, const boo
     }
 
     // Insert at beginning of bucket
-    new_node->next      = map->buckets[index];
+    new_node->next = map->buckets[index];
     map->buckets[index] = new_node;
     map->size++;
 
@@ -396,7 +396,7 @@ void* dsc_hashmap_get(const DSCHashMap* map, const void* key)
         return NULL;
     }
 
-    const size_t index         = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     const DSCHashMapNode* node = map->buckets[index];
 
     while (node)
@@ -419,7 +419,7 @@ int dsc_hashmap_remove(DSCHashMap* map, const void* key,
         return -1;
     }
 
-    const size_t index   = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
     DSCHashMapNode* prev = NULL;
 
@@ -455,7 +455,7 @@ void* dsc_hashmap_remove_get(DSCHashMap* map, const void* key, const bool should
         return NULL;
     }
 
-    const size_t index   = get_bucket_index(map, key);
+    const size_t index = get_bucket_index(map, key);
     DSCHashMapNode* node = map->buckets[index];
     DSCHashMapNode* prev = NULL;
 
@@ -705,8 +705,15 @@ static void* hashmap_iterator_get(const DSCIterator* it)
         return NULL;
     }
 
-    state->current_pair.key = state->current_node->key;
-    state->current_pair.value = state->current_node->value;
+    // Only update current_pair if it doesn't match current node
+    // (This handles the case where get() is called multiple times)
+    if (state->current_pair.key != state->current_node->key ||
+        state->current_pair.value != state->current_node->value)
+    {
+        state->current_pair.key = state->current_node->key;
+        state->current_pair.value = state->current_node->value;
+    }
+
     return &state->current_pair;
 }
 
@@ -721,22 +728,18 @@ static int hashmap_iterator_has_next(const DSCIterator* it)
     return state->current_node != NULL;
 }
 
-static void* hashmap_iterator_next(const DSCIterator* it)
+static int hashmap_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
-        return NULL;
+        return -1;
     }
 
     HashMapIteratorState* state = it->data_state;
     if (!state->current_node)
     {
-        return NULL;
+        return -1;
     }
-
-    // Save current pair
-    state->current_pair.key = state->current_node->key;
-    state->current_pair.value = state->current_node->value;
 
     // Advance to next node
     state->current_node = state->current_node->next;
@@ -748,7 +751,7 @@ static void* hashmap_iterator_next(const DSCIterator* it)
         state->current_node = state->map->buckets[state->current_bucket];
     }
 
-    return &state->current_pair;
+    return 0;
 }
 
 static int hashmap_iterator_has_prev(const DSCIterator* it)
@@ -757,10 +760,10 @@ static int hashmap_iterator_has_prev(const DSCIterator* it)
     return 0; // Hash map iterator doesn't support backward iteration
 }
 
-static void* hashmap_iterator_prev(const DSCIterator* it)
+static int hashmap_iterator_prev(const DSCIterator* it)
 {
     (void)it;
-    return NULL; // Hash map iterator doesn't support backward iteration
+    return -1; // Hash map iterator doesn't support backward iteration
 }
 
 static void hashmap_iterator_reset(const DSCIterator* it)
@@ -851,14 +854,19 @@ DSCIterator dsc_hashmap_iterator(const DSCHashMap* map)
 }
 
 DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
-                                      const hash_func hash, const key_equals_func key_equals)
+                                      const hash_func hash, const key_equals_func key_equals, const bool should_copy)
 {
     if (!it || !alloc || !hash || !key_equals)
     {
         return NULL;
     }
 
-    if (!it->is_valid(it))
+    if (should_copy && !alloc->copy_func)
+    {
+        return NULL; // Can't copy without copy function
+    }
+
+    if (!it->is_valid || !it->is_valid(it))
     {
         return NULL;
     }
@@ -871,17 +879,23 @@ DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
 
     while (it->has_next(it))
     {
-        DSCKeyValuePair* pair = it->next(it);
+        DSCKeyValuePair* pair = it->get(it);
+
+        // Skip NULL elements - they indicate iterator issues
         if (!pair)
         {
+            if (it->next(it) != 0)
+            {
+                break; // Iterator exhausted or failed
+            }
             continue;
         }
 
         void* key_to_insert = pair->key;
         void* value_to_insert = pair->value;
 
-        // Use copy functions if available
-        if (alloc->copy_func)
+        // Use copy functions if requested
+        if (should_copy)
         {
             key_to_insert = alloc->copy_func(pair->key);
             if (!key_to_insert)
@@ -893,7 +907,7 @@ DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
             value_to_insert = alloc->copy_func(pair->value);
             if (!value_to_insert)
             {
-                alloc->data_free_func(key_to_insert);
+                dsc_alloc_data_free(alloc, key_to_insert);
                 dsc_hashmap_destroy(map, true, true);
                 return NULL;
             }
@@ -901,13 +915,18 @@ DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
 
         if (dsc_hashmap_put(map, key_to_insert, value_to_insert) != 0)
         {
-            if (alloc->copy_func && alloc->data_free_func)
+            if (should_copy)
             {
-                alloc->data_free_func(key_to_insert);
-                alloc->data_free_func(value_to_insert);
+                dsc_alloc_data_free(alloc, key_to_insert);
+                dsc_alloc_data_free(alloc, value_to_insert);
             }
-            dsc_hashmap_destroy(map, alloc->copy_func != NULL, alloc->copy_func != NULL);
+            dsc_hashmap_destroy(map, should_copy, should_copy);
             return NULL;
+        }
+
+        if (it->next(it) != 0)
+        {
+            break; // Iterator done or failed
         }
     }
 

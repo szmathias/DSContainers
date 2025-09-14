@@ -27,7 +27,7 @@ int test_sort_already_sorted(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -52,7 +52,7 @@ int test_sort_reverse_order(void)
     for (int i = 4; i >= 0; i--)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -82,13 +82,13 @@ int test_sort_with_duplicates(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
-    const int values[]        = {5, 2, 9, 5, 7, 2, 9, 5};
-    const size_t count        = sizeof(values) / sizeof(values[0]);
+    const int values[] = {5, 2, 9, 5, 7, 2, 9, 5};
+    const size_t count = sizeof(values) / sizeof(values[0]);
 
     for (size_t i = 0; i < count; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = values[i];
+        *val = values[i];
         dsc_dll_insert_back(list, val);
     }
 
@@ -120,13 +120,13 @@ int test_sort_large_list(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
-    const int SIZE            = 1000;
+    const int SIZE = 1000;
 
     // Insert in reverse order
     for (int i = SIZE - 1; i >= 0; i--)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -167,7 +167,7 @@ int test_sort_custom_compare(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -217,21 +217,21 @@ int test_sort_stability(void)
 
     // Verify order: All Alice's should come before Bob
     const DSCDoublyLinkedNode* node = list->head;
-    const Person* person            = node->data;
+    const Person* person = node->data;
     ASSERT_EQ(strcmp(person->name, "Alice"), 0);
     ASSERT_EQ(person->age, 30); // First Alice
 
-    node   = node->next;
+    node = node->next;
     person = node->data;
     ASSERT_EQ(strcmp(person->name, "Alice"), 0);
     ASSERT_EQ(person->age, 25); // Second Alice
 
-    node   = node->next;
+    node = node->next;
     person = node->data;
     ASSERT_EQ(strcmp(person->name, "Alice"), 0);
     ASSERT_EQ(person->age, 40); // Third Alice
 
-    node   = node->next;
+    node = node->next;
     person = node->data;
     ASSERT_EQ(strcmp(person->name, "Bob"), 0);
     ASSERT_EQ(person->age, 35);
@@ -251,7 +251,7 @@ int test_reverse(void)
 
     // Test single element
     int* a = malloc(sizeof(int));
-    *a     = 10;
+    *a = 10;
     dsc_dll_insert_back(list, a);
     ASSERT_EQ(dsc_dll_reverse(list), 0);
     ASSERT_EQ(list->size, 1);
@@ -260,9 +260,9 @@ int test_reverse(void)
 
     // Test multiple elements
     int* b = malloc(sizeof(int));
-    *b     = 20;
+    *b = 20;
     int* c = malloc(sizeof(int));
-    *c     = 30;
+    *c = 30;
     dsc_dll_insert_back(list, b);
     dsc_dll_insert_back(list, c);
     // List is now [10,20,30]
@@ -317,9 +317,9 @@ int test_merge(void)
 
     // Test merging empty with non-empty
     int* a1 = malloc(sizeof(int));
-    *a1     = 10;
+    *a1 = 10;
     int* b1 = malloc(sizeof(int));
-    *b1     = 20;
+    *b1 = 20;
     dsc_dll_insert_back(list2, a1);
     dsc_dll_insert_back(list2, b1);
 
@@ -339,10 +339,10 @@ int test_merge(void)
 
     // Test merging two non-empty lists
     DSCDoublyLinkedList* list3 = dsc_dll_create(&alloc);
-    int* a2                    = malloc(sizeof(int));
-    *a2                        = 30;
-    int* b2                    = malloc(sizeof(int));
-    *b2                        = 40;
+    int* a2 = malloc(sizeof(int));
+    *a2 = 30;
+    int* b2 = malloc(sizeof(int));
+    *b2 = 40;
     dsc_dll_insert_back(list3, a2);
     dsc_dll_insert_back(list3, b2);
 
@@ -379,18 +379,18 @@ int test_splice(void)
     DSCAllocator alloc = create_int_allocator();
     // Test splicing at the beginning
     DSCDoublyLinkedList* dest1 = dsc_dll_create(&alloc);
-    DSCDoublyLinkedList* src1  = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src1 = dsc_dll_create(&alloc);
 
     int* a1 = malloc(sizeof(int));
-    *a1     = 10;
+    *a1 = 10;
     int* b1 = malloc(sizeof(int));
-    *b1     = 20;
+    *b1 = 20;
     int* c1 = malloc(sizeof(int));
-    *c1     = 30;
+    *c1 = 30;
     int* d1 = malloc(sizeof(int));
-    *d1     = 40;
+    *d1 = 40;
     int* e1 = malloc(sizeof(int));
-    *e1     = 50;
+    *e1 = 50;
 
     dsc_dll_insert_back(dest1, a1);
     dsc_dll_insert_back(dest1, b1);
@@ -417,18 +417,18 @@ int test_splice(void)
 
     // Test splicing in the middle
     DSCDoublyLinkedList* dest2 = dsc_dll_create(&alloc);
-    DSCDoublyLinkedList* src2  = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src2 = dsc_dll_create(&alloc);
 
     int* a2 = malloc(sizeof(int));
-    *a2     = 10;
+    *a2 = 10;
     int* b2 = malloc(sizeof(int));
-    *b2     = 20;
+    *b2 = 20;
     int* c2 = malloc(sizeof(int));
-    *c2     = 30;
+    *c2 = 30;
     int* d2 = malloc(sizeof(int));
-    *d2     = 40;
+    *d2 = 40;
     int* e2 = malloc(sizeof(int));
-    *e2     = 50;
+    *e2 = 50;
 
     dsc_dll_insert_back(dest2, a2);
     dsc_dll_insert_back(dest2, b2);
@@ -455,18 +455,18 @@ int test_splice(void)
 
     // Test splicing at the end
     DSCDoublyLinkedList* dest3 = dsc_dll_create(&alloc);
-    DSCDoublyLinkedList* src3  = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* src3 = dsc_dll_create(&alloc);
 
     int* a3 = malloc(sizeof(int));
-    *a3     = 10;
+    *a3 = 10;
     int* b3 = malloc(sizeof(int));
-    *b3     = 20;
+    *b3 = 20;
     int* c3 = malloc(sizeof(int));
-    *c3     = 30;
+    *c3 = 30;
     int* d3 = malloc(sizeof(int));
-    *d3     = 40;
+    *d3 = 40;
     int* e3 = malloc(sizeof(int));
-    *e3     = 50;
+    *e3 = 50;
 
     dsc_dll_insert_back(dest3, a3);
     dsc_dll_insert_back(dest3, b3);
@@ -521,13 +521,13 @@ int test_equals(void)
 
     // Lists with same elements should be equal
     int* a1 = malloc(sizeof(int));
-    *a1     = 10;
+    *a1 = 10;
     int* b1 = malloc(sizeof(int));
-    *b1     = 20;
+    *b1 = 20;
     int* a2 = malloc(sizeof(int));
-    *a2     = 10;
+    *a2 = 10;
     int* b2 = malloc(sizeof(int));
-    *b2     = 20;
+    *b2 = 20;
     dsc_dll_insert_back(list1, a1);
     dsc_dll_insert_back(list1, b1);
     dsc_dll_insert_back(list2, a2);
@@ -537,17 +537,17 @@ int test_equals(void)
 
     // Lists with different elements should not be equal
     int* c2 = malloc(sizeof(int));
-    *c2     = 30;
+    *c2 = 30;
     dsc_dll_insert_back(list2, c2);
 
     ASSERT_EQ(dsc_dll_equals(list1, list2, int_cmp), 0);
 
     // Lists with same size but different elements should not be equal
     DSCDoublyLinkedList* list3 = dsc_dll_create(&alloc);
-    int* a3                    = malloc(sizeof(int));
-    *a3                        = 10;
-    int* b3                    = malloc(sizeof(int));
-    *b3                        = 30; // Different value
+    int* a3 = malloc(sizeof(int));
+    *a3 = 10;
+    int* b3 = malloc(sizeof(int));
+    *b3 = 30; // Different value
     dsc_dll_insert_back(list3, a3);
     dsc_dll_insert_back(list3, b3);
 
@@ -573,7 +573,7 @@ int test_filter(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -595,7 +595,7 @@ int test_filter(void)
     ASSERT_EQ(list->size, 10);
 
     // Test empty list
-    DSCDoublyLinkedList* empty_list     = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* empty_list = dsc_dll_create(&alloc);
     DSCDoublyLinkedList* filtered_empty = dsc_dll_filter(empty_list, is_even);
     ASSERT_NOT_NULL(filtered_empty);
     ASSERT_EQ(filtered_empty->size, 0);
@@ -620,7 +620,7 @@ int test_filter_deep(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -632,7 +632,7 @@ int test_filter_deep(void)
     // Verify values and deep-copy semantics (pointers differ)
     const DSCDoublyLinkedNode* orig = list->head;
     const DSCDoublyLinkedNode* node = filtered->head;
-    int idx                         = 0;
+    int idx = 0;
     while (node && orig)
     {
         const int expected_values[] = {0, 2, 4, 6, 8};
@@ -651,7 +651,7 @@ int test_filter_deep(void)
     // Mutate original and ensure filtered copy unchanged
     if (list->head && list->head->data)
     {
-        *(int*)list->head->data          = 99; // change 0 -> 99
+        *(int*)list->head->data = 99; // change 0 -> 99
         const DSCDoublyLinkedNode* fnode = filtered->head;
         ASSERT_EQ(*(int*)fnode->data, 0);
     }
@@ -670,7 +670,7 @@ int test_transform(void)
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -707,7 +707,7 @@ int test_transform(void)
     }
 
     // Test empty list
-    DSCDoublyLinkedList* empty_list        = dsc_dll_create(&alloc);
+    DSCDoublyLinkedList* empty_list = dsc_dll_create(&alloc);
     DSCDoublyLinkedList* transformed_empty = dsc_dll_transform(empty_list, double_value, true);
     ASSERT_NOT_NULL(transformed_empty);
     ASSERT_EQ(transformed_empty->size, 0);
@@ -732,7 +732,7 @@ int test_for_each(void)
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -787,7 +787,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

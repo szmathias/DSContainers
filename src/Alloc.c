@@ -34,7 +34,7 @@ DSCAllocator dsc_alloc_default(void)
 }
 
 DSCAllocator dsc_alloc_custom(const alloc_func alloc_func, const dealloc_func dealloc_func,
-                          const data_free_func data_free_func, const copy_func copy_func)
+                              const data_free_func data_free_func, const copy_func copy_func)
 {
     DSCAllocator alloc = {
         .alloc_func = alloc_func,

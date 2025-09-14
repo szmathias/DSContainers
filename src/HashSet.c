@@ -220,7 +220,7 @@ DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2)
 
     // Create result set with same configuration as set1
     DSCHashSet* result = dsc_hashset_create(set1->map->alloc, set1->map->hash,
-                                           set1->map->key_equals, 0);
+                                            set1->map->key_equals, 0);
     if (!result)
     {
         return NULL;
@@ -230,13 +230,15 @@ DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2)
     DSCIterator it1 = dsc_hashmap_iterator(set1->map);
     while (it1.has_next(&it1))
     {
-        const DSCKeyValuePair* pair = it1.next(&it1);
+        const DSCKeyValuePair* pair = it1.get(&it1);
+
         if (pair && dsc_hashset_add(result, pair->key) != 0)
         {
             it1.destroy(&it1);
             dsc_hashset_destroy(result, false);
             return NULL;
         }
+        it1.next(&it1);
     }
     it1.destroy(&it1);
 
@@ -244,11 +246,12 @@ DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2)
     DSCIterator it2 = dsc_hashmap_iterator(set2->map);
     while (it2.has_next(&it2))
     {
-        const DSCKeyValuePair* pair = it2.next(&it2);
+        const DSCKeyValuePair* pair = it2.get(&it2);
         if (pair)
         {
             dsc_hashset_add(result, pair->key); // Ignore errors for duplicates
         }
+        it2.next(&it2);
     }
     it2.destroy(&it2);
 
@@ -264,7 +267,7 @@ DSCHashSet* dsc_hashset_intersection(const DSCHashSet* set1, const DSCHashSet* s
 
     // Create result set
     DSCHashSet* result = dsc_hashset_create(set1->map->alloc, set1->map->hash,
-                                           set1->map->key_equals, 0);
+                                            set1->map->key_equals, 0);
     if (!result)
     {
         return NULL;
@@ -277,7 +280,8 @@ DSCHashSet* dsc_hashset_intersection(const DSCHashSet* set1, const DSCHashSet* s
     DSCIterator it = dsc_hashmap_iterator(smaller->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
+
         if (pair && dsc_hashset_contains(larger, pair->key))
         {
             if (dsc_hashset_add(result, pair->key) != 0)
@@ -287,6 +291,7 @@ DSCHashSet* dsc_hashset_intersection(const DSCHashSet* set1, const DSCHashSet* s
                 return NULL;
             }
         }
+        it.next(&it);
     }
     it.destroy(&it);
 
@@ -302,7 +307,7 @@ DSCHashSet* dsc_hashset_difference(const DSCHashSet* set1, const DSCHashSet* set
 
     // Create result set
     DSCHashSet* result = dsc_hashset_create(set1->map->alloc, set1->map->hash,
-                                           set1->map->key_equals, 0);
+                                            set1->map->key_equals, 0);
     if (!result)
     {
         return NULL;
@@ -312,7 +317,7 @@ DSCHashSet* dsc_hashset_difference(const DSCHashSet* set1, const DSCHashSet* set
     DSCIterator it = dsc_hashmap_iterator(set1->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
         if (pair && (!set2 || !set2->map || !dsc_hashset_contains(set2, pair->key)))
         {
             if (dsc_hashset_add(result, pair->key) != 0)
@@ -322,6 +327,7 @@ DSCHashSet* dsc_hashset_difference(const DSCHashSet* set1, const DSCHashSet* set
                 return NULL;
             }
         }
+        it.next(&it);
     }
     it.destroy(&it);
 
@@ -345,12 +351,14 @@ int dsc_hashset_is_subset(const DSCHashSet* subset, const DSCHashSet* superset)
     DSCIterator it = dsc_hashmap_iterator(subset->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
+
         if (pair && !dsc_hashset_contains(superset, pair->key))
         {
             it.destroy(&it);
             return 0;
         }
+        it.next(&it);
     }
     it.destroy(&it);
 
@@ -395,7 +403,7 @@ DSCHashSet* dsc_hashset_copy(const DSCHashSet* set)
     }
 
     DSCHashSet* copy = dsc_hashset_create(set->map->alloc, set->map->hash,
-                                         set->map->key_equals, set->map->bucket_count);
+                                          set->map->key_equals, set->map->bucket_count);
     if (!copy)
     {
         return NULL;
@@ -405,13 +413,15 @@ DSCHashSet* dsc_hashset_copy(const DSCHashSet* set)
     DSCIterator it = dsc_hashmap_iterator(set->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
+
         if (pair && dsc_hashset_add(copy, pair->key) != 0)
         {
             it.destroy(&it);
             dsc_hashset_destroy(copy, false);
             return NULL;
         }
+        it.next(&it);
     }
     it.destroy(&it);
 
@@ -426,7 +436,7 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
     }
 
     DSCHashSet* copy = dsc_hashset_create(set->map->alloc, set->map->hash,
-                                         set->map->key_equals, set->map->bucket_count);
+                                          set->map->key_equals, set->map->bucket_count);
     if (!copy)
     {
         return NULL;
@@ -436,7 +446,8 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
     DSCIterator it = dsc_hashmap_iterator(set->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.next(&it);
+        const DSCKeyValuePair* pair = it.get(&it);
+
         if (pair)
         {
             void* copied_key = key_copy ? key_copy(pair->key) : pair->key;
@@ -451,6 +462,7 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
                 return NULL;
             }
         }
+        it.next(&it);
     }
     it.destroy(&it);
 
@@ -464,9 +476,9 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
 // HashSet iterator state - wraps HashMap iterator but only returns keys
 typedef struct HashSetIteratorState
 {
-    DSCIterator map_iterator;  // Underlying HashMap iterator
-    void* current_key;         // Current key to return
-    DSCAllocator* alloc;          // Allocator for freeing this state
+    DSCIterator map_iterator; // Underlying HashMap iterator
+    void* current_key;        // Current key to return
+    DSCAllocator* alloc;      // Allocator for freeing this state
 } HashSetIteratorState;
 
 static void* hashset_iterator_get(const DSCIterator* it)
@@ -476,7 +488,18 @@ static void* hashset_iterator_get(const DSCIterator* it)
         return NULL;
     }
 
-    const HashSetIteratorState* state = it->data_state;
+    HashSetIteratorState* state = it->data_state;
+
+    // If we don't have a current key, try to get one from the underlying iterator
+    if (!state->current_key && state->map_iterator.has_next(&state->map_iterator))
+    {
+        const DSCKeyValuePair* pair = state->map_iterator.get(&state->map_iterator);
+        if (pair)
+        {
+            state->current_key = pair->key;
+        }
+    }
+
     return state->current_key;
 }
 
@@ -491,24 +514,22 @@ static int hashset_iterator_has_next(const DSCIterator* it)
     return state->map_iterator.has_next(&state->map_iterator);
 }
 
-static void* hashset_iterator_next(const DSCIterator* it)
+static int hashset_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
-        return NULL;
+        return -1;
     }
 
     HashSetIteratorState* state = it->data_state;
-    const DSCKeyValuePair* pair = state->map_iterator.next(&state->map_iterator);
 
-    if (pair)
-    {
-        state->current_key = pair->key;
-        return state->current_key;
-    }
+    // Advance the underlying iterator
+    int result = state->map_iterator.next(&state->map_iterator);
 
+    // Clear current key so next get() will fetch the new one
     state->current_key = NULL;
-    return NULL;
+
+    return result;
 }
 
 static int hashset_iterator_has_prev(const DSCIterator* it)
@@ -517,10 +538,10 @@ static int hashset_iterator_has_prev(const DSCIterator* it)
     return 0; // Hash set iterator doesn't support backward iteration
 }
 
-static void* hashset_iterator_prev(const DSCIterator* it)
+static int hashset_iterator_prev(const DSCIterator* it)
 {
     (void)it;
-    return NULL; // Hash set iterator doesn't support backward iteration
+    return -1; // Hash set iterator doesn't support backward iteration
 }
 
 static void hashset_iterator_reset(const DSCIterator* it)
@@ -575,10 +596,10 @@ static int invalid_iterator_has_next(const DSCIterator* it)
     return 0;
 }
 
-static void* invalid_iterator_next(const DSCIterator* it)
+static int invalid_iterator_next(const DSCIterator* it)
 {
     (void)it;
-    return NULL;
+    return -1;
 }
 
 static int invalid_iterator_has_prev(const DSCIterator* it)
@@ -587,10 +608,10 @@ static int invalid_iterator_has_prev(const DSCIterator* it)
     return 0;
 }
 
-static void* invalid_iterator_prev(const DSCIterator* it)
+static int invalid_iterator_prev(const DSCIterator* it)
 {
     (void)it;
-    return NULL;
+    return -1;
 }
 
 static void invalid_iterator_reset(const DSCIterator* it)
@@ -653,14 +674,18 @@ DSCIterator dsc_hashset_iterator(const DSCHashSet* set)
 }
 
 DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
-                                      const hash_func hash, const key_equals_func key_equals)
+                                      const hash_func hash, const key_equals_func key_equals, const bool should_copy)
 {
     if (!it || !alloc || !hash || !key_equals)
     {
         return NULL;
     }
+    if (should_copy && !alloc->copy_func)
+    {
+        return NULL; // Can't copy without copy function
+    }
 
-    if (!it->is_valid(it))
+    if (!it->is_valid || !it->is_valid(it))
     {
         return NULL;
     }
@@ -673,31 +698,44 @@ DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
 
     while (it->has_next(it))
     {
-        void* key = it->next(it);
-        if (key)
+        void* key = it->get(it);
+
+        // Skip NULL elements - they indicate iterator issues
+        if (!key)
         {
-            void* key_to_insert = key;
-
-            // Use copy function if available
-            if (alloc->copy_func)
+            if (it->next(it) != 0)
             {
-                key_to_insert = alloc->copy_func(key);
-                if (!key_to_insert)
-                {
-                    dsc_hashset_destroy(set, true);
-                    return NULL;
-                }
+                break; // Iterator exhausted or failed
             }
+            continue;
+        }
 
-            if (dsc_hashset_add(set, key_to_insert) != 0)
+        void* key_to_insert = key;
+
+        // Use copy function if requested
+        if (should_copy)
+        {
+            key_to_insert = alloc->copy_func(key);
+            if (!key_to_insert)
             {
-                if (alloc->copy_func && alloc->data_free_func)
-                {
-                    alloc->data_free_func(key_to_insert);
-                }
-                dsc_hashset_destroy(set, alloc->copy_func != NULL);
+                dsc_hashset_destroy(set, true);
                 return NULL;
             }
+        }
+
+        if (dsc_hashset_add(set, key_to_insert) != 0)
+        {
+            if (should_copy)
+            {
+                dsc_alloc_data_free(alloc, key_to_insert);
+            }
+            dsc_hashset_destroy(set, should_copy);
+            return NULL;
+        }
+
+        if (it->next(it) != 0)
+        {
+            break; // Iterator done or failed
         }
     }
 

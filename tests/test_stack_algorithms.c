@@ -16,7 +16,7 @@ int test_stack_copy_shallow(void)
 
     for (int i = 0; i < 5; i++)
     {
-        data_ptrs[i]  = malloc(sizeof(int));
+        data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
         ASSERT_EQ(dsc_stack_push(original, data_ptrs[i]), 0);
     }
@@ -61,7 +61,7 @@ int test_stack_copy_deep(void)
     for (int i = 0; i < 3; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = original_values[i];
+        *data = original_values[i];
         ASSERT_EQ(dsc_stack_push(original, data), 0);
     }
 
@@ -99,7 +99,7 @@ int test_stack_for_each(void)
     for (int i = 1; i <= 5; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = i * 10;
+        *data = i * 10;
         ASSERT_EQ(dsc_stack_push(stack, data), 0);
     }
 
@@ -110,7 +110,7 @@ int test_stack_for_each(void)
     for (int i = 0; i < 5; i++)
     {
         const int expected[] = {51, 41, 31, 21, 11};
-        void* data           = dsc_stack_pop_data(stack);
+        void* data = dsc_stack_pop_data(stack);
         ASSERT_EQ(*(int*)data, expected[i]);
         free(data);
     }
@@ -130,8 +130,8 @@ int test_stack_with_persons(void)
     DSCStack* stack = dsc_stack_create(&alloc);
 
     // Create and push some persons
-    Person* alice   = create_person("Alice", 25);
-    Person* bob     = create_person("Bob", 30);
+    Person* alice = create_person("Alice", 25);
+    Person* bob = create_person("Bob", 30);
     Person* charlie = create_person("Charlie", 35);
 
     ASSERT_EQ(dsc_stack_push(stack, alice), 0);
@@ -152,9 +152,9 @@ int test_stack_with_persons(void)
     // Verify persons are in correct LIFO order
     for (int i = 0; i < 3; i++)
     {
-        const int expected_ages[]    = {35, 30, 25};
+        const int expected_ages[] = {35, 30, 25};
         const char* expected_names[] = {"Charlie", "Bob", "Alice"};
-        Person* person               = (Person*)dsc_stack_pop_data(copy);
+        Person* person = (Person*)dsc_stack_pop_data(copy);
         ASSERT_NOT_NULL(person);
         ASSERT_EQ_STR(person->name, expected_names[i]);
         ASSERT_EQ(person->age, expected_ages[i]);
@@ -183,7 +183,7 @@ int main(void)
 
     printf("Running Stack algorithm tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

@@ -70,7 +70,7 @@ int test_hashmap_copy_deep(void)
         int* orig_value = (int*)dsc_hashmap_get(original, &i);
         int* copy_value = (int*)dsc_hashmap_get(copy, &i);
         ASSERT_NOT_EQ_PTR(orig_value, copy_value); // Should be different pointers
-        ASSERT_EQ(*orig_value, *copy_value); // Same values
+        ASSERT_EQ(*orig_value, *copy_value);       // Same values
         ASSERT_EQ(*orig_value, i * 10);
     }
 
@@ -80,7 +80,8 @@ int test_hashmap_copy_deep(void)
 }
 
 // Helper function for for_each test
-static void increment_value(void* key, void* value) {
+static void increment_value(void* key, void* value)
+{
     (void)key; // Unused
     int* val = (int*)value;
     (*val)++;
@@ -114,7 +115,7 @@ int test_hashmap_for_each(void)
 
     // Test with NULL parameters
     dsc_hashmap_for_each(NULL, increment_value); // Should be safe
-    dsc_hashmap_for_each(map, NULL);           // Should be safe
+    dsc_hashmap_for_each(map, NULL);             // Should be safe
 
     dsc_hashmap_destroy(map, true, true);
     return TEST_SUCCESS;
@@ -223,7 +224,7 @@ int test_hashmap_from_iterator(void)
     DSCIterator it = dsc_hashmap_iterator(original);
 
     // Create new map from iterator
-    DSCHashMap* new_map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string);
+    DSCHashMap* new_map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
     ASSERT_NOT_NULL(new_map);
     ASSERT_EQ(dsc_hashmap_size(new_map), 3);
 

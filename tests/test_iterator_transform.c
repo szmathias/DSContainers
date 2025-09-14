@@ -1,163 +1,766 @@
 //
 // Created by zack on 9/3/25.
 //
+// Comprehensive test suite for transform iterator functionality.
+// Tests cover basic transformation, chaining, error handling, memory management,
+// and integration with different data structures and iterator types.
 
 #include "Iterator.h"
 #include "DoublyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include <stdlib.h>
+#include <stdio.h>
 
-// Test basic transform iterator functionality
-static int test_transform_iterator(void)
+//==============================================================================
+// Helper Functions for Transform Iterator Tests
+//==============================================================================
+
+/**
+ * Helper function to collect all values from an iterator into an array.
+ * Returns the number of values collected.
+ */
+static int collect_values(const DSCIterator* it, int* values, const int max_count)
 {
-    // Create a list with integers
-    DSCAllocator alloc           = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
-    ASSERT_NOT_NULL(list);
+    int count = 0;
+    while (it->has_next(it) && count < max_count)
+    {
+        const int* value = it->get(it);
+        if (value)
+        {
+            values[count++] = *value;
+        }
+        it->next(it);
+    }
+    return count;
+}
 
-    // Add some elements
-    for (int i = 1; i <= 5; i++)
+/**
+ * Helper function to verify an array matches expected values.
+ */
+static int verify_values(const int* actual, const int* expected, const int count, const char* test_name)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (actual[i] != expected[i])
+        {
+            printf("FAIL: %s - Expected %d at index %d, got %d\n",
+                   test_name, expected[i], i, actual[i]);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/**
+ * Helper function to create a test list with integers 1 through n.
+ */
+static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
+{
+    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    if (!list)
+        return NULL;
+
+    for (int i = 1; i <= n; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        if (!val)
+        {
+            dsc_dll_destroy(list, true);
+            return NULL;
+        }
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
+    return list;
+}
 
-    // Create a basic iterator
+//==============================================================================
+// Basic Transform Iterator Tests
+//==============================================================================
+
+/**
+ * Test basic transform iterator functionality with double_value.
+ */
+static int test_transform_basic_double(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ASSERT_NOT_NULL(list);
+
+    // Create base iterator
     DSCIterator base_it = dsc_dll_iterator(list);
+    ASSERT_TRUE(base_it.is_valid(&base_it));
     ASSERT_TRUE(base_it.has_next(&base_it));
 
-    // Create a transform iterator that doubles each value
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value);
+    // Create transform iterator that doubles each value
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
     ASSERT_TRUE(transform_it.has_next(&transform_it));
 
-    // Test that transform works correctly
-    int expected = 2; // First element (1) doubled
-    while (transform_it.has_next(&transform_it))
-    {
-        int* value = transform_it.next(&transform_it);
-        ASSERT_NOT_NULL(value);
-        ASSERT_EQ(*value, expected);
-        expected += 2; // Next expected value
-        free(value);   // Free the transformed value
-    }
+    // Expected: [1,2,3,4,5] -> [2,4,6,8,10]
+    const int expected[] = {2, 4, 6, 8, 10};
+    int actual[5];
+    const int count = collect_values(&transform_it, actual, 5);
 
-    // Verify we processed all elements
-    ASSERT_EQ(expected, 12); // After 1,2,3,4,5 -> 2,4,6,8,10
+    ASSERT_EQ(count, 5);
+    ASSERT_TRUE(verify_values(actual, expected, count, "basic_double"));
+
+    // Iterator should be exhausted
+    ASSERT_FALSE(transform_it.has_next(&transform_it));
+    ASSERT_NULL(transform_it.get(&transform_it));
 
     // Cleanup
     transform_it.destroy(&transform_it);
     dsc_dll_destroy(list, true);
-
     return TEST_SUCCESS;
 }
 
-// Test transform iterator with edge cases
-static int test_transform_edge_cases(void)
+/**
+ * Test transform iterator with square function.
+ */
+static int test_transform_square(void)
 {
-    // Test with empty list
-    DSCAllocator alloc                 = create_int_allocator();
-    DSCDoublyLinkedList* empty_list = dsc_dll_create(&alloc);
-    ASSERT_NOT_NULL(empty_list);
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 4);
+    ASSERT_NOT_NULL(list);
 
-    DSCIterator empty_it = dsc_dll_iterator(empty_list);
-    ASSERT_FALSE(empty_it.has_next(&empty_it));
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, square_func, true);
 
-    DSCIterator transform_empty = dsc_iterator_transform(&empty_it, &alloc, double_value);
-    ASSERT_FALSE(transform_empty.has_next(&transform_empty));
-    ASSERT_NULL(transform_empty.next(&transform_empty));
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
-    transform_empty.destroy(&transform_empty);
-    dsc_dll_destroy(empty_list, false);
+    // Expected: [1,2,3,4] -> [1,4,9,16]
+    const int expected[] = {1, 4, 9, 16};
+    int actual[4];
+    const int count = collect_values(&transform_it, actual, 4);
 
-    // Test with NULL base iterator (should handle gracefully)
-    DSCIterator null_transform = dsc_iterator_transform(NULL, &alloc, double_value);
-    ASSERT_FALSE(null_transform.has_next(&null_transform));
-    ASSERT_NULL(null_transform.next(&null_transform));
+    ASSERT_EQ(count, 4);
+    ASSERT_TRUE(verify_values(actual, expected, count, "square_transform"));
 
-    null_transform.destroy(&null_transform);
-
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
-// Test transform iterator chaining
-static int test_transform_chaining(void)
+/**
+ * Test transform iterator with add_one function.
+ */
+static int test_transform_add_one(void)
 {
-    DSCAllocator alloc           = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_one, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // Expected: [1,2,3] -> [2,3,4]
+    const int expected[] = {2, 3, 4};
+    int actual[3];
+    const int count = collect_values(&transform_it, actual, 3);
+
+    ASSERT_EQ(count, 3);
+    ASSERT_TRUE(verify_values(actual, expected, count, "add_one_transform"));
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Transform Iterator Chaining Tests
+//==============================================================================
+
+/**
+ * Test chaining transform iterators: double then add one.
+ */
+static int test_transform_chain_double_add_one(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    // Create base iterator
+    DSCIterator base_it = dsc_dll_iterator(list);
+
+    // Chain transforms: first double, then add one
+    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    DSCIterator add_one_it = dsc_iterator_transform(&double_it, &alloc, add_one, true);
+
+    ASSERT_TRUE(add_one_it.is_valid(&add_one_it));
+
+    // Expected: [1,2,3] -> [2,4,6] -> [3,5,7]
+    const int expected[] = {3, 5, 7};
+    int actual[3];
+    const int count = collect_values(&add_one_it, actual, 3);
+
+    ASSERT_EQ(count, 3);
+    ASSERT_TRUE(verify_values(actual, expected, count, "chain_double_add_one"));
+
+    add_one_it.destroy(&add_one_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test chaining transform iterators: square then multiply by 3.
+ */
+static int test_transform_chain_square_multiply(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator square_it = dsc_iterator_transform(&base_it, &alloc, square_func, true);
+    DSCIterator multiply_it = dsc_iterator_transform(&square_it, &alloc, multiply_by_three, true);
+
+    // Expected: [1,2,3] -> [1,4,9] -> [3,12,27]
+    const int expected[] = {3, 12, 27};
+    int actual[3];
+    const int count = collect_values(&multiply_it, actual, 3);
+
+    ASSERT_EQ(count, 3);
+    ASSERT_TRUE(verify_values(actual, expected, count, "chain_square_multiply"));
+
+    multiply_it.destroy(&multiply_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test complex chaining: three transforms in sequence.
+ */
+static int test_transform_triple_chain(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    DSCIterator add_five_it = dsc_iterator_transform(&double_it, &alloc, add_five, true);
+    DSCIterator square_it = dsc_iterator_transform(&add_five_it, &alloc, square_func, true);
+
+    // Expected: [1,2] -> [2,4] -> [7,9] -> [49,81]
+    const int expected[] = {49, 81};
+    int actual[2];
+    const int count = collect_values(&square_it, actual, 2);
+
+    ASSERT_EQ(count, 2);
+    ASSERT_TRUE(verify_values(actual, expected, count, "triple_chain"));
+
+    square_it.destroy(&square_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Edge Case Tests
+//==============================================================================
+
+/**
+ * Test transform iterator with empty input.
+ */
+static int test_transform_empty_input(void)
+{
+    DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
-    // Add elements 1-3
-    for (int i = 1; i <= 3; i++)
-    {
-        int* val = malloc(sizeof(int));
-        *val     = i;
-        dsc_dll_insert_back(list, val);
-    }
+    // Create iterator on empty list
+    DSCIterator base_it = dsc_dll_iterator(list);
+    ASSERT_FALSE(base_it.has_next(&base_it));
 
-    // First transformation: double the value
-    DSCIterator base_it   = dsc_dll_iterator(list);
-    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value);
+    // Create transform iterator
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+    ASSERT_FALSE(transform_it.has_next(&transform_it));
+    ASSERT_NULL(transform_it.get(&transform_it));
 
-    DSCIterator chain_it = dsc_iterator_transform(&double_it, &alloc, add_one);
+    // Test that next() fails appropriately
+    ASSERT_EQ(transform_it.next(&transform_it), -1);
 
-    // Test the chained transformations (1->2->3, 2->4->5, 3->6->7)
-    int idx = 0;
-
-    while (chain_it.has_next(&chain_it))
-    {
-        const int expected_values[] = {3, 5, 7};
-        int* value                  = chain_it.next(&chain_it);
-        ASSERT_NOT_NULL(value);
-        ASSERT_EQ(*value, expected_values[idx++]);
-        free(value);
-    }
-
-    ASSERT_EQ(idx, 3); // Verify we processed all elements
-
-    // Cleanup - note that destroying the outermost iterator should
-    // recursively destroy all inner iterators
-    chain_it.destroy(&chain_it);
-    dsc_dll_destroy(list, true);
-
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
-// Test multiple transform chaining (range -> transform -> transform)
-static int test_multiple_transforms(void)
+/**
+ * Test transform iterator with single element.
+ */
+static int test_transform_single_element(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    // Create range from 1 to 6, then double, then add 10
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
-    ASSERT_TRUE(range_it.is_valid(&range_it));
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ASSERT_NOT_NULL(list);
 
-    DSCIterator double_it = dsc_iterator_transform(&range_it, &alloc, double_value);
-    ASSERT_TRUE(double_it.is_valid(&double_it));
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, multiply_by_three, true);
 
-    DSCIterator add_ten_it = dsc_iterator_transform(&double_it, &alloc, add_ten_func);
-    ASSERT_TRUE(add_ten_it.is_valid(&add_ten_it));
+    ASSERT_TRUE(transform_it.has_next(&transform_it));
 
-    // Expected: [12,14,16,18,20] (double each element in range [1-5], then add 10)
-    int idx = 0;
+    const int* value = transform_it.get(&transform_it);
+    ASSERT_NOT_NULL(value);
+    ASSERT_EQ(*value, 3); // 1 * 3 = 3
 
-    while (add_ten_it.has_next(&add_ten_it))
-    {
-        const int expected[] = {12, 14, 16, 18, 20};
-        int* value           = add_ten_it.next(&add_ten_it);
-        ASSERT_NOT_NULL(value);
-        ASSERT_EQ(*value, expected[idx]);
-        idx++;
-        free(value);
-    }
+    transform_it.next(&transform_it);
+    ASSERT_FALSE(transform_it.has_next(&transform_it));
+    ASSERT_NULL(transform_it.get(&transform_it));
 
-    ASSERT_EQ(idx, 5); // Should have 5 elements
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Error Handling Tests
+//==============================================================================
+
+/**
+ * Test transform iterator with invalid inputs.
+ */
+static int test_transform_invalid_inputs(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+
+    // Test with NULL iterator
+    DSCIterator invalid_it1 = dsc_iterator_transform(NULL, &alloc, double_value, true);
+    ASSERT_FALSE(invalid_it1.is_valid(&invalid_it1));
+    ASSERT_FALSE(invalid_it1.has_next(&invalid_it1));
+    ASSERT_NULL(invalid_it1.get(&invalid_it1));
+
+    // Test with NULL transform function
+    DSCIterator invalid_it2 = dsc_iterator_transform(&base_it, &alloc, NULL, true);
+    ASSERT_FALSE(invalid_it2.is_valid(&invalid_it2));
+
+    // Test with NULL allocator
+    DSCIterator base_it2 = dsc_dll_iterator(list);
+    DSCIterator invalid_it3 = dsc_iterator_transform(&base_it2, NULL, double_value, true);
+    ASSERT_FALSE(invalid_it3.is_valid(&invalid_it3));
 
     // Cleanup
-    add_ten_it.destroy(&add_ten_it); // This should destroy all chained iterators
+    invalid_it1.destroy(&invalid_it1);
+    invalid_it2.destroy(&invalid_it2);
+    invalid_it3.destroy(&invalid_it3);
+    base_it2.destroy(&base_it2);
+    base_it.destroy(&base_it);
+    dsc_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
+/**
+ * Test transform iterator operations on invalid iterator.
+ */
+static int test_transform_operations_on_invalid(void)
+{
+    const DSCAllocator alloc = create_int_allocator();
+
+    // Create invalid transform iterator
+    DSCIterator invalid_it = dsc_iterator_transform(NULL, &alloc, double_value, false);
+    ASSERT_FALSE(invalid_it.is_valid(&invalid_it));
+
+    // All operations should fail gracefully
+    ASSERT_EQ(invalid_it.next(&invalid_it), -1);
+    ASSERT_EQ(invalid_it.prev(&invalid_it), 0); // Transform doesn't support prev
+    ASSERT_FALSE(invalid_it.has_next(&invalid_it));
+    ASSERT_FALSE(invalid_it.has_prev(&invalid_it)); // Transform doesn't support has_prev
+    ASSERT_NULL(invalid_it.get(&invalid_it));
+
+    // Reset should be safe to call but ineffective
+    invalid_it.reset(&invalid_it); // Should not crash
+
+    invalid_it.destroy(&invalid_it);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// API Behavior Tests
+//==============================================================================
+
+/**
+ * Test that get() doesn't advance, next() does advance.
+ */
+static int test_transform_get_next_separation(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_ten_func, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // Test get without advancing
+    const int* value1 = transform_it.get(&transform_it);
+    ASSERT_NOT_NULL(value1);
+    ASSERT_EQ(*value1, 11); // 1 + 10 = 11
+
+    // Get again - should return same value
+    const int* value2 = transform_it.get(&transform_it);
+    ASSERT_NOT_NULL(value2);
+    ASSERT_EQ(*value2, 11);
+
+    // Store value before advancing
+    const int first_value = *value1;
+
+    // Now advance
+    ASSERT_EQ(transform_it.next(&transform_it), 0);
+    const int* value3 = transform_it.get(&transform_it);
+    ASSERT_NOT_NULL(value3);
+    ASSERT_EQ(*value3, 12); // 2 + 10 = 12
+    ASSERT_NOT_EQ(first_value, *value3);
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test next() return codes.
+ */
+static int test_transform_next_return_codes(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // First next should succeed
+    ASSERT_EQ(transform_it.next(&transform_it), 0);
+
+    // Second next should succeed
+    ASSERT_EQ(transform_it.next(&transform_it), 0);
+
+    // Third next should fail (at end)
+    ASSERT_EQ(transform_it.next(&transform_it), -1);
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test unsupported bidirectional operations.
+ */
+static int test_transform_unsupported_operations(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // Transform iterator should not support bidirectional operations
+    ASSERT_FALSE(transform_it.has_prev(&transform_it));
+    ASSERT_EQ(transform_it.prev(&transform_it), 0); // Returns 0 for unsupported
+
+    // Reset should be safe but ineffective
+    transform_it.reset(&transform_it);
+
+    // Should still be valid after unsupported operations
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Integration Tests with Range Iterator
+//==============================================================================
+
+/**
+ * Test transform iterator with range iterator as input.
+ */
+static int test_transform_with_range_iterator(void)
+{
+    const DSCAllocator alloc = create_int_allocator();
+
+    // Create range iterator: [2, 4, 6, 8]
+    DSCIterator range_it = dsc_iterator_range(2, 10, 2, &alloc);
+    ASSERT_TRUE(range_it.is_valid(&range_it));
+
+    // Apply square transform
+    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, square_func, true);
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // Expected: [2,4,6,8] -> [4,16,36,64]
+    const int expected[] = {4, 16, 36, 64};
+    int actual[4];
+    const int count = collect_values(&transform_it, actual, 4);
+
+    ASSERT_EQ(count, 4);
+    ASSERT_TRUE(verify_values(actual, expected, count, "transform_range"));
+
+    transform_it.destroy(&transform_it);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test chaining range -> transform -> transform.
+ */
+static int test_range_transform_chain(void)
+{
+    const DSCAllocator alloc = create_int_allocator();
+
+    // Create range iterator: [1, 2, 3]
+    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
+
+    // Chain: range -> double -> add_five
+    DSCIterator double_it = dsc_iterator_transform(&range_it, &alloc, double_value, true);
+    DSCIterator add_five_it = dsc_iterator_transform(&double_it, &alloc, add_five, true);
+
+    // Expected: [1,2,3] -> [2,4,6] -> [7,9,11]
+    const int expected[] = {7, 9, 11};
+    int actual[3];
+    const int count = collect_values(&add_five_it, actual, 3);
+
+    ASSERT_EQ(count, 3);
+    ASSERT_TRUE(verify_values(actual, expected, count, "range_transform_chain"));
+
+    add_five_it.destroy(&add_five_it);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Memory Management Tests
+//==============================================================================
+
+/**
+ * Test memory consistency across operations.
+ */
+static int test_transform_memory_consistency(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, multiply_by_three, true);
+
+    // Get multiple references to the same value
+    const int* ptr1 = transform_it.get(&transform_it);
+    const int* ptr2 = transform_it.get(&transform_it);
+    const int* ptr3 = transform_it.get(&transform_it);
+
+    // All should point to the same memory and have the same value
+    ASSERT_EQ(ptr1, ptr2);
+    ASSERT_EQ(ptr2, ptr3);
+    ASSERT_EQ(*ptr1, 3); // 1 * 3 = 3
+    ASSERT_EQ(*ptr2, 3);
+    ASSERT_EQ(*ptr3, 3);
+
+    // Store the value before moving to next
+    const int first_value = *ptr1;
+
+    // Move to next and verify new value
+    transform_it.next(&transform_it);
+    const int* ptr4 = transform_it.get(&transform_it);
+    ASSERT_EQ(*ptr4, 6); // 2 * 3 = 6
+
+    // The transform iterator may use different memory for each value
+    // This is normal behavior - what matters is the values are correct
+    ASSERT_NOT_EQ(first_value, *ptr4); // Values should be different
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test that transform iterator properly manages base iterator lifecycle.
+ */
+static int test_transform_iterator_ownership(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ASSERT_NOT_NULL(list);
+
+    // Create base iterator
+    DSCIterator base_it = dsc_dll_iterator(list);
+    ASSERT_TRUE(base_it.is_valid(&base_it));
+
+    // Create transform iterator (takes ownership of base_it)
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    // Verify transform works
+    const int* value = transform_it.get(&transform_it);
+    ASSERT_NOT_NULL(value);
+    ASSERT_EQ(*value, 2); // 1 * 2 = 2
+
+    // When we destroy transform iterator, it should clean up base iterator too
+    transform_it.destroy(&transform_it);
+
+    // Note: We should not access base_it after this point as it's been destroyed
+
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Performance and Stress Tests
+//==============================================================================
+
+/**
+ * Test transform iterator with large dataset.
+ */
+static int test_transform_large_dataset(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    const int SIZE = 1000;
+
+    DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    int count = 0;
+    int expected = 2; // First element (1) doubled
+
+    while (transform_it.has_next(&transform_it))
+    {
+        const int* value = transform_it.get(&transform_it);
+        ASSERT_NOT_NULL(value);
+        ASSERT_EQ(*value, expected);
+
+        count++;
+        expected += 2; // Next expected value (each input increments by 1, doubled)
+        transform_it.next(&transform_it);
+    }
+
+    ASSERT_EQ(count, SIZE);
+    ASSERT_FALSE(transform_it.has_next(&transform_it));
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+/**
+ * Test deep chaining performance.
+ */
+static int test_transform_deep_chaining(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ASSERT_NOT_NULL(list);
+
+    // Create a deep chain of 5 transforms
+    DSCIterator it1 = dsc_dll_iterator(list);
+    DSCIterator it2 = dsc_iterator_transform(&it1, &alloc, add_one, true);
+    DSCIterator it3 = dsc_iterator_transform(&it2, &alloc, double_value, true);
+    DSCIterator it4 = dsc_iterator_transform(&it3, &alloc, add_five, true);
+    DSCIterator it5 = dsc_iterator_transform(&it4, &alloc, multiply_by_three, true);
+    DSCIterator final_it = dsc_iterator_transform(&it5, &alloc, square_func, true);
+
+    ASSERT_TRUE(final_it.is_valid(&final_it));
+
+    // Just verify it works end-to-end for first element
+    // Input: 1 -> +1 -> *2 -> +5 -> *3 -> ^2
+    // 1 -> 2 -> 4 -> 9 -> 27 -> 729
+    const int* first_value = final_it.get(&final_it);
+    ASSERT_NOT_NULL(first_value);
+    ASSERT_EQ(*first_value, 729);
+
+    // Verify we can iterate through all elements
+    int count = 0;
+    while (final_it.has_next(&final_it))
+    {
+        const int* value = final_it.get(&final_it);
+        ASSERT_NOT_NULL(value);
+        count++;
+        final_it.next(&final_it);
+    }
+
+    ASSERT_EQ(count, 10);
+
+    final_it.destroy(&final_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Enhanced Helper Function Tests
+//==============================================================================
+
+/**
+ * Enhanced helper function with better validation.
+ */
+static int collect_values_with_validation(const DSCIterator* it, int* values, int max_count)
+{
+    int count = 0;
+    while (it->has_next(it) && count < max_count)
+    {
+        const int* value = it->get(it);
+        if (!value)
+        {
+            // get() returned null but has_next was true - this is an error
+            return -1;
+        }
+
+        values[count++] = *value;
+
+        // Verify that next() succeeds when has_next() is true
+        if (it->next(it) != 0)
+        {
+            // next() failed but has_next() was true - this is an error
+            return -1;
+        }
+    }
+    return count;
+}
+
+/**
+ * Test helper function validation with transform iterator.
+ */
+static int test_transform_helper_validation(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ASSERT_NOT_NULL(list);
+
+    DSCIterator base_it = dsc_dll_iterator(list);
+    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_five, true);
+
+    ASSERT_TRUE(transform_it.is_valid(&transform_it));
+
+    int values[5];
+    const int count = collect_values_with_validation(&transform_it, values, 5);
+
+    // Should successfully collect all 5 values
+    ASSERT_EQ(count, 5);
+
+    const int expected[] = {6, 7, 8, 9, 10}; // [1,2,3,4,5] + 5 each
+    ASSERT_TRUE(verify_values(values, expected, count, "helper_validation"));
+
+    transform_it.destroy(&transform_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+//==============================================================================
+// Test Suite Definition
+//==============================================================================
 
 typedef struct
 {
@@ -165,35 +768,86 @@ typedef struct
     const char* name;
 } TestCase;
 
-TestCase tests[] = {
-    {test_transform_iterator, "test_transform_iterator"},
-    {test_transform_edge_cases, "test_transform_edge_cases"},
-    {test_transform_chaining, "test_transform_chaining"},
-    {test_multiple_transforms, "test_multiple_transforms"},
+static const TestCase tests[] = {
+    // Basic functionality tests
+    {test_transform_basic_double, "test_transform_basic_double"},
+    {test_transform_square, "test_transform_square"},
+    {test_transform_add_one, "test_transform_add_one"},
+
+    // Chaining tests
+    {test_transform_chain_double_add_one, "test_transform_chain_double_add_one"},
+    {test_transform_chain_square_multiply, "test_transform_chain_square_multiply"},
+    {test_transform_triple_chain, "test_transform_triple_chain"},
+
+    // Edge case tests
+    {test_transform_empty_input, "test_transform_empty_input"},
+    {test_transform_single_element, "test_transform_single_element"},
+
+    // Error handling tests
+    {test_transform_invalid_inputs, "test_transform_invalid_inputs"},
+    {test_transform_operations_on_invalid, "test_transform_operations_on_invalid"},
+
+    // API behavior tests
+    {test_transform_get_next_separation, "test_transform_get_next_separation"},
+    {test_transform_next_return_codes, "test_transform_next_return_codes"},
+    {test_transform_unsupported_operations, "test_transform_unsupported_operations"},
+
+    // Integration tests
+    {test_transform_with_range_iterator, "test_transform_with_range_iterator"},
+    {test_range_transform_chain, "test_range_transform_chain"},
+
+    // Memory management tests
+    {test_transform_memory_consistency, "test_transform_memory_consistency"},
+    {test_transform_iterator_ownership, "test_transform_iterator_ownership"},
+
+    // Performance and stress tests
+    {test_transform_large_dataset, "test_transform_large_dataset"},
+    {test_transform_deep_chaining, "test_transform_deep_chaining"},
+
+    // Enhanced helper tests
+    {test_transform_helper_validation, "test_transform_helper_validation"},
 };
+
+//==============================================================================
+// Main Test Runner
+//==============================================================================
 
 int main(void)
 {
-    int failed          = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
+    int failed = 0;
+    int passed = 0;
+
+    printf("Running %d transform iterator tests...\n\n", num_tests);
 
     for (int i = 0; i < num_tests; i++)
     {
-        if (tests[i].func() != TEST_SUCCESS)
+        printf("Running %s... ", tests[i].name);
+        fflush(stdout);
+
+        if (tests[i].func() == TEST_SUCCESS)
         {
-            printf("%s failed\n", tests[i].name);
+            printf("PASSED\n");
+            passed++;
+        }
+        else
+        {
+            printf("FAILED\n");
             failed++;
         }
     }
 
-    if (failed)
+    printf("\n=== Transform Iterator Test Results ===\n");
+    printf("Total tests: %d\n", num_tests);
+    printf("Passed: %d\n", passed);
+    printf("Failed: %d\n", failed);
+
+    if (failed == 0)
     {
-        printf("%d test(s) failed.\n", failed);
-        return 1;
-    }
-    else
-    {
-        printf("All transform iterator tests passed!\n");
+        printf("\n🎉 All transform iterator tests passed!\n");
         return 0;
     }
+
+    printf("\n❌ %d test(s) failed.\n", failed);
+    return 1;
 }

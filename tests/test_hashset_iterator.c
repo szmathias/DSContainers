@@ -1,38 +1,67 @@
 //
-// HashSet Iterator test
+// HashSet iterator test - converted from HashMap iterator test
 //
 
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include "HashSet.h"
+#include "Iterator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // Test basic iterator functionality
-int test_hashset_iterator_basic(void)
+static int test_hashset_iterator_basic(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
-    for (int i = 0; i < 3; i++)
+    const char* keys[] = {"key1", "key2", "key3", "key4", "key5"};
+    const int num_items = 5;
+
+    // Add test data
+    for (int i = 0; i < num_items; i++)
     {
-        char* elements[] = {"apple", "banana", "cherry"};
-        ASSERT_EQ(dsc_hashset_add(set, elements[i]), 0);
+        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
     }
 
+    // Test iterator
     DSCIterator it = dsc_hashset_iterator(set);
     ASSERT(it.is_valid(&it));
 
-    // Count elements through iteration
-    int count = 0;
+    int visited_count = 0;
+    bool found[5] = {false, false, false, false, false};
+
     while (it.has_next(&it))
     {
-        const void* key = it.next(&it);
+        const void* key = it.get(&it);
         ASSERT_NOT_NULL(key);
-        count++;
+
+        // Find which item this is
+        for (int i = 0; i < num_items; i++)
+        {
+            if (strcmp((char*)key, keys[i]) == 0)
+            {
+                ASSERT(!found[i]); // Should not have seen this before
+                found[i] = true;
+                break;
+            }
+        }
+        visited_count++;
+        it.next(&it);
     }
-    ASSERT_EQ(count, 3);
+
+    // Verify we visited all items exactly once
+    ASSERT_EQ(visited_count, num_items);
+    for (int i = 0; i < num_items; i++)
+    {
+        ASSERT(found[i]);
+    }
+
+    // Verify the iterator is exhausted
+    ASSERT(!it.has_next(&it));
+    ASSERT_NULL(it.get(&it));
+    ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
@@ -40,80 +69,149 @@ int test_hashset_iterator_basic(void)
 }
 
 // Test iterator with empty set
-int test_hashset_iterator_empty(void)
+static int test_hashset_iterator_empty(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     DSCIterator it = dsc_hashset_iterator(set);
-    ASSERT(it.is_valid(&it));
-    ASSERT(!it.has_next(&it));
 
-    void* key = it.next(&it);
-    ASSERT_NULL(key);
+    // Verify iterator for empty set
+    ASSERT(!it.has_next(&it));
+    ASSERT_NULL(it.get(&it));
+    ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
-// Test iterator reset functionality
-int test_hashset_iterator_reset(void)
+// Test iterator with modifications
+static int test_hashset_iterator_with_modifications(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
-    ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
-    ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
+    // Insert initial elements
+    const char* keys[] = {"key1", "key2", "key3"};
 
+    for (int i = 0; i < 3; i++)
+    {
+        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
+    }
+
+    // Create iterator
     DSCIterator it = dsc_hashset_iterator(set);
 
-    // First iteration
-    int count1 = 0;
+    // Consume first element
+    const void* key = it.get(&it);
+    ASSERT_NOT_NULL(key);
+    it.next(&it);
+
+    // Modify set by adding new element
+    ASSERT_EQ(dsc_hashset_add(set, "new_key"), 0);
+
+    // Continue iteration - new element should be visible
+    int remaining_count = 0;
     while (it.has_next(&it))
     {
+        key = it.get(&it);
+        ASSERT_NOT_NULL(key);
+        remaining_count++;
         it.next(&it);
+    }
+
+    // Should have seen at least 2 more elements (original + new)
+    ASSERT_GTE(remaining_count, 2);
+
+    it.destroy(&it);
+    dsc_hashset_destroy(set, false);
+    return TEST_SUCCESS;
+}
+
+// Test multiple iterators
+static int test_hashset_iterator_multiple(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    // Insert elements
+    for (int i = 1; i <= 5; i++)
+    {
+        char* key = malloc(16);
+        snprintf(key, 16, "key%d", i);
+        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+    }
+
+    // Create two independent iterators
+    DSCIterator it1 = dsc_hashset_iterator(set);
+    DSCIterator it2 = dsc_hashset_iterator(set);
+
+    // First iterator consumes two elements
+    const void* key1 = it1.get(&it1);
+    ASSERT_NOT_NULL(key1);
+    it1.next(&it1);
+
+    key1 = it1.get(&it1);
+    ASSERT_NOT_NULL(key1);
+    it1.next(&it1);
+
+    // Second iterator should still be at the beginning
+    const void* key2 = it2.get(&it2);
+    ASSERT_NOT_NULL(key2);
+    it2.next(&it2);
+
+    // Continue with both iterators and verify they're independent
+    int count1 = 0, count2 = 0;
+    while (it1.has_next(&it1))
+    {
+        it1.get(&it1);
+        it1.next(&it1);
         count1++;
     }
-    ASSERT_EQ(count1, 2);
 
-    // Reset and iterate again
-    it.reset(&it);
-    int count2 = 0;
-    while (it.has_next(&it))
+    while (it2.has_next(&it2))
     {
-        it.next(&it);
+        it2.get(&it2);
+        it2.next(&it2);
         count2++;
     }
-    ASSERT_EQ(count2, 2);
 
-    it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    // Both should have seen all remaining elements
+    ASSERT_EQ(count1, 3); // 5 total - 2 already consumed
+    ASSERT_EQ(count2, 4); // 5 total - 1 already consumed
+
+    it1.destroy(&it1);
+    it2.destroy(&it2);
+    dsc_hashset_destroy(set, true);
     return TEST_SUCCESS;
 }
 
-// Test iterator get current element
-int test_hashset_iterator_get(void)
+// Test iterator get function
+static int test_hashset_iterator_get(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
     char* key = "test_key";
+
     ASSERT_EQ(dsc_hashset_add(set, key), 0);
 
     DSCIterator it = dsc_hashset_iterator(set);
 
-    // Before calling next, get should return NULL
-    ASSERT_NULL(it.get(&it));
-
-    // After calling next, get should return the current element
-    ASSERT(it.has_next(&it));
-    void* next_key = it.next(&it);
-    ASSERT_NOT_NULL(next_key);
-
-    void* current_key = it.get(&it);
-    ASSERT_EQ(next_key, current_key);
+    // Test get without advancing
+    const void* current_key = it.get(&it);
+    ASSERT_NOT_NULL(current_key);
     ASSERT_EQ_STR((char*)current_key, key);
+
+    // Get again - should return same value
+    const void* same_key = it.get(&it);
+    ASSERT_EQ(current_key, same_key); // Same pointer
+
+    // Now advance
+    it.next(&it);
+    ASSERT(!it.has_next(&it));
+    ASSERT_NULL(it.get(&it));
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
@@ -121,7 +219,7 @@ int test_hashset_iterator_get(void)
 }
 
 // Test iterator backward operations (should not be supported)
-int test_hashset_iterator_backward(void)
+static int test_hashset_iterator_backward(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -132,134 +230,356 @@ int test_hashset_iterator_backward(void)
 
     // HashSet iterator should not support backward iteration
     ASSERT(!it.has_prev(&it));
-    ASSERT_NULL(it.prev(&it));
+    ASSERT_EQ(it.prev(&it), -1);
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
-// Test iterator with NULL set
-int test_hashset_iterator_null_set(void)
+// Test creating hashset from iterator
+static int test_hashset_from_iterator(void)
 {
-    const DSCIterator it = dsc_hashset_iterator(NULL);
+    DSCAllocator alloc = create_string_allocator();
 
-    // Iterator should be invalid for NULL set
-    ASSERT(!it.is_valid(&it));
-    ASSERT(!it.has_next(&it));
-    ASSERT_NULL(it.next(&it));
-    ASSERT_NULL(it.get(&it));
+    // Create original hashset
+    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
-    return TEST_SUCCESS;
-}
+    const char* keys[] = {"key1", "key2", "key3"};
 
-// Test from_iterator functionality
-int test_hashset_from_iterator(void)
-{
-    DSCAllocator alloc = create_int_allocator();
-    // Set the copy function to string_copy for proper string handling
-    alloc.copy_func = string_copy;
-
-    DSCHashSet* original_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-
-    char* elements[] = {"one", "two", "three"};
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(original_set, elements[i]), 0);
+        ASSERT_EQ(dsc_hashset_add(original, (void*)keys[i]), 0);
     }
 
-    // Create iterator and new set from it
-    DSCIterator it = dsc_hashset_iterator(original_set);
-    DSCHashSet* new_set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string);
+    // Create iterator from original
+    DSCIterator it = dsc_hashset_iterator(original);
 
+    // Create new hashset from iterator
+    DSCHashSet* new_set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
     ASSERT_NOT_NULL(new_set);
     ASSERT_EQ(dsc_hashset_size(new_set), 3);
 
-    // Verify all elements are in the new set
+    // Verify all data was copied
     for (int i = 0; i < 3; i++)
     {
-        ASSERT(dsc_hashset_contains(new_set, elements[i]));
+        ASSERT(dsc_hashset_contains(new_set, keys[i]));
     }
 
     it.destroy(&it);
-    dsc_hashset_destroy(original_set, false);
-    dsc_hashset_destroy(new_set, true);  // Free the copied string keys
+    dsc_hashset_destroy(original, false);
+    dsc_hashset_destroy(new_set, true);
+    return TEST_SUCCESS;
+}
+
+// Test iterator with invalid hashset
+static int test_hashset_iterator_invalid(void)
+{
+    const DSCIterator iter = dsc_hashset_iterator(NULL);
+    ASSERT(!iter.is_valid(&iter));
+    return TEST_SUCCESS;
+}
+
+// Test copy isolation - verify that copied elements are independent
+static int test_hashset_copy_isolation(void)
+{
+    DSCAllocator alloc = create_string_allocator();
+
+    // Create source hashset
+    DSCHashSet* source_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ASSERT_NOT_NULL(source_set);
+
+    const char* keys[] = {"key1", "key2", "key3"};
+
+    for (int i = 0; i < 3; i++)
+    {
+        ASSERT_EQ(dsc_hashset_add(source_set, (void*)keys[i]), 0);
+    }
+
+    DSCIterator set_it = dsc_hashset_iterator(source_set);
+    ASSERT(set_it.is_valid(&set_it));
+
+    // Create hashset with copying enabled
+    DSCHashSet* new_set = dsc_hashset_from_iterator(&set_it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ASSERT_NOT_NULL(new_set);
+    ASSERT_EQ(dsc_hashset_size(new_set), 3);
+
+    // Verify all original values are preserved in new set
+    for (int i = 0; i < 3; i++)
+    {
+        ASSERT(dsc_hashset_contains(new_set, keys[i]));
+    }
+
+    set_it.destroy(&set_it);
+    dsc_hashset_destroy(new_set, true);
+    dsc_hashset_destroy(source_set, false);
+    return TEST_SUCCESS;
+}
+
+// Test that should_copy=true fails when allocator has no copy function
+static int test_hashset_copy_function_required(void)
+{
+    DSCAllocator alloc = dsc_alloc_default();
+    alloc.copy_func = NULL;
+
+    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ASSERT_EQ(dsc_hashset_add(source, "key"), 0);
+
+    DSCIterator it = dsc_hashset_iterator(source);
+    ASSERT(it.is_valid(&it));
+
+    // Should return NULL because should_copy=true but no copy function available
+    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ASSERT_NULL(set);
+
+    it.destroy(&it);
+    dsc_hashset_destroy(source, false);
+    return TEST_SUCCESS;
+}
+
+// Test that should_copy=false uses elements directly without copying
+static int test_hashset_from_iterator_no_copy(void)
+{
+    DSCAllocator alloc = create_string_allocator();
+
+    // Create source set with allocated strings
+    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    char* key = malloc(16);
+    strcpy(key, "test_key");
+
+    ASSERT_EQ(dsc_hashset_add(source, key), 0);
+
+    DSCIterator it = dsc_hashset_iterator(source);
+    ASSERT(it.is_valid(&it));
+
+    // Create hashset without copying (should_copy = false)
+    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, false);
+    ASSERT_NOT_NULL(set);
+    ASSERT_EQ(dsc_hashset_size(set), 1);
+
+    // Verify key is correct
+    ASSERT(dsc_hashset_contains(set, "test_key"));
+
+    it.destroy(&it);
+    dsc_hashset_destroy(set, false);   // Don't free since we're sharing data
+    dsc_hashset_destroy(source, true); // Free the original allocated data
+    return TEST_SUCCESS;
+}
+
+// Test that iterator is exhausted after being consumed by dsc_hashset_from_iterator
+static int test_hashset_iterator_exhaustion_after_creation(void)
+{
+    DSCAllocator alloc = create_string_allocator();
+
+    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    for (int i = 0; i < 5; i++)
+    {
+        char* key = malloc(16);
+        snprintf(key, 16, "key%d", i);
+        ASSERT_EQ(dsc_hashset_add(source, key), 0);
+    }
+
+    DSCIterator it = dsc_hashset_iterator(source);
+    ASSERT(it.is_valid(&it));
+
+    // Verify iterator starts with elements
+    ASSERT(it.has_next(&it));
+
+    // Create hashset from iterator (consumes all elements)
+    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ASSERT_NOT_NULL(set);
+    ASSERT_EQ(dsc_hashset_size(set), 5);
+
+    // Iterator should now be exhausted
+    ASSERT(!it.has_next(&it));
+    ASSERT_NULL(it.get(&it));
+    ASSERT_EQ(it.next(&it), -1); // Should fail to advance
+
+    // But iterator should still be valid
+    ASSERT(it.is_valid(&it));
+
+    it.destroy(&it);
+    dsc_hashset_destroy(set, true);
+    dsc_hashset_destroy(source, true);
+    return TEST_SUCCESS;
+}
+
+// Test next() return values for proper error handling
+static int test_hashset_iterator_next_return_values(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    // Add single element
+    ASSERT_EQ(dsc_hashset_add(set, "key"), 0);
+
+    DSCIterator iter = dsc_hashset_iterator(set);
+    ASSERT(iter.is_valid(&iter));
+
+    // Should successfully advance once
+    ASSERT(iter.has_next(&iter));
+    ASSERT_EQ(iter.next(&iter), 0); // Success
+
+    // Should fail to advance when exhausted
+    ASSERT(!iter.has_next(&iter));
+    ASSERT_EQ(iter.next(&iter), -1); // Failure
+
+    // Additional calls should continue to fail
+    ASSERT_EQ(iter.next(&iter), -1); // Still failure
+    ASSERT(!iter.has_next(&iter));   // Still no elements
+
+    iter.destroy(&iter);
+    dsc_hashset_destroy(set, false);
+    return TEST_SUCCESS;
+}
+
+// Test various combinations of get/next/has_next calls for consistency
+static int test_hashset_iterator_mixed_operations(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    // Add test data
+    const char* keys[] = {"a", "b", "c"};
+
+    for (int i = 0; i < 3; i++)
+    {
+        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
+    }
+
+    DSCIterator iter = dsc_hashset_iterator(set);
+    ASSERT(iter.is_valid(&iter));
+
+    // Multiple get() calls should return same value
+    const void* key1 = iter.get(&iter);
+    const void* key2 = iter.get(&iter);
+    ASSERT_NOT_NULL(key1);
+    ASSERT_NOT_NULL(key2);
+    ASSERT_EQ(key1, key2);                   // Same pointer
+    ASSERT_EQ_STR((char*)key1, (char*)key2); // Same key
+
+    // has_next should be consistent
+    ASSERT(iter.has_next(&iter));
+    ASSERT(iter.has_next(&iter)); // Multiple calls should be safe
+
+    // Only advance if there are more elements
+    if (iter.has_next(&iter))
+    {
+        ASSERT_EQ(iter.next(&iter), 0);
+
+        // Check if we still have a valid element after advancing
+        if (iter.has_next(&iter))
+        {
+            const void* key3 = iter.get(&iter);
+            ASSERT_NOT_NULL(key3);
+            // Different keys should have different values
+            ASSERT(strcmp((char*)key1, (char*)key3) != 0);
+        }
+        else
+        {
+            // Iterator is exhausted after advancing
+            ASSERT_NULL(iter.get(&iter));
+        }
+    }
+
+    iter.destroy(&iter);
+    dsc_hashset_destroy(set, false);
+    return TEST_SUCCESS;
+}
+
+// Test reset functionality
+static int test_hashset_iterator_reset(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    for (int i = 0; i < 3; i++)
+    {
+        char* key = malloc(16);
+        snprintf(key, 16, "key%d", i);
+        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+    }
+
+    DSCIterator iter = dsc_hashset_iterator(set);
+
+    // First iteration
+    int first_count = 0;
+    while (iter.has_next(&iter))
+    {
+        iter.get(&iter);
+        iter.next(&iter);
+        first_count++;
+    }
+    ASSERT_EQ(first_count, 3);
+
+    // Reset and iterate again
+    iter.reset(&iter);
+    int second_count = 0;
+    while (iter.has_next(&iter))
+    {
+        iter.get(&iter);
+        iter.next(&iter);
+        second_count++;
+    }
+    ASSERT_EQ(second_count, 3);
+
+    iter.destroy(&iter);
+    dsc_hashset_destroy(set, true);
+    return TEST_SUCCESS;
+}
+
+// Test single element iterator behavior
+static int test_hashset_iterator_single_element(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
+    ASSERT_EQ(dsc_hashset_add(set, "single"), 0);
+
+    DSCIterator iter = dsc_hashset_iterator(set);
+
+    ASSERT(iter.has_next(&iter));
+    ASSERT(!iter.has_prev(&iter)); // HashSet doesn't support backward iteration
+
+    const void* key = iter.get(&iter);
+    ASSERT_NOT_NULL(key);
+    ASSERT_EQ_STR((char*)key, "single");
+
+    iter.next(&iter);
+    ASSERT(!iter.has_next(&iter));
+    ASSERT(!iter.has_prev(&iter)); // Still no backward support
+
+    iter.destroy(&iter);
+    dsc_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test from_iterator with NULL parameters
-int test_hashset_from_iterator_null_params(void)
+static int test_hashset_from_iterator_null_params(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     DSCIterator it = dsc_hashset_iterator(set);
 
     // Test NULL iterator
-    ASSERT_NULL(dsc_hashset_from_iterator(NULL, &alloc, dsc_hash_string, dsc_key_equals_string));
+    ASSERT_NULL(dsc_hashset_from_iterator(NULL, &alloc, dsc_hash_string, dsc_key_equals_string, true));
 
     // Test NULL allocator
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, NULL, dsc_hash_string, dsc_key_equals_string));
+    ASSERT_NULL(dsc_hashset_from_iterator(&it, NULL, dsc_hash_string, dsc_key_equals_string, true));
 
     // Test NULL hash function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, NULL, dsc_key_equals_string));
+    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, NULL, dsc_key_equals_string, true));
 
     // Test NULL key_equals function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, NULL));
+    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, NULL, true));
 
     it.destroy(&it);
     dsc_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
-// Test iterator multiple instances
-int test_hashset_iterator_multiple(void)
-{
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-
-    ASSERT_EQ(dsc_hashset_add(set, "key1"), 0);
-    ASSERT_EQ(dsc_hashset_add(set, "key2"), 0);
-    ASSERT_EQ(dsc_hashset_add(set, "key3"), 0);
-
-    // Create multiple iterators
-    DSCIterator it1 = dsc_hashset_iterator(set);
-    DSCIterator it2 = dsc_hashset_iterator(set);
-
-    // Both should be valid and independent
-    ASSERT(it1.is_valid(&it1));
-    ASSERT(it2.is_valid(&it2));
-
-    // Advance first iterator
-    ASSERT(it1.has_next(&it1));
-    it1.next(&it1);
-
-    // Second iterator should still be at the beginning
-    ASSERT(it2.has_next(&it2));
-
-    // Both should iterate through all elements
-    int count1 = 1; // Already advanced once
-    while (it1.has_next(&it1))
-    {
-        it1.next(&it1);
-        count1++;
-    }
-    ASSERT_EQ(count1, 3);
-
-    int count2 = 0;
-    while (it2.has_next(&it2))
-    {
-        it2.next(&it2);
-        count2++;
-    }
-    ASSERT_EQ(count2, 3);
-
-    it1.destroy(&it1);
-    it2.destroy(&it2);
-    dsc_hashset_destroy(set, false);
-    return TEST_SUCCESS;
-}
-
-// Main test runner
 typedef struct
 {
     int (*func)(void);
@@ -268,45 +588,46 @@ typedef struct
 
 int main(void)
 {
-    const TestCase tests[] = {
+    TestCase tests[] = {
         {test_hashset_iterator_basic, "test_hashset_iterator_basic"},
         {test_hashset_iterator_empty, "test_hashset_iterator_empty"},
-        {test_hashset_iterator_reset, "test_hashset_iterator_reset"},
+        {test_hashset_iterator_with_modifications, "test_hashset_iterator_with_modifications"},
+        {test_hashset_iterator_multiple, "test_hashset_iterator_multiple"},
         {test_hashset_iterator_get, "test_hashset_iterator_get"},
         {test_hashset_iterator_backward, "test_hashset_iterator_backward"},
-        {test_hashset_iterator_null_set, "test_hashset_iterator_null_set"},
         {test_hashset_from_iterator, "test_hashset_from_iterator"},
+        {test_hashset_iterator_invalid, "test_hashset_iterator_invalid"},
+        {test_hashset_copy_isolation, "test_hashset_copy_isolation"},
+        {test_hashset_copy_function_required, "test_hashset_copy_function_required"},
+        {test_hashset_from_iterator_no_copy, "test_hashset_from_iterator_no_copy"},
+        {test_hashset_iterator_exhaustion_after_creation, "test_hashset_iterator_exhaustion_after_creation"},
+        {test_hashset_iterator_next_return_values, "test_hashset_iterator_next_return_values"},
+        {test_hashset_iterator_mixed_operations, "test_hashset_iterator_mixed_operations"},
+        {test_hashset_iterator_reset, "test_hashset_iterator_reset"},
+        {test_hashset_iterator_single_element, "test_hashset_iterator_single_element"},
         {test_hashset_from_iterator_null_params, "test_hashset_from_iterator_null_params"},
-        {test_hashset_iterator_multiple, "test_hashset_iterator_multiple"},
     };
 
-    printf("Running HashSet Iterator tests...\n");
+    printf("Running HashSet iterator tests...\n");
 
     int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)
     {
-        printf("Running %s... ", tests[i].name);
-        fflush(stdout);
-
-        const int result = tests[i].func();
-        if (result == TEST_SUCCESS)
+        if (tests[i].func() != TEST_SUCCESS)
         {
-            printf("PASSED\n");
-        }
-        else
-        {
-            printf("FAILED\n");
+            printf("%s failed\n", tests[i].name);
             failed++;
         }
     }
 
     if (failed == 0)
     {
-        printf("All HashSet Iterator tests passed!\n");
+        printf("All HashSet iterator tests passed!\n");
         return 0;
     }
-    printf("%d HashSet Iterator tests failed!\n", failed);
+
+    printf("%d HashSet iterator test(s) failed.\n", failed);
     return 1;
 }

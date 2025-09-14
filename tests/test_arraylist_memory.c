@@ -21,9 +21,9 @@ int test_reserve(void)
 
     // Add some elements
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     dsc_arraylist_push_back(list, a);
     dsc_arraylist_push_back(list, b);
 
@@ -56,7 +56,7 @@ int test_shrink_to_fit(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -102,7 +102,7 @@ int test_growth_pattern(void)
     for (int i = 0; i < 100; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
 
         const size_t current_capacity = dsc_arraylist_capacity(list);
@@ -151,7 +151,7 @@ int test_large_capacity(void)
     for (int i = 0; i < 1000; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -175,7 +175,7 @@ int test_memory_cleanup_on_destroy(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -195,7 +195,7 @@ int test_memory_cleanup_on_clear(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -220,7 +220,7 @@ int test_capacity_consistency(void)
     for (int i = 0; i < 50; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
 
         ASSERT_GTE(dsc_arraylist_capacity(list), dsc_arraylist_size(list));
@@ -257,7 +257,7 @@ int main(void)
         {test_capacity_consistency, "test_capacity_consistency"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

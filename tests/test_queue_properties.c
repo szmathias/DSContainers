@@ -165,7 +165,7 @@ int test_queue_copy_preserves_order(void)
         ASSERT_EQ_PTR(orig_data, shallow_data);
         ASSERT_NOT_EQ_PTR(orig_data, deep_data);
 
-        free(orig_data);  // Also frees shallow_data
+        free(orig_data); // Also frees shallow_data
         free(deep_data);
     }
 
@@ -317,7 +317,7 @@ int main(void)
 
     printf("Running Queue property tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

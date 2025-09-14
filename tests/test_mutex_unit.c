@@ -62,8 +62,8 @@ int test_mutex_threaded_increment(void)
     for (int i = 0; i < NUM_THREADS; ++i)
     {
         args[i].counter = &counter;
-        args[i].m       = &m;
-        const int rc    = dsc_thread_create(&threads[i], inc_thread, &args[i]);
+        args[i].m = &m;
+        const int rc = dsc_thread_create(&threads[i], inc_thread, &args[i]);
         ASSERT_EQ(rc, 0);
     }
 
@@ -92,7 +92,7 @@ int main(void)
         {test_mutex_threaded_increment, "test_mutex_threaded_increment"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

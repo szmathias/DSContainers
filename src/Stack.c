@@ -68,8 +68,8 @@ DSCStack* dsc_stack_create(DSCAllocator* alloc)
         return NULL;
     }
 
-    stack->top   = NULL;
-    stack->size  = 0;
+    stack->top = NULL;
+    stack->size = 0;
     stack->alloc = alloc;
 
     return stack;
@@ -102,7 +102,7 @@ void dsc_stack_clear(DSCStack* stack, const bool should_free_data)
         current = next;
     }
 
-    stack->top  = NULL;
+    stack->top = NULL;
     stack->size = 0;
 }
 
@@ -189,7 +189,7 @@ int dsc_stack_push(DSCStack* stack, void* data)
     }
 
     new_node->next = stack->top;
-    stack->top     = new_node;
+    stack->top = new_node;
     stack->size++;
 
     return 0;
@@ -203,7 +203,7 @@ int dsc_stack_pop(DSCStack* stack, const bool should_free_data)
     }
 
     DSCStackNode* old_top = stack->top;
-    stack->top            = old_top->next;
+    stack->top = old_top->next;
     stack->size--;
 
     free_node(stack, old_top, should_free_data);
@@ -218,7 +218,7 @@ void* dsc_stack_pop_data(DSCStack* stack)
     }
 
     DSCStackNode* old_top = stack->top;
-    void* data            = old_top->data;
+    void* data = old_top->data;
 
     stack->top = old_top->next;
     stack->size--;
@@ -279,11 +279,11 @@ DSCStack* dsc_stack_copy(const DSCStack* stack)
 
     // Collect elements from top to bottom
     const DSCStackNode* current = stack->top;
-    size_t index                = 0;
+    size_t index = 0;
     while (current && index < stack->size)
     {
         temp_array[index++] = current->data;
-        current             = current->next;
+        current = current->next;
     }
 
     // Push elements in reverse order to maintain stack order
@@ -329,7 +329,7 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data
 
     // Collect elements from top to bottom, making copies
     const DSCStackNode* current = stack->top;
-    size_t index                = 0;
+    size_t index = 0;
     while (current && index < stack->size)
     {
         void* copied_data = dsc_alloc_copy(stack->alloc, current->data);
@@ -348,7 +348,7 @@ DSCStack* dsc_stack_copy_deep(const DSCStack* stack, const bool should_free_data
             return NULL;
         }
         temp_array[index++] = copied_data;
-        current             = current->next;
+        current = current->next;
     }
 
     // Push elements in reverse order to maintain stack order
@@ -407,22 +407,21 @@ static int stack_iterator_has_next(const DSCIterator* it)
     return state->current != NULL;
 }
 
-static void* stack_iterator_next(const DSCIterator* it)
+static int stack_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
-        return NULL;
+        return -1;
     }
 
     StackIteratorState* state = it->data_state;
     if (!state->current)
     {
-        return NULL;
+        return -1;
     }
 
-    void* data     = state->current->data;
     state->current = state->current->next;
-    return data;
+    return 0;
 }
 
 static int stack_iterator_has_prev(const DSCIterator* it)
@@ -432,11 +431,11 @@ static int stack_iterator_has_prev(const DSCIterator* it)
     return 0;
 }
 
-static void* stack_iterator_prev(const DSCIterator* it)
+static int stack_iterator_prev(const DSCIterator* it)
 {
     // Stack iterator doesn't support backward iteration efficiently
     (void)it;
-    return NULL;
+    return -1;
 }
 
 static void stack_iterator_reset(const DSCIterator* it)
@@ -447,7 +446,7 @@ static void stack_iterator_reset(const DSCIterator* it)
     }
 
     StackIteratorState* state = it->data_state;
-    state->current            = state->start;
+    state->current = state->start;
 }
 
 static int stack_iterator_is_valid(const DSCIterator* it)
@@ -470,20 +469,21 @@ static void stack_iterator_destroy(DSCIterator* it)
             dsc_alloc_free(state->stack->alloc, state);
         }
     }
+    it->data_state = NULL;
 }
 
 DSCIterator dsc_stack_iterator(const DSCStack* stack)
 {
     DSCIterator it = {0};
 
-    it.get        = stack_iterator_get;
-    it.has_next   = stack_iterator_has_next;
-    it.next       = stack_iterator_next;
-    it.has_prev   = stack_iterator_has_prev;
-    it.prev       = stack_iterator_prev;
-    it.reset      = stack_iterator_reset;
-    it.is_valid   = stack_iterator_is_valid;
-    it.destroy    = stack_iterator_destroy;
+    it.get = stack_iterator_get;
+    it.has_next = stack_iterator_has_next;
+    it.next = stack_iterator_next;
+    it.has_prev = stack_iterator_has_prev;
+    it.prev = stack_iterator_prev;
+    it.reset = stack_iterator_reset;
+    it.is_valid = stack_iterator_is_valid;
+    it.destroy = stack_iterator_destroy;
 
     if (!stack || !stack->alloc)
     {
@@ -496,9 +496,9 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
         return it;
     }
 
-    state->stack   = stack;
+    state->stack = stack;
     state->current = stack->top;
-    state->start   = stack->top;
+    state->start = stack->top;
 
     it.alloc = stack->alloc;
     it.data_state = state;
@@ -506,9 +506,18 @@ DSCIterator dsc_stack_iterator(const DSCStack* stack)
     return it;
 }
 
-DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc)
+DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc, const bool should_copy)
 {
-    if (!it || !alloc || !it->is_valid(it))
+    if (!it || !alloc)
+    {
+        return NULL;
+    }
+    if (should_copy && !alloc->copy_func)
+    {
+        return NULL; // Can't copy without copy function
+    }
+
+    if (!it->is_valid || !it->is_valid(it))
     {
         return NULL;
     }
@@ -519,15 +528,44 @@ DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc)
         return NULL;
     }
 
-    // Push elements directly as they come from the iterator
-    // This will result in the last element being on top
     while (it->has_next(it))
     {
-        void* element = it->next(it);
-        if (dsc_stack_push(stack, element) != 0)
+        void* element = it->get(it);
+
+        // Skip NULL elements - they indicate iterator issues
+        if (!element)
         {
-            dsc_stack_destroy(stack, false);
+            if (it->next(it) != 0)
+            {
+                break; // Iterator exhausted or failed
+            }
+            continue;
+        }
+
+        void* element_to_insert = element;
+        if (should_copy)
+        {
+            element_to_insert = alloc->copy_func(element);
+            if (!element_to_insert)
+            {
+                dsc_stack_destroy(stack, true);
+                return NULL;
+            }
+        }
+
+        if (dsc_stack_push(stack, element_to_insert) != 0)
+        {
+            if (should_copy && alloc->data_free_func)
+            {
+                dsc_alloc_data_free(alloc, element_to_insert);
+            }
+            dsc_stack_destroy(stack, should_copy);
             return NULL;
+        }
+
+        if (it->next(it) != 0)
+        {
+            break; // Iterator done or failed
         }
     }
 

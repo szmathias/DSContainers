@@ -13,7 +13,8 @@
 // Arena Allocator Implementation
 //==============================================================================
 
-typedef struct {
+typedef struct
+{
     char* memory;
     size_t size;
     size_t used;
@@ -21,15 +22,18 @@ typedef struct {
 
 static Arena arena_global = {0};
 
-static void* arena_alloc(const size_t size) {
-    if (!arena_global.memory) {
+static void* arena_alloc(const size_t size)
+{
+    if (!arena_global.memory)
+    {
         return NULL;
     }
 
     // Align to 8-byte boundary
     const size_t aligned_size = (size + 7) & ~7;
 
-    if (arena_global.used + aligned_size > arena_global.size) {
+    if (arena_global.used + aligned_size > arena_global.size)
+    {
         return NULL; // Out of memory
     }
 
@@ -38,18 +42,22 @@ static void* arena_alloc(const size_t size) {
     return ptr;
 }
 
-static void arena_free(void* ptr) {
+static void arena_free(void* ptr)
+{
     // Arena allocator doesn't free individual allocations
     (void)ptr;
 }
 
-static void arena_reset(void) {
+static void arena_reset(void)
+{
     arena_global.used = 0;
 }
 
-static int arena_init(size_t size) {
+static int arena_init(size_t size)
+{
     arena_global.memory = malloc(size);
-    if (!arena_global.memory) {
+    if (!arena_global.memory)
+    {
         return -1;
     }
     arena_global.size = size;
@@ -57,7 +65,8 @@ static int arena_init(size_t size) {
     return 0;
 }
 
-static void arena_destroy(void) {
+static void arena_destroy(void)
+{
     free(arena_global.memory);
     arena_global.memory = NULL;
     arena_global.size = 0;
@@ -72,11 +81,13 @@ static void arena_destroy(void) {
 static char stack_memory[STACK_SIZE];
 static size_t stack_top = 0;
 
-static void* stack_alloc(const size_t size) {
+static void* stack_alloc(const size_t size)
+{
     // Align to 8-byte boundary
     const size_t aligned_size = (size + 7) & ~7;
 
-    if (stack_top + aligned_size > STACK_SIZE) {
+    if (stack_top + aligned_size > STACK_SIZE)
+    {
         return NULL; // Stack overflow
     }
 
@@ -85,20 +96,25 @@ static void* stack_alloc(const size_t size) {
     return ptr;
 }
 
-static void stack_free(void* ptr) {
+static void stack_free(void* ptr)
+{
     // Simple stack allocator only supports LIFO deallocation
-    if (!ptr) return;
+    if (!ptr)
+        return;
 
     const char* char_ptr = ptr;
-    if (char_ptr >= stack_memory && char_ptr < stack_memory + STACK_SIZE) {
+    if (char_ptr >= stack_memory && char_ptr < stack_memory + STACK_SIZE)
+    {
         // Only free if it's the top allocation
-        if (char_ptr < stack_memory + stack_top) {
+        if (char_ptr < stack_memory + stack_top)
+        {
             stack_top = char_ptr - stack_memory;
         }
     }
 }
 
-static void stack_reset(void) {
+static void stack_reset(void)
+{
     stack_top = 0;
 }
 
@@ -109,27 +125,33 @@ static void stack_reset(void) {
 static size_t alloc_count = 0;
 static size_t free_count = 0;
 
-static void* counting_alloc(const size_t size) {
+static void* counting_alloc(const size_t size)
+{
     alloc_count++;
     return malloc(size);
 }
 
-static void counting_free(void* ptr) {
-    if (ptr) {
+static void counting_free(void* ptr)
+{
+    if (ptr)
+    {
         free_count++;
         free(ptr);
     }
 }
 
-static void reset_counters(void) {
+static void reset_counters(void)
+{
     alloc_count = 0;
     free_count = 0;
 }
 
-static void* counting_int_copy(const void* data) {
+static void* counting_int_copy(const void* data)
+{
     const int* original = data;
     int* copy = counting_alloc(sizeof(int));
-    if (copy) {
+    if (copy)
+    {
         *copy = *original;
     }
     return copy;
@@ -139,7 +161,8 @@ static void* counting_int_copy(const void* data) {
 // Test Functions
 //==============================================================================
 
-int test_default_allocator(void) {
+int test_default_allocator(void)
+{
     const DSCAllocator alloc = dsc_alloc_default();
 
     // Test allocation
@@ -157,7 +180,8 @@ int test_default_allocator(void) {
     return TEST_SUCCESS;
 }
 
-int test_arena_allocator(void) {
+int test_arena_allocator(void)
+{
     // Initialize arena
     ASSERT_EQ(arena_init(1024), 0);
 
@@ -192,7 +216,8 @@ int test_arena_allocator(void) {
     return TEST_SUCCESS;
 }
 
-int test_stack_allocator(void) {
+int test_stack_allocator(void)
+{
     stack_reset();
 
     const DSCAllocator alloc = dsc_alloc_custom(stack_alloc, stack_free, NULL, NULL);
@@ -217,7 +242,8 @@ int test_stack_allocator(void) {
     return TEST_SUCCESS;
 }
 
-int test_counting_allocator(void) {
+int test_counting_allocator(void)
+{
     reset_counters();
 
     const DSCAllocator alloc = dsc_alloc_custom(counting_alloc, counting_free, counting_free, counting_int_copy);
@@ -254,7 +280,8 @@ int test_counting_allocator(void) {
     return TEST_SUCCESS;
 }
 
-int test_custom_copy_functions(void) {
+int test_custom_copy_functions(void)
+{
     const DSCAllocator int_alloc = dsc_alloc_custom(malloc, free, free, int_copy);
     const DSCAllocator str_alloc = dsc_alloc_custom(malloc, free, free, string_copy);
 
@@ -277,7 +304,8 @@ int test_custom_copy_functions(void) {
     return TEST_SUCCESS;
 }
 
-int test_allocator_edge_cases(void) {
+int test_allocator_edge_cases(void)
+{
     const DSCAllocator alloc = dsc_alloc_default();
 
     // Test NULL pointer handling
@@ -298,7 +326,8 @@ int test_allocator_edge_cases(void) {
     return TEST_SUCCESS;
 }
 
-int test_allocator_with_null_functions(void) {
+int test_allocator_with_null_functions(void)
+{
     // Test allocator with NULL copy and data_free functions
     const DSCAllocator alloc = dsc_alloc_custom(malloc, free, NULL, NULL);
 
@@ -318,7 +347,8 @@ int test_allocator_with_null_functions(void) {
     return TEST_SUCCESS;
 }
 
-int test_arena_memory_alignment(void) {
+int test_arena_memory_alignment(void)
+{
     ASSERT_EQ(arena_init(1024), 0);
 
     const DSCAllocator alloc = dsc_alloc_custom(arena_alloc, arena_free, NULL, NULL);
@@ -342,7 +372,8 @@ int test_arena_memory_alignment(void) {
     return TEST_SUCCESS;
 }
 
-int test_stack_allocator_lifo_behavior(void) {
+int test_stack_allocator_lifo_behavior(void)
+{
     stack_reset();
 
     const DSCAllocator alloc = dsc_alloc_custom(stack_alloc, stack_free, NULL, NULL);
@@ -379,43 +410,51 @@ int test_stack_allocator_lifo_behavior(void) {
 // Main test runner
 //==============================================================================
 
-int main(void) {
+int main(void)
+{
     int tests_passed = 0;
     int tests_total = 0;
 
     printf("Running custom allocator tests...\n\n");
 
     // Run all tests
-    const struct {
+    const struct
+    {
         const char* name;
         int (*test_func)(void);
     } tests[] = {
-        {"Default Allocator", test_default_allocator},
-        {"Arena Allocator", test_arena_allocator},
-        {"Stack Allocator", test_stack_allocator},
-        {"Counting Allocator", test_counting_allocator},
-        {"Custom Copy Functions", test_custom_copy_functions},
-        {"Allocator Edge Cases", test_allocator_edge_cases},
-        {"Allocator with NULL Functions", test_allocator_with_null_functions},
-        {"Arena Memory Alignment", test_arena_memory_alignment},
-        {"Stack LIFO Behavior", test_stack_allocator_lifo_behavior}
-    };
+            {"Default Allocator", test_default_allocator},
+            {"Arena Allocator", test_arena_allocator},
+            {"Stack Allocator", test_stack_allocator},
+            {"Counting Allocator", test_counting_allocator},
+            {"Custom Copy Functions", test_custom_copy_functions},
+            {"Allocator Edge Cases", test_allocator_edge_cases},
+            {"Allocator with NULL Functions", test_allocator_with_null_functions},
+            {"Arena Memory Alignment", test_arena_memory_alignment},
+            {"Stack LIFO Behavior", test_stack_allocator_lifo_behavior}
+        };
 
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
+    for (int i = 0; i < num_tests; i++)
+    {
         printf("Test %d: %s... ", i + 1, tests[i].name);
         fflush(stdout);
 
         const int result = tests[i].test_func();
         tests_total++;
 
-        if (result == TEST_SUCCESS) {
+        if (result == TEST_SUCCESS)
+        {
             printf("PASSED\n");
             tests_passed++;
-        } else if (result == TEST_FAILURE) {
+        }
+        else if (result == TEST_FAILURE)
+        {
             printf("FAILED\n");
-        } else {
+        }
+        else
+        {
             printf("SKIPPED\n");
         }
     }

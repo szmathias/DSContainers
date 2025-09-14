@@ -74,10 +74,10 @@ int test_hashset_duplicates(void)
     ASSERT_EQ(dsc_hashset_size(set), 1);
 
     ASSERT_EQ(dsc_hashset_add(set, key), 0); // Should be no-op
-    ASSERT_EQ(dsc_hashset_size(set), 1); // Size unchanged
+    ASSERT_EQ(dsc_hashset_size(set), 1);     // Size unchanged
 
     ASSERT_EQ(dsc_hashset_add(set, key), 0); // Should be no-op
-    ASSERT_EQ(dsc_hashset_size(set), 1); // Size unchanged
+    ASSERT_EQ(dsc_hashset_size(set), 1);     // Size unchanged
 
     ASSERT(dsc_hashset_contains(set, key));
 
@@ -300,8 +300,9 @@ int test_hashset_iterator(void)
 
     while (it.has_next(&it))
     {
-        char* key = (char*)it.next(&it);
+        const char* key = it.get(&it);
         ASSERT_NOT_NULL(key);
+        it.next(&it);
 
         // Find which key this is
         for (int i = 0; i < num_keys; i++)

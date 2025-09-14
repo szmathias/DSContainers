@@ -24,18 +24,18 @@ int test_insert_front_back_find(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 2;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 3;
+    int* a = malloc(sizeof(int));
+    *a = 1;
+    int* b = malloc(sizeof(int));
+    *b = 2;
+    int* c = malloc(sizeof(int));
+    *c = 3;
     ASSERT_EQ(dsc_sll_insert_front(list, a), 0);
     ASSERT_EQ(dsc_sll_insert_back(list, b), 0);
     ASSERT_EQ(dsc_sll_insert_back(list, c), 0);
     ASSERT_EQ(list->size, 3);
 
-    const int key                    = 2;
+    const int key = 2;
     const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
@@ -48,12 +48,12 @@ int test_remove(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 2;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 3;
+    int* a = malloc(sizeof(int));
+    *a = 1;
+    int* b = malloc(sizeof(int));
+    *b = 2;
+    int* c = malloc(sizeof(int));
+    *c = 3;
     dsc_sll_insert_back(list, a);
     dsc_sll_insert_back(list, b);
     dsc_sll_insert_back(list, c);
@@ -72,8 +72,8 @@ int test_remove_not_found(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
+    int* a = malloc(sizeof(int));
+    *a = 1;
     dsc_sll_insert_back(list, a);
 
     const int key = 99;
@@ -97,18 +97,18 @@ int test_insert_at(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 2;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 3;
+    int* a = malloc(sizeof(int));
+    *a = 1;
+    int* b = malloc(sizeof(int));
+    *b = 2;
+    int* c = malloc(sizeof(int));
+    *c = 3;
     ASSERT_EQ(dsc_sll_insert_back(list, a), 0);  // [1]
     ASSERT_EQ(dsc_sll_insert_back(list, c), 0);  // [1,3]
     ASSERT_EQ(dsc_sll_insert_at(list, 1, b), 0); // [1,2,3]
     ASSERT_EQ(list->size, 3);
 
-    const int key                    = 2;
+    const int key = 2;
     const DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, 2);
@@ -121,12 +121,12 @@ int test_remove_at(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 10;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 20;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 30;
+    int* a = malloc(sizeof(int));
+    *a = 10;
+    int* b = malloc(sizeof(int));
+    *b = 20;
+    int* c = malloc(sizeof(int));
+    *c = 30;
     dsc_sll_insert_back(list, a); // [10]
     dsc_sll_insert_back(list, b); // [10,20]
     dsc_sll_insert_back(list, c); // [10,20,30]
@@ -134,7 +134,7 @@ int test_remove_at(void)
     ASSERT_EQ(dsc_sll_remove_at(list, 1, true), 0); // remove 20
     ASSERT_EQ(list->size, 2);
 
-    const int key              = 20;
+    const int key = 20;
     DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
@@ -146,17 +146,17 @@ int test_remove_at_head(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 100;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 200;
+    int* a = malloc(sizeof(int));
+    *a = 100;
+    int* b = malloc(sizeof(int));
+    *b = 200;
     dsc_sll_insert_back(list, a); // [100]
     dsc_sll_insert_back(list, b); // [100,200]
 
     ASSERT_EQ(dsc_sll_remove_at(list, 0, true), 0); // remove head (100)
     ASSERT_EQ(list->size, 1);
 
-    const int key              = 100;
+    const int key = 100;
     DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
@@ -168,12 +168,12 @@ int test_remove_at_last(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 2;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 3;
+    int* a = malloc(sizeof(int));
+    *a = 1;
+    int* b = malloc(sizeof(int));
+    *b = 2;
+    int* c = malloc(sizeof(int));
+    *c = 3;
     dsc_sll_insert_back(list, a); // [1]
     dsc_sll_insert_back(list, b); // [1,2]
     dsc_sll_insert_back(list, c); // [1,2,3]
@@ -181,7 +181,7 @@ int test_remove_at_last(void)
     ASSERT_EQ(dsc_sll_remove_at(list, 2, true), 0); // remove last (3)
     ASSERT_EQ(list->size, 2);
 
-    const int key              = 3;
+    const int key = 3;
     DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
@@ -193,8 +193,8 @@ int test_remove_at_invalid(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
+    int* a = malloc(sizeof(int));
+    *a = 1;
     dsc_sll_insert_back(list, a); // [1]
 
     ASSERT_EQ(dsc_sll_remove_at(list, 5, true), -1);          // invalid position
@@ -217,8 +217,8 @@ int test_remove_at_single_element(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 123;
+    int* a = malloc(sizeof(int));
+    *a = 123;
     dsc_sll_insert_back(list, a);                   // [123]
     ASSERT_EQ(dsc_sll_remove_at(list, 0, true), 0); // remove only element
     ASSERT_EQ(list->size, 0);
@@ -230,8 +230,8 @@ int test_remove_at_single_element_invalid_pos(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 123;
+    int* a = malloc(sizeof(int));
+    *a = 123;
     dsc_sll_insert_back(list, a);                    // [123]
     ASSERT_EQ(dsc_sll_remove_at(list, 1, true), -1); // invalid position
     ASSERT_EQ(list->size, 1);
@@ -243,8 +243,8 @@ int test_insert_at_out_of_bounds(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
+    int* a = malloc(sizeof(int));
+    *a = 1;
     ASSERT_EQ(dsc_sll_insert_at(list, 2, a), -1);          // out of bounds (list size is 0)
     ASSERT_EQ(dsc_sll_insert_at(list, (size_t)-1, a), -1); // very large index
     dsc_sll_destroy(list, true);
@@ -268,27 +268,27 @@ int test_mixed_operations_integrity(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 10;
-    int* b                    = malloc(sizeof(int));
-    *b                        = 20;
-    int* c                    = malloc(sizeof(int));
-    *c                        = 30;
+    int* a = malloc(sizeof(int));
+    *a = 10;
+    int* b = malloc(sizeof(int));
+    *b = 20;
+    int* c = malloc(sizeof(int));
+    *c = 30;
     dsc_sll_insert_back(list, a);  // [10]
     dsc_sll_insert_front(list, b); // [20,10]
     dsc_sll_insert_at(list, 1, c); // [20,30,10]
     ASSERT_EQ(list->size, 3);
 
     ASSERT_EQ(dsc_sll_remove_at(list, 1, true), 0); // remove 30, [20,10]
-    int key                    = 30;
+    int key = 30;
     DSCSinglyLinkedNode* found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NULL(found);
 
-    key   = 20;
+    key = 20;
     found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
 
-    key   = 10;
+    key = 10;
     found = dsc_sll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
 
@@ -303,9 +303,9 @@ int test_size(void)
     ASSERT_EQ(dsc_sll_size(list), 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 10;
+    *a = 10;
     int* b = malloc(sizeof(int));
-    *b     = 20;
+    *b = 20;
     dsc_sll_insert_back(list, a);
     ASSERT_EQ(dsc_sll_size(list), 1);
     dsc_sll_insert_back(list, b);
@@ -325,7 +325,7 @@ int test_is_empty(void)
     ASSERT_EQ(dsc_sll_is_empty(list), 1); // Empty list
 
     int* a = malloc(sizeof(int));
-    *a     = 10;
+    *a = 10;
     dsc_sll_insert_back(list, a);
     ASSERT_EQ(dsc_sll_is_empty(list), 0); // Non-empty list
 
@@ -375,7 +375,7 @@ int test_remove_all(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_sll_insert_back(list, val);
     }
     ASSERT_EQ(list->size, 10);
@@ -403,11 +403,11 @@ int test_remove_front(void)
 
     // Add elements
     int* a = malloc(sizeof(int));
-    *a     = 10;
+    *a = 10;
     int* b = malloc(sizeof(int));
-    *b     = 20;
+    *b = 20;
     int* c = malloc(sizeof(int));
-    *c     = 30;
+    *c = 30;
     dsc_sll_insert_back(list, a);
     dsc_sll_insert_back(list, b);
     dsc_sll_insert_back(list, c);
@@ -443,7 +443,7 @@ int test_remove_back(void)
 
     // Test on single element list
     int* a = malloc(sizeof(int));
-    *a     = 10;
+    *a = 10;
     dsc_sll_insert_back(list, a);
     ASSERT_EQ(dsc_sll_remove_back(list, true), 0);
     ASSERT_EQ(list->size, 0);
@@ -451,11 +451,11 @@ int test_remove_back(void)
 
     // Test with multiple elements
     int* b = malloc(sizeof(int));
-    *b     = 20;
+    *b = 20;
     int* c = malloc(sizeof(int));
-    *c     = 30;
+    *c = 30;
     int* d = malloc(sizeof(int));
-    *d     = 40;
+    *d = 40;
     dsc_sll_insert_back(list, b);
     dsc_sll_insert_back(list, c);
     dsc_sll_insert_back(list, d);
@@ -508,7 +508,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

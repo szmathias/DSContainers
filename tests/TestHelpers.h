@@ -58,8 +58,14 @@ int is_greater_than_five(const void* data);
 // Predicate: is greater than 10
 int is_greater_than_10(const void* data);
 
+// Predicate: is greater than 20
+int is_greater_than_20(const void* data);
+
 // Predicate: is divisible by 3
 int is_divisible_by_3(const void* data);
+
+// Predicate: is divisible by 4
+int is_divisible_by_4(const void* data);
 
 // Predicate: is divisible by 6
 int is_divisible_by_six(const void* data);

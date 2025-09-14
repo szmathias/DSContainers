@@ -67,8 +67,8 @@ DSCQueue* dsc_queue_create(DSCAllocator* alloc)
     }
 
     queue->front = NULL;
-    queue->back  = NULL;
-    queue->size  = 0;
+    queue->back = NULL;
+    queue->size = 0;
     queue->alloc = alloc;
 
     return queue;
@@ -102,8 +102,8 @@ void dsc_queue_clear(DSCQueue* queue, const bool should_free_data)
     }
 
     queue->front = NULL;
-    queue->back  = NULL;
-    queue->size  = 0;
+    queue->back = NULL;
+    queue->size = 0;
 }
 
 //==============================================================================
@@ -196,13 +196,13 @@ int dsc_queue_enqueue(DSCQueue* queue, void* data)
     if (queue->size == 0)
     {
         queue->front = new_node;
-        queue->back  = new_node;
+        queue->back = new_node;
     }
     else
     {
         // Add to back of queue
         queue->back->next = new_node;
-        queue->back       = new_node;
+        queue->back = new_node;
     }
 
     queue->size++;
@@ -217,7 +217,7 @@ int dsc_queue_dequeue(DSCQueue* queue, const bool should_free_data)
     }
 
     DSCQueueNode* old_front = queue->front;
-    queue->front            = old_front->next;
+    queue->front = old_front->next;
 
     // If queue becomes empty, update back pointer
     if (!queue->front)
@@ -238,7 +238,7 @@ void* dsc_queue_dequeue_data(DSCQueue* queue)
     }
 
     DSCQueueNode* old_front = queue->front;
-    void* data              = old_front->data;
+    void* data = old_front->data;
 
     queue->front = old_front->next;
 
@@ -388,22 +388,21 @@ static int queue_iterator_has_next(const DSCIterator* it)
     return state->current != NULL;
 }
 
-static void* queue_iterator_next(const DSCIterator* it)
+static int queue_iterator_next(const DSCIterator* it)
 {
     if (!it || !it->data_state)
     {
-        return NULL;
+        return -1;
     }
 
     QueueIteratorState* state = it->data_state;
     if (!state->current)
     {
-        return NULL;
+        return -1;
     }
 
-    void* data     = state->current->data;
     state->current = state->current->next;
-    return data;
+    return 0;
 }
 
 static int queue_iterator_has_prev(const DSCIterator* it)
@@ -413,11 +412,11 @@ static int queue_iterator_has_prev(const DSCIterator* it)
     return 0;
 }
 
-static void* queue_iterator_prev(const DSCIterator* it)
+static int queue_iterator_prev(const DSCIterator* it)
 {
     // Queue iterator doesn't support backward iteration efficiently
     (void)it;
-    return NULL;
+    return -1;
 }
 
 static void queue_iterator_reset(const DSCIterator* it)
@@ -428,7 +427,7 @@ static void queue_iterator_reset(const DSCIterator* it)
     }
 
     QueueIteratorState* state = it->data_state;
-    state->current            = state->start;
+    state->current = state->start;
 }
 
 static int queue_iterator_is_valid(const DSCIterator* it)
@@ -448,20 +447,21 @@ static void queue_iterator_destroy(DSCIterator* it)
         QueueIteratorState* state = it->data_state;
         dsc_alloc_free(state->queue->alloc, state);
     }
+    it->data_state = NULL;
 }
 
 DSCIterator dsc_queue_iterator(const DSCQueue* queue)
 {
     DSCIterator it = {0};
 
-    it.get        = queue_iterator_get;
-    it.has_next   = queue_iterator_has_next;
-    it.next       = queue_iterator_next;
-    it.has_prev   = queue_iterator_has_prev;
-    it.prev       = queue_iterator_prev;
-    it.reset      = queue_iterator_reset;
-    it.is_valid   = queue_iterator_is_valid;
-    it.destroy    = queue_iterator_destroy;
+    it.get = queue_iterator_get;
+    it.has_next = queue_iterator_has_next;
+    it.next = queue_iterator_next;
+    it.has_prev = queue_iterator_has_prev;
+    it.prev = queue_iterator_prev;
+    it.reset = queue_iterator_reset;
+    it.is_valid = queue_iterator_is_valid;
+    it.destroy = queue_iterator_destroy;
 
     if (!queue || !queue->alloc)
     {
@@ -474,9 +474,9 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
         return it;
     }
 
-    state->queue   = queue;
+    state->queue = queue;
     state->current = queue->front;
-    state->start   = queue->front;
+    state->start = queue->front;
 
     it.alloc = queue->alloc;
     it.data_state = state;
@@ -484,9 +484,18 @@ DSCIterator dsc_queue_iterator(const DSCQueue* queue)
     return it;
 }
 
-DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc)
+DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc, const bool should_copy)
 {
-    if (!it || !alloc || !it->is_valid(it))
+    if (!it || !alloc)
+    {
+        return NULL;
+    }
+    if (should_copy && !alloc->copy_func)
+    {
+        return NULL; // Can't copy without copy function
+    }
+
+    if (!it->is_valid || !it->is_valid(it))
     {
         return NULL;
     }
@@ -497,14 +506,44 @@ DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc)
         return NULL;
     }
 
-    // Add elements from iterator in order (no reversal needed like in stack)
     while (it->has_next(it))
     {
-        void* data = it->next(it);
-        if (dsc_queue_enqueue(queue, data) != 0)
+        void* element = it->get(it);
+
+        // Skip NULL elements - they indicate iterator issues
+        if (!element)
         {
-            dsc_queue_destroy(queue, false);
+            if (it->next(it) != 0)
+            {
+                break; // Iterator exhausted or failed
+            }
+            continue;
+        }
+
+        void* element_to_insert = element;
+        if (should_copy)
+        {
+            element_to_insert = alloc->copy_func(element);
+            if (!element_to_insert)
+            {
+                dsc_queue_destroy(queue, true);
+                return NULL;
+            }
+        }
+
+        if (dsc_queue_enqueue(queue, element_to_insert) != 0)
+        {
+            if (should_copy)
+            {
+                dsc_alloc_data_free(alloc, element_to_insert);
+            }
+            dsc_queue_destroy(queue, should_copy);
             return NULL;
+        }
+
+        if (it->next(it) != 0)
+        {
+            break; // Iterator done or failed
         }
     }
 

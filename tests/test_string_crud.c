@@ -205,7 +205,7 @@ int test_insert_cstring_empty(void)
 
 int test_insert_string_empty(void)
 {
-    DSCString str   = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     dsc_str_insert_string(&str, 1, &empty);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -216,7 +216,7 @@ int test_insert_string_empty(void)
 
 int test_append_string_empty(void)
 {
-    DSCString str   = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     dsc_str_append_string(&str, &empty);
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -265,7 +265,7 @@ int test_insert_cstring_out_of_bounds(void)
 
 int test_insert_string_out_of_bounds(void)
 {
-    DSCString str   = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     DSCString other = dsc_str_create_from_cstring("XYZ");
     dsc_str_insert_string(&str, 10, &other); // Should do nothing
     ASSERT_EQ_STR(dsc_str_data(&str), "abc");
@@ -326,8 +326,8 @@ int test_insert_cstring_at_0_and_size(void)
 int test_insert_string_at_0_and_size(void)
 {
     DSCString str = dsc_str_create_from_cstring("bc");
-    DSCString sA  = dsc_str_create_from_cstring("A");
-    DSCString sZ  = dsc_str_create_from_cstring("Z");
+    DSCString sA = dsc_str_create_from_cstring("A");
+    DSCString sZ = dsc_str_create_from_cstring("Z");
     dsc_str_insert_string(&str, 0, &sA);
     ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
     dsc_str_insert_string(&str, dsc_str_size(&str), &sZ);
@@ -380,7 +380,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

@@ -49,9 +49,9 @@ int test_stack_push_pop(void)
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
     int* data3 = malloc(sizeof(int));
-    *data1     = 10;
-    *data2     = 20;
-    *data3     = 30;
+    *data1 = 10;
+    *data2 = 20;
+    *data3 = 30;
 
     // Test pushing elements
     ASSERT_EQ(dsc_stack_push(stack, data1), 0);
@@ -96,8 +96,8 @@ int test_stack_pop_data(void)
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
-    *data1     = 42;
-    *data2     = 84;
+    *data1 = 42;
+    *data2 = 84;
 
     ASSERT_EQ(dsc_stack_push(stack, data1), 0);
     ASSERT_EQ(dsc_stack_push(stack, data2), 0);
@@ -133,7 +133,7 @@ int test_stack_clear(void)
     for (int i = 0; i < 5; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = i * 10;
+        *data = i * 10;
         ASSERT_EQ(dsc_stack_push(stack, data), 0);
     }
 
@@ -147,7 +147,7 @@ int test_stack_clear(void)
 
     // Stack should still be usable after clear
     int* new_data = malloc(sizeof(int));
-    *new_data     = 999;
+    *new_data = 999;
     ASSERT_EQ(dsc_stack_push(stack, new_data), 0);
     ASSERT_EQ(dsc_stack_size(stack), 1);
     ASSERT_EQ(*(int*)dsc_stack_peek(stack), 999);
@@ -174,7 +174,7 @@ int test_stack_equals(void)
     {
         int* data1 = malloc(sizeof(int));
         int* data2 = malloc(sizeof(int));
-        *data1     = *data2 = i * 10;
+        *data1 = *data2 = i * 10;
         ASSERT_EQ(dsc_stack_push(stack1, data1), 0);
         ASSERT_EQ(dsc_stack_push(stack2, data2), 0);
     }
@@ -183,7 +183,7 @@ int test_stack_equals(void)
 
     // Add different element to one stack
     int* diff_data = malloc(sizeof(int));
-    *diff_data     = 999;
+    *diff_data = 999;
     ASSERT_EQ(dsc_stack_push(stack1, diff_data), 0);
 
     ASSERT_EQ(dsc_stack_equals(stack1, stack2, int_cmp), 0);
