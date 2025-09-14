@@ -337,13 +337,27 @@ DSC_API DSCSinglyLinkedList* dsc_sll_copy_deep(const DSCSinglyLinkedList* list, 
 DSC_API DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list);
 
 /**
- * Create a new list from an iterator using the provided allocator.
+ * Create a new SinglyLinkedList from an iterator with custom allocator.
  *
- * @param it Source iterator (must be valid)
- * @param alloc Allocator to use for the new list
- * @return New list with elements from iterator, or NULL on error
+ * This function consumes all elements from the provided iterator and creates
+ * a new SinglyLinkedList containing those elements. The iteration follows the standard
+ * get()/next() pattern, filtering out any NULL elements returned by the iterator.
+ * Elements are added to the SinglyLinkedList in the order they are encountered from the iterator.
+ *
+ * @param it The source iterator (must be valid and support has_next/get/next)
+ * @param alloc The custom allocator to use for the new SinglyLinkedList
+ * @param should_copy If true, creates deep copies of all elements using alloc->copy_func.
+ *                    If false, uses elements directly from iterator.
+ *                    When true, alloc->copy_func must not be NULL.
+ * @return A new SinglyLinkedList with elements from iterator, or NULL on error
+ *
+ * @note NULL elements from the iterator are always filtered out as they indicate
+ *       iterator issues rather than valid data.
+ * @note The iterator is consumed during this operation - it will be at the end
+ *       position after the function completes.
+ * @note If should_copy is true and copying fails for any element, the function
+ *       cleans up and returns NULL.
  */
-DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator * it, DSCAllocator * alloc);
+DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
 
 #endif //DSCONTAINERS_SINGLYLINKEDLIST_H
-

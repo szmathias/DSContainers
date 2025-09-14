@@ -23,7 +23,7 @@ static char* mem_calloc(const size_t num_elements)
 // Centralized buffer management helper
 static bool dsc_str_realloc(DSCString* str, const size_t new_capacity)
 {
-    const char* old_data   = STR_DATA(str);
+    const char* old_data = STR_DATA(str);
     const size_t copy_size = str->size;
 
     if (new_capacity <= STR_MIN_INIT_CAP)
@@ -57,7 +57,7 @@ static bool dsc_str_realloc(DSCString* str, const size_t new_capacity)
             SAFE_FREE(str->data);
         }
 
-        str->data     = new_data;
+        str->data = new_data;
         str->capacity = new_capacity;
     }
     return true;
@@ -87,7 +87,7 @@ DSCString dsc_str_create_empty(const size_t initial_capacity)
     const size_t capacity = (initial_capacity >= STR_MIN_INIT_CAP) ? initial_capacity : STR_MIN_INIT_CAP;
 
     result.capacity = capacity;
-    result.size     = 0;
+    result.size = 0;
 
     if (capacity > STR_MIN_INIT_CAP)
     {
@@ -117,8 +117,8 @@ DSCString dsc_str_create_from_cstring(const char* cstr)
     }
 
     const size_t length = strlen(cstr);
-    DSCString result    = dsc_str_create_empty(length + 1); // +1 for the null-terminator
-    char* data_to_use   = STR_DATA(&result);
+    DSCString result = dsc_str_create_empty(length + 1); // +1 for the null-terminator
+    char* data_to_use = STR_DATA(&result);
     memcpy(data_to_use, cstr, length);
     result.size = length;
 
@@ -147,9 +147,9 @@ void dsc_str_destroy(DSCString* str)
     {
         free(str->data);
     }
-    str->size     = 0;
+    str->size = 0;
     str->capacity = 0;
-    str->data     = NULL;
+    str->data = NULL;
 }
 
 void dsc_str_destroy_split(DSCString** str, const size_t count)
@@ -184,8 +184,8 @@ void dsc_str_assign_char(DSCString* str, const char value)
 
     dsc_str_clear(str);
     char* data_to_use = STR_DATA(str);
-    data_to_use[0]    = value;
-    str->size         = 1;
+    data_to_use[0] = value;
+    str->size = 1;
 }
 
 void dsc_str_assign_cstring(DSCString* str, const char* cstr)
@@ -547,7 +547,7 @@ void dsc_str_trim_front(DSCString* str)
     }
 
     char* data = STR_DATA(str);
-    size_t i   = 0;
+    size_t i = 0;
 
     while (i < str->size && isspace((unsigned char)data[i]))
     {
@@ -749,7 +749,7 @@ size_t dsc_str_split(const DSCString* str, const char* delim, DSCString** out)
     }
 
     size_t num_strings = 0;
-    char* buffer       = mem_calloc(str->size + 1);
+    char* buffer = mem_calloc(str->size + 1);
     memcpy(buffer, STR_DATA(str), str->size);
 
     DSCString* temp = malloc(sizeof(DSCString));
@@ -770,7 +770,7 @@ size_t dsc_str_split(const DSCString* str, const char* delim, DSCString** out)
             free(temp);
             return 0;
         }
-        temp              = new_temp;
+        temp = new_temp;
         temp[num_strings] = dsc_str_create_from_cstring(token);
         num_strings++;
         token = strtok(NULL, delim);
@@ -791,7 +791,7 @@ int dsc_str_compare_cstring(const DSCString* lhs, const char* rhs)
     const char* data_to_use = STR_DATA(lhs);
 
     const size_t rhs_size = strlen(rhs);
-    const size_t min      = (lhs->size < strlen(rhs)) ? lhs->size : rhs_size;
+    const size_t min = (lhs->size < strlen(rhs)) ? lhs->size : rhs_size;
 
     int result = strncmp(data_to_use, rhs, min);
     if (result != 0)
@@ -833,7 +833,7 @@ int dsc_str_getline_ch(FILE* stream, DSCString* line, int delim)
     }
 
     dsc_str_clear(line);
-    int ch     = 0;
+    int ch = 0;
     int status = 0;
 
     if (delim == '\0')
@@ -867,7 +867,7 @@ int dsc_str_getline_cstring(FILE* stream, DSCString* line, const char* delim)
 
     dsc_str_clear(line);
 
-    int ch     = 0;
+    int ch = 0;
     int status = 0;
 
     while (((ch = fgetc(stream))) && ch != EOF)

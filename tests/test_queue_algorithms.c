@@ -7,7 +7,7 @@
 // Test queue copying (shallow)
 int test_queue_copy_shallow(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -16,7 +16,7 @@ int test_queue_copy_shallow(void)
 
     for (int i = 0; i < 5; i++)
     {
-        data_ptrs[i]  = malloc(sizeof(int));
+        data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
         ASSERT_EQ(dsc_queue_enqueue(original, data_ptrs[i]), 0);
     }
@@ -52,7 +52,7 @@ int test_queue_copy_shallow(void)
 // Test queue copying (deep)
 int test_queue_copy_deep(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCQueue* original = dsc_queue_create(&alloc);
 
     // Add some test data
@@ -61,7 +61,7 @@ int test_queue_copy_deep(void)
     for (int i = 0; i < 3; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = original_values[i];
+        *data = original_values[i];
         ASSERT_EQ(dsc_queue_enqueue(original, data), 0);
     }
 
@@ -99,7 +99,7 @@ int test_queue_for_each(void)
     for (int i = 1; i <= 5; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = i * 10;
+        *data = i * 10;
         ASSERT_EQ(dsc_queue_enqueue(queue, data), 0);
     }
 
@@ -110,7 +110,7 @@ int test_queue_for_each(void)
     for (int i = 0; i < 5; i++)
     {
         const int expected[] = {11, 21, 31, 41, 51};
-        void* data           = dsc_queue_dequeue_data(queue);
+        void* data = dsc_queue_dequeue_data(queue);
         ASSERT_EQ(*(int*)data, expected[i]);
         free(data);
     }
@@ -131,8 +131,8 @@ int test_queue_with_persons(void)
     DSCQueue* queue = dsc_queue_create(&alloc);
 
     // Create and enqueue some persons
-    Person* alice   = create_person("Alice", 25);
-    Person* bob     = create_person("Bob", 30);
+    Person* alice = create_person("Alice", 25);
+    Person* bob = create_person("Bob", 30);
     Person* charlie = create_person("Charlie", 35);
 
     ASSERT_EQ(dsc_queue_enqueue(queue, alice), 0);
@@ -157,7 +157,7 @@ int test_queue_with_persons(void)
 
     // Verify persons are in correct FIFO order
     const char* expected_names[] = {"Alice", "Bob", "Charlie"};
-    int expected_ages[]          = {25, 30, 35};
+    int expected_ages[] = {25, 30, 35};
 
     for (int i = 0; i < 3; i++)
     {
@@ -183,7 +183,7 @@ int test_queue_mixed_operations(void)
     for (int i = 0; i < 3; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = i;
+        *data = i;
         ASSERT_EQ(dsc_queue_enqueue(queue, data), 0);
     }
 
@@ -197,7 +197,7 @@ int test_queue_mixed_operations(void)
     for (int i = 3; i < 6; i++)
     {
         int* data = malloc(sizeof(int));
-        *data     = i;
+        *data = i;
         ASSERT_EQ(dsc_queue_enqueue(queue, data), 0);
     }
 
@@ -235,7 +235,7 @@ int main(void)
 
     printf("Running Queue algorithm tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

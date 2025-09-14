@@ -217,4 +217,3 @@ DSC_API int dsc_str_getline_string(FILE* stream, DSCString* line, const DSCStrin
         String *: dsc_str_getline_string,\
         default: dsc_str_getline_ch)(stream, line, delim)
 #endif //DSCONTAINERS_DYNAMICSTRING_H
-

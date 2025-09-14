@@ -19,12 +19,14 @@
 #define POOL_BLOCK_SIZE 64
 #define POOL_NUM_BLOCKS 16
 
-typedef struct PoolBlock {
+typedef struct PoolBlock
+{
     struct PoolBlock* next;
     char data[POOL_BLOCK_SIZE];
 } PoolBlock;
 
-typedef struct {
+typedef struct
+{
     PoolBlock blocks[POOL_NUM_BLOCKS];
     PoolBlock* free_list;
     int initialized;
@@ -32,26 +34,32 @@ typedef struct {
 
 static Pool pool_global = {0};
 
-static void pool_init(void) {
-    if (pool_global.initialized) return;
+static void pool_init(void)
+{
+    if (pool_global.initialized)
+        return;
 
     // Initialize free list
     pool_global.free_list = NULL;
-    for (int i = 0; i < POOL_NUM_BLOCKS; i++) {
+    for (int i = 0; i < POOL_NUM_BLOCKS; i++)
+    {
         pool_global.blocks[i].next = pool_global.free_list;
         pool_global.free_list = &pool_global.blocks[i];
     }
     pool_global.initialized = 1;
 }
 
-static void* pool_alloc(const size_t size) {
-    if (size > POOL_BLOCK_SIZE) {
+static void* pool_alloc(const size_t size)
+{
+    if (size > POOL_BLOCK_SIZE)
+    {
         return NULL; // Size too large for pool
     }
 
     pool_init();
 
-    if (!pool_global.free_list) {
+    if (!pool_global.free_list)
+    {
         return NULL; // Pool exhausted
     }
 
@@ -60,12 +68,16 @@ static void* pool_alloc(const size_t size) {
     return block->data;
 }
 
-static void pool_free(void* ptr) {
-    if (!ptr) return;
+static void pool_free(void* ptr)
+{
+    if (!ptr)
+        return;
 
     // Find which block this pointer belongs to
-    for (int i = 0; i < POOL_NUM_BLOCKS; i++) {
-        if (ptr == pool_global.blocks[i].data) {
+    for (int i = 0; i < POOL_NUM_BLOCKS; i++)
+    {
+        if (ptr == pool_global.blocks[i].data)
+        {
             pool_global.blocks[i].next = pool_global.free_list;
             pool_global.free_list = &pool_global.blocks[i];
             return;
@@ -73,7 +85,8 @@ static void pool_free(void* ptr) {
     }
 }
 
-static void pool_reset(void) {
+static void pool_reset(void)
+{
     pool_global.initialized = 0;
     pool_init();
 }
@@ -84,7 +97,8 @@ static void pool_reset(void) {
 
 #define MAX_ALLOCATIONS 100
 
-typedef struct {
+typedef struct
+{
     void* ptr;
     size_t size;
     const char* file;
@@ -96,12 +110,15 @@ static int allocation_count = 0;
 static size_t total_allocated = 0;
 static size_t peak_allocated = 0;
 
-static void* debug_alloc(const size_t size) {
+static void* debug_alloc(const size_t size)
+{
     void* ptr = malloc(size);
-    if (!ptr) return NULL;
+    if (!ptr)
+        return NULL;
 
     // Record allocation
-    if (allocation_count < MAX_ALLOCATIONS) {
+    if (allocation_count < MAX_ALLOCATIONS)
+    {
         allocations[allocation_count].ptr = ptr;
         allocations[allocation_count].size = size;
         allocations[allocation_count].file = __FILE__;
@@ -110,23 +127,29 @@ static void* debug_alloc(const size_t size) {
     }
 
     total_allocated += size;
-    if (total_allocated > peak_allocated) {
+    if (total_allocated > peak_allocated)
+    {
         peak_allocated = total_allocated;
     }
 
     return ptr;
 }
 
-static void debug_free(void* ptr) {
-    if (!ptr) return;
+static void debug_free(void* ptr)
+{
+    if (!ptr)
+        return;
 
     // Find and remove allocation record
-    for (int i = 0; i < allocation_count; i++) {
-        if (allocations[i].ptr == ptr) {
+    for (int i = 0; i < allocation_count; i++)
+    {
+        if (allocations[i].ptr == ptr)
+        {
             total_allocated -= allocations[i].size;
 
             // Remove by shifting remaining elements
-            for (int j = i; j < allocation_count - 1; j++) {
+            for (int j = i; j < allocation_count - 1; j++)
+            {
                 allocations[j] = allocations[j + 1];
             }
             allocation_count--;
@@ -137,21 +160,25 @@ static void debug_free(void* ptr) {
     free(ptr);
 }
 
-static void debug_reset(void) {
+static void debug_reset(void)
+{
     allocation_count = 0;
     total_allocated = 0;
     peak_allocated = 0;
 }
 
-static void debug_report(void) {
+static void debug_report(void)
+{
     printf("=== Debug Allocator Report ===\n");
     printf("Active allocations: %d\n", allocation_count);
     printf("Total allocated: %zu bytes\n", total_allocated);
     printf("Peak allocated: %zu bytes\n", peak_allocated);
 
-    if (allocation_count > 0) {
+    if (allocation_count > 0)
+    {
         printf("Memory leaks detected:\n");
-        for (int i = 0; i < allocation_count; i++) {
+        for (int i = 0; i < allocation_count; i++)
+        {
             printf("  %p: %zu bytes (from %s:%d)\n",
                    allocations[i].ptr, allocations[i].size,
                    allocations[i].file, allocations[i].line);
@@ -164,7 +191,8 @@ static void debug_report(void) {
 // Test Functions
 //==============================================================================
 
-int test_pool_allocator_integration(void) {
+int test_pool_allocator_integration(void)
+{
     pool_reset();
 
     // Use separate allocators: default for ArrayList structure, pool for data
@@ -176,7 +204,8 @@ int test_pool_allocator_integration(void) {
     ASSERT(list != NULL);
 
     // Add elements using pool allocator for the data
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         int* value = dsc_alloc_malloc(&pool_data_alloc, sizeof(int));
         ASSERT(value != NULL);
         *value = i * 10;
@@ -186,7 +215,8 @@ int test_pool_allocator_integration(void) {
     ASSERT_EQ(dsc_arraylist_size(list), 8);
 
     // Verify values
-    for (size_t i = 0; i < 8; i++) {
+    for (size_t i = 0; i < 8; i++)
+    {
         const int* value = dsc_arraylist_get(list, i);
         ASSERT_EQ(*value, (int)(i * 10));
     }
@@ -195,9 +225,11 @@ int test_pool_allocator_integration(void) {
     void* ptrs[POOL_NUM_BLOCKS];
     int allocated = 0;
 
-    for (int i = 0; i < POOL_NUM_BLOCKS + 5; i++) {
+    for (int i = 0; i < POOL_NUM_BLOCKS + 5; i++)
+    {
         void* ptr = dsc_alloc_malloc(&pool_data_alloc, 32);
-        if (ptr) {
+        if (ptr)
+        {
             ptrs[allocated++] = ptr;
         }
     }
@@ -207,12 +239,14 @@ int test_pool_allocator_integration(void) {
     ASSERT(allocated > 0);
 
     // Free allocated blocks
-    for (int i = 0; i < allocated; i++) {
+    for (int i = 0; i < allocated; i++)
+    {
         dsc_alloc_free(&pool_data_alloc, ptrs[i]);
     }
 
     // Clean up: manually free data with pool allocator, then destroy list
-    for (size_t i = 0; i < dsc_arraylist_size(list); i++) {
+    for (size_t i = 0; i < dsc_arraylist_size(list); i++)
+    {
         int* value = dsc_arraylist_get(list, i);
         dsc_alloc_free(&pool_data_alloc, value);
     }
@@ -221,16 +255,19 @@ int test_pool_allocator_integration(void) {
     return TEST_SUCCESS;
 }
 
-static void* debug_int_copy(const void* data) {
+static void* debug_int_copy(const void* data)
+{
     const int* original = data;
     int* copy = debug_alloc(sizeof(int));
-    if (copy) {
+    if (copy)
+    {
         *copy = *original;
     }
     return copy;
 }
 
-int test_debug_allocator_tracking(void) {
+int test_debug_allocator_tracking(void)
+{
     debug_reset();
 
     const DSCAllocator alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
@@ -271,7 +308,8 @@ int test_debug_allocator_tracking(void) {
     return TEST_SUCCESS;
 }
 
-int test_failing_allocator_error_handling(void) {
+int test_failing_allocator_error_handling(void)
+{
     set_alloc_fail_countdown(2); // Allow 2 allocations, then fail
 
     const DSCAllocator alloc = dsc_alloc_custom(failing_alloc, failing_free, failing_free, NULL);
@@ -298,7 +336,8 @@ int test_failing_allocator_error_handling(void) {
     return TEST_SUCCESS;
 }
 
-int test_allocator_with_linked_list(void) {
+int test_allocator_with_linked_list(void)
+{
     debug_reset();
 
     // Use debug allocator only for data, regular allocator for structure
@@ -310,7 +349,8 @@ int test_allocator_with_linked_list(void) {
     ASSERT(list != NULL);
 
     // Add several elements using debug allocator for data
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         int* value = dsc_alloc_malloc(&data_alloc, sizeof(int));
         ASSERT(value != NULL);
         *value = i + 1;
@@ -322,9 +362,11 @@ int test_allocator_with_linked_list(void) {
     // Verify elements using iterator
     DSCIterator iter = dsc_sll_iterator(list);
     int expected = 1;
-    while (iter.has_next(&iter)) {
-        const int* value = iter.next(&iter);
+    while (iter.has_next(&iter))
+    {
+        const int* value = iter.get(&iter);
         ASSERT_EQ(*value, expected++);
+        iter.next(&iter);
     }
     iter.destroy(&iter);
 
@@ -336,9 +378,11 @@ int test_allocator_with_linked_list(void) {
 
     // Clean up manually: iterate through list and free each data element
     DSCIterator cleanup_iter = dsc_sll_iterator(list);
-    while (cleanup_iter.has_next(&cleanup_iter)) {
-        int* value = cleanup_iter.next(&cleanup_iter);
+    while (cleanup_iter.has_next(&cleanup_iter))
+    {
+        int* value = cleanup_iter.get(&cleanup_iter);
         dsc_alloc_free(&data_alloc, value);
+        cleanup_iter.next(&cleanup_iter);
     }
     cleanup_iter.destroy(&cleanup_iter);
 
@@ -352,7 +396,8 @@ int test_allocator_with_linked_list(void) {
     return TEST_SUCCESS;
 }
 
-int test_allocator_stress_test(void) {
+int test_allocator_stress_test(void)
+{
     debug_reset();
 
     const DSCAllocator alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, string_copy);
@@ -362,14 +407,18 @@ int test_allocator_stress_test(void) {
     int active_ptrs = 0;
 
     // Perform mixed allocation/deallocation operations
-    for (int i = 0; i < num_operations; i++) {
-        if (active_ptrs == 0 || (i % 3 != 0 && active_ptrs < num_operations / 2)) {
+    for (int i = 0; i < num_operations; i++)
+    {
+        if (active_ptrs == 0 || (i % 3 != 0 && active_ptrs < num_operations / 2))
+        {
             // Allocate
             const size_t size = 16 + (i % 64); // Variable sizes
             ptrs[active_ptrs] = dsc_alloc_malloc(&alloc, size);
             ASSERT(ptrs[active_ptrs] != NULL);
             active_ptrs++;
-        } else {
+        }
+        else
+        {
             // Free a random pointer
             const int index = i % active_ptrs;
             dsc_alloc_free(&alloc, ptrs[index]);
@@ -381,7 +430,8 @@ int test_allocator_stress_test(void) {
     }
 
     // Free remaining allocations
-    for (int i = 0; i < active_ptrs; i++) {
+    for (int i = 0; i < active_ptrs; i++)
+    {
         dsc_alloc_free(&alloc, ptrs[i]);
     }
 
@@ -393,7 +443,8 @@ int test_allocator_stress_test(void) {
     return TEST_SUCCESS;
 }
 
-int test_mixed_allocator_scenarios(void) {
+int test_mixed_allocator_scenarios(void)
+{
     // Test using different allocators for different purposes
     const DSCAllocator debug_alloc_struct = dsc_alloc_custom(debug_alloc, debug_free, debug_free, NULL);
     const DSCAllocator pool_alloc_struct = dsc_alloc_custom(pool_alloc, pool_free, NULL, NULL);
@@ -427,7 +478,8 @@ int test_mixed_allocator_scenarios(void) {
     return TEST_SUCCESS;
 }
 
-int test_allocator_copy_function_variants(void) {
+int test_allocator_copy_function_variants(void)
+{
     // Test different copy function behaviors
     const DSCAllocator shallow_alloc = dsc_alloc_custom(malloc, free, free, NULL);
     const DSCAllocator deep_alloc = dsc_alloc_custom(malloc, free, free, int_copy);
@@ -457,40 +509,48 @@ int test_allocator_copy_function_variants(void) {
 // Main test runner
 //==============================================================================
 
-int main(void) {
+int main(void)
+{
     int tests_passed = 0;
     int tests_total = 0;
 
     printf("Running advanced allocator integration tests...\n\n");
 
-    const struct {
+    const struct
+    {
         const char* name;
         int (*test_func)(void);
     } tests[] = {
-        {"Pool Allocator Integration", test_pool_allocator_integration},
-        {"Debug Allocator Tracking", test_debug_allocator_tracking},
-        {"Failing Allocator Error Handling", test_failing_allocator_error_handling},
-        {"Allocator with Linked List", test_allocator_with_linked_list},
-        {"Allocator Stress Test", test_allocator_stress_test},
-        {"Mixed Allocator Scenarios", test_mixed_allocator_scenarios},
-        {"Copy Function Variants", test_allocator_copy_function_variants}
-    };
+            {"Pool Allocator Integration", test_pool_allocator_integration},
+            {"Debug Allocator Tracking", test_debug_allocator_tracking},
+            {"Failing Allocator Error Handling", test_failing_allocator_error_handling},
+            {"Allocator with Linked List", test_allocator_with_linked_list},
+            {"Allocator Stress Test", test_allocator_stress_test},
+            {"Mixed Allocator Scenarios", test_mixed_allocator_scenarios},
+            {"Copy Function Variants", test_allocator_copy_function_variants}
+        };
 
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
-    for (int i = 0; i < num_tests; i++) {
+    for (int i = 0; i < num_tests; i++)
+    {
         printf("Test %d: %s... ", i + 1, tests[i].name);
         fflush(stdout);
 
         const int result = tests[i].test_func();
         tests_total++;
 
-        if (result == TEST_SUCCESS) {
+        if (result == TEST_SUCCESS)
+        {
             printf("PASSED\n");
             tests_passed++;
-        } else if (result == TEST_FAILURE) {
+        }
+        else if (result == TEST_FAILURE)
+        {
             printf("FAILED\n");
-        } else {
+        }
+        else
+        {
             printf("SKIPPED\n");
         }
     }

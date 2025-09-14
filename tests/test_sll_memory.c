@@ -17,7 +17,7 @@ int test_custom_allocator(void)
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
-    *a     = 42;
+    *a = 42;
     ASSERT_EQ(dsc_sll_insert_back(list, a), 0);
     ASSERT_EQ(list->size, 1);
     dsc_sll_destroy(list, true);
@@ -33,7 +33,7 @@ int test_clear(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_sll_insert_back(list, val);
     }
     ASSERT_EQ(list->size, 5);
@@ -48,7 +48,7 @@ int test_clear(void)
 
     // Make sure we can still add elements after clearing
     int* val = malloc(sizeof(int));
-    *val     = 42;
+    *val = 42;
     ASSERT_EQ(dsc_sll_insert_back(list, val), 0);
     ASSERT_EQ(list->size, 1);
 
@@ -86,7 +86,7 @@ int test_copy_shallow(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i * 10;
+        *val = i * 10;
         dsc_sll_insert_back(list, val);
     }
 
@@ -96,7 +96,7 @@ int test_copy_shallow(void)
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure
-    DSCSinglyLinkedNode* orig_node  = list->head;
+    DSCSinglyLinkedNode* orig_node = list->head;
     DSCSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
@@ -105,13 +105,13 @@ int test_copy_shallow(void)
         // But nodes themselves should be different
         ASSERT_NOT_EQ(orig_node, clone_node);
 
-        orig_node  = orig_node->next;
+        orig_node = orig_node->next;
         clone_node = clone_node->next;
     }
 
     // Modifying data should affect both lists (shared pointers)
     int* first_value = list->head->data;
-    *first_value     = 999;
+    *first_value = 999;
     ASSERT_EQ(*(int*)clone->head->data, 999);
 
     // Cleanup - free each int only once since they're shared
@@ -129,7 +129,7 @@ int test_copy_deep(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i * 10;
+        *val = i * 10;
         dsc_sll_insert_back(list, val);
     }
 
@@ -139,7 +139,7 @@ int test_copy_deep(void)
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure and values
-    const DSCSinglyLinkedNode* orig_node  = list->head;
+    const DSCSinglyLinkedNode* orig_node = list->head;
     const DSCSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
@@ -148,13 +148,13 @@ int test_copy_deep(void)
         // But values should be the same
         ASSERT_EQ(*(int*)orig_node->data, *(int*)clone_node->data);
 
-        orig_node  = orig_node->next;
+        orig_node = orig_node->next;
         clone_node = clone_node->next;
     }
 
     // Modifying data should not affect the other list (independent copies)
     int* first_value = list->head->data;
-    *first_value     = 999;
+    *first_value = 999;
     ASSERT_NOT_EQ(*(int*)clone->head->data, 999);
 
     // Cleanup - each list has its own data
@@ -183,11 +183,11 @@ int test_copy_complex_data(void)
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure and values
-    const DSCSinglyLinkedNode* orig_node  = list->head;
+    const DSCSinglyLinkedNode* orig_node = list->head;
     const DSCSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
-        Person* orig_person  = orig_node->data;
+        Person* orig_person = orig_node->data;
         Person* clone_person = clone_node->data;
 
         // Data pointers should be different
@@ -196,13 +196,13 @@ int test_copy_complex_data(void)
         ASSERT_EQ(strcmp(orig_person->name, clone_person->name), 0);
         ASSERT_EQ(orig_person->age, clone_person->age);
 
-        orig_node  = orig_node->next;
+        orig_node = orig_node->next;
         clone_node = clone_node->next;
     }
 
     // Modifying should not affect the other list
-    Person* first_person      = list->head->data;
-    first_person->age         = 99;
+    Person* first_person = list->head->data;
+    first_person->age = 99;
     const Person* clone_first = clone->head->data;
     ASSERT_NOT_EQ(first_person->age, clone_first->age);
 
@@ -258,7 +258,7 @@ int test_transform_allocation_failure(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_sll_insert_back(list, val);
     }
 
@@ -291,7 +291,7 @@ int test_copy_deep_allocation_failure(void)
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_sll_insert_back(list, val);
     }
 
@@ -320,15 +320,15 @@ int test_insert_allocation_failure(void)
     set_alloc_fail_countdown(-1);
     DSCAllocator alloc = create_failing_int_allocator();
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    int* a                    = malloc(sizeof(int));
-    *a                        = 1;
+    int* a = malloc(sizeof(int));
+    *a = 1;
     dsc_sll_insert_back(list, a);
     ASSERT_EQ(list->size, 1);
 
     // Set allocator to fail on the next allocation
     set_alloc_fail_countdown(0);
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     ASSERT_EQ(dsc_sll_insert_back(list, b), -1);
 
     // Verify list is unchanged
@@ -365,7 +365,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

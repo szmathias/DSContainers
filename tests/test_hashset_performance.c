@@ -193,7 +193,8 @@ int test_hashset_iterator_performance(void)
         int count = 0;
         while (it.has_next(&it))
         {
-            const void* key = it.next(&it);
+            const void* key = it.get(&it);
+            it.next(&it);
             ASSERT_NOT_NULL(key);
             count++;
         }

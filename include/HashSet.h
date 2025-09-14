@@ -26,7 +26,7 @@
  */
 typedef struct DSCHashSet
 {
-    DSCHashMap* map;                 // Underlying hash map
+    DSCHashMap* map; // Underlying hash map
 } DSCHashSet;
 
 //==============================================================================
@@ -43,7 +43,7 @@ typedef struct DSCHashSet
  * @return Pointer to new hash set, or NULL on failure
  */
 DSC_API DSCHashSet* dsc_hashset_create(DSCAllocator* alloc, hash_func hash,
-                               key_equals_func key_equals, size_t initial_capacity);
+                                       key_equals_func key_equals, size_t initial_capacity);
 
 /**
  * Destroy the hash set and free all nodes.
@@ -240,13 +240,28 @@ DSC_API DSCIterator dsc_hashset_iterator(const DSCHashSet* set);
 /**
  * Create a new hash set from an iterator of keys.
  *
- * @param it The source iterator (must yield key pointers)
- * @param alloc The custom allocator to use
+ * This function consumes all elements from the provided iterator and creates
+ * a new HashSet containing those elements. The iteration follows the standard
+ * get()/next() pattern, filtering out any NULL elements returned by the iterator.
+ * Elements are added to the HashSet in the order they are encountered from the iterator.
+ *
+ * @param it The source iterator (must be valid and support has_next/get/next, yields key pointers)
+ * @param alloc The custom allocator to use for the new HashSet
  * @param hash Hash function for keys
  * @param key_equals Key equality function
+ * @param should_copy If true, creates deep copies of all keys using alloc->copy_func.
+ *                    If false, uses keys directly from iterator.
+ *                    When true, alloc->copy_func must not be NULL.
  * @return A new hash set with elements from iterator, or NULL on error
+ *
+ * @note NULL elements from the iterator are always filtered out as they indicate
+ *       iterator issues rather than valid data.
+ * @note The iterator is consumed during this operation - it will be at the end
+ *       position after the function completes.
+ * @note If should_copy is true and copying fails for any element, the function
+ *       cleans up and returns NULL.
  */
 DSC_API DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
-                                      hash_func hash, key_equals_func key_equals);
+                                              hash_func hash, key_equals_func key_equals, bool should_copy);
 
 #endif //DSCONTAINERS_HASHSET_H

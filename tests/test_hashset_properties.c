@@ -269,7 +269,9 @@ int test_hashset_iterator_consistency(void)
     int iter_count = 0;
     while (it.has_next(&it))
     {
-        const void* key = it.next(&it);
+        const void* key = it.get(&it);
+        it.next(&it);
+
         ASSERT_NOT_NULL(key);
 
         // Verify the key exists in the set

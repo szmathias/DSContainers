@@ -18,7 +18,7 @@ int test_hashmap_failing_allocator(void)
     set_alloc_fail_countdown(1);
     DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
     ASSERT_NULL(map); // Should fail to create
-    
+
     return TEST_SUCCESS;
 }
 
@@ -38,7 +38,7 @@ int test_hashmap_node_alloc_failure(void)
     ASSERT_EQ(dsc_hashmap_size(map), 0);
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -67,7 +67,7 @@ int test_hashmap_resize_failure(void)
     ASSERT_NOT_NULL(dsc_hashmap_get(map, "key2"));
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -101,7 +101,7 @@ int test_hashmap_memory_freeing(void)
     ASSERT(dsc_hashmap_is_empty(map));
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -155,7 +155,7 @@ int test_hashmap_deep_copy_failure(void)
     ASSERT_NULL(copy); // Should fail due to copy function failure
 
     dsc_hashmap_destroy(original, true, true);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -180,7 +180,7 @@ int test_hashmap_get_keys_failure(void)
     ASSERT_EQ(result, -1); // Should fail
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -201,7 +201,7 @@ int test_hashmap_null_handling(void)
     ASSERT_NULL(retrieved); // NULL value is valid
 
     dsc_hashmap_destroy(map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -225,7 +225,7 @@ int test_hashmap_extreme_sizes(void)
     ASSERT_EQ_STR((char*)dsc_hashmap_get(small_map, "c"), "3");
 
     dsc_hashmap_destroy(small_map, false, false);
-    
+
     return TEST_SUCCESS;
 }
 

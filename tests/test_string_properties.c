@@ -40,7 +40,7 @@ int test_string_size_and_capacity(void)
 // Property: Trimming an already-trimmed string should not change it.
 int test_string_idempotent_trim(void)
 {
-    DSCString str  = dsc_str_create_from_cstring("no whitespace");
+    DSCString str = dsc_str_create_from_cstring("no whitespace");
     DSCString copy = dsc_str_create_from_string(&str);
 
     dsc_str_trim_front(&str);
@@ -85,7 +85,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

@@ -18,7 +18,7 @@ static void portable_sleep_ms(unsigned int ms) { Sleep(ms); }
 static void portable_sleep_ms(unsigned int ms)
 {
     struct timespec ts;
-    ts.tv_sec  = ms / 1000;
+    ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000000L;
     nanosleep(&ts, NULL);
 }
@@ -150,7 +150,7 @@ int main(void)
         {test_thread_detach_then_join_fails, "test_thread_detach_then_join_fails"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; ++i)
     {

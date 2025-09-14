@@ -11,15 +11,15 @@
 
 int test_sort(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add unsorted elements
     for (int i = 0; i < 6; i++)
     {
         const int values[] = {5, 2, 8, 1, 9, 3};
-        int* val           = malloc(sizeof(int));
-        *val               = values[i];
+        int* val = malloc(sizeof(int));
+        *val = values[i];
         dsc_arraylist_push_back(list, val);
     }
 
@@ -33,13 +33,13 @@ int test_sort(void)
     }
 
     dsc_arraylist_destroy(list, true);
-    
+
     return TEST_SUCCESS;
 }
 
 int test_sort_empty(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Sort empty list should succeed
@@ -53,11 +53,11 @@ int test_sort_empty(void)
 
 int test_sort_single_element(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* val = malloc(sizeof(int));
-    *val     = 42;
+    *val = 42;
     dsc_arraylist_push_back(list, val);
 
     ASSERT_EQ(dsc_arraylist_sort(list, int_cmp), 0);
@@ -70,14 +70,14 @@ int test_sort_single_element(void)
 
 int test_sort_already_sorted(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add already sorted elements
     for (int i = 1; i <= 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -96,14 +96,14 @@ int test_sort_already_sorted(void)
 
 int test_sort_reverse_sorted(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add reverse sorted elements
     for (int i = 10; i >= 1; i--)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -122,14 +122,14 @@ int test_sort_reverse_sorted(void)
 
 int test_reverse(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add elements 1, 2, 3, 4, 5
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -148,7 +148,7 @@ int test_reverse(void)
 
 int test_reverse_empty(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Reverse empty list should succeed
@@ -162,11 +162,11 @@ int test_reverse_empty(void)
 
 int test_reverse_single_element(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     int* val = malloc(sizeof(int));
-    *val     = 42;
+    *val = 42;
     dsc_arraylist_push_back(list, val);
 
     ASSERT_EQ(dsc_arraylist_reverse(list), 0);
@@ -179,14 +179,14 @@ int test_reverse_single_element(void)
 
 int test_filter(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-10
     for (int i = 1; i <= 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -211,14 +211,14 @@ int test_filter(void)
 // New test: deep filter should produce copies of matching elements
 int test_filter_deep(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-10
     for (int i = 1; i <= 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -247,7 +247,7 @@ int test_filter_deep(void)
 // New test: deep filter on empty list should return an empty list
 int test_filter_deep_empty(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     DSCArrayList* filtered = dsc_arraylist_filter_deep(list, is_even);
@@ -262,14 +262,14 @@ int test_filter_deep_empty(void)
 
 int test_transform(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     // Add numbers 1-5
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -300,7 +300,7 @@ static void add_to_sum(void* data)
 
 int test_for_each(void)
 {
-    DSCAllocator alloc    = create_int_allocator();
+    DSCAllocator alloc = create_int_allocator();
     DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
 
     for_each_sum = 0;
@@ -309,7 +309,7 @@ int test_for_each(void)
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
     }
 
@@ -346,7 +346,7 @@ int main(void)
         {test_for_each, "test_for_each"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

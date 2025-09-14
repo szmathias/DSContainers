@@ -41,7 +41,7 @@ int test_mutex_basic(void)
     for (int i = 0; i < NUM_THREADS; ++i)
     {
         args[i].counter = &counter;
-        args[i].m       = &m;
+        args[i].m = &m;
         if (dsc_thread_create(&threads[i], inc_thread, &args[i]) != 0)
         {
             fprintf(stderr, "thread_create failed\n");
@@ -78,7 +78,7 @@ int main(void)
         {test_mutex_basic, "test_mutex_basic"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

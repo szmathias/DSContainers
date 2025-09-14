@@ -47,7 +47,7 @@ int test_substr(void)
 
 int test_substr_out_of_bounds(void)
 {
-    DSCString str  = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     DSCString sub1 = dsc_str_substr_create_string(&str, 10, 2);
     ASSERT_EQ(dsc_str_size(&sub1), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub1), "");
@@ -61,7 +61,7 @@ int test_substr_out_of_bounds(void)
 
 int test_embedded_null(void)
 {
-    DSCString str     = dsc_str_create_empty(16);
+    DSCString str = dsc_str_create_empty(16);
     const char data[] = {'a', 'b', '\0', 'c', 'd', '\0'};
     dsc_str_assign_cstring(&str, data);
     ASSERT_EQ(dsc_str_size(&str), 2); // Only up to first null
@@ -171,7 +171,7 @@ int test_compare_string_equality(void)
 int test_substr_create_cstring_cases(void)
 {
     const char* src = "abcdef";
-    DSCString sub1  = dsc_str_substr_create_cstring(src, 0, 2);
+    DSCString sub1 = dsc_str_substr_create_cstring(src, 0, 2);
     ASSERT_EQ_STR(dsc_str_data(&sub1), "ab");
     DSCString sub2 = dsc_str_substr_create_cstring(src, 4, 10); // count > length
     ASSERT_EQ_STR(dsc_str_data(&sub2), "ef");
@@ -200,7 +200,7 @@ int test_getline_ch_simulated(void)
     fputs("hello\nworld", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line   = dsc_str_create_empty(16);
+    DSCString line = dsc_str_create_empty(16);
     const int status = dsc_str_getline_ch(fp, &line, '\n');
     ASSERT_EQ_STR(dsc_str_data(&line), "hello");
     ASSERT_EQ(status, 0);
@@ -217,7 +217,7 @@ int test_getline_cstring_simulated(void)
     fputs("foo,bar,baz", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line   = dsc_str_create_empty(16);
+    DSCString line = dsc_str_create_empty(16);
     const int status = dsc_str_getline_cstring(fp, &line, ",");
     ASSERT_EQ_STR(dsc_str_data(&line), "foo");
     ASSERT_EQ(status, 0);
@@ -237,7 +237,7 @@ int test_find_cstring_empty_search(void)
 
 int test_find_string_empty_search(void)
 {
-    DSCString str   = dsc_str_create_from_cstring("abc");
+    DSCString str = dsc_str_create_from_cstring("abc");
     DSCString empty = dsc_str_create_empty(4);
     ASSERT_EQ(dsc_str_find_string(&str, &empty), STR_NPOS);
     dsc_str_destroy(&str);
@@ -280,7 +280,7 @@ int test_substr_create_string_pos_gt_size(void)
 int test_substr_cstring_pos_at_length(void)
 {
     const char* src = "abc";
-    char buf[8]     = {0};
+    char buf[8] = {0};
     dsc_str_substr_cstring(src, strlen(src), 2, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
@@ -289,7 +289,7 @@ int test_substr_cstring_pos_at_length(void)
 int test_substr_cstring_pos_gt_length(void)
 {
     const char* src = "abc";
-    char buf[8]     = {0};
+    char buf[8] = {0};
     dsc_str_substr_cstring(src, strlen(src) + 1, 2, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
@@ -317,7 +317,7 @@ int test_getline_ch_empty_file(void)
 {
     FILE* fp = fopen("test_tmpfile_empty.txt", "w+");
     ASSERT_NOT_NULL(fp);
-    DSCString line   = dsc_str_create_empty(8);
+    DSCString line = dsc_str_create_empty(8);
     const int status = dsc_str_getline_ch(fp, &line, '\n');
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(dsc_str_empty(&line));
@@ -331,7 +331,7 @@ int test_getline_cstring_empty_file(void)
 {
     FILE* fp = fopen("test_tmpfile_empty2.txt", "w+");
     ASSERT_NOT_NULL(fp);
-    DSCString line   = dsc_str_create_empty(8);
+    DSCString line = dsc_str_create_empty(8);
     const int status = dsc_str_getline_cstring(fp, &line, ",");
     ASSERT_EQ(status, EOF);
     ASSERT_TRUE(dsc_str_empty(&line));
@@ -400,7 +400,7 @@ int test_substr_create_string_zero_count_zero_pos(void)
 int test_substr_create_cstring_zero_count_zero_pos(void)
 {
     const char* src = "abc";
-    DSCString sub   = dsc_str_substr_create_cstring(src, 0, 0);
+    DSCString sub = dsc_str_substr_create_cstring(src, 0, 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub), "");
     dsc_str_destroy(&sub);
@@ -410,7 +410,7 @@ int test_substr_create_cstring_zero_count_zero_pos(void)
 int test_substr_string_zero_count_zero_pos(void)
 {
     DSCString str = dsc_str_create_from_cstring("abc");
-    char buf[8]   = {0};
+    char buf[8] = {0};
     dsc_str_substr_string(&str, 0, 0, buf);
     ASSERT_EQ_STR(buf, "");
     dsc_str_destroy(&str);
@@ -420,7 +420,7 @@ int test_substr_string_zero_count_zero_pos(void)
 int test_substr_cstring_zero_count_zero_pos(void)
 {
     const char* src = "abc";
-    char buf[8]     = {0};
+    char buf[8] = {0};
     dsc_str_substr_cstring(src, 0, 0, buf);
     ASSERT_EQ_STR(buf, "");
     return TEST_SUCCESS;
@@ -455,7 +455,7 @@ int test_getline_ch_delim_not_present(void)
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line   = dsc_str_create_empty(8);
+    DSCString line = dsc_str_create_empty(8);
     const int status = dsc_str_getline_ch(fp, &line, ';'); // Delimiter not present
     ASSERT_EQ_STR(dsc_str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
@@ -472,7 +472,7 @@ int test_getline_cstring_delim_not_present(void)
     fputs("abcdef", fp);
     fflush(fp);
     rewind(fp);
-    DSCString line   = dsc_str_create_empty(8);
+    DSCString line = dsc_str_create_empty(8);
     const int status = dsc_str_getline_cstring(fp, &line, ";"); // Delimiter not present
     ASSERT_EQ_STR(dsc_str_data(&line), "abcdef");
     ASSERT_EQ(status, EOF);
@@ -532,7 +532,7 @@ int test_find_cstring_at_end(void)
 
 int test_find_string_at_end(void)
 {
-    DSCString str  = dsc_str_create_from_cstring("abcdef");
+    DSCString str = dsc_str_create_from_cstring("abcdef");
     DSCString find = dsc_str_create_from_cstring("ef");
     ASSERT_EQ(dsc_str_find_string(&str, &find), 4);
     dsc_str_destroy(&str);
@@ -554,7 +554,7 @@ int test_substr_create_string_count_0_pos_end(void)
 int test_substr_create_cstring_count_0_pos_end(void)
 {
     const char* src = "abc";
-    DSCString sub   = dsc_str_substr_create_cstring(src, strlen(src), 0);
+    DSCString sub = dsc_str_substr_create_cstring(src, strlen(src), 0);
     ASSERT_EQ(dsc_str_size(&sub), 0);
     ASSERT_EQ_STR(dsc_str_data(&sub), "");
     dsc_str_destroy(&sub);
@@ -586,10 +586,10 @@ int test_invalid_values(void)
 int test_str_free_split_basic(void)
 {
     const size_t count = 3;
-    DSCString* arr     = (DSCString*)malloc(sizeof(DSCString) * count);
-    arr[0]             = dsc_str_create_from_cstring("one");
-    arr[1]             = dsc_str_create_from_cstring("two");
-    arr[2]             = dsc_str_create_from_cstring("three");
+    DSCString* arr = (DSCString*)malloc(sizeof(DSCString) * count);
+    arr[0] = dsc_str_create_from_cstring("one");
+    arr[1] = dsc_str_create_from_cstring("two");
+    arr[2] = dsc_str_create_from_cstring("three");
     dsc_str_destroy_split(&arr, count);
     ASSERT_NULL(arr); // arr should be NULL after free
     return TEST_SUCCESS;
@@ -604,8 +604,8 @@ int test_str_free_split_nullptr(void)
 int test_str_free_split_zero_count(void)
 {
     DSCString* arr = (DSCString*)malloc(sizeof(DSCString) * 2);
-    arr[0]         = dsc_str_create_from_cstring("a");
-    arr[1]         = dsc_str_create_from_cstring("b");
+    arr[0] = dsc_str_create_from_cstring("a");
+    arr[1] = dsc_str_create_from_cstring("b");
     dsc_str_destroy_split(&arr, 0); // Should only free the array pointer
     ASSERT_NULL(arr);
     return TEST_SUCCESS;
@@ -613,8 +613,8 @@ int test_str_free_split_zero_count(void)
 
 int test_str_split_basic(void)
 {
-    DSCString str      = dsc_str_create_from_cstring("a,b,c");
-    DSCString* out     = nullptr;
+    DSCString str = dsc_str_create_from_cstring("a,b,c");
+    DSCString* out = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 3);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "a");
@@ -627,8 +627,8 @@ int test_str_split_basic(void)
 
 int test_str_split_no_delim(void)
 {
-    DSCString str      = dsc_str_create_from_cstring("abc");
-    DSCString* out     = nullptr;
+    DSCString str = dsc_str_create_from_cstring("abc");
+    DSCString* out = nullptr;
     const size_t count = dsc_str_split(&str, ";", &out);
     ASSERT_EQ(count, 1);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "abc");
@@ -639,8 +639,8 @@ int test_str_split_no_delim(void)
 
 int test_str_split_empty_string(void)
 {
-    DSCString str      = dsc_str_create_empty(8);
-    DSCString* out     = nullptr;
+    DSCString str = dsc_str_create_empty(8);
+    DSCString* out = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 0);
     ASSERT_NULL(out);
@@ -657,8 +657,8 @@ int test_str_split_nullptr(void)
 
 int test_str_split_and_free_split(void)
 {
-    DSCString str      = dsc_str_create_from_cstring("alpha,beta,gamma,delta");
-    DSCString* out     = nullptr;
+    DSCString str = dsc_str_create_from_cstring("alpha,beta,gamma,delta");
+    DSCString* out = nullptr;
     const size_t count = dsc_str_split(&str, ",", &out);
     ASSERT_EQ(count, 4);
     ASSERT_EQ_STR(dsc_str_data(&out[0]), "alpha");
@@ -742,7 +742,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

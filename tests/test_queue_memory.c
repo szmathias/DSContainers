@@ -19,7 +19,7 @@ int test_queue_failing_allocator(void)
     // Queue creation should fail
     DSCQueue* queue = dsc_queue_create(&failing_alloc);
     ASSERT_NULL(queue);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -99,7 +99,7 @@ int test_queue_deep_copy_failure(void)
     ASSERT_NULL(copy);
 
     dsc_queue_destroy(original, true);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -133,7 +133,7 @@ int test_queue_large_memory_usage(void)
     ASSERT(dsc_queue_is_empty(queue));
 
     dsc_queue_destroy(queue, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -163,7 +163,7 @@ int test_queue_clear_memory(void)
     }
 
     dsc_queue_destroy(queue, false);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -186,7 +186,7 @@ int test_queue_iterator_memory_failure(void)
     ASSERT(!it.is_valid(&it));
 
     dsc_queue_destroy(queue, true);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -223,7 +223,7 @@ int test_queue_front_back_consistency(void)
     }
 
     dsc_queue_destroy(queue, true);
-    
+
     return TEST_SUCCESS;
 }
 
@@ -248,7 +248,7 @@ int main(void)
 
     printf("Running Queue memory tests...\n");
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

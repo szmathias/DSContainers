@@ -15,12 +15,12 @@ int test_dsc_dll_size_after_insert_and_remove(void)
     ASSERT_EQ(dsc_dll_size(list), 0);
 
     int* a = malloc(sizeof(int));
-    *a     = 1;
+    *a = 1;
     dsc_dll_insert_back(list, a);
     ASSERT_EQ(dsc_dll_size(list), 1);
 
     int* b = malloc(sizeof(int));
-    *b     = 2;
+    *b = 2;
     dsc_dll_insert_front(list, b);
     ASSERT_EQ(dsc_dll_size(list), 2);
 
@@ -42,7 +42,7 @@ int test_dsc_dll_sort_is_idempotent(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -66,7 +66,7 @@ int test_dsc_dll_reverse_is_involution(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -96,7 +96,7 @@ TestCase tests[] = {
 
 int main(void)
 {
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
 
     for (int i = 0; i < num_tests; i++)

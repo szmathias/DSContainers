@@ -149,7 +149,8 @@ int test_hashset_memory_iterator(void)
     int count = 0;
     while (it.has_next(&it))
     {
-        const void* key = it.next(&it);
+        const void* key = it.get(&it);
+        it.next(&it);
         ASSERT_NOT_NULL(key);
         count++;
     }
@@ -218,12 +219,12 @@ int test_hashset_memory_no_leaks(void)
     ASSERT_EQ(dsc_hashset_size(set), 10);
 
     // Remove some elements
-    ASSERT_EQ(dsc_hashset_remove(set, keys[0], true), 0);  // Free the key
-    ASSERT_EQ(dsc_hashset_remove(set, keys[5], true), 0);  // Free the key
+    ASSERT_EQ(dsc_hashset_remove(set, keys[0], true), 0); // Free the key
+    ASSERT_EQ(dsc_hashset_remove(set, keys[5], true), 0); // Free the key
     ASSERT_EQ(dsc_hashset_size(set), 8);
 
     // Clear and add again
-    dsc_hashset_clear(set, true);  // Free remaining keys
+    dsc_hashset_clear(set, true); // Free remaining keys
     ASSERT_EQ(dsc_hashset_size(set), 0);
 
     char* final_key = malloc(32);
@@ -242,7 +243,7 @@ int test_hashset_memory_no_leaks(void)
     ASSERT_EQ(count, 1);
     it.destroy(&it);
 
-    dsc_hashset_destroy(set, true);  // Free final key
+    dsc_hashset_destroy(set, true); // Free final key
     free(keys);
     return TEST_SUCCESS;
 }

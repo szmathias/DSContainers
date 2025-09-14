@@ -20,7 +20,7 @@ static int test_basic_iteration(void)
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -33,9 +33,10 @@ static int test_basic_iteration(void)
     int expected = 1;
     while (it.has_next(&it))
     {
-        const int* value = it.next(&it);
+        const int* value = it.get(&it);
         ASSERT_NOT_NULL(value);
         ASSERT_EQ(*value, expected++);
+        it.next(&it);
     }
 
     // Verify we processed all elements
@@ -43,7 +44,8 @@ static int test_basic_iteration(void)
 
     // Verify the iterator is exhausted
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULL(it.next(&it));
+    ASSERT_NULL(it.get(&it));
+    ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     // Cleanup
     if (it.destroy)
@@ -63,7 +65,8 @@ static int test_empty_list_iterator(void)
 
     // Verify iterator for empty list
     ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULL(it.next(&it));
+    ASSERT_NULL(it.get(&it));
+    ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     // Cleanup
     if (it.destroy)
@@ -83,7 +86,7 @@ static int test_iterator_with_modifications(void)
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -91,28 +94,32 @@ static int test_iterator_with_modifications(void)
     DSCIterator it = dsc_dll_iterator(list);
 
     // Consume first element
-    const int* value = it.next(&it);
+    const int* value = it.get(&it);
     ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 1);
+    it.next(&it);
 
     // Modify list by adding new elements
     int* new_val = malloc(sizeof(int));
-    *new_val     = 99;
+    *new_val = 99;
     dsc_dll_insert_back(list, new_val);
 
     // Continue iteration
-    value = it.next(&it);
+    value = it.get(&it);
     ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 2);
+    it.next(&it);
 
-    value = it.next(&it);
+    value = it.get(&it);
     ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 3);
+    it.next(&it);
 
     // The newly added element should also be accessible
-    value = it.next(&it);
+    value = it.get(&it);
     ASSERT_NOT_NULL(value);
     ASSERT_EQ(*value, 99);
+    it.next(&it);
 
     ASSERT_FALSE(it.has_next(&it));
 
@@ -134,7 +141,7 @@ static int test_multiple_iterators(void)
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
@@ -143,20 +150,28 @@ static int test_multiple_iterators(void)
     DSCIterator it2 = dsc_dll_iterator(list);
 
     // First iterator consumes two elements
-    const int* value1 = it1.next(&it1);
+    const int* value1 = it1.get(&it1);
     ASSERT_EQ(*value1, 1);
-    value1 = it1.next(&it1);
+    it1.next(&it1);
+
+    value1 = it1.get(&it1);
     ASSERT_EQ(*value1, 2);
+    it1.next(&it1);
 
     // Second iterator should still be at the beginning
-    const int* value2 = it2.next(&it2);
+    const int* value2 = it2.get(&it2);
     ASSERT_EQ(*value2, 1);
+    it2.next(&it2);
 
-    // Continue with both iterators
-    value1 = it1.next(&it1);
+    // Continue with first iterator
+    value1 = it1.get(&it1);
     ASSERT_EQ(*value1, 3);
-    value2 = it2.next(&it2);
+    it1.next(&it1);
+
+    // Continue with second iterator
+    value2 = it2.get(&it2);
     ASSERT_EQ(*value2, 2);
+    it2.next(&it2);
 
     // Cleanup
     if (it1.destroy)
@@ -167,255 +182,480 @@ static int test_multiple_iterators(void)
     return TEST_SUCCESS;
 }
 
-// Test iterator reset functionality if available
-static int test_iterator_reset(void)
-{
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
-    ASSERT_NOT_NULL(list);
-
-    for (int i = 1; i <= 3; i++)
-    {
-        int* val = malloc(sizeof(int));
-        *val     = i;
-        dsc_dll_insert_back(list, val);
-    }
-
-    DSCIterator it = dsc_dll_iterator(list);
-    while (it.has_next(&it))
-        it.next(&it);
-    ASSERT_FALSE(it.has_next(&it));
-
-    if (it.reset)
-    {
-        it.reset(&it);
-        ASSERT_TRUE(it.has_next(&it));
-        int expected = 1;
-        while (it.has_next(&it))
-        {
-            const int* value = it.next(&it);
-            ASSERT_EQ(*value, expected++);
-        }
-        ASSERT_EQ(expected, 4);
-    }
-
-    if (it.destroy)
-        it.destroy(&it);
-    dsc_dll_destroy(list, true);
-    return TEST_SUCCESS;
-}
-
-// Test reverse iterator functionality
+// Test reverse iterator
 static int test_reverse_iteration(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
+    // Insert elements 1-5
     for (int i = 1; i <= 5; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_dll_insert_back(list, val);
     }
 
+    // Create reverse iterator
     DSCIterator it = dsc_dll_iterator_reverse(list);
     ASSERT_NOT_NULL(it.data_state);
     ASSERT_TRUE(it.has_next(&it));
 
+    // Iterate in reverse order (should get 5, 4, 3, 2, 1)
     int expected = 5;
     while (it.has_next(&it))
     {
-        const int* value = it.next(&it);
+        const int* value = it.get(&it);
         ASSERT_NOT_NULL(value);
         ASSERT_EQ(*value, expected--);
+        it.next(&it);
     }
 
+    // Verify we processed all elements
     ASSERT_EQ(expected, 0);
-    ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULL(it.next(&it));
 
+    // Cleanup
     if (it.destroy)
         it.destroy(&it);
     dsc_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
-// Test empty list with reverse iterator
-static int test_empty_list_reverse_iterator(void)
+// Test iterator get function
+static int test_iterator_get(void)
 {
     DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator it = dsc_dll_iterator_reverse(list);
-    ASSERT_FALSE(it.has_next(&it));
-    ASSERT_NULL(it.next(&it));
-
-    if (it.destroy)
-        it.destroy(&it);
-    dsc_dll_destroy(list, false);
-    return TEST_SUCCESS;
-}
-
-// Helper functions
-static void* copy_int(const void* data)
-{
-    if (!data)
-        return NULL;
-    int* copy = malloc(sizeof(int));
-    if (!copy)
-        return NULL;
-    *copy = *(const int*)data;
-    return copy;
-}
-
-static int int_compare(const void* a, const void* b)
-{
-    const int* ia = a;
-    const int* ib = b;
-    if (*ia == *ib)
-        return 0;
-    return (*ia < *ib) ? -1 : 1;
-}
-
-// Test converting a basic iterator to a list with dsc_dll_from_iterator_custom
-static int test_from_iterator_basic(void)
-{
-    DSCAllocator src_alloc = create_int_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(&src_alloc);
-    ASSERT_NOT_NULL(src_list);
-
-    for (int i = 1; i <= 5; i++)
+    // Insert elements
+    for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
-        dsc_dll_insert_back(src_list, val);
+        *val = i;
+        dsc_dll_insert_back(list, val);
     }
 
-    DSCIterator it = dsc_dll_iterator(src_list);
-    ASSERT_TRUE(it.has_next(&it));
+    DSCIterator it = dsc_dll_iterator(list);
 
-    // Convert iterator to a new list (shallow copy - same data pointers)
-    DSCDoublyLinkedList* new_list = dsc_dll_copy(src_list);
-    ASSERT_NOT_NULL(new_list);
-    ASSERT_EQ(dsc_dll_size(new_list), 5);
+    // Test get without advancing
+    const int* val = it.get(&it);
+    ASSERT_NOT_NULL(val);
+    ASSERT_EQ(*val, 1);
 
-    DSCIterator new_it = dsc_dll_iterator(new_list);
-    int expected       = 1;
-    while (new_it.has_next(&new_it))
-    {
-        const int* value = new_it.next(&new_it);
-        ASSERT_EQ(*value, expected++);
-    }
+    // Get again - should return same value
+    val = it.get(&it);
+    ASSERT_EQ(*val, 1);
 
-    const DSCDoublyLinkedNode* node = dsc_dll_find(src_list, &(int){1}, int_compare);
-    ASSERT_NOT_NULL(node);
-    *((int*)node->data) = 99;
+    // Now advance and test get
+    it.next(&it);
+    val = it.get(&it);
+    ASSERT_EQ(*val, 2);
 
-    // Modify the original data; because this is a shallow copy, the new list
-    // should reference the same data pointer. Modify the original node's data
-    // and verify the new list's head sees the change by directly inspecting
-    // the data pointer rather than creating another iterator.
-    *((int*)node->data) = 99;
-
-    // The head of the copied list should point to the same data pointer
-    ASSERT_NOT_NULL(new_list->head);
-    ASSERT_EQ(*(int*)new_list->head->data, 99);
-
-    if (new_it.destroy)
-        new_it.destroy(&new_it);
+    // Cleanup
     if (it.destroy)
         it.destroy(&it);
-
-    dsc_dll_destroy(new_list, false); // Don't free data - shared with src_list
-    dsc_dll_destroy(src_list, true);  // Free the data
-
+    dsc_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
-// Test deep copying with dsc_dll_from_iterator_custom using a copy function
-static int test_from_iterator_with_copy(void)
+// Test bidirectional iteration
+static int test_bidirectional_iteration(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(&alloc);
-    ASSERT_NOT_NULL(src_list);
-
-    for (int i = 1; i <= 5; i++)
-    {
-        int* val = malloc(sizeof(int));
-        *val     = i;
-        dsc_dll_insert_back(src_list, val);
-    }
-
-    DSCIterator it = dsc_dll_iterator(src_list);
-    ASSERT_TRUE(it.has_next(&it));
-
-    DSCAllocator alloc_copy = create_int_allocator();
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, &alloc_copy);
-    ASSERT_NOT_NULL(new_list);
-    ASSERT_EQ(dsc_dll_size(new_list), 5);
-
-    const DSCDoublyLinkedNode* node = dsc_dll_find(src_list, &(int){1}, int_compare);
-    ASSERT_NOT_NULL(node);
-    *((int*)node->data) = 99;
-
-    DSCIterator new_it = dsc_dll_iterator(new_list);
-    int expected2      = 1;
-    while (new_it.has_next(&new_it))
-    {
-        const int* value = new_it.next(&new_it);
-        ASSERT_EQ(*value, expected2++);
-    }
-
-    if (new_it.destroy)
-        new_it.destroy(&new_it);
-    if (it.destroy)
-        it.destroy(&it);
-
-    dsc_dll_destroy(new_list, true);
-    dsc_dll_destroy(src_list, true);
-    return TEST_SUCCESS;
-}
-
-// Test dsc_dll_from_iterator_custom with an empty list
-static int test_from_iterator_empty(void)
-{
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* src_list = dsc_dll_create(&alloc);
-    ASSERT_NOT_NULL(src_list);
-
-    DSCIterator it = dsc_dll_iterator(src_list);
-    ASSERT_FALSE(it.has_next(&it));
-
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&it, &alloc);
-    ASSERT_NOT_NULL(new_list);
-    ASSERT_EQ(dsc_dll_size(new_list), 0);
-    ASSERT_TRUE(dsc_dll_is_empty(new_list));
-
-    if (it.destroy)
-        it.destroy(&it);
-    dsc_dll_destroy(new_list, false);
-    dsc_dll_destroy(src_list, false);
-    return TEST_SUCCESS;
-}
-
-// Test dsc_dll_from_iterator_custom with invalid iterator
-static int test_from_iterator_invalid(void)
-{
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(NULL, NULL);
-    ASSERT_NULL(new_list);
-
     DSCAllocator alloc = create_int_allocator();
     DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ASSERT_NOT_NULL(list);
+
+    // Insert elements 1-5
+    for (int i = 1; i <= 5; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val = i;
+        dsc_dll_insert_back(list, val);
+    }
+
     DSCIterator it = dsc_dll_iterator(list);
+
+    // Move forward to middle
+    it.next(&it); // Move to 2
+    it.next(&it); // Move to 3
+
+    const int* val = it.get(&it);
+    ASSERT_EQ(*val, 3);
+
+    // Move back
+    ASSERT_TRUE(it.has_prev(&it));
+    it.prev(&it);
+    val = it.get(&it);
+    ASSERT_EQ(*val, 2);
+
+    // Move forward again
+    it.next(&it);
+    val = it.get(&it);
+    ASSERT_EQ(*val, 3);
+
+    // Cleanup
     if (it.destroy)
         it.destroy(&it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
 
-    new_list = dsc_dll_from_iterator(&it, &alloc);
-    ASSERT_NULL(new_list);
+// Test creating doubly linked list from iterator
+static int test_from_iterator(void)
+{
+    DSCAllocator alloc = create_int_allocator();
 
-    dsc_dll_destroy(list, false);
+    // Create a range iterator (0, 1, 2, 3, 4)
+    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+
+    // Create doubly linked list from iterator
+    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ASSERT_NOT_NULL(list);
+    ASSERT_EQ(dsc_dll_size(list), 5);
+
+    // Clean up the iterator immediately after use
+    range_it.destroy(&range_it);
+
+    // Verify doubly linked list has correct values in sequential order
+    // Iterator gives 0,1,2,3,4 and doubly linked list should have them as 0,1,2,3,4 (head to tail)
+    DSCDoublyLinkedNode* node = list->head;
+    for (int expected = 0; expected < 5; expected++)
+    {
+        ASSERT_NOT_NULL(node);
+        ASSERT_EQ(*(int*)node->data, expected);
+        node = node->next;
+    }
+
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test iterator with invalid doubly linked list
+static int test_iterator_invalid(void)
+{
+    const DSCIterator iter = dsc_dll_iterator(NULL);
+    ASSERT(!iter.is_valid(&iter));
+    return TEST_SUCCESS;
+}
+
+// Test copy isolation - verify that copied elements are independent
+static int test_dll_copy_isolation(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+
+    // Create original data that we can modify
+    int original_values[] = {10, 20, 30};
+    int* data_ptrs[3];
+
+    // Create a source doubly linked list
+    DSCDoublyLinkedList* source_list = dsc_dll_create(&alloc);
+    ASSERT_NOT_NULL(source_list);
+
+    for (int i = 0; i < 3; i++)
+    {
+        data_ptrs[i] = malloc(sizeof(int));
+        *data_ptrs[i] = original_values[i];
+        ASSERT_EQ(dsc_dll_insert_back(source_list, data_ptrs[i]), 0);
+    }
+
+    DSCIterator list_it = dsc_dll_iterator(source_list);
+    ASSERT(list_it.is_valid(&list_it));
+
+    // Create doubly linked list with copying enabled
+    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&list_it, &alloc, true);
+    ASSERT_NOT_NULL(new_list);
+    ASSERT_EQ(dsc_dll_size(new_list), 3);
+
+    // Modify original data
+    *data_ptrs[0] = 999;
+    *data_ptrs[1] = 888;
+    *data_ptrs[2] = 777;
+
+    // DoublyLinkedList should still have original values (proving data was copied)
+    // Sequential order: 10, 20, 30
+    DSCDoublyLinkedNode* node = new_list->head;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 10); // Should be unchanged
+
+    node = node->next;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 20); // Should be unchanged
+
+    node = node->next;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 30); // Should be unchanged
+
+    // Cleanup
+    list_it.destroy(&list_it);
+    dsc_dll_destroy(new_list, true);
+    dsc_dll_destroy(source_list, true);
+
+    return TEST_SUCCESS;
+}
+
+// Test that should_copy=true fails when allocator has no copy function
+static int test_dll_copy_function_required(void)
+{
+    DSCAllocator alloc = dsc_alloc_default();
+    alloc.copy_func = NULL;
+
+    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ASSERT(range_it.is_valid(&range_it));
+
+    // Should return NULL because should_copy=true but no copy function available
+    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ASSERT_NULL(list);
+
+    range_it.destroy(&range_it);
+    return TEST_SUCCESS;
+}
+
+// Test that should_copy=false uses elements directly without copying
+static int test_dll_from_iterator_no_copy(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+
+    // Create a range iterator and then a copy iterator to get actual owned data
+    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ASSERT(range_it.is_valid(&range_it));
+
+    // Use copy iterator to create actual data elements that we own
+    DSCIterator copy_it = dsc_iterator_copy(&range_it, &alloc, int_copy);
+    ASSERT(copy_it.is_valid(&copy_it));
+
+    // Create doubly linked list without copying (should_copy = false)
+    // This will use the copied elements directly from the copy iterator
+    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&copy_it, &alloc, false);
+    ASSERT_NOT_NULL(list);
+    ASSERT_EQ(dsc_dll_size(list), 3);
+
+    // Verify values are correct (sequential order: 0, 1, 2)
+    DSCDoublyLinkedNode* node = list->head;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 0);
+
+    node = node->next;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 1);
+
+    node = node->next;
+    ASSERT_NOT_NULL(node);
+    ASSERT_EQ(*(int*)node->data, 2);
+
+    range_it.destroy(&range_it);
+    copy_it.destroy(&copy_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test that iterator is exhausted after being consumed by dsc_dll_from_iterator
+static int test_iterator_exhaustion_after_dll_creation(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+    ASSERT(range_it.is_valid(&range_it));
+
+    // Verify iterator starts with elements
+    ASSERT(range_it.has_next(&range_it));
+
+    // Create doubly linked list from iterator (consumes all elements)
+    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ASSERT_NOT_NULL(list);
+    ASSERT_EQ(dsc_dll_size(list), 5);
+
+    // Iterator should now be exhausted
+    ASSERT(!range_it.has_next(&range_it));
+    ASSERT_NULL(range_it.get(&range_it));
+    ASSERT_EQ(range_it.next(&range_it), -1); // Should fail to advance
+
+    // But iterator should still be valid
+    ASSERT(range_it.is_valid(&range_it));
+
+    range_it.destroy(&range_it);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test next() return values for proper error handling
+static int test_dll_iterator_next_return_values(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ASSERT_NOT_NULL(list);
+
+    // Add single element
+    int* data = malloc(sizeof(int));
+    *data = 42;
+    ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+
+    DSCIterator iter = dsc_dll_iterator(list);
+    ASSERT(iter.is_valid(&iter));
+
+    // Should successfully advance once
+    ASSERT(iter.has_next(&iter));
+    ASSERT_EQ(iter.next(&iter), 0); // Success
+
+    // Should fail to advance when exhausted
+    ASSERT(!iter.has_next(&iter));
+    ASSERT_EQ(iter.next(&iter), -1); // Failure
+
+    // Additional calls should continue to fail
+    ASSERT_EQ(iter.next(&iter), -1); // Still failure
+    ASSERT(!iter.has_next(&iter));   // Still no elements
+
+    iter.destroy(&iter);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test various combinations of get/next/has_next calls for consistency
+static int test_dll_iterator_mixed_operations(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ASSERT_NOT_NULL(list);
+
+    // Add test data (will be in sequential order: 0, 10, 20)
+    for (int i = 0; i < 3; i++)
+    {
+        int* data = malloc(sizeof(int));
+        *data = i * 10;
+        ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+    }
+
+    DSCIterator iter = dsc_dll_iterator(list);
+    ASSERT(iter.is_valid(&iter));
+
+    // Multiple get() calls should return same value
+    void* data1 = iter.get(&iter);
+    void* data2 = iter.get(&iter);
+    ASSERT_NOT_NULL(data1);
+    ASSERT_NOT_NULL(data2);
+    ASSERT_EQ(data1, data2);               // Same pointer
+    ASSERT_EQ(*(int*)data1, *(int*)data2); // Same value
+    ASSERT_EQ(*(int*)data1, 0);            // First element should be 0
+
+    // has_next should be consistent
+    ASSERT(iter.has_next(&iter));
+    ASSERT(iter.has_next(&iter)); // Multiple calls should be safe
+
+    // Advance and verify new position
+    ASSERT_EQ(iter.next(&iter), 0);
+    void* data3 = iter.get(&iter);
+    ASSERT_NOT_NULL(data3);
+    // Note: data1 and data3 point to different doubly linked list elements
+    ASSERT_NOT_EQ(*(int*)data1, *(int*)data3); // Different values
+    ASSERT_EQ(*(int*)data3, 10);               // Next element should be 10
+
+    // Verify we can still advance
+    ASSERT(iter.has_next(&iter));
+    ASSERT_EQ(iter.next(&iter), 0);
+
+    void* data4 = iter.get(&iter);
+    ASSERT_NOT_NULL(data4);
+    ASSERT_EQ(*(int*)data4, 20); // Last element should be 20
+
+    // Now should be at end
+    ASSERT_EQ(iter.next(&iter), 0); // Advance past last element
+    ASSERT(!iter.has_next(&iter));
+    ASSERT_NULL(iter.get(&iter));
+
+    iter.destroy(&iter);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test iterator traversal order
+static int test_dll_iterator_order(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+
+    // Add elements in specific order
+    const int values[] = {100, 200, 300, 400, 500};
+    for (int i = 0; i < 5; i++)
+    {
+        int* data = malloc(sizeof(int));
+        *data = values[i];
+        ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+    }
+
+    // Create iterator and verify order
+    DSCIterator iter = dsc_dll_iterator(list);
+
+    for (int i = 0; i < 5; i++)
+    {
+        ASSERT(iter.has_next(&iter));
+        void* data = iter.get(&iter);
+        ASSERT_NOT_NULL(data);
+        ASSERT_EQ(*(int*)data, values[i]);
+        iter.next(&iter);
+    }
+
+    ASSERT(!iter.has_next(&iter));
+
+    iter.destroy(&iter);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test reset functionality
+static int test_dll_iterator_reset(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+
+    // Add numbers 1-3
+    for (int i = 1; i <= 3; i++)
+    {
+        int* val = malloc(sizeof(int));
+        *val = i;
+        dsc_dll_insert_back(list, val);
+    }
+
+    DSCIterator iter = dsc_dll_iterator(list);
+
+    // Advance iterator
+    iter.next(&iter);
+    iter.next(&iter);
+
+    // Reset and verify back at beginning
+    iter.reset(&iter);
+    int* val = (int*)iter.get(&iter);
+    ASSERT_EQ(*val, 1);
+    ASSERT(iter.has_next(&iter));
+
+    iter.destroy(&iter);
+    dsc_dll_destroy(list, true);
+    return TEST_SUCCESS;
+}
+
+// Test single element iterator behavior
+static int test_dll_iterator_single_element(void)
+{
+    DSCAllocator alloc = create_int_allocator();
+    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+
+    int* val = malloc(sizeof(int));
+    *val = 42;
+    dsc_dll_insert_back(list, val);
+
+    DSCIterator iter = dsc_dll_iterator(list);
+
+    ASSERT(iter.has_next(&iter));
+    ASSERT(!iter.has_prev(&iter)); // At beginning, no previous
+
+    const int* retrieved = iter.get(&iter);
+    ASSERT_EQ(*retrieved, 42);
+
+    iter.next(&iter);
+    ASSERT(!iter.has_next(&iter));
+    ASSERT(iter.has_prev(&iter)); // At end, has previous
+
+    iter.destroy(&iter);
+    dsc_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -425,24 +665,32 @@ typedef struct
     const char* name;
 } TestCase;
 
-TestCase tests[] = {
-    {test_basic_iteration, "test_basic_iteration"},
-    {test_empty_list_iterator, "test_empty_list_iterator"},
-    {test_iterator_with_modifications, "test_iterator_with_modifications"},
-    {test_multiple_iterators, "test_multiple_iterators"},
-    {test_iterator_reset, "test_iterator_reset"},
-    {test_reverse_iteration, "test_reverse_iteration"},
-    {test_empty_list_reverse_iterator, "test_empty_list_reverse_iterator"},
-    {test_from_iterator_basic, "test_from_iterator_basic"},
-    {test_from_iterator_with_copy, "test_from_iterator_with_copy"},
-    {test_from_iterator_empty, "test_from_iterator_empty"},
-    {test_from_iterator_invalid, "test_from_iterator_invalid"},
-};
-
 int main(void)
 {
-    int failed          = 0;
+    TestCase tests[] = {
+        {test_basic_iteration, "test_basic_iteration"},
+        {test_empty_list_iterator, "test_empty_list_iterator"},
+        {test_iterator_with_modifications, "test_iterator_with_modifications"},
+        {test_multiple_iterators, "test_multiple_iterators"},
+        {test_reverse_iteration, "test_reverse_iteration"},
+        {test_iterator_get, "test_iterator_get"},
+        {test_bidirectional_iteration, "test_bidirectional_iteration"},
+        {test_from_iterator, "test_from_iterator"},
+        {test_iterator_invalid, "test_iterator_invalid"},
+        {test_dll_copy_isolation, "test_dll_copy_isolation"},
+        {test_dll_copy_function_required, "test_dll_copy_function_required"},
+        {test_dll_from_iterator_no_copy, "test_dll_from_iterator_no_copy"},
+        {test_iterator_exhaustion_after_dll_creation, "test_iterator_exhaustion_after_dll_creation"},
+        {test_dll_iterator_next_return_values, "test_dll_iterator_next_return_values"},
+        {test_dll_iterator_mixed_operations, "test_dll_iterator_mixed_operations"},
+        {test_dll_iterator_order, "test_dll_iterator_order"},
+        {test_dll_iterator_reset, "test_dll_iterator_reset"},
+        {test_dll_iterator_single_element, "test_dll_iterator_single_element"},
+    };
+
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
+
     for (int i = 0; i < num_tests; i++)
     {
         if (tests[i].func() != TEST_SUCCESS)
@@ -451,11 +699,15 @@ int main(void)
             failed++;
         }
     }
-    if (failed == 0)
+
+    if (failed)
     {
-        printf("All DoublyLinkedList Iterator tests passed.\n");
+        printf("%d test(s) failed.\n", failed);
+        return 1;
+    }
+    else
+    {
+        printf("All doubly linked list iterator tests passed!\n");
         return 0;
     }
-    printf("%d DoublyLinkedList Iterator tests failed.\n", failed);
-    return 1;
 }

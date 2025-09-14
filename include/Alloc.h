@@ -92,7 +92,7 @@ DSC_API DSCAllocator dsc_alloc_default(void);
  * @return DSCAllocator struct with custom functions
  */
 DSC_API DSCAllocator dsc_alloc_custom(alloc_func alloc_func, dealloc_func dealloc_func,
-                          data_free_func data_free_func, copy_func copy_func);
+                                      data_free_func data_free_func, copy_func copy_func);
 
 /**
  * Allocate memory using the allocator's allocation function.
@@ -129,7 +129,6 @@ DSC_API void dsc_alloc_data_free(const DSCAllocator* alloc, void* ptr);
  * @return Pointer to copied data, or NULL if copy_func is NULL or on failure
  */
 DSC_API void* dsc_alloc_copy(const DSCAllocator* alloc, const void* data);
-
 
 
 #endif //DSCONTAINERS_ALLOC_H

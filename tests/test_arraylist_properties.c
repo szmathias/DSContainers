@@ -23,8 +23,8 @@ int test_equals(void)
     {
         int* val1 = malloc(sizeof(int));
         int* val2 = malloc(sizeof(int));
-        *val1     = i;
-        *val2     = i;
+        *val1 = i;
+        *val2 = i;
         dsc_arraylist_push_back(list1, val1);
         dsc_arraylist_push_back(list2, val2);
     }
@@ -33,7 +33,7 @@ int test_equals(void)
 
     // Add different element to list2
     int* val = malloc(sizeof(int));
-    *val     = 99;
+    *val = 99;
     dsc_arraylist_push_back(list2, val);
 
     ASSERT_EQ(dsc_arraylist_equals(list1, list2, int_cmp), 0);
@@ -50,11 +50,11 @@ int test_equals_different_sizes(void)
     DSCArrayList* list2 = dsc_arraylist_create(&alloc, 0);
 
     int* val1 = malloc(sizeof(int));
-    *val1     = 1;
+    *val1 = 1;
     int* val2 = malloc(sizeof(int));
-    *val2     = 1;
+    *val2 = 1;
     int* val3 = malloc(sizeof(int));
-    *val3     = 2;
+    *val3 = 2;
 
     dsc_arraylist_push_back(list1, val1);
     dsc_arraylist_push_back(list2, val2);
@@ -76,7 +76,7 @@ int test_copy_shallow(void)
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(original, val);
     }
 
@@ -105,7 +105,7 @@ int test_copy_deep(void)
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(original, val);
     }
 
@@ -141,7 +141,7 @@ int test_boundary_conditions(void)
 
     // Test invalid indices
     int* val = malloc(sizeof(int));
-    *val     = 42;
+    *val = 42;
     dsc_arraylist_push_back(list, val);
 
     ASSERT_NULL(dsc_arraylist_get(list, 1));
@@ -185,7 +185,7 @@ int test_size_consistency(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         dsc_arraylist_push_back(list, val);
         ASSERT_EQ(dsc_arraylist_size(list), (size_t)i + 1);
         ASSERT(!dsc_arraylist_is_empty(list));
@@ -219,13 +219,13 @@ int test_data_integrity_after_operations(void)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i * 10; // 0, 10, 20, ..., 90
+        *val = i * 10; // 0, 10, 20, ..., 90
         dsc_arraylist_push_back(list, val);
     }
 
     // Insert in middle
     int* val = malloc(sizeof(int));
-    *val     = 99;
+    *val = 99;
     dsc_arraylist_insert(list, 5, val);
 
     // Verify data integrity
@@ -263,7 +263,7 @@ int test_large_data_set(void)
     for (int i = 0; i < NUM_ELEMENTS; i++)
     {
         int* val = malloc(sizeof(int));
-        *val     = i;
+        *val = i;
         ASSERT_EQ(dsc_arraylist_push_back(list, val), 0);
     }
 
@@ -307,7 +307,7 @@ int main(void)
         {test_large_data_set, "test_large_data_set"},
     };
 
-    int failed          = 0;
+    int failed = 0;
     const int num_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < num_tests; i++)
     {

@@ -26,7 +26,7 @@ typedef struct DSCIterator DSCIterator;
  */
 struct DSCIterator
 {
-    void* data_state; // Implementation-specific state data
+    void* data_state;          // Implementation-specific state data
     const DSCAllocator* alloc; // Allocator for memory management
 
     // Element access
@@ -34,11 +34,11 @@ struct DSCIterator
 
     // Forward iteration
     int (*has_next)(const DSCIterator* it); // Check if more elements exist
-    void*(*next)(const DSCIterator* it);    // Get next element and advance
+    int (*next)(const DSCIterator* it);     // Advance to next position (returns 0 on success, -1 on failure)
 
     // Backward iteration
     int (*has_prev)(const DSCIterator* it); // Check if previous elements exist
-    void*(*prev)(const DSCIterator* it);    // Get previous element and move back
+    int (*prev)(const DSCIterator* it);     // Move back to previous position (returns 0 on success, -1 on failure)
 
     // Control operations
     void (*reset)(const DSCIterator* it);   // Reset to starting position
@@ -68,6 +68,8 @@ typedef void*(*transform_func)(const void* element);
  */
 typedef int (*filter_func)(const void* element);
 
+// Copy function provided in Alloc.h
+
 //==============================================================================
 // Higher-order iterator functions
 //==============================================================================
@@ -79,12 +81,17 @@ typedef int (*filter_func)(const void* element);
  * Note: The returned iterator takes ownership of the source iterator
  * and will destroy it when the transform iterator is destroyed.
  *
+ * Transform functions should return non-allocated memory (static buffers,
+ * pointers to existing data, etc.) or handle their own memory management.
+ * If you need to collect transformed values, use dsc_iterator_copy().
+ *
  * @param it Base iterator to transform (ownership transferred)
- * @param alloc The allocator to use for the new iterator's state.
+ * @param alloc The allocator to use for the new iterator's state
  * @param transform Function to apply to each element
+ * @param transform_allocates Flag: does transform function allocate memory
  * @return A new iterator producing transformed elements
  */
-DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, const DSCAllocator* alloc, transform_func transform);
+DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, const DSCAllocator* alloc, transform_func transform, int transform_allocates);
 
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
@@ -110,5 +117,18 @@ DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, const DSCAllocator* all
  * @return A new iterator yielding integers in the specified range
  */
 DSC_API DSCIterator dsc_iterator_range(int start, int end, int step, const DSCAllocator* alloc);
+
+/**
+ * Create a copy iterator that returns deep copies of elements.
+ *
+ * The copy iterator creates deep copies that the USER OWNS and must free.
+ * This is different from other iterators which return cached pointers.
+ *
+ * @param it Base iterator to copy from (ownership transferred)
+ * @param alloc The allocator to use for iterator state and element copies
+ * @param copy Function to create deep copies of elements
+ * @return A new iterator yielding user-owned copies
+ */
+DSC_API DSCIterator dsc_iterator_copy(DSCIterator* it, const DSCAllocator* alloc, copy_func copy);
 
 #endif //DSCONTAINERS_ITERATOR_H

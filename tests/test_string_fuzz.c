@@ -33,7 +33,8 @@ static size_t fuzz_rand_size(size_t bound)
 static void ensure_seeded(void)
 {
     static int seeded = 0;
-    if (!seeded) {
+    if (!seeded)
+    {
         fuzz_seed();
         seeded = 1;
     }

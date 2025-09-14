@@ -36,9 +36,9 @@ typedef int (*key_equals_func)(const void* key1, const void* key2);
  */
 typedef struct DSCHashMapNode
 {
-    void* key;                       // Pointer to key data
-    void* value;                     // Pointer to value data
-    struct DSCHashMapNode* next;     // Next node in chain
+    void* key;                   // Pointer to key data
+    void* value;                 // Pointer to value data
+    struct DSCHashMapNode* next; // Next node in chain
 } DSCHashMapNode;
 
 /**
@@ -48,13 +48,13 @@ typedef struct DSCHashMapNode
  */
 typedef struct DSCHashMap
 {
-    DSCHashMapNode** buckets;        // Array of bucket heads
-    size_t bucket_count;             // Number of buckets
-    size_t size;                     // Number of key-value pairs
-    double max_load_factor;          // Maximum load factor before resize
-    hash_func hash;                  // Hash function for keys
-    key_equals_func key_equals;      // Key equality function
-    DSCAllocator* alloc;                 // Custom allocator
+    DSCHashMapNode** buckets;   // Array of bucket heads
+    size_t bucket_count;        // Number of buckets
+    size_t size;                // Number of key-value pairs
+    double max_load_factor;     // Maximum load factor before resize
+    hash_func hash;             // Hash function for keys
+    key_equals_func key_equals; // Key equality function
+    DSCAllocator* alloc;        // Custom allocator
 } DSCHashMap;
 
 /**
@@ -80,7 +80,7 @@ typedef struct DSCKeyValuePair
  * @return Pointer to new hash map, or NULL on failure
  */
 DSC_API DSCHashMap* dsc_hashmap_create(DSCAllocator* alloc, hash_func hash,
-                               key_equals_func key_equals, size_t initial_capacity);
+                                       key_equals_func key_equals, size_t initial_capacity);
 
 /**
  * Destroy the hash map and free all nodes.
@@ -194,7 +194,7 @@ DSC_API void* dsc_hashmap_get(const DSCHashMap* map, const void* key);
  * @return 0 on success, -1 if key not found or on error
  */
 DSC_API int dsc_hashmap_remove(DSCHashMap* map, const void* key,
-                       bool should_free_key, bool should_free_value);
+                               bool should_free_key, bool should_free_value);
 
 /**
  * Remove a key-value pair and return the value.
@@ -259,7 +259,7 @@ DSC_API DSCHashMap* dsc_hashmap_copy(const DSCHashMap* map);
  * @return A new hash map with copies of all data, or NULL on error
  */
 DSC_API DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
-                                  copy_func key_copy, copy_func value_copy);
+                                          copy_func key_copy, copy_func value_copy);
 
 //==============================================================================
 // Iterator functions
@@ -277,14 +277,29 @@ DSC_API DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
 /**
  * Create a new hash map from an iterator of key-value pairs.
  *
- * @param it The source iterator (must yield DSCKeyValuePair*)
- * @param alloc The custom allocator to use
+ * This function consumes all elements from the provided iterator and creates
+ * a new HashMap containing those elements. The iteration follows the standard
+ * get()/next() pattern, filtering out any NULL elements returned by the iterator.
+ * Elements are added to the HashMap in the order they are encountered from the iterator.
+ *
+ * @param it The source iterator (must be valid and support has_next/get/next, yields DSCKeyValuePair*)
+ * @param alloc The custom allocator to use for the new HashMap
  * @param hash Hash function for keys
  * @param key_equals Key equality function
+ * @param should_copy If true, creates deep copies of all keys and values using alloc->copy_func.
+ *                    If false, uses keys and values directly from iterator.
+ *                    When true, alloc->copy_func must not be NULL.
  * @return A new hash map with elements from iterator, or NULL on error
+ *
+ * @note NULL elements from the iterator are always filtered out as they indicate
+ *       iterator issues rather than valid data.
+ * @note The iterator is consumed during this operation - it will be at the end
+ *       position after the function completes.
+ * @note If should_copy is true and copying fails for any element, the function
+ *       cleans up and returns NULL.
  */
 DSC_API DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
-                                      hash_func hash, key_equals_func key_equals);
+                                              hash_func hash, key_equals_func key_equals, bool should_copy);
 
 //==============================================================================
 // Utility hash functions

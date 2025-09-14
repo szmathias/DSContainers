@@ -55,7 +55,7 @@ void test_dealloc(void* ptr)
 void* int_copy(const void* data)
 {
     const int* original = data;
-    int* copy           = malloc(sizeof(int));
+    int* copy = malloc(sizeof(int));
     if (copy)
     {
         *copy = *original;
@@ -85,7 +85,7 @@ void* string_copy(const void* data)
 void* person_copy(const void* data)
 {
     const Person* original = data;
-    Person* copy           = create_person(original->name, original->age);
+    Person* copy = create_person(original->name, original->age);
     return copy;
 }
 
@@ -97,7 +97,7 @@ Person* create_person(const char* name, const int age)
     {
         strncpy(p->name, name, 49);
         p->name[49] = '\0';
-        p->age      = age;
+        p->age = age;
     }
     return p;
 }
@@ -129,11 +129,25 @@ int is_greater_than_10(const void* data)
     return (*value > 10);
 }
 
+// Predicate: is greater than 20
+int is_greater_than_20(const void* data)
+{
+    const int* value = data;
+    return (*value > 20);
+}
+
 // Predicate: is divisible by 3
 int is_divisible_by_3(const void* data)
 {
     const int* value = data;
     return (*value % 3 == 0);
+}
+
+// Predicate: is divisible by 4
+int is_divisible_by_4(const void* data)
+{
+    const int* value = data;
+    return (*value % 4 == 0);
 }
 
 // Predicate: is divisible by 6
@@ -158,7 +172,7 @@ void* double_value(const void* data)
 void* square_func(const void* data)
 {
     const int* original = data;
-    int* result         = malloc(sizeof(int));
+    int* result = malloc(sizeof(int));
     if (result)
     {
         *result = (*original) * (*original);
@@ -170,8 +184,8 @@ void* square_func(const void* data)
 void* add_one(const void* data)
 {
     const int* original = data;
-    int* result         = malloc(sizeof(int));
-    *result             = (*original) + 1;
+    int* result = malloc(sizeof(int));
+    *result = (*original) + 1;
     return result;
 }
 
@@ -179,8 +193,8 @@ void* add_one(const void* data)
 void* add_five(const void* data)
 {
     const int* original = data;
-    int* result         = malloc(sizeof(int));
-    *result             = (*original) + 5;
+    int* result = malloc(sizeof(int));
+    *result = (*original) + 5;
     return result;
 }
 
@@ -188,8 +202,8 @@ void* add_five(const void* data)
 void* add_ten_func(const void* data)
 {
     const int* original = data;
-    int* result         = malloc(sizeof(int));
-    *result             = (*original) + 10;
+    int* result = malloc(sizeof(int));
+    *result = (*original) + 10;
     return result;
 }
 
@@ -197,8 +211,8 @@ void* add_ten_func(const void* data)
 void* multiply_by_three(const void* data)
 {
     const int* original = data;
-    int* result         = malloc(sizeof(int));
-    *result             = (*original) * 3;
+    int* result = malloc(sizeof(int));
+    *result = (*original) * 3;
     return result;
 }
 
