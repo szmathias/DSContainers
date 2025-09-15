@@ -59,7 +59,7 @@ typedef int (*pair_compare_func)(const void* a, const void* b);
 DSC_API DSCPair* dsc_pair_create(DSCAllocator* alloc, void* first, void* second);
 
 /**
-* Initialize a pair structure with the given elements (no allocation).
+* Initialize a DSCPair structure with the given elements (no allocation).
 * The pair takes ownership of the provided pointers but is not itself allocated.
 * Use this when you have a stack-allocated DSCPair structure.
 *
