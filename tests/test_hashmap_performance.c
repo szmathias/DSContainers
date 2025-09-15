@@ -2,13 +2,13 @@
 // HashMap performance test - converted from HashTable performance test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test insertion performance
 int test_hashmap_performance_insertion(void)
@@ -181,7 +181,7 @@ int test_hashmap_performance_iteration(void)
     int visited_count = 0;
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
         visited_count++;
         it.next(&it);

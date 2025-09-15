@@ -34,10 +34,13 @@ void* test_calloc(size_t size);
 void test_dealloc(void* ptr);
 
 // --- Copy/Clone Helpers ---
+
 // Clone an integer
 void* int_copy(const void* data);
+
 // Clone a string
 void* string_copy(const void* data);
+
 // Clone a person
 void* person_copy(const void* data);
 

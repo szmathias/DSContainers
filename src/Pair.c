@@ -4,6 +4,8 @@
 
 #include "Pair.h"
 
+#include <string.h>
+
 //==============================================================================
 // Creation and destruction functions
 //==============================================================================
@@ -26,6 +28,20 @@ DSCPair* dsc_pair_create(DSCAllocator* alloc, void* first, void* second)
     pair->alloc = alloc;
 
     return pair;
+}
+
+int dsc_pair_init(DSCPair* pair, DSCAllocator* alloc, void* first, void* second)
+{
+    if (!pair)
+    {
+        return -1;
+    }
+
+    pair->first = first;
+    pair->second = second;
+    pair->alloc = alloc;
+
+    return 0;
 }
 
 void dsc_pair_destroy(DSCPair* pair, const bool should_free_first, const bool should_free_second)
@@ -203,6 +219,246 @@ DSCPair* dsc_pair_copy_deep(const DSCPair* pair, const bool should_free, const c
     else
     {
         new_pair->second = NULL;
+    }
+
+    return new_pair;
+}
+
+//==============================================================================
+// Common copy helper functions
+//==============================================================================
+
+void* dsc_pair_copy_string_int(const void* pair_data)
+{
+    if (!pair_data)
+    {
+        return NULL;
+    }
+
+    const DSCPair* original = pair_data;
+    if (!original->alloc)
+    {
+        return NULL;
+    }
+
+    // Create new pair structure
+    DSCPair* new_pair = dsc_alloc_malloc(original->alloc, sizeof(DSCPair));
+    if (!new_pair)
+    {
+        return NULL;
+    }
+
+    new_pair->alloc = original->alloc;
+    new_pair->first = NULL;
+    new_pair->second = NULL;
+
+    // Copy string first element
+    if (original->first)
+    {
+        const char* str = original->first;
+        const size_t len = strlen(str) + 1;
+        char* str_copy = dsc_alloc_malloc(original->alloc, len);
+        if (!str_copy)
+        {
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        strcpy(str_copy, str);
+        new_pair->first = str_copy;
+    }
+
+    // Copy int second element
+    if (original->second)
+    {
+        int* int_copy = dsc_alloc_malloc(original->alloc, sizeof(int));
+        if (!int_copy)
+        {
+            if (new_pair->first)
+            {
+                dsc_alloc_free(original->alloc, new_pair->first);
+            }
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        *int_copy = *(const int*)original->second;
+        new_pair->second = int_copy;
+    }
+
+    return new_pair;
+}
+
+void* dsc_pair_copy_int_string(const void* pair_data)
+{
+    if (!pair_data)
+    {
+        return NULL;
+    }
+
+    const DSCPair* original = pair_data;
+    if (!original->alloc)
+    {
+        return NULL;
+    }
+
+    // Create new pair structure
+    DSCPair* new_pair = dsc_alloc_malloc(original->alloc, sizeof(DSCPair));
+    if (!new_pair)
+    {
+        return NULL;
+    }
+
+    new_pair->alloc = original->alloc;
+    new_pair->first = NULL;
+    new_pair->second = NULL;
+
+    // Copy int first element
+    if (original->first)
+    {
+        int* int_copy = dsc_alloc_malloc(original->alloc, sizeof(int));
+        if (!int_copy)
+        {
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        *int_copy = *(const int*)original->first;
+        new_pair->first = int_copy;
+    }
+
+    // Copy string second element
+    if (original->second)
+    {
+        const char* str = (const char*)original->second;
+        const size_t len = strlen(str) + 1;
+        char* str_copy = dsc_alloc_malloc(original->alloc, len);
+        if (!str_copy)
+        {
+            if (new_pair->first)
+            {
+                dsc_alloc_free(original->alloc, new_pair->first);
+            }
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        strcpy(str_copy, str);
+        new_pair->second = str_copy;
+    }
+
+    return new_pair;
+}
+
+void* dsc_pair_copy_string_string(const void* pair_data)
+{
+    if (!pair_data)
+    {
+        return NULL;
+    }
+
+    const DSCPair* original = pair_data;
+    if (!original->alloc)
+    {
+        return NULL;
+    }
+
+    // Create new pair structure
+    DSCPair* new_pair = dsc_alloc_malloc(original->alloc, sizeof(DSCPair));
+    if (!new_pair)
+    {
+        return NULL;
+    }
+
+    new_pair->alloc = original->alloc;
+    new_pair->first = NULL;
+    new_pair->second = NULL;
+
+    // Copy string first element
+    if (original->first)
+    {
+        const char* str1 = (const char*)original->first;
+        const size_t len1 = strlen(str1) + 1;
+        char* str1_copy = dsc_alloc_malloc(original->alloc, len1);
+        if (!str1_copy)
+        {
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        strcpy(str1_copy, str1);
+        new_pair->first = str1_copy;
+    }
+
+    // Copy string second element
+    if (original->second)
+    {
+        const char* str2 = (const char*)original->second;
+        const size_t len2 = strlen(str2) + 1;
+        char* str2_copy = dsc_alloc_malloc(original->alloc, len2);
+        if (!str2_copy)
+        {
+            if (new_pair->first)
+            {
+                dsc_alloc_free(original->alloc, new_pair->first);
+            }
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        strcpy(str2_copy, str2);
+        new_pair->second = str2_copy;
+    }
+
+    return new_pair;
+}
+
+void* dsc_pair_copy_int_int(const void* pair_data)
+{
+    if (!pair_data)
+    {
+        return NULL;
+    }
+
+    const DSCPair* original = pair_data;
+    if (!original->alloc)
+    {
+        return NULL;
+    }
+
+    // Create new pair structure
+    DSCPair* new_pair = dsc_alloc_malloc(original->alloc, sizeof(DSCPair));
+    if (!new_pair)
+    {
+        return NULL;
+    }
+
+    new_pair->alloc = original->alloc;
+    new_pair->first = NULL;
+    new_pair->second = NULL;
+
+    // Copy int first element
+    if (original->first)
+    {
+        int* int1_copy = dsc_alloc_malloc(original->alloc, sizeof(int));
+        if (!int1_copy)
+        {
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        *int1_copy = *(const int*)original->first;
+        new_pair->first = int1_copy;
+    }
+
+    // Copy int second element
+    if (original->second)
+    {
+        int* int2_copy = dsc_alloc_malloc(original->alloc, sizeof(int));
+        if (!int2_copy)
+        {
+            if (new_pair->first)
+            {
+                dsc_alloc_free(original->alloc, new_pair->first);
+            }
+            dsc_alloc_free(original->alloc, new_pair);
+            return NULL;
+        }
+        *int2_copy = *(const int*)original->second;
+        new_pair->second = int2_copy;
     }
 
     return new_pair;

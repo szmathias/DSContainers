@@ -2,12 +2,12 @@
 // HashMap algorithms test - converted from HashTable algorithms test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test hash map copying (shallow)
 int test_hashmap_copy_shallow(void)
@@ -83,7 +83,7 @@ int test_hashmap_copy_deep(void)
 static void increment_value(void* key, void* value)
 {
     (void)key; // Unused
-    int* val = (int*)value;
+    int* val = value;
     (*val)++;
 }
 
@@ -109,7 +109,7 @@ int test_hashmap_for_each(void)
     // Verify values were incremented
     for (int i = 1; i <= 5; i++)
     {
-        int* value = (int*)dsc_hashmap_get(map, &i);
+        const int* value = dsc_hashmap_get(map, &i);
         ASSERT_EQ(*value, i * 10 + 1);
     }
 
@@ -209,7 +209,9 @@ int test_hashmap_get_values(void)
 int test_hashmap_from_iterator(void)
 {
     DSCAllocator alloc = create_string_allocator();
+    alloc.copy_func = dsc_pair_copy_string_string;
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
 
     const char* keys[] = {"key1", "key2", "key3"};
     const char* values[] = {"val1", "val2", "val3"};

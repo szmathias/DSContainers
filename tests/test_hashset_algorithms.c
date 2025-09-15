@@ -2,12 +2,10 @@
 // HashSet Algorithms test - Set operations
 //
 
+#include <stdio.h>
+#include "HashSet.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include "HashSet.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // Helper function to create a set with string elements
 DSCHashSet* create_string_set(DSCAllocator* alloc, char** elements, const size_t count)

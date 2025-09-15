@@ -9,6 +9,7 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
+#include "Pair.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,15 +61,6 @@ typedef struct DSCHashMap
     key_equals_func key_equals; // Key equality function
     DSCAllocator* alloc;        // Custom allocator
 } DSCHashMap;
-
-/**
- * Key-value pair structure for iteration and bulk operations.
- */
-typedef struct DSCKeyValuePair
-{
-    void* key;
-    void* value;
-} DSCKeyValuePair;
 
 //==============================================================================
 // Creation and destruction functions
@@ -287,12 +279,13 @@ DSC_API DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
  * Elements are added to the HashMap in the order they are encountered from the iterator.
  *
  * @param it The source iterator (must be valid and support has_next/get/next, yields DSCKeyValuePair*)
- * @param alloc The custom allocator to use for the new HashMap
+ * @param alloc The custom allocator to use
  * @param hash Hash function for keys
  * @param key_equals Key equality function
- * @param should_copy If true, creates deep copies of all keys and values using alloc->copy_func.
- *                    If false, uses keys and values directly from iterator.
- *                    When true, alloc->copy_func must not be NULL.
+* @param should_copy If true, creates deep copies of all keys and values using alloc->copy_func.
+*                    If false, uses keys and values directly from iterator.
+*                    When true, alloc->copy_func must not be NULL and must accept a DSCPair*
+*                    as input to handle copying both key and value appropriately.
  * @return A new hash map with elements from iterator, or NULL on error
  *
  * @note NULL elements from the iterator are always filtered out as they indicate
@@ -303,7 +296,7 @@ DSC_API DSCIterator dsc_hashmap_iterator(const DSCHashMap* map);
  *       cleans up and returns NULL.
  */
 DSC_API DSCHashMap* dsc_hashmap_from_iterator(DSCIterator* it, DSCAllocator* alloc,
-                                              hash_func hash, key_equals_func key_equals, bool should_copy);
+                                      hash_func hash, key_equals_func key_equals, bool should_copy);
 
 //==============================================================================
 // Utility hash functions

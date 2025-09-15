@@ -2,12 +2,12 @@
 // HashMap memory-safe test - converted from HashTable memory-safe test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test the new dsc_hashmap_put_replace function
 int test_hashmap_put_replace(void)

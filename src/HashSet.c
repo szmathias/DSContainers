@@ -230,9 +230,9 @@ DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2)
     DSCIterator it1 = dsc_hashmap_iterator(set1->map);
     while (it1.has_next(&it1))
     {
-        const DSCKeyValuePair* pair = it1.get(&it1);
+        const DSCPair* pair = it1.get(&it1);
 
-        if (pair && dsc_hashset_add(result, pair->key) != 0)
+        if (pair && dsc_hashset_add(result, pair->first) != 0)
         {
             it1.destroy(&it1);
             dsc_hashset_destroy(result, false);
@@ -246,10 +246,10 @@ DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2)
     DSCIterator it2 = dsc_hashmap_iterator(set2->map);
     while (it2.has_next(&it2))
     {
-        const DSCKeyValuePair* pair = it2.get(&it2);
+        const DSCPair* pair = it2.get(&it2);
         if (pair)
         {
-            dsc_hashset_add(result, pair->key); // Ignore errors for duplicates
+            dsc_hashset_add(result, pair->first); // Ignore errors for duplicates
         }
         it2.next(&it2);
     }
@@ -280,11 +280,11 @@ DSCHashSet* dsc_hashset_intersection(const DSCHashSet* set1, const DSCHashSet* s
     DSCIterator it = dsc_hashmap_iterator(smaller->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
 
-        if (pair && dsc_hashset_contains(larger, pair->key))
+        if (pair && dsc_hashset_contains(larger, pair->first))
         {
-            if (dsc_hashset_add(result, pair->key) != 0)
+            if (dsc_hashset_add(result, pair->first) != 0)
             {
                 it.destroy(&it);
                 dsc_hashset_destroy(result, false);
@@ -317,10 +317,10 @@ DSCHashSet* dsc_hashset_difference(const DSCHashSet* set1, const DSCHashSet* set
     DSCIterator it = dsc_hashmap_iterator(set1->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
-        if (pair && (!set2 || !set2->map || !dsc_hashset_contains(set2, pair->key)))
+        const DSCPair* pair = it.get(&it);
+        if (pair && (!set2 || !set2->map || !dsc_hashset_contains(set2, pair->first)))
         {
-            if (dsc_hashset_add(result, pair->key) != 0)
+            if (dsc_hashset_add(result, pair->first) != 0)
             {
                 it.destroy(&it);
                 dsc_hashset_destroy(result, false);
@@ -351,9 +351,9 @@ int dsc_hashset_is_subset(const DSCHashSet* subset, const DSCHashSet* superset)
     DSCIterator it = dsc_hashmap_iterator(subset->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
 
-        if (pair && !dsc_hashset_contains(superset, pair->key))
+        if (pair && !dsc_hashset_contains(superset, pair->first))
         {
             it.destroy(&it);
             return 0;
@@ -413,9 +413,9 @@ DSCHashSet* dsc_hashset_copy(const DSCHashSet* set)
     DSCIterator it = dsc_hashmap_iterator(set->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
 
-        if (pair && dsc_hashset_add(copy, pair->key) != 0)
+        if (pair && dsc_hashset_add(copy, pair->first) != 0)
         {
             it.destroy(&it);
             dsc_hashset_destroy(copy, false);
@@ -446,11 +446,11 @@ DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, const copy_func key_cop
     DSCIterator it = dsc_hashmap_iterator(set->map);
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
 
         if (pair)
         {
-            void* copied_key = key_copy ? key_copy(pair->key) : pair->key;
+            void* copied_key = key_copy ? key_copy(pair->first) : pair->first;
             if ((key_copy && !copied_key) || dsc_hashset_add(copy, copied_key) != 0)
             {
                 if (key_copy && copied_key)
@@ -493,10 +493,10 @@ static void* hashset_iterator_get(const DSCIterator* it)
     // If we don't have a current key, try to get one from the underlying iterator
     if (!state->current_key && state->map_iterator.has_next(&state->map_iterator))
     {
-        const DSCKeyValuePair* pair = state->map_iterator.get(&state->map_iterator);
+        const DSCPair* pair = state->map_iterator.get(&state->map_iterator);
         if (pair)
         {
-            state->current_key = pair->key;
+            state->current_key = pair->first;
         }
     }
 
@@ -524,7 +524,7 @@ static int hashset_iterator_next(const DSCIterator* it)
     HashSetIteratorState* state = it->data_state;
 
     // Advance the underlying iterator
-    int result = state->map_iterator.next(&state->map_iterator);
+    const int result = state->map_iterator.next(&state->map_iterator);
 
     // Clear current key so next get() will fetch the new one
     state->current_key = NULL;

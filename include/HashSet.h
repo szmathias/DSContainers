@@ -10,10 +10,10 @@
 #define DSCONTAINERS_HASHSET_H
 
 #include <stddef.h>
-#include "HashMap.h"
 #include "Alloc.h"
-#include "Iterator.h"
 #include "CStandardCompatibility.h"
+#include "HashMap.h"
+#include "Iterator.h"
 
 #ifdef __cplusplus
 extern "C" {

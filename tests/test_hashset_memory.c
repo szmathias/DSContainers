@@ -2,12 +2,12 @@
 // HashSet Memory test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashSet.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashSet.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test memory allocation and deallocation
 int test_hashset_memory_basic(void)
