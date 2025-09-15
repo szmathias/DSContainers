@@ -26,6 +26,17 @@ extern "C" {
 typedef struct DSCIterator DSCIterator;
 
 /**
+* Indexed element structure for enumerate iterator.
+* Contains both the index/position and the element data.
+*/
+typedef struct DSCIndexedElement
+{
+    size_t index;         // Zero-based index/position
+    void* element;        // Pointer to the element data
+    DSCAllocator* alloc;  // Allocator for memory management
+} DSCIndexedElement;
+
+/**
 * Iterator interface with function pointers for standard operations.
 */
 struct DSCIterator
@@ -134,6 +145,64 @@ DSC_API DSCIterator dsc_iterator_range(int start, int end, int step, const DSCAl
 * @return A new iterator yielding user-owned copies
 */
 DSC_API DSCIterator dsc_iterator_copy(DSCIterator* it, const DSCAllocator* alloc, copy_func copy);
+
+/**
+* Create a take iterator that limits iteration to first N elements.
+* The new iterator will yield at most N elements from the base iterator.
+*
+* Note: The returned iterator takes ownership of the source iterator
+* and will destroy it when the take iterator is destroyed.
+*
+* @param it Base iterator to take from (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state
+* @param count Maximum number of elements to yield (0 means no elements)
+* @return A new iterator yielding at most count elements
+*/
+DSC_API DSCIterator dsc_iterator_take(DSCIterator* it, const DSCAllocator* alloc, size_t count);
+
+/**
+* Create a skip iterator that skips first N elements, then yields the rest.
+* The new iterator will skip the first N elements and then yield all remaining elements.
+*
+* Note: The returned iterator takes ownership of the source iterator
+* and will destroy it when the skip iterator is destroyed.
+*
+* @param it Base iterator to skip from (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state
+* @param count Number of elements to skip (0 means skip none)
+* @return A new iterator yielding elements after skipping count elements
+*/
+DSC_API DSCIterator dsc_iterator_skip(DSCIterator* it, const DSCAllocator* alloc, size_t count);
+
+/**
+* Create a zip iterator that combines elements from two iterators pairwise.
+* The new iterator yields DSCPair objects containing corresponding elements from both iterators.
+* Iteration stops when either iterator is exhausted.
+*
+* Note: The returned iterator takes ownership of both source iterators
+* and will destroy them when the zip iterator is destroyed.
+*
+* @param it1 First iterator (ownership transferred)
+* @param it2 Second iterator (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state and pair creation
+* @return A new iterator yielding DSCPair objects with elements from both iterators
+*/
+DSC_API DSCIterator dsc_iterator_zip(DSCIterator* it1, DSCIterator* it2, const DSCAllocator* alloc);
+
+/**
+* Create an enumerate iterator that adds index numbers to elements.
+* The new iterator yields DSCIndexedElement objects containing both the zero-based
+* index and the original element data.
+*
+* Note: The returned iterator takes ownership of the source iterator
+* and will destroy it when the enumerate iterator is destroyed.
+*
+* @param it Base iterator to enumerate (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state
+* @param start_index Starting index value (typically 0)
+* @return A new iterator yielding DSCIndexedElement objects with index and data
+*/
+DSC_API DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* alloc, size_t start_index);
 
 #ifdef __cplusplus
 }
