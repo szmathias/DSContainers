@@ -62,6 +62,12 @@ if (ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE MATCHES "Debug" AND (CMAKE_C_COMPILER
     target_compile_definitions(DSContainers PUBLIC DSC_SANITIZERS_ENABLED)
 endif ()
 
+configure_file(
+        "${CMAKE_SOURCE_DIR}/README.md.in"
+        "${CMAKE_SOURCE_DIR}/README.md"
+        @ONLY
+)
+
 enable_testing()
 
 # Add the tests subdirectory

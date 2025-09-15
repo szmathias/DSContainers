@@ -1,6 +1,7 @@
 # Build directories
 build/
 cmake-build-*/
+Testing/
 
 # IDE files
 .idea/
@@ -30,8 +31,6 @@ CMakeFiles/
 cmake_install.cmake
 install_manifest.txt
 
-# Testing
-Testing/
-
 # Other
 *.log
+*.in
