@@ -2,12 +2,12 @@
 // HashMap CRUD test - converted from HashTable CRUD test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test basic hash map creation and destruction
 int test_hashmap_create_destroy(void)
@@ -210,7 +210,7 @@ int test_hashmap_resize(void)
     for (int i = 0; i < 10; i++)
     {
         int key = i;
-        void* retrieved = dsc_hashmap_get(map, &key);
+        const void* retrieved = dsc_hashmap_get(map, &key);
         ASSERT_NOT_NULL(retrieved);
     }
 

@@ -2,12 +2,12 @@
 // HashMap properties test - converted from HashTable properties test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test hash map size property
 int test_hashmap_size_property(void)
@@ -137,13 +137,13 @@ int test_hashmap_load_factor_property(void)
 
         ASSERT_EQ(dsc_hashmap_put(map, keys[i], values[i]), 0);
 
-        double expected_lf = (double)(i + 1) / 8.0;
-        double actual_lf = dsc_hashmap_load_factor(map);
+        const double expected_lf = (double)(i + 1) / 8.0;
+        const double actual_lf = dsc_hashmap_load_factor(map);
         ASSERT(actual_lf >= expected_lf - 0.01 && actual_lf <= expected_lf + 0.01);
     }
 
     // Load factor should be 0.5 with 4 items in 8 buckets
-    double lf = dsc_hashmap_load_factor(map);
+    const double lf = dsc_hashmap_load_factor(map);
     ASSERT(lf >= 0.49 && lf <= 0.51);
 
     dsc_hashmap_destroy(map, false, false);
@@ -181,7 +181,7 @@ int test_hashmap_resize_property(void)
     items_added++;
 
     // After resize, load factor should be lower
-    double post_resize_lf = dsc_hashmap_load_factor(map);
+    const double post_resize_lf = dsc_hashmap_load_factor(map);
     ASSERT(post_resize_lf < initial_lf);
     ASSERT_EQ(dsc_hashmap_size(map), (size_t)items_added);
 
@@ -305,14 +305,14 @@ int test_hashmap_iterator_completeness(void)
 
     while (it.has_next(&it))
     {
-        DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
 
         // Find which item this is
         int found_index = -1;
         for (int i = 0; i < num_items; i++)
         {
-            if (strcmp(pair->key, keys[i]) == 0)
+            if (strcmp(pair->first, keys[i]) == 0)
             {
                 found_index = i;
                 break;
@@ -324,7 +324,7 @@ int test_hashmap_iterator_completeness(void)
         found_flags[found_index] = 1;
 
         // Verify value matches
-        ASSERT_EQ_STR((char*)pair->value, values[found_index]);
+        ASSERT_EQ_STR((char*)pair->second, values[found_index]);
         visited_count++;
         it.next(&it);
     }

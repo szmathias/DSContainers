@@ -2,12 +2,12 @@
 // HashMap algorithms test - converted from HashTable algorithms test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test hash map copying (shallow)
 int test_hashmap_copy_shallow(void)
@@ -67,8 +67,8 @@ int test_hashmap_copy_deep(void)
     // Verify data is different (different pointers, same values)
     for (int i = 0; i < 3; i++)
     {
-        int* orig_value = (int*)dsc_hashmap_get(original, &i);
-        int* copy_value = (int*)dsc_hashmap_get(copy, &i);
+        int* orig_value = dsc_hashmap_get(original, &i);
+        int* copy_value = dsc_hashmap_get(copy, &i);
         ASSERT_NOT_EQ_PTR(orig_value, copy_value); // Should be different pointers
         ASSERT_EQ(*orig_value, *copy_value);       // Same values
         ASSERT_EQ(*orig_value, i * 10);
@@ -83,7 +83,7 @@ int test_hashmap_copy_deep(void)
 static void increment_value(void* key, void* value)
 {
     (void)key; // Unused
-    int* val = (int*)value;
+    int* val = value;
     (*val)++;
 }
 
@@ -109,7 +109,7 @@ int test_hashmap_for_each(void)
     // Verify values were incremented
     for (int i = 1; i <= 5; i++)
     {
-        int* value = (int*)dsc_hashmap_get(map, &i);
+        const int* value = dsc_hashmap_get(map, &i);
         ASSERT_EQ(*value, i * 10 + 1);
     }
 
@@ -149,7 +149,7 @@ int test_hashmap_get_keys(void)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (strcmp((char*)retrieved_keys[i], keys[j]) == 0)
+            if (strcmp(retrieved_keys[i], keys[j]) == 0)
             {
                 found_count++;
                 break;
@@ -191,7 +191,7 @@ int test_hashmap_get_values(void)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (strcmp((char*)retrieved_values[i], values[j]) == 0)
+            if (strcmp(retrieved_values[i], values[j]) == 0)
             {
                 found_count++;
                 break;
@@ -209,7 +209,9 @@ int test_hashmap_get_values(void)
 int test_hashmap_from_iterator(void)
 {
     DSCAllocator alloc = create_string_allocator();
+    alloc.copy_func = dsc_pair_copy_string_string;
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+
 
     const char* keys[] = {"key1", "key2", "key3"};
     const char* values[] = {"val1", "val2", "val3"};

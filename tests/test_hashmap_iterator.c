@@ -2,13 +2,13 @@
 // HashMap iterator test - converted from DoublyLinkedList iterator test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
-#include "Iterator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "Iterator.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test basic iterator functionality
 static int test_hashmap_iterator_basic(void)
@@ -35,17 +35,17 @@ static int test_hashmap_iterator_basic(void)
 
     while (it.has_next(&it))
     {
-        const DSCKeyValuePair* pair = it.get(&it);
+        const DSCPair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
-        ASSERT_NOT_NULL(pair->key);
-        ASSERT_NOT_NULL(pair->value);
+        ASSERT_NOT_NULL(pair->first);
+        ASSERT_NOT_NULL(pair->second);
 
         // Find which item this is
         for (int i = 0; i < num_items; i++)
         {
-            if (strcmp(pair->key, keys[i]) == 0)
+            if (strcmp(pair->first, keys[i]) == 0)
             {
-                ASSERT_EQ_STR((char*)pair->value, values[i]);
+                ASSERT_EQ_STR((char*)pair->second, values[i]);
                 ASSERT(!found[i]); // Should not have seen this before
                 found[i] = true;
                 break;
@@ -109,7 +109,7 @@ static int test_hashmap_iterator_with_modifications(void)
     DSCIterator it = dsc_hashmap_iterator(map);
 
     // Consume first element
-    const DSCKeyValuePair* pair = it.get(&it);
+    const DSCPair* pair = it.get(&it);
     ASSERT_NOT_NULL(pair);
     it.next(&it);
 
@@ -155,7 +155,7 @@ static int test_hashmap_iterator_multiple(void)
     DSCIterator it2 = dsc_hashmap_iterator(map);
 
     // First iterator consumes two elements
-    const DSCKeyValuePair* pair1 = it1.get(&it1);
+    const DSCPair* pair1 = it1.get(&it1);
     ASSERT_NOT_NULL(pair1);
     it1.next(&it1);
 
@@ -164,7 +164,7 @@ static int test_hashmap_iterator_multiple(void)
     it1.next(&it1);
 
     // Second iterator should still be at the beginning
-    const DSCKeyValuePair* pair2 = it2.get(&it2);
+    const DSCPair* pair2 = it2.get(&it2);
     ASSERT_NOT_NULL(pair2);
     it2.next(&it2);
 
@@ -208,13 +208,13 @@ static int test_hashmap_iterator_get(void)
     DSCIterator it = dsc_hashmap_iterator(map);
 
     // Test get without advancing
-    const DSCKeyValuePair* pair = it.get(&it);
+    const DSCPair* pair = it.get(&it);
     ASSERT_NOT_NULL(pair);
-    ASSERT_EQ_STR((char*)pair->key, key);
-    ASSERT_EQ_STR((char*)pair->value, value);
+    ASSERT_EQ_STR((char*)pair->first, key);
+    ASSERT_EQ_STR((char*)pair->second, value);
 
     // Get again - should return same value
-    const DSCKeyValuePair* pair2 = it.get(&it);
+    const DSCPair* pair2 = it.get(&it);
     ASSERT_EQ(pair, pair2); // Same pointer
 
     // Now advance
@@ -250,6 +250,7 @@ static int test_hashmap_iterator_backward(void)
 static int test_hashmap_from_iterator(void)
 {
     DSCAllocator alloc = create_string_allocator();
+    alloc.copy_func = dsc_pair_copy_string_string;
 
     // Create original hashmap
     DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -296,6 +297,7 @@ static int test_hashmap_iterator_invalid(void)
 static int test_hashmap_copy_isolation(void)
 {
     DSCAllocator alloc = create_string_allocator();
+    alloc.copy_func = dsc_pair_copy_string_string;
 
     // Create source hashmap
     DSCHashMap* source_map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
@@ -390,6 +392,7 @@ static int test_hashmap_from_iterator_no_copy(void)
 static int test_hashmap_iterator_exhaustion_after_creation(void)
 {
     DSCAllocator alloc = create_string_allocator();
+    alloc.copy_func = dsc_pair_copy_string_string;
 
     DSCHashMap* source = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
 
@@ -474,20 +477,20 @@ static int test_hashmap_iterator_mixed_operations(void)
     ASSERT(iter.is_valid(&iter));
 
     // Multiple get() calls should return same pointer and same content
-    const DSCKeyValuePair* pair1 = iter.get(&iter);
-    const DSCKeyValuePair* pair2 = iter.get(&iter);
+    const DSCPair* pair1 = iter.get(&iter);
+    const DSCPair* pair2 = iter.get(&iter);
     ASSERT_NOT_NULL(pair1);
     ASSERT_NOT_NULL(pair2);
     ASSERT_EQ(pair1, pair2);                                 // Same pointer
-    ASSERT_EQ_STR((char*)pair1->key, (char*)pair2->key);     // Same key
-    ASSERT_EQ_STR((char*)pair1->value, (char*)pair2->value); // Same value
+    ASSERT_EQ_STR((char*)pair1->first, (char*)pair2->first);     // Same key
+    ASSERT_EQ_STR((char*)pair1->second, (char*)pair2->second); // Same value
 
     // Capture first pair's data before advancing
     char first_key[10];
     char first_value[10];
 
-    strcpy(first_key, pair1->key);
-    strcpy(first_value, pair1->value);
+    strcpy(first_key, pair1->first);
+    strcpy(first_value, pair1->second);
 
     // has_next should be consistent
     ASSERT(iter.has_next(&iter));
@@ -495,39 +498,39 @@ static int test_hashmap_iterator_mixed_operations(void)
 
     // Advance and verify new position
     ASSERT_EQ(iter.next(&iter), 0);
-    const DSCKeyValuePair* pair3 = iter.get(&iter);
+    const DSCPair* pair3 = iter.get(&iter);
     ASSERT_NOT_NULL(pair3);
 
     // Same pointer (cached), but different content after advancing
     ASSERT_EQ(pair1, pair3); // Same cached pointer
-    ASSERT(strcmp(first_key, (char*)pair3->key) != 0 ||
-           strcmp(first_value, (char*)pair3->value) != 0); // Different content
+    ASSERT(strcmp(first_key, (char*)pair3->first) != 0 ||
+           strcmp(first_value, (char*)pair3->second) != 0); // Different content
 
     // Verify get() consistency at new position
-    const DSCKeyValuePair* pair4 = iter.get(&iter);
+    const DSCPair* pair4 = iter.get(&iter);
     ASSERT_EQ(pair3, pair4);                                 // Same pointer
-    ASSERT_EQ_STR((char*)pair3->key, (char*)pair4->key);     // Same content
-    ASSERT_EQ_STR((char*)pair3->value, (char*)pair4->value); // Same content
+    ASSERT_EQ_STR((char*)pair3->first, (char*)pair4->first);     // Same content
+    ASSERT_EQ_STR((char*)pair3->second, (char*)pair4->second); // Same content
 
     // Test has_next behavior
     ASSERT_TRUE(iter.has_next(&iter));
 
     char second_key[10];
     char second_value[10];
-    strcpy(second_key, pair3->key);
-    strcpy(second_value, pair3->value);
+    strcpy(second_key, pair3->first);
+    strcpy(second_value, pair3->second);
 
     ASSERT_EQ(iter.next(&iter), 0);
 
-    const DSCKeyValuePair* pair5 = iter.get(&iter);
+    const DSCPair* pair5 = iter.get(&iter);
     ASSERT_NOT_NULL(pair5);
 
     // Should be different from both previous positions
-    ASSERT(strcmp(first_key, pair5->key) != 0 ||
-           strcmp(first_value, pair5->value) != 0);
+    ASSERT(strcmp(first_key, pair5->first) != 0 ||
+           strcmp(first_value, pair5->second) != 0);
 
-    ASSERT(strcmp(second_key, pair5->key) != 0 ||
-           strcmp(second_value, pair5->value) != 0);
+    ASSERT(strcmp(second_key, pair5->first) != 0 ||
+           strcmp(second_value, pair5->second) != 0);
 
     iter.destroy(&iter);
     dsc_hashmap_destroy(map, false, false);
@@ -590,10 +593,10 @@ static int test_hashmap_iterator_single_element(void)
     ASSERT(iter.has_next(&iter));
     ASSERT(!iter.has_prev(&iter)); // HashMap doesn't support backward iteration
 
-    const DSCKeyValuePair* pair = iter.get(&iter);
+    const DSCPair* pair = iter.get(&iter);
     ASSERT_NOT_NULL(pair);
-    ASSERT_EQ_STR((char*)pair->key, "single");
-    ASSERT_EQ_STR((char*)pair->value, "element");
+    ASSERT_EQ_STR((char*)pair->first, "single");
+    ASSERT_EQ_STR((char*)pair->second, "element");
 
     iter.next(&iter);
     ASSERT(!iter.has_next(&iter));
@@ -612,7 +615,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_hashmap_iterator_basic, "test_hashmap_iterator_basic"},
         {test_hashmap_iterator_empty, "test_hashmap_iterator_empty"},
         {test_hashmap_iterator_with_modifications, "test_hashmap_iterator_with_modifications"},

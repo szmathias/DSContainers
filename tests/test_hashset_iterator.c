@@ -2,13 +2,13 @@
 // HashSet iterator test - converted from HashMap iterator test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashSet.h"
-#include "Iterator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashSet.h"
+#include "Iterator.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test basic iterator functionality
 static int test_hashset_iterator_basic(void)
@@ -588,7 +588,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_hashset_iterator_basic, "test_hashset_iterator_basic"},
         {test_hashset_iterator_empty, "test_hashset_iterator_empty"},
         {test_hashset_iterator_with_modifications, "test_hashset_iterator_with_modifications"},

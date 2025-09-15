@@ -11,6 +11,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+
 #endif
 
 //==============================================================================
@@ -56,6 +57,19 @@ typedef int (*pair_compare_func)(const void* a, const void* b);
  * @return Pointer to new pair, or NULL on failure
  */
 DSC_API DSCPair* dsc_pair_create(DSCAllocator* alloc, void* first, void* second);
+
+/**
+* Initialize a pair structure with the given elements (no allocation).
+* The pair takes ownership of the provided pointers but is not itself allocated.
+* Use this when you have a stack-allocated DSCPair structure.
+*
+* @param pair Pointer to existing DSCPair structure
+* @param alloc Custom allocator (can be NULL for simple cases)
+* @param first Pointer to first element data
+* @param second Pointer to second element data
+* @return 0 on success, -1 if pair is NULL
+*/
+DSC_API int dsc_pair_init(DSCPair* pair, DSCAllocator* alloc, void* first, void* second);
 
 /**
  * Destroy the pair and optionally free the contained data.
@@ -161,6 +175,46 @@ DSC_API DSCPair* dsc_pair_copy(const DSCPair* pair);
  * @return Pointer to new pair copy, or NULL on failure
  */
 DSC_API DSCPair* dsc_pair_copy_deep(const DSCPair* pair, bool should_free, copy_func first_copy, copy_func second_copy);
+
+//==============================================================================
+// Common copy helper functions
+//==============================================================================
+
+/**
+ * Copy function for pairs containing string first and int second elements.
+ * Creates a deep copy of a DSCPair where first is a string and second is an int.
+ *
+ * @param pair_data Pointer to a DSCPair containing string first, int second
+ * @return Pointer to newly allocated DSCPair copy, or NULL on failure
+ */
+DSC_API void* dsc_pair_copy_string_int(const void* pair_data);
+
+/**
+ * Copy function for pairs containing int first and string second elements.
+ * Creates a deep copy of a DSCPair where first is an int and second is a string.
+ *
+ * @param pair_data Pointer to a DSCPair containing int first, string second
+ * @return Pointer to newly allocated DSCPair copy, or NULL on failure
+ */
+DSC_API void* dsc_pair_copy_int_string(const void* pair_data);
+
+/**
+ * Copy function for pairs containing string first and string second elements.
+ * Creates a deep copy of a DSCPair where both elements are strings.
+ *
+ * @param pair_data Pointer to a DSCPair containing string first, string second
+ * @return Pointer to newly allocated DSCPair copy, or NULL on failure
+ */
+DSC_API void* dsc_pair_copy_string_string(const void* pair_data);
+
+/**
+ * Copy function for pairs containing int first and int second elements.
+ * Creates a deep copy of a DSCPair where both elements are integers.
+ *
+ * @param pair_data Pointer to a DSCPair containing int first, int second
+ * @return Pointer to newly allocated DSCPair copy, or NULL on failure
+ */
+DSC_API void* dsc_pair_copy_int_int(const void* pair_data);
 
 #ifdef __cplusplus
 }

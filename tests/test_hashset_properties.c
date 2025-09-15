@@ -2,12 +2,12 @@
 // HashSet Properties test
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashSet.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashSet.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test load factor properties
 int test_hashset_load_factor(void)

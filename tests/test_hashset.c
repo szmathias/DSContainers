@@ -2,12 +2,12 @@
 // HashSet test file - comprehensive testing of set operations
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashSet.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashSet.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test basic HashSet creation and destruction
 int test_hashset_create_destroy(void)

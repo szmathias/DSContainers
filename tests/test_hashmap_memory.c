@@ -2,12 +2,12 @@
 // Created by zack on 9/9/25.
 //
 
-#include "TestAssert.h"
-#include "TestHelpers.h"
-#include "HashMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "HashMap.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Test hash map with failing allocator
 int test_hashmap_failing_allocator(void)
