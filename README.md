@@ -314,7 +314,7 @@ This project is released under an open source license. Please refer to the licen
 
 ## Changelog
 
-### v0.7.2 (Current)
+### v0.7.3 (Current)
 
 - ✅ Complete implementation of 8 core data structures
 - ✅ Comprehensive test suite (50+ test modules, 17,000+ lines)

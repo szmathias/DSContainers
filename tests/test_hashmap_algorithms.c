@@ -67,8 +67,8 @@ int test_hashmap_copy_deep(void)
     // Verify data is different (different pointers, same values)
     for (int i = 0; i < 3; i++)
     {
-        int* orig_value = (int*)dsc_hashmap_get(original, &i);
-        int* copy_value = (int*)dsc_hashmap_get(copy, &i);
+        int* orig_value = dsc_hashmap_get(original, &i);
+        int* copy_value = dsc_hashmap_get(copy, &i);
         ASSERT_NOT_EQ_PTR(orig_value, copy_value); // Should be different pointers
         ASSERT_EQ(*orig_value, *copy_value);       // Same values
         ASSERT_EQ(*orig_value, i * 10);
@@ -149,7 +149,7 @@ int test_hashmap_get_keys(void)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (strcmp((char*)retrieved_keys[i], keys[j]) == 0)
+            if (strcmp(retrieved_keys[i], keys[j]) == 0)
             {
                 found_count++;
                 break;
@@ -191,7 +191,7 @@ int test_hashmap_get_values(void)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (strcmp((char*)retrieved_values[i], values[j]) == 0)
+            if (strcmp(retrieved_values[i], values[j]) == 0)
             {
                 found_count++;
                 break;

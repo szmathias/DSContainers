@@ -660,11 +660,11 @@ DSCHashMap* dsc_hashmap_copy_deep(const DSCHashMap* map,
                 // Clean up on failure
                 if (key_copy)
                 {
-                    map->alloc->data_free_func(copied_key);
+                    dsc_alloc_data_free(map->alloc, copied_key);
                 }
-                if (value_copy && map->alloc->data_free_func)
+                if (value_copy)
                 {
-                    map->alloc->data_free_func(copied_value);
+                    dsc_alloc_data_free(map->alloc, copied_value);
                 }
                 dsc_hashmap_destroy(copy, key_copy != NULL, value_copy != NULL);
                 return NULL;
