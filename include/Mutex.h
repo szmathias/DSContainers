@@ -11,7 +11,11 @@
 #ifndef DSCONTAINERS_MUTEX_H
 #define DSCONTAINERS_MUTEX_H
 
-#include "PlatformDefs.h"
+#include "CStandardCompatibility.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef DSCONTAINERS_PLATFORM_WINDOWS
 #include <windows.h>
@@ -80,5 +84,9 @@ DSC_API int dsc_mutex_unlock(DSCMutex* mtx);
  *   dsc_mutex_destroy.
  */
 DSC_API int dsc_mutex_destroy(DSCMutex* mtx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DSCONTAINERS_MUTEX_H

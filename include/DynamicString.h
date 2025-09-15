@@ -7,7 +7,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include"CStandardCompatibility.h"
-#include"PlatformDefs.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Minimum initial string capacity
 #define STR_MIN_INIT_CAP 16
@@ -216,4 +219,9 @@ DSC_API int dsc_str_getline_string(FILE* stream, DSCString* line, const DSCStrin
         const char *: dsc_str_getline_cstring,\
         String *: dsc_str_getline_string,\
         default: dsc_str_getline_ch)(stream, line, delim)
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //DSCONTAINERS_DYNAMICSTRING_H

@@ -156,8 +156,8 @@ while (transformed.has_next(&transformed))
 {
     int *value = transformed.next(&transformed);
     printf("%d ", *value);
-    free(value);
 }
+filtered.destroy(&filtered);
 transformed.destroy(&transformed);
 ```
 
@@ -205,11 +205,11 @@ User* user = dsc_hashmap_get(user_db, "user123");
 
 ```c
 // Cross-platform mutex
-DSCMutex* mutex = dsc_mutex_create();
-dsc_mutex_lock(mutex);
+DSCMutex mutex = dsc_mutex_create();
+dsc_mutex_lock(&mutex);
 // ... access shared data structure ...
-dsc_mutex_unlock(mutex);
-dsc_mutex_destroy(mutex);
+dsc_mutex_unlock(&mutex);
+dsc_mutex_destroy(&mutex);
 
 // Thread creation and management
 DSCThread worker;
@@ -314,7 +314,7 @@ This project is released under an open source license. Please refer to the licen
 
 ## Changelog
 
-### v0.7.1 (Current)
+### v0.7.2 (Current)
 
 - ✅ Complete implementation of 8 core data structures
 - ✅ Comprehensive test suite (50+ test modules, 17,000+ lines)

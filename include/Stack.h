@@ -9,7 +9,10 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
-#include "PlatformDefs.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Type definitions
@@ -220,5 +223,9 @@ DSC_API DSCIterator dsc_stack_iterator(const DSCStack* stack);
  *       cleans up and returns NULL.
  */
 DSC_API DSCStack* dsc_stack_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_STACK_H

@@ -13,17 +13,21 @@
 #include "HashMap.h"
 #include "Alloc.h"
 #include "Iterator.h"
-#include "PlatformDefs.h"
+#include "CStandardCompatibility.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Type definitions
 //==============================================================================
 
 /**
- * Hash set structure with custom allocator support.
- * Uses HashMap internally with a sentinel value for all elements.
- * Provides average O(1) add, remove, and contains operations.
- */
+* Hash set structure with custom allocator support.
+* Uses HashMap internally with a sentinel value for all elements.
+* Provides average O(1) add, remove, and contains operations.
+*/
 typedef struct DSCHashSet
 {
     DSCHashMap* map; // Underlying hash map
@@ -34,31 +38,31 @@ typedef struct DSCHashSet
 //==============================================================================
 
 /**
- * Create a new hash set with custom allocator and functions.
- *
- * @param alloc Custom allocator (required)
- * @param hash Hash function for keys (required)
- * @param key_equals Key equality function (required)
- * @param initial_capacity Initial number of buckets (0 for default)
- * @return Pointer to new hash set, or NULL on failure
- */
+* Create a new hash set with custom allocator and functions.
+*
+* @param alloc Custom allocator (required)
+* @param hash Hash function for keys (required)
+* @param key_equals Key equality function (required)
+* @param initial_capacity Initial number of buckets (0 for default)
+* @return Pointer to new hash set, or NULL on failure
+*/
 DSC_API DSCHashSet* dsc_hashset_create(DSCAllocator* alloc, hash_func hash,
                                        key_equals_func key_equals, size_t initial_capacity);
 
 /**
- * Destroy the hash set and free all nodes.
- *
- * @param set The hash set to destroy
- * @param should_free_keys Whether to free key data using alloc->data_free_func
- */
+* Destroy the hash set and free all nodes.
+*
+* @param set The hash set to destroy
+* @param should_free_keys Whether to free key data using alloc->data_free_func
+*/
 DSC_API void dsc_hashset_destroy(DSCHashSet* set, bool should_free_keys);
 
 /**
- * Clear all elements from the hash set, but keep the structure intact.
- *
- * @param set The hash set to clear
- * @param should_free_keys Whether to free key data
- */
+* Clear all elements from the hash set, but keep the structure intact.
+*
+* @param set The hash set to clear
+* @param should_free_keys Whether to free key data
+*/
 DSC_API void dsc_hashset_clear(DSCHashSet* set, bool should_free_keys);
 
 //==============================================================================
@@ -66,27 +70,27 @@ DSC_API void dsc_hashset_clear(DSCHashSet* set, bool should_free_keys);
 //==============================================================================
 
 /**
- * Get the number of elements in the hash set.
- *
- * @param set The hash set to query
- * @return Number of elements, or 0 if set is NULL
- */
+* Get the number of elements in the hash set.
+*
+* @param set The hash set to query
+* @return Number of elements, or 0 if set is NULL
+*/
 DSC_API size_t dsc_hashset_size(const DSCHashSet* set);
 
 /**
- * Check if the hash set is empty.
- *
- * @param set The hash set to check
- * @return 1 if empty or NULL, 0 if it contains elements
- */
+* Check if the hash set is empty.
+*
+* @param set The hash set to check
+* @return 1 if empty or NULL, 0 if it contains elements
+*/
 DSC_API int dsc_hashset_is_empty(const DSCHashSet* set);
 
 /**
- * Get the current load factor of the hash set.
- *
- * @param set The hash set to query
- * @return Load factor (size / bucket_count), or 0.0 if set is NULL
- */
+* Get the current load factor of the hash set.
+*
+* @param set The hash set to query
+* @return Load factor (size / bucket_count), or 0.0 if set is NULL
+*/
 DSC_API double dsc_hashset_load_factor(const DSCHashSet* set);
 
 //==============================================================================
@@ -94,51 +98,51 @@ DSC_API double dsc_hashset_load_factor(const DSCHashSet* set);
 //==============================================================================
 
 /**
- * Add an element to the hash set.
- * If the element already exists, this is a no-op.
- *
- * @param set The hash set to modify
- * @param key Pointer to key data (ownership transferred to set)
- * @return 0 on success, -1 on error
- */
+* Add an element to the hash set.
+* If the element already exists, this is a no-op.
+*
+* @param set The hash set to modify
+* @param key Pointer to key data (ownership transferred to set)
+* @return 0 on success, -1 on error
+*/
 DSC_API int dsc_hashset_add(DSCHashSet* set, void* key);
 
 /**
- * Add an element to the hash set, returning whether it was newly added.
- *
- * @param set The hash set to modify
- * @param key Pointer to key data (ownership transferred to set)
- * @param was_added_out Pointer to store whether key was newly added (not NULL if new)
- * @return 0 on success, -1 on error
- */
+* Add an element to the hash set, returning whether it was newly added.
+*
+* @param set The hash set to modify
+* @param key Pointer to key data (ownership transferred to set)
+* @param was_added_out Pointer to store whether key was newly added (not NULL if new)
+* @return 0 on success, -1 on error
+*/
 DSC_API int dsc_hashset_add_check(DSCHashSet* set, void* key, bool* was_added_out);
 
 /**
- * Check if the hash set contains an element.
- *
- * @param set The hash set to search
- * @param key The key to search for
- * @return 1 if element exists, 0 if not found or on error
- */
+* Check if the hash set contains an element.
+*
+* @param set The hash set to search
+* @param key The key to search for
+* @return 1 if element exists, 0 if not found or on error
+*/
 DSC_API int dsc_hashset_contains(const DSCHashSet* set, const void* key);
 
 /**
- * Remove an element from the hash set.
- *
- * @param set The hash set to modify
- * @param key The key to remove
- * @param should_free_key Whether to free the key data
- * @return 0 on success, -1 if key not found or on error
- */
+* Remove an element from the hash set.
+*
+* @param set The hash set to modify
+* @param key The key to remove
+* @param should_free_key Whether to free the key data
+* @return 0 on success, -1 if key not found or on error
+*/
 DSC_API int dsc_hashset_remove(DSCHashSet* set, const void* key, bool should_free_key);
 
 /**
- * Remove an element and return it.
- *
- * @param set The hash set to modify
- * @param key The key to remove
- * @return Pointer to the removed key, or NULL if not found or on error
- */
+* Remove an element and return it.
+*
+* @param set The hash set to modify
+* @param key The key to remove
+* @return Pointer to the removed key, or NULL if not found or on error
+*/
 DSC_API void* dsc_hashset_remove_get(DSCHashSet* set, const void* key);
 
 //==============================================================================
@@ -146,39 +150,39 @@ DSC_API void* dsc_hashset_remove_get(DSCHashSet* set, const void* key);
 //==============================================================================
 
 /**
- * Create the union of two hash sets (elements in either set).
- *
- * @param set1 First hash set
- * @param set2 Second hash set
- * @return New hash set containing union, or NULL on error
- */
+* Create the union of two hash sets (elements in either set).
+*
+* @param set1 First hash set
+* @param set2 Second hash set
+* @return New hash set containing union, or NULL on error
+*/
 DSC_API DSCHashSet* dsc_hashset_union(const DSCHashSet* set1, const DSCHashSet* set2);
 
 /**
- * Create the intersection of two hash sets (elements in both sets).
- *
- * @param set1 First hash set
- * @param set2 Second hash set
- * @return New hash set containing intersection, or NULL on error
- */
+* Create the intersection of two hash sets (elements in both sets).
+*
+* @param set1 First hash set
+* @param set2 Second hash set
+* @return New hash set containing intersection, or NULL on error
+*/
 DSC_API DSCHashSet* dsc_hashset_intersection(const DSCHashSet* set1, const DSCHashSet* set2);
 
 /**
- * Create the difference of two hash sets (elements in first but not second).
- *
- * @param set1 First hash set
- * @param set2 Second hash set
- * @return New hash set containing difference, or NULL on error
- */
+* Create the difference of two hash sets (elements in first but not second).
+*
+* @param set1 First hash set
+* @param set2 Second hash set
+* @return New hash set containing difference, or NULL on error
+*/
 DSC_API DSCHashSet* dsc_hashset_difference(const DSCHashSet* set1, const DSCHashSet* set2);
 
 /**
- * Check if one set is a subset of another.
- *
- * @param subset The potential subset
- * @param superset The potential superset
- * @return 1 if subset is contained in superset, 0 otherwise
- */
+* Check if one set is a subset of another.
+*
+* @param subset The potential subset
+* @param superset The potential superset
+* @return 1 if subset is contained in superset, 0 otherwise
+*/
 DSC_API int dsc_hashset_is_subset(const DSCHashSet* subset, const DSCHashSet* superset);
 
 //==============================================================================
@@ -186,21 +190,21 @@ DSC_API int dsc_hashset_is_subset(const DSCHashSet* subset, const DSCHashSet* su
 //==============================================================================
 
 /**
- * Get all elements in the hash set.
- *
- * @param set The hash set to query
- * @param keys_out Pointer to array that will be allocated and filled with keys
- * @param count_out Pointer to size_t that will receive the number of keys
- * @return 0 on success, -1 on error
- */
+* Get all elements in the hash set.
+*
+* @param set The hash set to query
+* @param keys_out Pointer to array that will be allocated and filled with keys
+* @param count_out Pointer to size_t that will receive the number of keys
+* @return 0 on success, -1 on error
+*/
 DSC_API int dsc_hashset_get_elements(const DSCHashSet* set, void*** keys_out, size_t* count_out);
 
 /**
- * Apply an action function to each element in the hash set.
- *
- * @param set The hash set to process
- * @param action Function applied to each key
- */
+* Apply an action function to each element in the hash set.
+*
+* @param set The hash set to process
+* @param action Function applied to each key
+*/
 DSC_API void dsc_hashset_for_each(const DSCHashSet* set, void (*action)(void* key));
 
 //==============================================================================
@@ -208,20 +212,20 @@ DSC_API void dsc_hashset_for_each(const DSCHashSet* set, void (*action)(void* ke
 //==============================================================================
 
 /**
- * Create a shallow copy of the hash set (sharing key pointers).
- *
- * @param set The hash set to copy
- * @return A new hash set with same structure but sharing data, or NULL on error
- */
+* Create a shallow copy of the hash set (sharing key pointers).
+*
+* @param set The hash set to copy
+* @return A new hash set with same structure but sharing data, or NULL on error
+*/
 DSC_API DSCHashSet* dsc_hashset_copy(const DSCHashSet* set);
 
 /**
- * Create a deep copy of the hash set (cloning keys).
- *
- * @param set The hash set to copy
- * @param key_copy Function to copy key data (NULL for shallow copy of keys)
- * @return A new hash set with copies of all data, or NULL on error
- */
+* Create a deep copy of the hash set (cloning keys).
+*
+* @param set The hash set to copy
+* @param key_copy Function to copy key data (NULL for shallow copy of keys)
+* @return A new hash set with copies of all data, or NULL on error
+*/
 DSC_API DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, copy_func key_copy);
 
 //==============================================================================
@@ -229,39 +233,43 @@ DSC_API DSCHashSet* dsc_hashset_copy_deep(const DSCHashSet* set, copy_func key_c
 //==============================================================================
 
 /**
- * Create an iterator for the hash set (unordered traversal).
- * Iterator yields key pointers directly (not DSCKeyValuePair).
- *
- * @param set The hash set to iterate over
- * @return An Iterator object for traversal
- */
+* Create an iterator for the hash set (unordered traversal).
+* Iterator yields key pointers directly (not DSCKeyValuePair).
+*
+* @param set The hash set to iterate over
+* @return An Iterator object for traversal
+*/
 DSC_API DSCIterator dsc_hashset_iterator(const DSCHashSet* set);
 
 /**
- * Create a new hash set from an iterator of keys.
- *
- * This function consumes all elements from the provided iterator and creates
- * a new HashSet containing those elements. The iteration follows the standard
- * get()/next() pattern, filtering out any NULL elements returned by the iterator.
- * Elements are added to the HashSet in the order they are encountered from the iterator.
- *
- * @param it The source iterator (must be valid and support has_next/get/next, yields key pointers)
- * @param alloc The custom allocator to use for the new HashSet
- * @param hash Hash function for keys
- * @param key_equals Key equality function
- * @param should_copy If true, creates deep copies of all keys using alloc->copy_func.
- *                    If false, uses keys directly from iterator.
- *                    When true, alloc->copy_func must not be NULL.
- * @return A new hash set with elements from iterator, or NULL on error
- *
- * @note NULL elements from the iterator are always filtered out as they indicate
- *       iterator issues rather than valid data.
- * @note The iterator is consumed during this operation - it will be at the end
- *       position after the function completes.
- * @note If should_copy is true and copying fails for any element, the function
- *       cleans up and returns NULL.
- */
+* Create a new hash set from an iterator of keys.
+*
+* This function consumes all elements from the provided iterator and creates
+* a new HashSet containing those elements. The iteration follows the standard
+* get()/next() pattern, filtering out any NULL elements returned by the iterator.
+* Elements are added to the HashSet in the order they are encountered from the iterator.
+*
+* @param it The source iterator (must be valid and support has_next/get/next, yields key pointers)
+* @param alloc The custom allocator to use for the new HashSet
+* @param hash Hash function for keys
+* @param key_equals Key equality function
+* @param should_copy If true, creates deep copies of all keys using alloc->copy_func.
+*                    If false, uses keys directly from iterator.
+*                    When true, alloc->copy_func must not be NULL.
+* @return A new hash set with elements from iterator, or NULL on error
+*
+* @note NULL elements from the iterator are always filtered out as they indicate
+*       iterator issues rather than valid data.
+* @note The iterator is consumed during this operation - it will be at the end
+*       position after the function completes.
+* @note If should_copy is true and copying fails for any element, the function
+*       cleans up and returns NULL.
+*/
 DSC_API DSCHashSet* dsc_hashset_from_iterator(DSCIterator* it, DSCAllocator* alloc,
                                               hash_func hash, key_equals_func key_equals, bool should_copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_HASHSET_H

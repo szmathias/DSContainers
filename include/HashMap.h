@@ -10,6 +10,10 @@
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Type definitions
 //==============================================================================
@@ -359,5 +363,9 @@ DSC_API int dsc_key_equals_int(const void* key1, const void* key2);
  * @return 1 if pointers are equal, 0 otherwise
  */
 DSC_API int dsc_key_equals_pointer(const void* key1, const void* key2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_HASHMAP_H

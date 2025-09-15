@@ -12,7 +12,10 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
-#include "PlatformDefs.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Type definitions
@@ -354,5 +357,8 @@ DSC_API DSCIterator dsc_dll_iterator_reverse(const DSCDoublyLinkedList* list);
  */
 DSC_API DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_DOUBLYLINKEDLIST_H

@@ -14,7 +14,11 @@
 #ifndef DSCONTAINERS_THREADS_H
 #define DSCONTAINERS_THREADS_H
 
-#include "PlatformDefs.h"
+#include "CStandardCompatibility.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef DSCONTAINERS_PLATFORM_WINDOWS
 #include <windows.h>
@@ -74,5 +78,9 @@ DSC_API int dsc_thread_join(DSCThread thread, void** retval);
  *   thread exits.
  */
 DSC_API int dsc_thread_detach(DSCThread thread);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DSCONTAINERS_THREADS_H

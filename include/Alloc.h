@@ -130,5 +130,4 @@ DSC_API void dsc_alloc_data_free(const DSCAllocator* alloc, void* ptr);
  */
 DSC_API void* dsc_alloc_copy(const DSCAllocator* alloc, const void* data);
 
-
 #endif //DSCONTAINERS_ALLOC_H

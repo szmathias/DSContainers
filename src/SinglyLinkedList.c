@@ -930,7 +930,6 @@ static void sll_iterator_destroy(DSCIterator* it)
     it->data_state = NULL;
 }
 
-
 DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list)
 {
     DSCIterator it = {0};
