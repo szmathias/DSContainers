@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // Integer comparison function
 int int_cmp(const void* a, const void* b)
 {

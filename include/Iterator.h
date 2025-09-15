@@ -8,22 +8,26 @@
 #ifndef DSCONTAINERS_ITERATOR_H
 #define DSCONTAINERS_ITERATOR_H
 
-#include "PlatformDefs.h"
 #include "Alloc.h"
+#include "CStandardCompatibility.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Iterator interface
 //==============================================================================
 
 /**
- * Generic iterator structure.
- * Provides a common interface for traversing different data structures.
- */
+* Generic iterator structure.
+* Provides a common interface for traversing different data structures.
+*/
 typedef struct DSCIterator DSCIterator;
 
 /**
- * Iterator interface with function pointers for standard operations.
- */
+* Iterator interface with function pointers for standard operations.
+*/
 struct DSCIterator
 {
     void* data_state;          // Implementation-specific state data
@@ -53,19 +57,19 @@ struct DSCIterator
 //==============================================================================
 
 /**
- * Transformation function: creates a new element from an existing one.
- *
- * @param element The source element to transform
- * @return A new element derived from the source
- */
+* Transformation function: creates a new element from an existing one.
+*
+* @param element The source element to transform
+* @return A new element derived from the source
+*/
 typedef void*(*transform_func)(const void* element);
 
 /**
- * Filter predicate function: tests if elements should be included.
- *
- * @param element The element to test
- * @return Non-zero to include element, 0 to exclude
- */
+* Filter predicate function: tests if elements should be included.
+*
+* @param element The element to test
+* @return Non-zero to include element, 0 to exclude
+*/
 typedef int (*filter_func)(const void* element);
 
 // Copy function provided in Alloc.h
@@ -75,60 +79,64 @@ typedef int (*filter_func)(const void* element);
 //==============================================================================
 
 /**
- * Create a transforming iterator that applies a function to each element.
- * The new iterator produces transformed elements on-the-fly.
- *
- * Note: The returned iterator takes ownership of the source iterator
- * and will destroy it when the transform iterator is destroyed.
- *
- * Transform functions should return non-allocated memory (static buffers,
- * pointers to existing data, etc.) or handle their own memory management.
- * If you need to collect transformed values, use dsc_iterator_copy().
- *
- * @param it Base iterator to transform (ownership transferred)
- * @param alloc The allocator to use for the new iterator's state
- * @param transform Function to apply to each element
- * @param transform_allocates Flag: does transform function allocate memory
- * @return A new iterator producing transformed elements
- */
+* Create a transforming iterator that applies a function to each element.
+* The new iterator produces transformed elements on-the-fly.
+*
+* Note: The returned iterator takes ownership of the source iterator
+* and will destroy it when the transform iterator is destroyed.
+*
+* Transform functions should return non-allocated memory (static buffers,
+* pointers to existing data, etc.) or handle their own memory management.
+* If you need to collect transformed values, use dsc_iterator_copy().
+*
+* @param it Base iterator to transform (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state
+* @param transform Function to apply to each element
+* @param transform_allocates Flag: does transform function allocate memory
+* @return A new iterator producing transformed elements
+*/
 DSC_API DSCIterator dsc_iterator_transform(DSCIterator* it, const DSCAllocator* alloc, transform_func transform, int transform_allocates);
 
 /**
- * Create a filtering iterator that only yields elements matching a predicate.
- * The new iterator skips elements that don't satisfy the filter function.
- *
- * Note: The returned iterator takes ownership of the source iterator
- * and will destroy it when the filter iterator is destroyed.
- *
- * @param it Base iterator to filter (ownership transferred)
- * @param alloc The allocator to use for the new iterator's state.
- * @param filter Predicate function that determines which elements to include
- * @return A new iterator yielding only elements that satisfy the predicate
- */
+* Create a filtering iterator that only yields elements matching a predicate.
+* The new iterator skips elements that don't satisfy the filter function.
+*
+* Note: The returned iterator takes ownership of the source iterator
+* and will destroy it when the filter iterator is destroyed.
+*
+* @param it Base iterator to filter (ownership transferred)
+* @param alloc The allocator to use for the new iterator's state.
+* @param filter Predicate function that determines which elements to include
+* @return A new iterator yielding only elements that satisfy the predicate
+*/
 DSC_API DSCIterator dsc_iterator_filter(DSCIterator* it, const DSCAllocator* alloc, filter_func filter);
 
 /**
- * Create an iterator that yields integers in a specified range.
- * 
- * @param start Starting value (inclusive)
- * @param end Ending value (exclusive)
- * @param step Step value (positive or negative, non-zero)
- * @param alloc The allocator to use for the new iterator's state.
- * @return A new iterator yielding integers in the specified range
- */
+* Create an iterator that yields integers in a specified range.
+*
+* @param start Starting value (inclusive)
+* @param end Ending value (exclusive)
+* @param step Step value (positive or negative, non-zero)
+* @param alloc The allocator to use for the new iterator's state.
+* @return A new iterator yielding integers in the specified range
+*/
 DSC_API DSCIterator dsc_iterator_range(int start, int end, int step, const DSCAllocator* alloc);
 
 /**
- * Create a copy iterator that returns deep copies of elements.
- *
- * The copy iterator creates deep copies that the USER OWNS and must free.
- * This is different from other iterators which return cached pointers.
- *
- * @param it Base iterator to copy from (ownership transferred)
- * @param alloc The allocator to use for iterator state and element copies
- * @param copy Function to create deep copies of elements
- * @return A new iterator yielding user-owned copies
- */
+* Create a copy iterator that returns deep copies of elements.
+*
+* The copy iterator creates deep copies that the USER OWNS and must free.
+* This is different from other iterators which return cached pointers.
+*
+* @param it Base iterator to copy from (ownership transferred)
+* @param alloc The allocator to use for iterator state and element copies
+* @param copy Function to create deep copies of elements
+* @return A new iterator yielding user-owned copies
+*/
 DSC_API DSCIterator dsc_iterator_copy(DSCIterator* it, const DSCAllocator* alloc, copy_func copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_ITERATOR_H

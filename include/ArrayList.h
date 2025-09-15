@@ -9,7 +9,10 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
-#include "PlatformDefs.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Type definitions
@@ -394,5 +397,9 @@ DSC_API DSCIterator dsc_arraylist_iterator_reverse(const DSCArrayList* list);
  *       cleans up and returns NULL.
  */
 DSC_API DSCArrayList* dsc_arraylist_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_ARRAYLIST_H

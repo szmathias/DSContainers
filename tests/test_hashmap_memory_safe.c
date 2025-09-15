@@ -57,7 +57,6 @@ int test_hashmap_put_replace(void)
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
 
-
     return TEST_SUCCESS;
 }
 
@@ -170,7 +169,6 @@ int test_multiple_updates_cleanup(void)
     char* final_value = (char*)dsc_hashmap_get(map, key);
     dsc_hashmap_destroy(map, false, false);
     free(final_value);
-
 
     return TEST_SUCCESS;
 }

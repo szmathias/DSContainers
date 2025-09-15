@@ -16,7 +16,10 @@
 #include "Alloc.h"
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
-#include "PlatformDefs.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //==============================================================================
 // Type definitions
@@ -282,7 +285,6 @@ DSC_API DSCSinglyLinkedList* dsc_sll_filter(const DSCSinglyLinkedList* list, pre
  */
 DSC_API DSCSinglyLinkedList* dsc_sll_filter_deep(const DSCSinglyLinkedList* list, pred_func pred);
 
-
 /**
  * Create a new list by transforming each element using transform. The
  * transform function is responsible for allocating any new element data.
@@ -359,5 +361,9 @@ DSC_API DSCIterator dsc_sll_iterator(const DSCSinglyLinkedList* list);
  *       cleans up and returns NULL.
  */
 DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_SINGLYLINKEDLIST_H

@@ -10,6 +10,10 @@
 #include "CStandardCompatibility.h"
 #include "Iterator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //==============================================================================
 // Type definitions
 //==============================================================================
@@ -221,5 +225,9 @@ DSC_API DSCIterator dsc_queue_iterator(const DSCQueue* queue);
  *       cleans up and returns NULL.
  */
 DSC_API DSCQueue* dsc_queue_from_iterator(DSCIterator* it, DSCAllocator* alloc, bool should_copy);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DSCONTAINERS_QUEUE_H

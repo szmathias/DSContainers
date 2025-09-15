@@ -14,7 +14,6 @@
 #include <unistd.h>
 #endif
 
-
 // Property: The size of a string should never exceed its capacity.
 int test_string_size_and_capacity(void)
 {
