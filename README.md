@@ -3,7 +3,7 @@
 A comprehensive, production-ready C library implementing essential data structures with a focus on memory safety,
 performance, and usability. Built with modern C11 standards and extensive testing.
 
-### v0.7.3
+### v0.7.4
 
 ## Features
 
