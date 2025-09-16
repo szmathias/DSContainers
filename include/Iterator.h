@@ -215,11 +215,11 @@ DSC_API DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* 
 * Chain with copy iterator if unique instances are needed
 *
 * @param value Pointer to the value to repeat (must remain valid during iteration)
-* @param count Number of times to repeat the value (0 means no elements)
 * @param alloc The allocator to use for the iterator's internal state
+* @param count Number of times to repeat the value (0 means no elements)
 * @return A new iterator yielding the same value count times
 */
-DSC_API DSCIterator dsc_iterator_repeat(const void* value, size_t count, const DSCAllocator* alloc);
+DSC_API DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, size_t count);
 
 #ifdef __cplusplus
 }
