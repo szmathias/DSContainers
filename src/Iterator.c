@@ -1912,7 +1912,7 @@ static void repeat_destroy(DSCIterator* it)
 /**
  * Create a repeat iterator that yields the same value N times.
  */
-DSCIterator dsc_iterator_repeat(const void* value, const size_t count, const DSCAllocator* alloc)
+DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, const size_t count)
 {
     DSCIterator new_it = {0}; // Initialize all fields to NULL/0
 
