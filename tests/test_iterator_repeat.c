@@ -64,7 +64,7 @@ int test_repeat_basic_functionality(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 42;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 5, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 5);
     ASSERT_TRUE(repeat_it.is_valid(&repeat_it));
 
     int values[10];
@@ -82,7 +82,7 @@ int test_repeat_single_count(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 99;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 1, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 1);
     ASSERT_TRUE(repeat_it.is_valid(&repeat_it));
 
     ASSERT_TRUE(repeat_it.has_next(&repeat_it));
@@ -103,7 +103,7 @@ int test_repeat_zero_count(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 123;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 0, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 0);
     ASSERT_TRUE(repeat_it.is_valid(&repeat_it));
 
     // Should have no elements
@@ -119,7 +119,7 @@ int test_repeat_large_count(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 777;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 1000, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 1000);
     ASSERT_TRUE(repeat_it.is_valid(&repeat_it));
 
     // Test first few elements
@@ -158,7 +158,7 @@ int test_repeat_different_data_types(void)
 
     // Test with negative number
     const int negative_value = -42;
-    DSCIterator repeat_it1 = dsc_iterator_repeat(&negative_value, 3, &alloc);
+    DSCIterator repeat_it1 = dsc_iterator_repeat(&negative_value, &alloc, 3);
     ASSERT_TRUE(repeat_it1.is_valid(&repeat_it1));
 
     int values1[5];
@@ -170,7 +170,7 @@ int test_repeat_different_data_types(void)
 
     // Test with zero
     const int zero_value = 0;
-    DSCIterator repeat_it2 = dsc_iterator_repeat(&zero_value, 4, &alloc);
+    DSCIterator repeat_it2 = dsc_iterator_repeat(&zero_value, &alloc, 4);
     ASSERT_TRUE(repeat_it2.is_valid(&repeat_it2));
 
     int values2[5];
@@ -192,12 +192,12 @@ int test_repeat_invalid_parameters(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Test with NULL value
-    const DSCIterator repeat_it1 = dsc_iterator_repeat(NULL, 5, &alloc);
+    const DSCIterator repeat_it1 = dsc_iterator_repeat(NULL, &alloc, 5);
     ASSERT_FALSE(repeat_it1.is_valid(&repeat_it1));
 
     // Test with NULL allocator
     const int value = 42;
-    const DSCIterator repeat_it2 = dsc_iterator_repeat(&value, 5, NULL);
+    const DSCIterator repeat_it2 = dsc_iterator_repeat(&value, NULL, 5);
     ASSERT_FALSE(repeat_it2.is_valid(&repeat_it2));
 
     return TEST_SUCCESS;
@@ -208,7 +208,7 @@ int test_repeat_pointer_consistency(void)
     const DSCAllocator alloc = create_int_allocator();
 
     int value = 888;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 3);
 
     ASSERT_TRUE(repeat_it.has_next(&repeat_it));
 
@@ -232,7 +232,7 @@ int test_repeat_exhausted_iterator(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 555;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 2, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 2);
 
     // Exhaust the iterator
     ASSERT_TRUE(repeat_it.has_next(&repeat_it));
@@ -262,7 +262,7 @@ int test_repeat_reset_functionality(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 321;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 3);
 
     // Consume first element
     ASSERT_TRUE(repeat_it.has_next(&repeat_it));
@@ -294,7 +294,7 @@ int test_repeat_reset_exhausted(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 654;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 2, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 2);
 
     // Exhaust the iterator
     repeat_it.next(&repeat_it);
@@ -318,7 +318,7 @@ int test_repeat_reset_empty(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 111;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 0, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 0);
 
     // Should be empty
     ASSERT_FALSE(repeat_it.has_next(&repeat_it));
@@ -344,7 +344,7 @@ int test_repeat_with_filter(void)
 
     // Repeat even number 6 times, then filter for evens (should pass all)
     const int value = 8;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 6, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 6);
     DSCIterator filter_it = dsc_iterator_filter(&repeat_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -364,7 +364,7 @@ int test_repeat_with_filter_reject(void)
 
     // Repeat odd number 5 times, then filter for evens (should reject all)
     const int value = 7;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 5, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 5);
     DSCIterator filter_it = dsc_iterator_filter(&repeat_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -382,7 +382,7 @@ int test_repeat_with_take(void)
 
     // Repeat value 10 times, then take first 3
     const int value = 456;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 10, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 10);
     DSCIterator take_it = dsc_iterator_take(&repeat_it, &alloc, 3);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
@@ -402,7 +402,7 @@ int test_repeat_with_take_more_than_available(void)
 
     // Repeat value 3 times, then try to take 5
     const int value = 789;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 3);
     DSCIterator take_it = dsc_iterator_take(&repeat_it, &alloc, 5);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
@@ -422,7 +422,7 @@ int test_repeat_with_skip(void)
 
     // Repeat value 8 times, then skip first 3
     const int value = 202;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 8, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 8);
     DSCIterator skip_it = dsc_iterator_skip(&repeat_it, &alloc, 3);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
@@ -442,7 +442,7 @@ int test_repeat_with_skip_all(void)
 
     // Repeat value 4 times, then skip 4 (all)
     const int value = 303;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 4, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 4);
     DSCIterator skip_it = dsc_iterator_skip(&repeat_it, &alloc, 4);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
@@ -461,8 +461,8 @@ int test_repeat_with_zip(void)
     // Create two repeat iterators and zip them
     const int value1 = 100;
     const int value2 = 200;
-    DSCIterator repeat_it1 = dsc_iterator_repeat(&value1, 4, &alloc);
-    DSCIterator repeat_it2 = dsc_iterator_repeat(&value2, 4, &alloc);
+    DSCIterator repeat_it1 = dsc_iterator_repeat(&value1, &alloc, 4);
+    DSCIterator repeat_it2 = dsc_iterator_repeat(&value2, &alloc, 4);
 
     DSCIterator zip_it = dsc_iterator_zip(&repeat_it1, &repeat_it2, &alloc);
     ASSERT_TRUE(zip_it.is_valid(&zip_it));
@@ -492,7 +492,7 @@ int test_repeat_with_enumerate(void)
 
     // Repeat value 3 times, then enumerate
     const int value = 555;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 3);
     DSCIterator enum_it = dsc_iterator_enumerate(&repeat_it, &alloc, 0);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -520,7 +520,7 @@ int test_repeat_chained_operations(void)
 
     // Complex chain: repeat 10 times -> skip 2 -> take 5 -> filter evens
     const int value = 4; // Even number
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 10, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 10);
     DSCIterator skip_it = dsc_iterator_skip(&repeat_it, &alloc, 2);
     DSCIterator take_it = dsc_iterator_take(&skip_it, &alloc, 5);
     DSCIterator filter_it = dsc_iterator_filter(&take_it, &alloc, is_even);
@@ -555,7 +555,7 @@ int test_repeat_with_arraylist(void)
 
     // Create repeat iterator
     const int repeat_value = 99;
-    DSCIterator repeat_it = dsc_iterator_repeat(&repeat_value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&repeat_value, &alloc, 3);
 
     // Zip ArrayList with repeat iterator
     DSCIterator array_iter = dsc_arraylist_iterator(list);
@@ -591,7 +591,7 @@ int test_repeat_with_range(void)
     DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc); // [1,2,3,4,5]
 
     const int repeat_value = -1;
-    DSCIterator repeat_it = dsc_iterator_repeat(&repeat_value, 5, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&repeat_value, &alloc, 5);
 
     DSCIterator zip_it = dsc_iterator_zip(&range_it, &repeat_it, &alloc);
     ASSERT_TRUE(zip_it.is_valid(&zip_it));
@@ -622,7 +622,7 @@ int test_repeat_iteration_state(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 888;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 3, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 3);
 
     // Test step-by-step iteration
     ASSERT_TRUE(repeat_it.has_next(&repeat_it));
@@ -658,7 +658,7 @@ int test_repeat_unsupported_operations(void)
     const DSCAllocator alloc = create_int_allocator();
 
     const int value = 777;
-    DSCIterator repeat_it = dsc_iterator_repeat(&value, 5, &alloc);
+    DSCIterator repeat_it = dsc_iterator_repeat(&value, &alloc, 5);
 
     // Test unsupported operations
     ASSERT_FALSE(repeat_it.has_prev(&repeat_it));
