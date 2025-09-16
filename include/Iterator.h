@@ -204,6 +204,23 @@ DSC_API DSCIterator dsc_iterator_zip(DSCIterator* it1, DSCIterator* it2, const D
 */
 DSC_API DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* alloc, size_t start_index);
 
+/**
+* Create a repeat iterator that yields the same value N times.
+* The iterator returns a pointer to the original value for each iteration,
+* allowing the same data to be processed multiple times through iterator chains.
+*
+* Note: The returned iterator does not take ownership of the value pointer.
+* The caller must ensure the value remains valid for the lifetime of the iterator.
+* All calls to get() return the same pointer to the original value.
+* Chain with copy iterator if unique instances are needed
+*
+* @param value Pointer to the value to repeat (must remain valid during iteration)
+* @param alloc The allocator to use for the iterator's internal state
+* @param count Number of times to repeat the value (0 means no elements)
+* @return A new iterator yielding the same value count times
+*/
+DSC_API DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, size_t count);
+
 #ifdef __cplusplus
 }
 #endif

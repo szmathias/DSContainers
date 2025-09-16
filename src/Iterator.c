@@ -21,28 +21,6 @@ typedef struct TransformState
 static void* transform_get(const DSCIterator* it);
 
 //==============================================================================
-// Transform Helper function for memory management
-//==============================================================================
-
-/**
- * Helper function to free elements returned by base iterators.
- * Only frees elements that were allocated by transform iterators.
- */
-// static void free_if_allocated(const DSCIterator* base_it, void* element)
-// {
-//     if (!element) return;
-//
-//     if (base_it->get == transform_get)
-//     {
-//         const TransformState* state = base_it->data_state;
-//         if (state && state->transform_allocates)
-//         {
-//             dsc_alloc_free(base_it->alloc, element);
-//         }
-//     }
-// }
-
-//==============================================================================
 // Transform iterator implementation
 //==============================================================================
 
@@ -1028,7 +1006,7 @@ static int take_next(const DSCIterator* it)
 }
 
 /**
- * Check if take iterator has previous elements (not supported).
+ * Check if the take iterator has previous elements (not supported).
  */
 static int take_has_prev(const DSCIterator* it)
 {
@@ -1055,7 +1033,7 @@ static void take_reset(const DSCIterator* it)
 }
 
 /**
- * Check if take iterator is valid.
+ * Check if the take iterator is valid.
  */
 static int take_is_valid(const DSCIterator* it)
 {
@@ -1354,7 +1332,8 @@ typedef struct ZipState
 {
     DSCIterator* iter1;         // First source iterator
     DSCIterator* iter2;         // Second source iterator
-    DSCPair cached_pair;        // Cached pair to return pointers to
+    DSCPair* cached_pair;       // Cached pair to return pointers to
+    int has_cached_pair;        // Flag indicating if cached pair is valid
 } ZipState;
 
 /**
@@ -1384,16 +1363,20 @@ static void* zip_get(const DSCIterator* it)
         return NULL;
     }
 
-    // Get elements from both iterators
-    void* elem1 = state->iter1->get(state->iter1);
-    void* elem2 = state->iter2->get(state->iter2);
+    if (!state->has_cached_pair)
+    {
+        // Get elements from both iterators
+        void* elem1 = state->iter1->get(state->iter1);
+        void* elem2 = state->iter2->get(state->iter2);
 
-    // Update cached pair
-    state->cached_pair.first = elem1;
-    state->cached_pair.second = elem2;
-    state->cached_pair.alloc = (DSCAllocator*)it->alloc;
+        // Update cached pair
+        state->cached_pair->first = elem1;
+        state->cached_pair->second = elem2;
+        state->cached_pair->alloc = (DSCAllocator*)it->alloc;
+        state->has_cached_pair = 1;
+    }
 
-    return &state->cached_pair;
+    return state->cached_pair;
 }
 
 /**
@@ -1428,7 +1411,7 @@ static int zip_next(const DSCIterator* it)
         return -1;
     }
 
-    const ZipState* state = it->data_state;
+    ZipState* state = it->data_state;
     if (!state->iter1 || !state->iter2 ||
         !state->iter1->next || !state->iter2->next)
     {
@@ -1450,6 +1433,10 @@ static int zip_next(const DSCIterator* it)
     {
         return -1;
     }
+
+    state->cached_pair->first = NULL;
+    state->cached_pair->second = NULL;
+    state->has_cached_pair = 0;
 
     return 0;
 }
@@ -1524,6 +1511,7 @@ static void zip_destroy(DSCIterator* it)
         state->iter2->destroy(state->iter2);
     }
 
+    dsc_alloc_free(it->alloc, state->cached_pair);
     dsc_alloc_free(it->alloc, state);
     it->data_state = NULL;
 }
@@ -1555,11 +1543,16 @@ DSCIterator dsc_iterator_zip(DSCIterator* it1, DSCIterator* it2, const DSCAlloca
         return new_it;
     }
 
+    state->cached_pair = dsc_pair_create((DSCAllocator*)alloc, NULL, NULL);
+    if (!state->cached_pair)
+    {
+        dsc_alloc_free(alloc, state);
+        return new_it;
+    }
+
     state->iter1 = it1;
     state->iter2 = it2;
-
-    // Initialize cached pair
-    dsc_pair_init(&state->cached_pair, (DSCAllocator*)alloc, NULL, NULL);
+    state->has_cached_pair = 0;
 
     new_it.alloc = alloc;
     new_it.data_state = state;
@@ -1778,3 +1771,178 @@ DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* alloc, c
 
     return new_it;
 }
+
+//==============================================================================
+// Repeat iterator implementation
+//==============================================================================
+
+/**
+ * State structure for repeat iterator.
+ */
+typedef struct RepeatState
+{
+    const void* value;         // Pointer to the value to repeat (not owned)
+    size_t total_count;        // Total number of repetitions
+    size_t current_count;      // Current iteration count (0-based)
+} RepeatState;
+
+/**
+ * Get current element from repeat iterator.
+ * Returns the same value pointer for each iteration.
+ *
+ * Note: The returned pointer is valid until the iterator is destroyed.
+ * Do not free the returned pointer.
+ */
+static void* repeat_get(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return NULL;
+    }
+
+    const RepeatState* state = it->data_state;
+
+    // Check if we still have repetitions left
+    if (state->current_count < state->total_count)
+    {
+        return (void*)state->value;
+    }
+
+    return NULL;
+}
+
+/**
+ * Check if repeat iterator has more elements.
+ */
+static int repeat_has_next(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    const RepeatState* state = it->data_state;
+    return state->current_count < state->total_count;
+}
+
+/**
+ * Advance repeat iterator to next position.
+ * Returns 0 on success, -1 if no more elements.
+ */
+static int repeat_next(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return -1;
+    }
+
+    RepeatState* state = it->data_state;
+
+    // Check if we have more repetitions
+    if (state->current_count >= state->total_count)
+    {
+        return -1;
+    }
+
+    state->current_count++;
+    return 0;
+}
+
+/**
+ * Check if repeat iterator has previous elements (not supported).
+ */
+static int repeat_has_prev(const DSCIterator* it)
+{
+    (void)it; // Suppress unused parameter warning
+    return 0; // Repeat iterator does not support has_prev
+}
+
+/**
+ * Get previous element from repeat iterator (not supported).
+ */
+static int repeat_prev(const DSCIterator* it)
+{
+    (void)it; // Suppress unused parameter warning
+    return -1; // Repeat iterator does not support prev
+}
+
+/**
+ * Reset repeat iterator to starting position.
+ */
+static void repeat_reset(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return;
+    }
+
+    RepeatState* state = it->data_state;
+    state->current_count = 0;
+}
+
+/**
+ * Check if repeat iterator is valid.
+ */
+static int repeat_is_valid(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    const RepeatState* state = it->data_state;
+    return state->value != NULL;
+}
+
+/**
+ * Free resources used by repeat iterator.
+ */
+static void repeat_destroy(DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return;
+    }
+
+    // Note: We don't free the value pointer since we don't own it
+    dsc_alloc_free(it->alloc, it->data_state);
+    it->data_state = NULL;
+}
+
+/**
+ * Create a repeat iterator that yields the same value N times.
+ */
+DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, const size_t count)
+{
+    DSCIterator new_it = {0}; // Initialize all fields to NULL/0
+
+    new_it.get = repeat_get;
+    new_it.has_next = repeat_has_next;
+    new_it.next = repeat_next;
+    new_it.has_prev = repeat_has_prev;
+    new_it.prev = repeat_prev;
+    new_it.reset = repeat_reset;
+    new_it.is_valid = repeat_is_valid;
+    new_it.destroy = repeat_destroy;
+
+    if (!value || !alloc)
+    {
+        return new_it;
+    }
+
+    RepeatState* state = dsc_alloc_malloc(alloc, sizeof(RepeatState));
+    if (!state)
+    {
+        return new_it;
+    }
+
+    state->value = value;
+    state->total_count = count;
+    state->current_count = 0;
+
+    new_it.alloc = alloc;
+    new_it.data_state = state;
+
+    return new_it;
+}
+
