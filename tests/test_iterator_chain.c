@@ -61,8 +61,8 @@ static int test_chain_basic_functionality(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Create two range iterators to chain
-    DSCIterator range1 = dsc_iterator_range(1, 4, 1, &alloc);   // [1,2,3]
-    DSCIterator range2 = dsc_iterator_range(10, 13, 1, &alloc); // [10,11,12]
+    const DSCIterator range1 = dsc_iterator_range(1, 4, 1, &alloc);   // [1,2,3]
+    const DSCIterator range2 = dsc_iterator_range(10, 13, 1, &alloc); // [10,11,12]
 
     // Create array of iterators to chain
     DSCIterator iterators[] = {range1, range2};
@@ -87,7 +87,7 @@ static int test_chain_single_iterator(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Chain a single iterator
-    DSCIterator range1 = dsc_iterator_range(5, 8, 1, &alloc); // [5,6,7]
+    const DSCIterator range1 = dsc_iterator_range(5, 8, 1, &alloc); // [5,6,7]
 
     DSCIterator iterators[] = {range1};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 1, &alloc);
@@ -110,8 +110,8 @@ static int test_chain_empty_iterators(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Create empty range iterators (start == end)
-    DSCIterator range1 = dsc_iterator_range(5, 5, 1, &alloc); // empty
-    DSCIterator range2 = dsc_iterator_range(10, 10, 1, &alloc); // empty
+    const DSCIterator range1 = dsc_iterator_range(5, 5, 1, &alloc); // empty
+    const DSCIterator range2 = dsc_iterator_range(10, 10, 1, &alloc); // empty
 
     DSCIterator iterators[] = {range1, range2};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 2, &alloc);
@@ -129,10 +129,10 @@ static int test_chain_mixed_empty_and_non_empty(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Mix empty and non-empty iterators
-    DSCIterator range1 = dsc_iterator_range(1, 1, 1, &alloc);   // empty
-    DSCIterator range2 = dsc_iterator_range(5, 7, 1, &alloc);   // [5,6]
-    DSCIterator range3 = dsc_iterator_range(10, 10, 1, &alloc); // empty
-    DSCIterator range4 = dsc_iterator_range(20, 22, 1, &alloc); // [20,21]
+    const DSCIterator range1 = dsc_iterator_range(1, 1, 1, &alloc);   // empty
+    const DSCIterator range2 = dsc_iterator_range(5, 7, 1, &alloc);   // [5,6]
+    const DSCIterator range3 = dsc_iterator_range(10, 10, 1, &alloc); // empty
+    const DSCIterator range4 = dsc_iterator_range(20, 22, 1, &alloc); // [20,21]
 
     DSCIterator iterators[] = {range1, range2, range3, range4};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 4, &alloc);
@@ -155,10 +155,10 @@ static int test_chain_multiple_iterators(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Chain multiple range iterators
-    DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc);   // [1,2]
-    DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc); // [10,11]
-    DSCIterator range3 = dsc_iterator_range(20, 22, 1, &alloc); // [20,21]
-    DSCIterator range4 = dsc_iterator_range(30, 32, 1, &alloc); // [30,31]
+    const DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc);   // [1,2]
+    const DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc); // [10,11]
+    const DSCIterator range3 = dsc_iterator_range(20, 22, 1, &alloc); // [20,21]
+    const DSCIterator range4 = dsc_iterator_range(30, 32, 1, &alloc); // [30,31]
 
     DSCIterator iterators[] = {range1, range2, range3, range4};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 4, &alloc);
@@ -188,8 +188,8 @@ static int test_chain_with_repeat_iterators(void)
     const int value2 = 99;
 
     // Chain repeat iterators with different values
-    DSCIterator repeat1 = dsc_iterator_repeat(&value1, &alloc, 3); // [42,42,42]
-    DSCIterator repeat2 = dsc_iterator_repeat(&value2, &alloc, 2); // [99,99]
+    const DSCIterator repeat1 = dsc_iterator_repeat(&value1, &alloc, 3); // [42,42,42]
+    const DSCIterator repeat2 = dsc_iterator_repeat(&value2, &alloc, 2); // [99,99]
 
     DSCIterator iterators[] = {repeat1, repeat2};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 2, &alloc);
@@ -215,8 +215,8 @@ static int test_chain_with_take_skip_iterators(void)
     DSCIterator range1 = dsc_iterator_range(1, 10, 1, &alloc); // [1,2,3,4,5,6,7,8,9]
     DSCIterator range2 = dsc_iterator_range(1, 10, 1, &alloc); // [1,2,3,4,5,6,7,8,9]
 
-    DSCIterator take_it = dsc_iterator_take(&range1, &alloc, 3);    // [1,2,3]
-    DSCIterator skip_it = dsc_iterator_skip(&range2, &alloc, 6);    // [7,8,9]
+    const DSCIterator take_it = dsc_iterator_take(&range1, &alloc, 3);    // [1,2,3]
+    const DSCIterator skip_it = dsc_iterator_skip(&range2, &alloc, 6);    // [7,8,9]
 
     DSCIterator iterators[] = {take_it, skip_it};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 2, &alloc);
@@ -243,17 +243,17 @@ static int test_chain_invalid_parameters(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Test with NULL iterators array
-    DSCIterator chain_it1 = dsc_iterator_chain(NULL, 2, &alloc);
+    const DSCIterator chain_it1 = dsc_iterator_chain(NULL, 2, &alloc);
     ASSERT_FALSE(chain_it1.is_valid(&chain_it1));
 
     // Test with zero count
     DSCIterator range = dsc_iterator_range(1, 3, 1, &alloc);
     DSCIterator iterators[] = {range};
-    DSCIterator chain_it2 = dsc_iterator_chain(iterators, 0, &alloc);
+    const DSCIterator chain_it2 = dsc_iterator_chain(iterators, 0, &alloc);
     ASSERT_FALSE(chain_it2.is_valid(&chain_it2));
 
     // Test with NULL allocator
-    DSCIterator chain_it3 = dsc_iterator_chain(iterators, 1, NULL);
+    const DSCIterator chain_it3 = dsc_iterator_chain(iterators, 1, NULL);
     ASSERT_FALSE(chain_it3.is_valid(&chain_it3));
 
     // Clean up the range iterator that wasn't consumed
@@ -266,8 +266,8 @@ static int test_chain_iterator_operations(void)
 {
     const DSCAllocator alloc = create_int_allocator();
 
-    DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc); // [1,2]
-    DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc); // [10,11]
+    const DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc); // [1,2]
+    const DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc); // [10,11]
 
     DSCIterator iterators[] = {range1, range2};
     DSCIterator chain_it = dsc_iterator_chain(iterators, 2, &alloc);
@@ -321,16 +321,16 @@ static int test_chain_with_nested_chains(void)
     const DSCAllocator alloc = create_int_allocator();
 
     // Create first chain: [1,2] + [10,11]
-    DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc);
-    DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc);
+    const DSCIterator range1 = dsc_iterator_range(1, 3, 1, &alloc);
+    const DSCIterator range2 = dsc_iterator_range(10, 12, 1, &alloc);
     DSCIterator iterators1[] = {range1, range2};
-    DSCIterator chain1 = dsc_iterator_chain(iterators1, 2, &alloc);
+    const DSCIterator chain1 = dsc_iterator_chain(iterators1, 2, &alloc);
 
     // Create second chain: [20,21] + [30,31]
-    DSCIterator range3 = dsc_iterator_range(20, 22, 1, &alloc);
-    DSCIterator range4 = dsc_iterator_range(30, 32, 1, &alloc);
+    const DSCIterator range3 = dsc_iterator_range(20, 22, 1, &alloc);
+    const DSCIterator range4 = dsc_iterator_range(30, 32, 1, &alloc);
     DSCIterator iterators2[] = {range3, range4};
-    DSCIterator chain2 = dsc_iterator_chain(iterators2, 2, &alloc);
+    const DSCIterator chain2 = dsc_iterator_chain(iterators2, 2, &alloc);
 
     // Chain the two chain iterators
     DSCIterator master_iterators[] = {chain1, chain2};
