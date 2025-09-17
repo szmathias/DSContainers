@@ -563,8 +563,8 @@ static int range_next(const DSCIterator* it)
     {
         return -1;
     }
-
     state->current += state->step;
+
     return 0;
 }
 
@@ -1946,3 +1946,266 @@ DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, co
     return new_it;
 }
 
+//==============================================================================
+// Chain iterator implementation
+//==============================================================================
+
+/**
+ * State structure for chain iterator.
+ */
+typedef struct ChainState
+{
+    DSCIterator* iterators;        // Array of source iterators (owned)
+    size_t iterator_count;         // Number of iterators in the array
+    size_t current_iterator_index; // Index of currently active iterator
+} ChainState;
+
+/**
+ * Get current element from chain iterator.
+ * Returns element from the currently active iterator.
+ *
+ * Note: The returned pointer is valid until the next iterator operation.
+ * Do not free the returned pointer.
+ */
+static void* chain_get(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return NULL;
+    }
+
+    const ChainState* state = it->data_state;
+    if (!state->iterators || state->current_iterator_index >= state->iterator_count)
+    {
+        return NULL;
+    }
+
+    const DSCIterator* current_it = &state->iterators[state->current_iterator_index];
+    if (!current_it->get)
+    {
+        return NULL;
+    }
+
+    return current_it->get(current_it);
+}
+
+/**
+ * Check if chain iterator has more elements.
+ */
+static int chain_has_next(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    ChainState* state = it->data_state;
+    if (!state->iterators)
+    {
+        return 0;
+    }
+
+    // Check from current iterator onwards
+    for (size_t i = state->current_iterator_index; i < state->iterator_count; i++)
+    {
+        const DSCIterator* current_it = &state->iterators[i];
+        if (current_it->has_next && current_it->has_next(current_it))
+        {
+            return 1;
+        }
+        state->current_iterator_index++;
+    }
+
+    return 0;
+}
+
+/**
+ * Advance chain iterator to next position.
+ * Returns 0 on success, -1 if no more elements.
+ */
+static int chain_next(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return -1;
+    }
+
+    ChainState* state = it->data_state;
+    if (!state->iterators || state->current_iterator_index >= state->iterator_count)
+    {
+        return -1;
+    }
+
+    const DSCIterator* current_it = &state->iterators[state->current_iterator_index];
+
+    // Try to advance current iterator
+    if (current_it->next(current_it) == 0)
+    {
+        return 0;
+    }
+
+    // Current iterator exhausted, move to next one
+    state->current_iterator_index++;
+
+    // Check if we have more iterators
+    if (state->current_iterator_index >= state->iterator_count)
+    {
+        return -1;
+    }
+
+    return 0;
+
+    // // Try to advance current iterator
+    // if (current_it->has_next && current_it->has_next(current_it))
+    // {
+    //     return current_it->next(current_it);
+    // }
+    //
+    // // Current iterator exhausted, move to next one
+    // state->current_iterator_index++;
+    //
+    // // Check if we have more iterators
+    // if (state->current_iterator_index >= state->iterator_count)
+    // {
+    //     return -1; // No more iterators
+    // }
+    //
+    // // No need to advance the new iterator, just position at it
+    // return 0;
+}
+
+/**
+ * Check if chain iterator has previous elements (not supported).
+ */
+static int chain_has_prev(const DSCIterator* it)
+{
+    (void)it; // Suppress unused parameter warning
+    return 0; // Chain iterator does not support has_prev
+}
+
+/**
+ * Get previous element from chain iterator (not supported).
+ */
+static int chain_prev(const DSCIterator* it)
+{
+    (void)it; // Suppress unused parameter warning
+    return -1; // Chain iterator does not support prev
+}
+
+/**
+ * Reset chain iterator (not supported).
+ */
+static void chain_reset(const DSCIterator* it)
+{
+    (void)it; // Suppress unused parameter warning
+    // Chain iterator does not support reset
+}
+
+/**
+ * Check if chain iterator is valid.
+ */
+static int chain_is_valid(const DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return 0;
+    }
+
+    const ChainState* state = it->data_state;
+    if (!state->iterators || state->iterator_count == 0)
+    {
+        return 0;
+    }
+
+    // Check if at least one iterator is valid
+    for (size_t i = 0; i < state->iterator_count; i++)
+    {
+        const DSCIterator* current_it = &state->iterators[i];
+        if (current_it->is_valid && current_it->is_valid(current_it))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Free resources used by chain iterator.
+ */
+static void chain_destroy(DSCIterator* it)
+{
+    if (!it || !it->data_state)
+    {
+        return;
+    }
+
+    ChainState* state = it->data_state;
+
+    // Destroy all source iterators
+    if (state->iterators)
+    {
+        for (size_t i = 0; i < state->iterator_count; i++)
+        {
+            DSCIterator* current_it = &state->iterators[i];
+            if (current_it->destroy)
+            {
+                current_it->destroy(current_it);
+            }
+        }
+        dsc_alloc_free(it->alloc, state->iterators);
+    }
+
+    dsc_alloc_free(it->alloc, state);
+    it->data_state = NULL;
+}
+
+/**
+ * Create a chain iterator that combines multiple iterators sequentially.
+ */
+DSCIterator dsc_iterator_chain(DSCIterator* iterators, const size_t iterator_count, const DSCAllocator* alloc)
+{
+    DSCIterator new_it = {0}; // Initialize all fields to NULL/0
+
+    new_it.get = chain_get;
+    new_it.has_next = chain_has_next;
+    new_it.next = chain_next;
+    new_it.has_prev = chain_has_prev;
+    new_it.prev = chain_prev;
+    new_it.reset = chain_reset;
+    new_it.is_valid = chain_is_valid;
+    new_it.destroy = chain_destroy;
+
+    if (!iterators || iterator_count == 0 || !alloc)
+    {
+        return new_it;
+    }
+
+    ChainState* state = dsc_alloc_malloc(alloc, sizeof(ChainState));
+    if (!state)
+    {
+        return new_it;
+    }
+
+    // Allocate array to store copies of the iterators
+    state->iterators = dsc_alloc_malloc(alloc, sizeof(DSCIterator) * iterator_count);
+    if (!state->iterators)
+    {
+        dsc_alloc_free(alloc, state);
+        return new_it;
+    }
+
+    // Copy the iterators to our internal array
+    for (size_t i = 0; i < iterator_count; i++)
+    {
+        state->iterators[i] = iterators[i];
+    }
+
+    state->iterator_count = iterator_count;
+    state->current_iterator_index = 0;
+
+    new_it.alloc = alloc;
+    new_it.data_state = state;
+
+    return new_it;
+}

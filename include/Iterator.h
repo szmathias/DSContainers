@@ -221,6 +221,21 @@ DSC_API DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* 
 */
 DSC_API DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, size_t count);
 
+/**
+* Create a chain iterator that combines multiple iterators sequentially.
+* The new iterator yields all elements from the first iterator, then all elements
+* from the second iterator, and so on. This allows appending datasets together.
+*
+* Note: The returned iterator takes ownership of all source iterators
+* and will destroy them when the chain iterator is destroyed.
+*
+* @param iterators Array of iterators to chain together (ownership transferred)
+* @param iterator_count Number of iterators in the array
+* @param alloc The allocator to use for the iterator's internal state
+* @return A new iterator yielding elements from all source iterators sequentially
+*/
+DSC_API DSCIterator dsc_iterator_chain(DSCIterator* iterators, size_t iterator_count, const DSCAllocator* alloc);
+
 #ifdef __cplusplus
 }
 #endif
