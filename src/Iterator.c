@@ -6,6 +6,27 @@
 #include "Iterator.h"
 #include "Pair.h"
 
+static int invalid_has_prev(const DSCIterator* it)
+{
+    (void)it;
+    return 0;
+}
+
+static int invalid_prev(const DSCIterator* it)
+{
+    (void)it;
+    return -1;
+}
+
+static void invalid_reset(const DSCIterator* it)
+{
+    (void)it;
+}
+
+//==============================================================================
+// Transform iterator implementation
+//==============================================================================
+
 /**
  * State structure for transform iterator.
  */
@@ -16,13 +37,6 @@ typedef struct TransformState
     void* cached_result;        // Cached transformed result
     int transform_allocates;    // Flag: does transform function allocate memory?
 } TransformState;
-
-// Forward declaration for helper functions
-static void* transform_get(const DSCIterator* it);
-
-//==============================================================================
-// Transform iterator implementation
-//==============================================================================
 
 /**
  * Get current element from transform iterator.
@@ -116,33 +130,6 @@ static int transform_next(const DSCIterator* it)
 }
 
 /**
- * Check if transform iterator has previous elements (not supported).
- */
-static int transform_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Transform iterator does not support has_prev
-}
-
-/**
- * Get previous element from transform iterator (not supported).
- */
-static int transform_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Transform iterator does not support prev
-}
-
-/**
- * Reset transform iterator (not supported).
- */
-static void transform_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Transform iterator does not support reset
-}
-
-/**
  * Check if transform iterator is valid.
  */
 static int transform_is_valid(const DSCIterator* it)
@@ -199,9 +186,9 @@ DSCIterator dsc_iterator_transform(DSCIterator* it, const DSCAllocator* alloc, c
     new_it.get = transform_get;
     new_it.has_next = transform_has_next;
     new_it.next = transform_next;
-    new_it.has_prev = transform_has_prev;
-    new_it.prev = transform_prev;
-    new_it.reset = transform_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = transform_is_valid;
     new_it.destroy = transform_destroy;
 
@@ -370,33 +357,6 @@ static int filter_next(const DSCIterator* it)
 }
 
 /**
- * Check if filter iterator has previous elements (not supported).
- */
-static int filter_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Filter iterator does not support has_prev
-}
-
-/**
- * Get previous element from filter iterator (not supported).
- */
-static int filter_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Filter iterator does not support prev
-}
-
-/**
- * Reset filter iterator (not supported).
- */
-static void filter_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Filter iterator does not support reset
-}
-
-/**
  * Check if filter iterator is valid.
  */
 static int filter_is_valid(const DSCIterator* it)
@@ -450,9 +410,9 @@ DSCIterator dsc_iterator_filter(DSCIterator* it, const DSCAllocator* alloc, cons
     new_it.get = filter_get;
     new_it.has_next = filter_has_next;
     new_it.next = filter_next;
-    new_it.has_prev = filter_has_prev;
-    new_it.prev = filter_prev;
-    new_it.reset = filter_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = filter_is_valid;
     new_it.destroy = filter_destroy;
 
@@ -799,33 +759,6 @@ static int copy_next(const DSCIterator* it)
 }
 
 /**
- * Check if copy iterator has previous elements (not supported).
- */
-static int copy_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Copy iterator does not support has_prev
-}
-
-/**
- * Get previous element from copy iterator (not supported).
- */
-static int copy_prev(const DSCIterator* it)
-{
-    (void)it;  // Suppress unused parameter warning
-    return -1; // Copy iterator does not support prev
-}
-
-/**
- * Reset copy iterator (not supported).
- */
-static void copy_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Copy iterator does not support reset
-}
-
-/**
  * Check if copy iterator is valid.
  */
 static int copy_is_valid(const DSCIterator* it)
@@ -879,9 +812,9 @@ DSCIterator dsc_iterator_copy(DSCIterator* it, const DSCAllocator* alloc, const 
     new_it.get = copy_get;
     new_it.has_next = copy_has_next;
     new_it.next = copy_next;
-    new_it.has_prev = copy_has_prev;
-    new_it.prev = copy_prev;
-    new_it.reset = copy_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = copy_is_valid;
     new_it.destroy = copy_destroy;
 
@@ -1006,33 +939,6 @@ static int take_next(const DSCIterator* it)
 }
 
 /**
- * Check if the take iterator has previous elements (not supported).
- */
-static int take_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Take iterator does not support has_prev
-}
-
-/**
- * Get previous element from take iterator (not supported).
- */
-static int take_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Take iterator does not support prev
-}
-
-/**
- * Reset take iterator (not supported).
- */
-static void take_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Take iterator does not support reset
-}
-
-/**
  * Check if the take iterator is valid.
  */
 static int take_is_valid(const DSCIterator* it)
@@ -1083,9 +989,9 @@ DSCIterator dsc_iterator_take(DSCIterator* it, const DSCAllocator* alloc, const 
     new_it.get = take_get;
     new_it.has_next = take_has_next;
     new_it.next = take_next;
-    new_it.has_prev = take_has_prev;
-    new_it.prev = take_prev;
-    new_it.reset = take_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = take_is_valid;
     new_it.destroy = take_destroy;
 
@@ -1217,33 +1123,6 @@ static int skip_next(const DSCIterator* it)
 }
 
 /**
- * Check if skip iterator has previous elements (not supported).
- */
-static int skip_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Skip iterator does not support has_prev
-}
-
-/**
- * Get previous element from skip iterator (not supported).
- */
-static int skip_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Skip iterator does not support prev
-}
-
-/**
- * Reset skip iterator (not supported).
- */
-static void skip_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Skip iterator does not support reset
-}
-
-/**
  * Check if skip iterator is valid.
  */
 static int skip_is_valid(const DSCIterator* it)
@@ -1294,9 +1173,9 @@ DSCIterator dsc_iterator_skip(DSCIterator* it, const DSCAllocator* alloc, const 
     new_it.get = skip_get;
     new_it.has_next = skip_has_next;
     new_it.next = skip_next;
-    new_it.has_prev = skip_has_prev;
-    new_it.prev = skip_prev;
-    new_it.reset = skip_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = skip_is_valid;
     new_it.destroy = skip_destroy;
 
@@ -1442,33 +1321,6 @@ static int zip_next(const DSCIterator* it)
 }
 
 /**
- * Check if zip iterator has previous elements (not supported).
- */
-static int zip_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Zip iterator does not support has_prev
-}
-
-/**
- * Get previous element from zip iterator (not supported).
- */
-static int zip_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Zip iterator does not support prev
-}
-
-/**
- * Reset zip iterator (not supported).
- */
-static void zip_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Zip iterator does not support reset
-}
-
-/**
  * Check if zip iterator is valid.
  */
 static int zip_is_valid(const DSCIterator* it)
@@ -1526,9 +1378,9 @@ DSCIterator dsc_iterator_zip(DSCIterator* it1, DSCIterator* it2, const DSCAlloca
     new_it.get = zip_get;
     new_it.has_next = zip_has_next;
     new_it.next = zip_next;
-    new_it.has_prev = zip_has_prev;
-    new_it.prev = zip_prev;
-    new_it.reset = zip_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = zip_is_valid;
     new_it.destroy = zip_destroy;
 
@@ -1664,33 +1516,6 @@ static int enumerate_next(const DSCIterator* it)
 }
 
 /**
- * Check if enumerate iterator has previous elements (not supported).
- */
-static int enumerate_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Enumerate iterator does not support has_prev
-}
-
-/**
- * Get previous element from enumerate iterator (not supported).
- */
-static int enumerate_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Enumerate iterator does not support prev
-}
-
-/**
- * Reset enumerate iterator (not supported).
- */
-static void enumerate_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Enumerate iterator does not support reset
-}
-
-/**
  * Check if enumerate iterator is valid.
  */
 static int enumerate_is_valid(const DSCIterator* it)
@@ -1741,9 +1566,9 @@ DSCIterator dsc_iterator_enumerate(DSCIterator* it, const DSCAllocator* alloc, c
     new_it.get = enumerate_get;
     new_it.has_next = enumerate_has_next;
     new_it.next = enumerate_next;
-    new_it.has_prev = enumerate_has_prev;
-    new_it.prev = enumerate_prev;
-    new_it.reset = enumerate_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = enumerate_is_valid;
     new_it.destroy = enumerate_destroy;
 
@@ -1848,27 +1673,6 @@ static int repeat_next(const DSCIterator* it)
     return 0;
 }
 
-/**
- * Check if repeat iterator has previous elements (not supported).
- */
-static int repeat_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Repeat iterator does not support has_prev
-}
-
-/**
- * Get previous element from repeat iterator (not supported).
- */
-static int repeat_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Repeat iterator does not support prev
-}
-
-/**
- * Reset repeat iterator to starting position.
- */
 static void repeat_reset(const DSCIterator* it)
 {
     if (!it || !it->data_state)
@@ -1919,8 +1723,8 @@ DSCIterator dsc_iterator_repeat(const void* value, const DSCAllocator* alloc, co
     new_it.get = repeat_get;
     new_it.has_next = repeat_has_next;
     new_it.next = repeat_next;
-    new_it.has_prev = repeat_has_prev;
-    new_it.prev = repeat_prev;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
     new_it.reset = repeat_reset;
     new_it.is_valid = repeat_is_valid;
     new_it.destroy = repeat_destroy;
@@ -2075,33 +1879,6 @@ static int chain_next(const DSCIterator* it)
 }
 
 /**
- * Check if chain iterator has previous elements (not supported).
- */
-static int chain_has_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return 0; // Chain iterator does not support has_prev
-}
-
-/**
- * Get previous element from chain iterator (not supported).
- */
-static int chain_prev(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    return -1; // Chain iterator does not support prev
-}
-
-/**
- * Reset chain iterator (not supported).
- */
-static void chain_reset(const DSCIterator* it)
-{
-    (void)it; // Suppress unused parameter warning
-    // Chain iterator does not support reset
-}
-
-/**
  * Check if chain iterator is valid.
  */
 static int chain_is_valid(const DSCIterator* it)
@@ -2170,9 +1947,9 @@ DSCIterator dsc_iterator_chain(DSCIterator* iterators, const size_t iterator_cou
     new_it.get = chain_get;
     new_it.has_next = chain_has_next;
     new_it.next = chain_next;
-    new_it.has_prev = chain_has_prev;
-    new_it.prev = chain_prev;
-    new_it.reset = chain_reset;
+    new_it.has_prev = invalid_has_prev;
+    new_it.prev = invalid_prev;
+    new_it.reset = invalid_reset;
     new_it.is_valid = chain_is_valid;
     new_it.destroy = chain_destroy;
 

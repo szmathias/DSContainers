@@ -406,7 +406,7 @@ static int test_filter_operations_on_invalid(void)
 
     // All operations should fail gracefully
     ASSERT_EQ(invalid_it.next(&invalid_it), -1);
-    ASSERT_EQ(invalid_it.prev(&invalid_it), 0); // Filter doesn't support prev
+    ASSERT_EQ(invalid_it.prev(&invalid_it), -1); // Filter doesn't support prev
     ASSERT_FALSE(invalid_it.has_next(&invalid_it));
     ASSERT_FALSE(invalid_it.has_prev(&invalid_it)); // Filter doesn't support has_prev
     ASSERT_NULL(invalid_it.get(&invalid_it));
@@ -508,7 +508,7 @@ static int test_filter_unsupported_operations(void)
 
     // Filter iterator should not support bidirectional operations
     ASSERT_FALSE(filter_it.has_prev(&filter_it));
-    ASSERT_EQ(filter_it.prev(&filter_it), 0); // Returns 0 for unsupported
+    ASSERT_EQ(filter_it.prev(&filter_it), -1); // Returns 0 for unsupported
 
     // Reset should be safe but ineffective
     filter_it.reset(&filter_it);

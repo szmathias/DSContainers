@@ -369,7 +369,7 @@ static int test_transform_operations_on_invalid(void)
 
     // All operations should fail gracefully
     ASSERT_EQ(invalid_it.next(&invalid_it), -1);
-    ASSERT_EQ(invalid_it.prev(&invalid_it), 0); // Transform doesn't support prev
+    ASSERT_EQ(invalid_it.prev(&invalid_it), -1); // Transform doesn't support prev
     ASSERT_FALSE(invalid_it.has_next(&invalid_it));
     ASSERT_FALSE(invalid_it.has_prev(&invalid_it)); // Transform doesn't support has_prev
     ASSERT_NULL(invalid_it.get(&invalid_it));
@@ -468,7 +468,7 @@ static int test_transform_unsupported_operations(void)
 
     // Transform iterator should not support bidirectional operations
     ASSERT_FALSE(transform_it.has_prev(&transform_it));
-    ASSERT_EQ(transform_it.prev(&transform_it), 0); // Returns 0 for unsupported
+    ASSERT_EQ(transform_it.prev(&transform_it), -1); // Returns 0 for unsupported
 
     // Reset should be safe but ineffective
     transform_it.reset(&transform_it);
