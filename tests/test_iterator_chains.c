@@ -5,12 +5,13 @@
 // Tests cover all combinations of range, filter, and transform iterators,
 // error handling, memory management, and complex multistep chains.
 
-#include "Iterator.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
+#include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 //==============================================================================
 // Helper Functions for Iterator Chaining Tests
@@ -70,7 +71,7 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
             return NULL;
         }
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -308,7 +309,7 @@ static int test_filter_transform_no_matches(void)
     {
         int* val = malloc(sizeof(int));
         *val = odd_values[i];
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     DSCIterator base_it = dsc_dll_iterator(list);

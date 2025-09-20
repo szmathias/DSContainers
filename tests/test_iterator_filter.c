@@ -5,12 +5,13 @@
 // Tests cover basic filtering, filter chaining, error handling, memory management,
 // and integration with different data structures.
 
-#include "Iterator.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
+#include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 //==============================================================================
 // Helper Functions for Filter Iterator Tests
@@ -70,7 +71,7 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
             return NULL;
         }
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -93,7 +94,7 @@ static DSCDoublyLinkedList* create_list_with_values(DSCAllocator* alloc, const i
             return NULL;
         }
         *val = values[i];
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }

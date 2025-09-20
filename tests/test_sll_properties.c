@@ -2,10 +2,11 @@
 // Created by zack on 9/4/25.
 //
 
+#include <stdlib.h>
+
 #include "SinglyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
 
 // Property: The size of the list should be consistent after a series of insertions and removals.
 int test_sll_size_after_insert_and_remove(void)
@@ -16,12 +17,12 @@ int test_sll_size_after_insert_and_remove(void)
 
     int* a = malloc(sizeof(int));
     *a = 1;
-    dsc_sll_insert_back(list, a);
+    dsc_sll_push_back(list, a);
     ASSERT_EQ(dsc_sll_size(list), 1);
 
     int* b = malloc(sizeof(int));
     *b = 2;
-    dsc_sll_insert_back(list, b);
+    dsc_sll_push_back(list, b);
     ASSERT_EQ(dsc_sll_size(list), 2);
 
     dsc_sll_remove_at(list, 0, true);
@@ -43,7 +44,7 @@ int test_sll_sort_is_idempotent(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     dsc_sll_sort(list, int_cmp); // First sort
@@ -67,7 +68,7 @@ int test_sll_reverse_is_involution(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     DSCSinglyLinkedList* copy = dsc_sll_copy_deep(list, int_copy, true);

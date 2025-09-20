@@ -381,7 +381,7 @@ static int test_chain_with_arraylist_and_dll(void)
     {
         int* val = alloc.alloc_func(sizeof(int));
         *val = i * 10;
-        dsc_dll_insert_back(dll, val);
+        dsc_dll_push_back(dll, val);
     }
 
     // Get iterators from data structures
@@ -592,7 +592,7 @@ static int test_chain_with_zip_and_data_structures(void)
     {
         int* val = alloc.alloc_func(sizeof(int));
         *val = i * 10;
-        dsc_sll_insert_back(sll, val);
+        dsc_sll_push_back(sll, val);
     }
 
     // Get iterators and apply transformations

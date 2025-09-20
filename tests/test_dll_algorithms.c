@@ -2,13 +2,14 @@
 // Created by zack on 9/2/25.
 //
 
-#include "DoublyLinkedList.h"
-#include "TestAssert.h"
-#include "TestHelpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "DoublyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 int test_sort_empty(void)
 {
@@ -28,7 +29,7 @@ int test_sort_already_sorted(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     ASSERT_EQ(dsc_dll_sort(list, int_cmp), 0);
@@ -53,7 +54,7 @@ int test_sort_reverse_order(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     ASSERT_EQ(dsc_dll_sort(list, int_cmp), 0);
@@ -89,7 +90,7 @@ int test_sort_with_duplicates(void)
     {
         int* val = malloc(sizeof(int));
         *val = values[i];
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     ASSERT_EQ(dsc_dll_sort(list, int_cmp), 0);
@@ -127,7 +128,7 @@ int test_sort_large_list(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     const clock_t start = clock();
@@ -168,7 +169,7 @@ int test_sort_custom_compare(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Sort in descending order
@@ -207,10 +208,10 @@ int test_sort_stability(void)
     Person* p3 = create_person("Bob", 35);
     Person* p4 = create_person("Alice", 40); // Same name, different age
 
-    dsc_dll_insert_back(list, p1);
-    dsc_dll_insert_back(list, p2);
-    dsc_dll_insert_back(list, p3);
-    dsc_dll_insert_back(list, p4);
+    dsc_dll_push_back(list, p1);
+    dsc_dll_push_back(list, p2);
+    dsc_dll_push_back(list, p3);
+    dsc_dll_push_back(list, p4);
 
     // Sort by name only - ages should remain in insertion order for equal names
     ASSERT_EQ(dsc_dll_sort(list, person_cmp), 0);
@@ -252,7 +253,7 @@ int test_reverse(void)
     // Test single element
     int* a = malloc(sizeof(int));
     *a = 10;
-    dsc_dll_insert_back(list, a);
+    dsc_dll_push_back(list, a);
     ASSERT_EQ(dsc_dll_reverse(list), 0);
     ASSERT_EQ(list->size, 1);
     ASSERT_EQ(*(int*)list->head->data, 10);
@@ -263,8 +264,8 @@ int test_reverse(void)
     *b = 20;
     int* c = malloc(sizeof(int));
     *c = 30;
-    dsc_dll_insert_back(list, b);
-    dsc_dll_insert_back(list, c);
+    dsc_dll_push_back(list, b);
+    dsc_dll_push_back(list, c);
     // List is now [10,20,30]
 
     ASSERT_EQ(dsc_dll_reverse(list), 0);
@@ -320,8 +321,8 @@ int test_merge(void)
     *a1 = 10;
     int* b1 = malloc(sizeof(int));
     *b1 = 20;
-    dsc_dll_insert_back(list2, a1);
-    dsc_dll_insert_back(list2, b1);
+    dsc_dll_push_back(list2, a1);
+    dsc_dll_push_back(list2, b1);
 
     ASSERT_EQ(dsc_dll_merge(list1, list2), 0);
     ASSERT_EQ(list1->size, 2);
@@ -343,8 +344,8 @@ int test_merge(void)
     *a2 = 30;
     int* b2 = malloc(sizeof(int));
     *b2 = 40;
-    dsc_dll_insert_back(list3, a2);
-    dsc_dll_insert_back(list3, b2);
+    dsc_dll_push_back(list3, a2);
+    dsc_dll_push_back(list3, b2);
 
     ASSERT_EQ(dsc_dll_merge(list1, list3), 0);
     ASSERT_EQ(list1->size, 4);
@@ -392,11 +393,11 @@ int test_splice(void)
     int* e1 = malloc(sizeof(int));
     *e1 = 50;
 
-    dsc_dll_insert_back(dest1, a1);
-    dsc_dll_insert_back(dest1, b1);
-    dsc_dll_insert_back(dest1, c1);
-    dsc_dll_insert_back(src1, d1);
-    dsc_dll_insert_back(src1, e1);
+    dsc_dll_push_back(dest1, a1);
+    dsc_dll_push_back(dest1, b1);
+    dsc_dll_push_back(dest1, c1);
+    dsc_dll_push_back(src1, d1);
+    dsc_dll_push_back(src1, e1);
 
     ASSERT_EQ(dsc_dll_splice(dest1, src1, 0), 0);
     ASSERT_EQ(dest1->size, 5);
@@ -430,11 +431,11 @@ int test_splice(void)
     int* e2 = malloc(sizeof(int));
     *e2 = 50;
 
-    dsc_dll_insert_back(dest2, a2);
-    dsc_dll_insert_back(dest2, b2);
-    dsc_dll_insert_back(dest2, c2);
-    dsc_dll_insert_back(src2, d2);
-    dsc_dll_insert_back(src2, e2);
+    dsc_dll_push_back(dest2, a2);
+    dsc_dll_push_back(dest2, b2);
+    dsc_dll_push_back(dest2, c2);
+    dsc_dll_push_back(src2, d2);
+    dsc_dll_push_back(src2, e2);
 
     ASSERT_EQ(dsc_dll_splice(dest2, src2, 1), 0);
     ASSERT_EQ(dest2->size, 5);
@@ -468,11 +469,11 @@ int test_splice(void)
     int* e3 = malloc(sizeof(int));
     *e3 = 50;
 
-    dsc_dll_insert_back(dest3, a3);
-    dsc_dll_insert_back(dest3, b3);
-    dsc_dll_insert_back(dest3, c3);
-    dsc_dll_insert_back(src3, d3);
-    dsc_dll_insert_back(src3, e3);
+    dsc_dll_push_back(dest3, a3);
+    dsc_dll_push_back(dest3, b3);
+    dsc_dll_push_back(dest3, c3);
+    dsc_dll_push_back(src3, d3);
+    dsc_dll_push_back(src3, e3);
 
     ASSERT_EQ(dsc_dll_splice(dest3, src3, 3), 0);
     ASSERT_EQ(dest3->size, 5);
@@ -528,17 +529,17 @@ int test_equals(void)
     *a2 = 10;
     int* b2 = malloc(sizeof(int));
     *b2 = 20;
-    dsc_dll_insert_back(list1, a1);
-    dsc_dll_insert_back(list1, b1);
-    dsc_dll_insert_back(list2, a2);
-    dsc_dll_insert_back(list2, b2);
+    dsc_dll_push_back(list1, a1);
+    dsc_dll_push_back(list1, b1);
+    dsc_dll_push_back(list2, a2);
+    dsc_dll_push_back(list2, b2);
 
     ASSERT_EQ(dsc_dll_equals(list1, list2, int_cmp), 1);
 
     // Lists with different elements should not be equal
     int* c2 = malloc(sizeof(int));
     *c2 = 30;
-    dsc_dll_insert_back(list2, c2);
+    dsc_dll_push_back(list2, c2);
 
     ASSERT_EQ(dsc_dll_equals(list1, list2, int_cmp), 0);
 
@@ -548,8 +549,8 @@ int test_equals(void)
     *a3 = 10;
     int* b3 = malloc(sizeof(int));
     *b3 = 30; // Different value
-    dsc_dll_insert_back(list3, a3);
-    dsc_dll_insert_back(list3, b3);
+    dsc_dll_push_back(list3, a3);
+    dsc_dll_push_back(list3, b3);
 
     ASSERT_EQ(dsc_dll_equals(list1, list3, int_cmp), 0);
 
@@ -574,7 +575,7 @@ int test_filter(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Filter for even numbers
@@ -621,7 +622,7 @@ int test_filter_deep(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Deep-filter for even numbers
@@ -671,7 +672,7 @@ int test_transform(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Map to double each value
@@ -733,7 +734,7 @@ int test_for_each(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Increment each value

@@ -5,13 +5,14 @@
 // Tests cover basic copying, error handling, memory management,
 // and integration with different data structures and iterator types.
 
-#include "Iterator.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "DoublyLinkedList.h"
+#include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 //==============================================================================
 // Helper Functions for Copy Iterator Tests
@@ -83,7 +84,7 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
             return NULL;
         }
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -192,9 +193,9 @@ static int test_copy_custom_structure(void)
     Person* p2 = create_person("Bob", 25);
     Person* p3 = create_person("Charlie", 35);
 
-    dsc_dll_insert_back(list, p1);
-    dsc_dll_insert_back(list, p2);
-    dsc_dll_insert_back(list, p3);
+    dsc_dll_push_back(list, p1);
+    dsc_dll_push_back(list, p2);
+    dsc_dll_push_back(list, p3);
 
     DSCIterator base_it = dsc_dll_iterator(list);
     DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, person_copy);
@@ -798,9 +799,9 @@ static int test_copy_strings(void)
     strcpy(str2, "World");
     strcpy(str3, "Test");
 
-    dsc_dll_insert_back(list, str1);
-    dsc_dll_insert_back(list, str2);
-    dsc_dll_insert_back(list, str3);
+    dsc_dll_push_back(list, str1);
+    dsc_dll_push_back(list, str2);
+    dsc_dll_push_back(list, str3);
 
     DSCIterator base_it = dsc_dll_iterator(list);
     DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, string_copy);

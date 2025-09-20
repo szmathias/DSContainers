@@ -2,12 +2,13 @@
 // Created by zack on 9/5/25.
 //
 
-#include "SinglyLinkedList.h"
-#include "TestAssert.h"
-#include "TestHelpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "SinglyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 int test_stress(void)
 {
@@ -20,7 +21,7 @@ int test_stress(void)
     {
         int* val = malloc(sizeof(int));
         *val = (int)i;
-        ASSERT_EQ(dsc_sll_insert_back(list, val), 0);
+        ASSERT_EQ(dsc_sll_push_back(list, val), 0);
     }
     ASSERT_EQ(list->size, NUM_ELEMENTS);
 
@@ -59,7 +60,7 @@ int test_performance(void)
         {
             int* val = malloc(sizeof(int));
             *val = i;
-            dsc_sll_insert_back(list, val);
+            dsc_sll_push_back(list, val);
         }
         clock_t end = clock();
         printf("Insert %d elements: %.6f seconds\n", SIZE,

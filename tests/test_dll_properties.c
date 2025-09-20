@@ -2,10 +2,11 @@
 // Created by zack on 9/4/25.
 //
 
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
 
 // Property: The size of the list should be consistent after a series of insertions and removals.
 int test_dsc_dll_size_after_insert_and_remove(void)
@@ -16,18 +17,18 @@ int test_dsc_dll_size_after_insert_and_remove(void)
 
     int* a = malloc(sizeof(int));
     *a = 1;
-    dsc_dll_insert_back(list, a);
+    dsc_dll_push_back(list, a);
     ASSERT_EQ(dsc_dll_size(list), 1);
 
     int* b = malloc(sizeof(int));
     *b = 2;
-    dsc_dll_insert_front(list, b);
+    dsc_dll_push_front(list, b);
     ASSERT_EQ(dsc_dll_size(list), 2);
 
     dsc_dll_remove_at(list, 0, true);
     ASSERT_EQ(dsc_dll_size(list), 1);
 
-    dsc_dll_remove_back(list, true);
+    dsc_dll_pop_back(list, true);
     ASSERT_EQ(dsc_dll_size(list), 0);
 
     dsc_dll_destroy(list, false);
@@ -43,7 +44,7 @@ int test_dsc_dll_sort_is_idempotent(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     dsc_dll_sort(list, int_cmp); // First sort
@@ -67,7 +68,7 @@ int test_dsc_dll_reverse_is_involution(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     DSCDoublyLinkedList* copy = dsc_dll_copy_deep(list, true);
