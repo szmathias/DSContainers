@@ -71,7 +71,7 @@ static int test_range_positive_step(void)
     int actual[5];
     const int count = collect_values(&it, actual, 5);
 
-    //ASSERT_EQ(count, 5);
+    ASSERT_EQ(count, 5);
     ASSERT_TRUE(verify_values(actual, expected, count, "basic_forward"));
 
     // Iterator should be exhausted
