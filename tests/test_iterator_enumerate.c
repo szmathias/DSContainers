@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ArrayList.h"
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
-#include "Queue.h"
+#include "containers/ArrayList.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
+#include "containers/Queue.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -23,12 +23,12 @@
  * Helper function to collect all indexed elements from an enumerate iterator.
  * Returns the number of indexed elements collected.
  */
-static int collect_indexed_elements(const DSCIterator* it, size_t* indices, int* values, const int max_count)
+static int collect_indexed_elements(const ANVIterator* it, size_t* indices, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
     {
-        const DSCIndexedElement* indexed = it->get(it);
+        const ANVIndexedElement* indexed = it->get(it);
         if (indexed && indexed->element)
         {
             indices[count] = indexed->index;
@@ -66,13 +66,13 @@ static int verify_indexed_elements(const size_t* actual_indices, const int* actu
 
 int test_enumerate_basic_functionality(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator [10, 11, 12, 13, 14]
-    DSCIterator range_it = dsc_iterator_range(10, 15, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(10, 15, 1, &alloc);
 
     // Enumerate starting from index 0
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 0);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 0);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     size_t indices[10];
@@ -91,13 +91,13 @@ int test_enumerate_basic_functionality(void)
 
 int test_enumerate_custom_start_index(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator [1, 2, 3]
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
 
     // Enumerate starting from index 100
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 100);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 100);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     size_t indices[10];
@@ -116,17 +116,17 @@ int test_enumerate_custom_start_index(void)
 
 int test_enumerate_single_element(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator with single element [42]
-    DSCIterator range_it = dsc_iterator_range(42, 43, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(42, 43, 1, &alloc);
 
     // Enumerate starting from index 5
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 5);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 5);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     ASSERT_TRUE(enum_it.has_next(&enum_it));
-    const DSCIndexedElement* indexed = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed);
     ASSERT_EQ(indexed->index, 5);
     ASSERT_NOT_NULL(indexed->element);
@@ -142,13 +142,13 @@ int test_enumerate_single_element(void)
 
 int test_enumerate_large_start_index(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator [1, 2]
-    DSCIterator range_it = dsc_iterator_range(1, 3, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 3, 1, &alloc);
 
     // Enumerate starting from SIZE_MAX - 1
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, SIZE_MAX - 1);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, SIZE_MAX - 1);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     size_t indices[10];
@@ -171,13 +171,13 @@ int test_enumerate_large_start_index(void)
 
 int test_enumerate_empty_source(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create empty range iterator
-    DSCIterator range_it = dsc_iterator_range(1, 1, 1, &alloc); // Empty
+    ANVIterator range_it = anv_iterator_range(1, 1, 1, &alloc); // Empty
 
     // Enumerate empty iterator
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 0);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 0);
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     // Should have no elements
@@ -190,15 +190,15 @@ int test_enumerate_empty_source(void)
 
 int test_enumerate_invalid_parameters(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test with NULL iterator
-    const DSCIterator enum_it1 = dsc_iterator_enumerate(NULL, &alloc, 0);
+    const ANVIterator enum_it1 = anv_iterator_enumerate(NULL, &alloc, 0);
     ASSERT_FALSE(enum_it1.is_valid(&enum_it1));
 
     // Test with NULL allocator
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
-    const DSCIterator enum_it2 = dsc_iterator_enumerate(&range_it, NULL, 0);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
+    const ANVIterator enum_it2 = anv_iterator_enumerate(&range_it, NULL, 0);
     ASSERT_FALSE(enum_it2.is_valid(&enum_it2));
     range_it.destroy(&range_it); // Clean up since enumerate failed
 
@@ -211,12 +211,12 @@ int test_enumerate_invalid_parameters(void)
 
 int test_enumerate_with_filter(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-10, filter evens, then enumerate
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even); // [2,4,6,8,10]
-    DSCIterator enum_it = dsc_iterator_enumerate(&filter_it, &alloc, 0);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even); // [2,4,6,8,10]
+    ANVIterator enum_it = anv_iterator_enumerate(&filter_it, &alloc, 0);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -236,12 +236,12 @@ int test_enumerate_with_filter(void)
 
 int test_enumerate_with_take(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-10, take first 3, then enumerate starting from 10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 3); // [1,2,3]
-    DSCIterator enum_it = dsc_iterator_enumerate(&take_it, &alloc, 10);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 3); // [1,2,3]
+    ANVIterator enum_it = anv_iterator_enumerate(&take_it, &alloc, 10);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -261,12 +261,12 @@ int test_enumerate_with_take(void)
 
 int test_enumerate_with_skip(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-7, skip first 2, then enumerate starting from 0
-    DSCIterator range_it = dsc_iterator_range(1, 8, 1, &alloc);   // [1,2,3,4,5,6,7]
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 2); // [3,4,5,6,7]
-    DSCIterator enum_it = dsc_iterator_enumerate(&skip_it, &alloc, 0);
+    ANVIterator range_it = anv_iterator_range(1, 8, 1, &alloc);   // [1,2,3,4,5,6,7]
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 2); // [3,4,5,6,7]
+    ANVIterator enum_it = anv_iterator_enumerate(&skip_it, &alloc, 0);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -286,21 +286,21 @@ int test_enumerate_with_skip(void)
 
 int test_enumerate_chained(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-10, filter odds, enumerate, then take first 2
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_odd); // [1,3,5,7,9]
-    DSCIterator enum_it = dsc_iterator_enumerate(&filter_it, &alloc, 50); // [(50,1),(51,3),(52,5),(53,7),(54,9)]
-    DSCIterator take_it = dsc_iterator_take(&enum_it, &alloc, 2); // [(50,1),(51,3)]
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);   // [1,2,3,4,5,6,7,8,9,10]
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_odd); // [1,3,5,7,9]
+    ANVIterator enum_it = anv_iterator_enumerate(&filter_it, &alloc, 50); // [(50,1),(51,3),(52,5),(53,7),(54,9)]
+    ANVIterator take_it = anv_iterator_take(&enum_it, &alloc, 2); // [(50,1),(51,3)]
 
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
-    // Since take operates on DSCIndexedElement objects, we need to handle this differently
+    // Since take operates on ANVIndexedElement objects, we need to handle this differently
     int count = 0;
     while (take_it.has_next(&take_it) && count < 2)
     {
-        const DSCIndexedElement* indexed = take_it.get(&take_it);
+        const ANVIndexedElement* indexed = take_it.get(&take_it);
         ASSERT_NOT_NULL(indexed);
 
         if (count == 0)
@@ -331,22 +331,22 @@ int test_enumerate_chained(void)
 
 int test_enumerate_arraylist(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create ArrayList with some data
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
+    ANVArrayList* list = anv_arraylist_create(&alloc, 0);
 
     // Add values 100, 200, 300
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i * 100;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
     }
 
     // Create iterator and enumerate starting from index 5
-    DSCIterator array_iter = dsc_arraylist_iterator(list);
-    DSCIterator enum_it = dsc_iterator_enumerate(&array_iter, &alloc, 5);
+    ANVIterator array_iter = anv_arraylist_iterator(list);
+    ANVIterator enum_it = anv_iterator_enumerate(&array_iter, &alloc, 5);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -361,28 +361,28 @@ int test_enumerate_arraylist(void)
     ASSERT_TRUE(verify_indexed_elements(indices, values, expected_indices, expected_values, 3, "enumerate_arraylist"));
 
     enum_it.destroy(&enum_it);
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_enumerate_dll(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create DoublyLinkedList with some data
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
 
     // Add values 5, 10, 15, 20
     for (int i = 1; i <= 4; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i * 5;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
     // Create iterator and enumerate starting from index 0
-    DSCIterator dll_iter = dsc_dll_iterator(list);
-    DSCIterator enum_it = dsc_iterator_enumerate(&dll_iter, &alloc, 0);
+    ANVIterator dll_iter = anv_dll_iterator(list);
+    ANVIterator enum_it = anv_iterator_enumerate(&dll_iter, &alloc, 0);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -397,28 +397,28 @@ int test_enumerate_dll(void)
     ASSERT_TRUE(verify_indexed_elements(indices, values, expected_indices, expected_values, 4, "enumerate_dll"));
 
     enum_it.destroy(&enum_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_enumerate_queue_with_stack(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create Queue with FIFO behavior
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVQueue* queue = anv_queue_create(&alloc);
 
     // Add values 1, 2, 3 (will iterate as 1, 2, 3)
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_queue_enqueue(queue, val);
+        anv_queue_enqueue(queue, val);
     }
 
     // Enumerate queue starting from index 10
-    DSCIterator queue_iter = dsc_queue_iterator(queue);
-    DSCIterator enum_it = dsc_iterator_enumerate(&queue_iter, &alloc, 10);
+    ANVIterator queue_iter = anv_queue_iterator(queue);
+    ANVIterator enum_it = anv_iterator_enumerate(&queue_iter, &alloc, 10);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -433,19 +433,19 @@ int test_enumerate_queue_with_stack(void)
     ASSERT_TRUE(verify_indexed_elements(indices, values, expected_indices, expected_values, 3, "enumerate_queue"));
 
     enum_it.destroy(&enum_it);
-    dsc_queue_destroy(queue, true);
+    anv_queue_destroy(queue, true);
     return TEST_SUCCESS;
 }
 
 int test_enumerate_complex_composition(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Complex pipeline: Range -> Filter -> Take -> Enumerate
-    DSCIterator range_it = dsc_iterator_range(1, 20, 1, &alloc); // [1..19]
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_divisible_by_3); // [3,6,9,12,15,18]
-    DSCIterator take_it = dsc_iterator_take(&filter_it, &alloc, 4); // [3,6,9,12]
-    DSCIterator enum_it = dsc_iterator_enumerate(&take_it, &alloc, 100); // [(100,3),(101,6),(102,9),(103,12)]
+    ANVIterator range_it = anv_iterator_range(1, 20, 1, &alloc); // [1..19]
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_divisible_by_3); // [3,6,9,12,15,18]
+    ANVIterator take_it = anv_iterator_take(&filter_it, &alloc, 4); // [3,6,9,12]
+    ANVIterator enum_it = anv_iterator_enumerate(&take_it, &alloc, 100); // [(100,3),(101,6),(102,9),(103,12)]
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
@@ -469,15 +469,15 @@ int test_enumerate_complex_composition(void)
 
 int test_enumerate_iteration_state(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create enumerate iterator and test step-by-step iteration
-    DSCIterator range_it = dsc_iterator_range(50, 53, 1, &alloc); // [50,51,52]
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 20);
+    ANVIterator range_it = anv_iterator_range(50, 53, 1, &alloc); // [50,51,52]
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 20);
 
     // Test step-by-step iteration
     ASSERT_TRUE(enum_it.has_next(&enum_it));
-    const DSCIndexedElement* indexed1 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed1 = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed1);
     ASSERT_EQ(indexed1->index, 20);
     ASSERT_EQ(*(const int*)indexed1->element, 50);
@@ -485,7 +485,7 @@ int test_enumerate_iteration_state(void)
     ASSERT_EQ(enum_it.next(&enum_it), 0);
     ASSERT_TRUE(enum_it.has_next(&enum_it));
 
-    const DSCIndexedElement* indexed2 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed2 = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed2);
     ASSERT_EQ(indexed2->index, 21);
     ASSERT_EQ(*(const int*)indexed2->element, 51);
@@ -493,7 +493,7 @@ int test_enumerate_iteration_state(void)
     ASSERT_EQ(enum_it.next(&enum_it), 0);
     ASSERT_TRUE(enum_it.has_next(&enum_it));
 
-    const DSCIndexedElement* indexed3 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed3 = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed3);
     ASSERT_EQ(indexed3->index, 22);
     ASSERT_EQ(*(const int*)indexed3->element, 52);
@@ -509,11 +509,11 @@ int test_enumerate_iteration_state(void)
 
 int test_enumerate_unsupported_operations(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create enumerate iterator
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 0);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 0);
 
     // Test unsupported operations
     ASSERT_FALSE(enum_it.has_prev(&enum_it));
@@ -528,16 +528,16 @@ int test_enumerate_unsupported_operations(void)
 
 int test_enumerate_element_consistency(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
-    // Test that the same DSCIndexedElement pointer is returned for multiple get() calls
-    DSCIterator range_it = dsc_iterator_range(1, 3, 1, &alloc); // [1,2]
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, 0);
+    // Test that the same ANVIndexedElement pointer is returned for multiple get() calls
+    ANVIterator range_it = anv_iterator_range(1, 3, 1, &alloc); // [1,2]
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, 0);
 
     ASSERT_TRUE(enum_it.has_next(&enum_it));
 
-    const DSCIndexedElement* indexed1 = enum_it.get(&enum_it);
-    const DSCIndexedElement* indexed2 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed1 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed2 = enum_it.get(&enum_it);
 
     // Should return same pointer (cached indexed element)
     ASSERT_EQ(indexed1, indexed2);
@@ -546,7 +546,7 @@ int test_enumerate_element_consistency(void)
 
     // After next(), should get different values but could be same pointer
     enum_it.next(&enum_it);
-    const DSCIndexedElement* indexed3 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed3 = enum_it.get(&enum_it);
     ASSERT_EQ(indexed3->index, 1);
     ASSERT_EQ(*(const int*)indexed3->element, 2);
 
@@ -556,17 +556,17 @@ int test_enumerate_element_consistency(void)
 
 int test_enumerate_index_overflow_behavior(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test behavior near SIZE_MAX (this tests the edge case of index overflow)
-    DSCIterator range_it = dsc_iterator_range(1, 3, 1, &alloc); // [1,2]
-    DSCIterator enum_it = dsc_iterator_enumerate(&range_it, &alloc, SIZE_MAX);
+    ANVIterator range_it = anv_iterator_range(1, 3, 1, &alloc); // [1,2]
+    ANVIterator enum_it = anv_iterator_enumerate(&range_it, &alloc, SIZE_MAX);
 
     ASSERT_TRUE(enum_it.is_valid(&enum_it));
 
     // First element should have index SIZE_MAX
     ASSERT_TRUE(enum_it.has_next(&enum_it));
-    const DSCIndexedElement* indexed1 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed1 = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed1);
     ASSERT_EQ(indexed1->index, SIZE_MAX);
     ASSERT_EQ(*(const int*)indexed1->element, 1);
@@ -574,7 +574,7 @@ int test_enumerate_index_overflow_behavior(void)
     // Second element should wrap around to 0 (or whatever SIZE_MAX + 1 becomes)
     enum_it.next(&enum_it);
     ASSERT_TRUE(enum_it.has_next(&enum_it));
-    const DSCIndexedElement* indexed2 = enum_it.get(&enum_it);
+    const ANVIndexedElement* indexed2 = enum_it.get(&enum_it);
     ASSERT_NOT_NULL(indexed2);
     // Index should be SIZE_MAX + 1, which wraps to 0 for size_t
     ASSERT_EQ(indexed2->index, 0);

@@ -2,14 +2,14 @@
 // Created by zack on 8/20/2025.
 //
 
-#ifndef DSCONTAINERS_TESTASSERT_H
-#define DSCONTAINERS_TESTASSERT_H
+#ifndef ANVIL_TESTASSERT_H
+#define ANVIL_TESTASSERT_H
 
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
-#include "CStandardCompatibility.h"
-#include "DynamicString.h"
+#include "common/CStandardCompatibility.h"
+#include "containers/DynamicString.h"
 
 #define TEST_SUCCESS 1
 #define TEST_FAILURE 0
@@ -53,10 +53,10 @@
 #define ASSERT_EQ_DSTRING(a, b) \
     do \
     { \
-        if (dsc_str_compare_string((a), (b)) != 0) \
+        if (anv_str_compare_string((a), (b)) != 0) \
         { \
             fprintf(stderr, "Assertion failed: %s == %s, file %s, line %d\n", #a, #b, __FILE__, __LINE__); \
-            fprintf(stderr, "  Actual: '%s' != '%s'\n", dsc_str_data(a), dsc_str_data(b)); \
+            fprintf(stderr, "  Actual: '%s' != '%s'\n", anv_str_data(a), anv_str_data(b)); \
             return TEST_FAILURE; \
         } \
     } while (0)
@@ -210,4 +210,4 @@
         return TEST_FAILURE; \
     } while (0)
 
-#endif //DSCONTAINERS_TESTASSERT_H
+#endif //ANVIL_TESTASSERT_H

@@ -2,10 +2,10 @@
 // Created by zack on 9/1/25.
 //
 
-#ifndef DSCONTAINERS_TESTHELPERS_H
-#define DSCONTAINERS_TESTHELPERS_H
+#ifndef ANVIL_TESTHELPERS_H
+#define ANVIL_TESTHELPERS_H
 
-#include "../include/Alloc.h"
+#include "common/Allocator.h"
 
 // --- Types ---
 typedef struct
@@ -111,9 +111,9 @@ void* double_value_failing(const void* data);
 // Helper to set up the failing allocator
 void set_alloc_fail_countdown(int count);
 
-DSCAllocator create_failing_int_allocator(void);
-DSCAllocator create_int_allocator(void);
-DSCAllocator create_person_allocator(void);
-DSCAllocator create_string_allocator(void);
+ANVAllocator create_failing_int_allocator(void);
+ANVAllocator create_int_allocator(void);
+ANVAllocator create_person_allocator(void);
+ANVAllocator create_string_allocator(void);
 
-#endif //DSCONTAINERS_TESTHELPERS_H
+#endif //ANVIL_TESTHELPERS_H

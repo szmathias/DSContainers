@@ -2,7 +2,7 @@
 // Created by zack on 9/15/25.
 //
 
-#include "Pair.h"
+#include "containers/Pair.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include <stdio.h>
@@ -40,7 +40,7 @@ static int string_cmp(const void* a, const void* b)
 
 int test_pair_compare_equal_pairs(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first1 = malloc(sizeof(int));
     int* second1 = malloc(sizeof(int));
@@ -51,24 +51,24 @@ int test_pair_compare_equal_pairs(void)
     *first2 = 42;
     *second2 = 84;
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     // Test with comparison functions
-    int result = dsc_pair_compare(pair1, pair2, int_cmp, int_cmp);
+    int result = anv_pair_compare(pair1, pair2, int_cmp, int_cmp);
     ASSERT_EQ(result, 0);
 
     // Test equality function
-    ASSERT_TRUE(dsc_pair_equals(pair1, pair2, int_cmp, int_cmp));
+    ASSERT_TRUE(anv_pair_equals(pair1, pair2, int_cmp, int_cmp));
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_first_different(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first1 = malloc(sizeof(int));
     int* second1 = malloc(sizeof(int));
@@ -79,24 +79,24 @@ int test_pair_compare_first_different(void)
     *first2 = 42;
     *second2 = 84;
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     // pair1 < pair2 (first element is smaller)
-    int result = dsc_pair_compare(pair1, pair2, int_cmp, int_cmp);
+    int result = anv_pair_compare(pair1, pair2, int_cmp, int_cmp);
     ASSERT_LT(result, 0);
 
     // Test equality function
-    ASSERT_FALSE(dsc_pair_equals(pair1, pair2, int_cmp, int_cmp));
+    ASSERT_FALSE(anv_pair_equals(pair1, pair2, int_cmp, int_cmp));
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_second_different(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first1 = malloc(sizeof(int));
     int* second1 = malloc(sizeof(int));
@@ -107,51 +107,51 @@ int test_pair_compare_second_different(void)
     *first2 = 42;
     *second2 = 84;
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     // pair1 < pair2 (first elements equal, second element is smaller)
-    int result = dsc_pair_compare(pair1, pair2, int_cmp, int_cmp);
+    int result = anv_pair_compare(pair1, pair2, int_cmp, int_cmp);
     ASSERT_LT(result, 0);
 
     // Test equality function
-    ASSERT_FALSE(dsc_pair_equals(pair1, pair2, int_cmp, int_cmp));
+    ASSERT_FALSE(anv_pair_equals(pair1, pair2, int_cmp, int_cmp));
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_null_pairs(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first = malloc(sizeof(int));
     int* second = malloc(sizeof(int));
     *first = 42;
     *second = 84;
 
-    DSCPair* pair = dsc_pair_create(&alloc, first, second);
+    ANVPair* pair = anv_pair_create(&alloc, first, second);
 
     // Both NULL
-    ASSERT_EQ(dsc_pair_compare(NULL, NULL, int_cmp, int_cmp), 0);
-    ASSERT_TRUE(dsc_pair_equals(NULL, NULL, int_cmp, int_cmp));
+    ASSERT_EQ(anv_pair_compare(NULL, NULL, int_cmp, int_cmp), 0);
+    ASSERT_TRUE(anv_pair_equals(NULL, NULL, int_cmp, int_cmp));
 
     // First NULL
-    ASSERT_LT(dsc_pair_compare(NULL, pair, int_cmp, int_cmp), 0);
-    ASSERT_FALSE(dsc_pair_equals(NULL, pair, int_cmp, int_cmp));
+    ASSERT_LT(anv_pair_compare(NULL, pair, int_cmp, int_cmp), 0);
+    ASSERT_FALSE(anv_pair_equals(NULL, pair, int_cmp, int_cmp));
 
     // Second NULL
-    ASSERT_GT(dsc_pair_compare(pair, NULL, int_cmp, int_cmp), 0);
-    ASSERT_FALSE(dsc_pair_equals(pair, NULL, int_cmp, int_cmp));
+    ASSERT_GT(anv_pair_compare(pair, NULL, int_cmp, int_cmp), 0);
+    ASSERT_FALSE(anv_pair_equals(pair, NULL, int_cmp, int_cmp));
 
-    dsc_pair_destroy(pair, true, true);
+    anv_pair_destroy(pair, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_no_comparison_functions(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first1 = malloc(sizeof(int));
     int* second1 = malloc(sizeof(int));
@@ -162,30 +162,30 @@ int test_pair_compare_no_comparison_functions(void)
     *first2 = 42;
     *second2 = 84;
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     // Test without comparison functions (should use pointer comparison)
-    int result = dsc_pair_compare(pair1, pair2, NULL, NULL);
+    int result = anv_pair_compare(pair1, pair2, NULL, NULL);
     // Result depends on memory layout, just ensure it doesn't crash
     (void)result; // Suppress unused variable warning
 
     // Test with only first comparison function
-    result = dsc_pair_compare(pair1, pair2, int_cmp, NULL);
+    result = anv_pair_compare(pair1, pair2, int_cmp, NULL);
     (void)result;
 
     // Test with only second comparison function
-    result = dsc_pair_compare(pair1, pair2, NULL, int_cmp);
+    result = anv_pair_compare(pair1, pair2, NULL, int_cmp);
     (void)result;
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_with_strings(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
     char* str1 = malloc(10);
     char* str2 = malloc(10);
@@ -196,42 +196,42 @@ int test_pair_compare_with_strings(void)
     strcpy(str3, "apple");
     strcpy(str4, "cherry");
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, str1, str2);
-    DSCPair* pair2 = dsc_pair_create(&alloc, str3, str4);
+    ANVPair* pair1 = anv_pair_create(&alloc, str1, str2);
+    ANVPair* pair2 = anv_pair_create(&alloc, str3, str4);
 
     // pair1 < pair2 (first elements equal, but "banana" < "cherry")
-    int result = dsc_pair_compare(pair1, pair2, string_cmp, string_cmp);
+    int result = anv_pair_compare(pair1, pair2, string_cmp, string_cmp);
     ASSERT_LT(result, 0);
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_with_persons(void)
 {
-    DSCAllocator alloc = create_person_allocator();
+    ANVAllocator alloc = create_person_allocator();
 
     Person* p1 = create_person("Alice", 25);
     Person* p2 = create_person("Bob", 30);
     Person* p3 = create_person("Alice", 25);
     Person* p4 = create_person("Charlie", 35);
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, p1, p2);
-    DSCPair* pair2 = dsc_pair_create(&alloc, p3, p4);
+    ANVPair* pair1 = anv_pair_create(&alloc, p1, p2);
+    ANVPair* pair2 = anv_pair_create(&alloc, p3, p4);
 
     // pair1 < pair2 (Alice == Alice, but Bob < Charlie)
-    int result = dsc_pair_compare(pair1, pair2, person_cmp, person_cmp);
+    int result = anv_pair_compare(pair1, pair2, person_cmp, person_cmp);
     ASSERT_LT(result, 0);
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_mixed_types(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int* first1 = malloc(sizeof(int));
     int* first2 = malloc(sizeof(int));
@@ -242,21 +242,21 @@ int test_pair_compare_mixed_types(void)
     strcpy(second1, "apple");
     strcpy(second2, "banana");
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     // First elements equal (42 == 42), second elements different ("apple" < "banana")
-    int result = dsc_pair_compare(pair1, pair2, int_cmp, string_cmp);
+    int result = anv_pair_compare(pair1, pair2, int_cmp, string_cmp);
     ASSERT_LT(result, 0);
 
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 
 int test_pair_compare_mixed_types_with_copy(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     int original_first1 = 42;
     int original_first2 = 42;
@@ -269,8 +269,8 @@ int test_pair_compare_mixed_types_with_copy(void)
     char* second1 = string_copy_func(original_second1);
     char* second2 = string_copy_func(original_second2);
 
-    DSCPair* pair1 = dsc_pair_create(&alloc, first1, second1);
-    DSCPair* pair2 = dsc_pair_create(&alloc, first2, second2);
+    ANVPair* pair1 = anv_pair_create(&alloc, first1, second1);
+    ANVPair* pair2 = anv_pair_create(&alloc, first2, second2);
 
     ASSERT_NOT_NULL(pair1);
     ASSERT_NOT_NULL(pair2);
@@ -282,12 +282,12 @@ int test_pair_compare_mixed_types_with_copy(void)
     ASSERT_EQ(strcmp((char*)pair2->second, "banana"), 0);
 
     // First elements equal (42 == 42), second elements different ("apple" < "banana")
-    int result = dsc_pair_compare(pair1, pair2, int_cmp, string_cmp);
+    int result = anv_pair_compare(pair1, pair2, int_cmp, string_cmp);
     ASSERT_LT(result, 0);
 
     // Now we can safely free both elements since they were copied
-    dsc_pair_destroy(pair1, true, true);
-    dsc_pair_destroy(pair2, true, true);
+    anv_pair_destroy(pair1, true, true);
+    anv_pair_destroy(pair2, true, true);
     return TEST_SUCCESS;
 }
 

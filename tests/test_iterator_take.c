@@ -5,7 +5,7 @@
 // Tests cover basic iteration, edge cases, limit handling,
 // error handling, and composition with other iterators.
 
-#include "Iterator.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -20,7 +20,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -58,13 +58,13 @@ static int verify_values(const int* actual, const int* expected, const int count
 
 int test_take_basic_functionality(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Take first 5 elements
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 5);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 5);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     int values[10];
@@ -81,13 +81,13 @@ int test_take_basic_functionality(void)
 
 int test_take_zero_count(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Take 0 elements
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 0);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 0);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     // Should have no elements
@@ -100,13 +100,13 @@ int test_take_zero_count(void)
 
 int test_take_more_than_available(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator with only 3 elements
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
 
     // Try to take 10 elements (more than available)
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 10);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 10);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     int values[10];
@@ -123,13 +123,13 @@ int test_take_more_than_available(void)
 
 int test_take_single_element(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Take only 1 element
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 1);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 1);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     ASSERT_TRUE(take_it.has_next(&take_it));
@@ -153,13 +153,13 @@ int test_take_single_element(void)
 
 int test_take_empty_source(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create empty range iterator
-    DSCIterator range_it = dsc_iterator_range(1, 1, 1, &alloc);  // Empty range
+    ANVIterator range_it = anv_iterator_range(1, 1, 1, &alloc);  // Empty range
 
     // Try to take 5 elements from empty iterator
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 5);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 5);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     // Should have no elements
@@ -172,16 +172,16 @@ int test_take_empty_source(void)
 
 int test_take_invalid_parameters(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test with NULL iterator
-    const DSCIterator take_it1 = dsc_iterator_take(NULL, &alloc, 5);
+    const ANVIterator take_it1 = anv_iterator_take(NULL, &alloc, 5);
     ASSERT_FALSE(take_it1.is_valid(&take_it1));
 
     // Test with NULL allocator
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
-    const DSCIterator take_it2 = dsc_iterator_take(&range_it, NULL, 5);
+    const ANVIterator take_it2 = anv_iterator_take(&range_it, NULL, 5);
     ASSERT_FALSE(take_it2.is_valid(&take_it2));
 
     // Clean up the range iterator manually since take failed
@@ -192,13 +192,13 @@ int test_take_invalid_parameters(void)
 
 int test_take_large_count(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-5
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Take very large number of elements
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, SIZE_MAX);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, SIZE_MAX);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     int values[10];
@@ -219,14 +219,14 @@ int test_take_large_count(void)
 
 int test_take_with_filter(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-10, filter evens, then take 2
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
 
-    DSCIterator take_it = dsc_iterator_take(&filter_it, &alloc, 2);
+    ANVIterator take_it = anv_iterator_take(&filter_it, &alloc, 2);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     int values[10];
@@ -243,14 +243,14 @@ int test_take_with_filter(void)
 
 int test_take_chained(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-20, take 10, then take 3 from that
-    DSCIterator range_it = dsc_iterator_range(1, 21, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 21, 1, &alloc);
 
-    DSCIterator take_it1 = dsc_iterator_take(&range_it, &alloc, 10);
+    ANVIterator take_it1 = anv_iterator_take(&range_it, &alloc, 10);
 
-    DSCIterator take_it2 = dsc_iterator_take(&take_it1, &alloc, 3);
+    ANVIterator take_it2 = anv_iterator_take(&take_it1, &alloc, 3);
     ASSERT_TRUE(take_it2.is_valid(&take_it2));
 
     int values[10];
@@ -271,13 +271,13 @@ int test_take_chained(void)
 
 int test_take_iteration_state(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Take first 3 elements
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 3);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 3);
 
     // Test step-by-step iteration
     ASSERT_TRUE(take_it.has_next(&take_it));
@@ -312,13 +312,13 @@ int test_take_iteration_state(void)
 
 int test_take_unsupported_operations(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Take first 5 elements
-    DSCIterator take_it = dsc_iterator_take(&range_it, &alloc, 5);
+    ANVIterator take_it = anv_iterator_take(&range_it, &alloc, 5);
 
     // Test unsupported operations
     ASSERT_FALSE(take_it.has_prev(&take_it));

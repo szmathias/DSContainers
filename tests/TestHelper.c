@@ -273,22 +273,22 @@ void set_alloc_fail_countdown(const int count)
     alloc_fail_countdown = count;
 }
 
-DSCAllocator create_failing_int_allocator(void)
+ANVAllocator create_failing_int_allocator(void)
 {
-    return dsc_alloc_custom(failing_alloc, failing_free, failing_free, failing_int_copy);
+    return anv_alloc_custom(failing_alloc, failing_free, failing_free, failing_int_copy);
 }
 
-DSCAllocator create_int_allocator(void)
+ANVAllocator create_int_allocator(void)
 {
-    return dsc_alloc_custom(test_calloc, test_dealloc, int_free, int_copy);
+    return anv_alloc_custom(test_calloc, test_dealloc, int_free, int_copy);
 }
 
-DSCAllocator create_person_allocator(void)
+ANVAllocator create_person_allocator(void)
 {
-    return dsc_alloc_custom(test_calloc, test_dealloc, person_free, person_copy);
+    return anv_alloc_custom(test_calloc, test_dealloc, person_free, person_copy);
 }
 
-DSCAllocator create_string_allocator(void)
+ANVAllocator create_string_allocator(void)
 {
-    return dsc_alloc_custom(test_calloc, test_dealloc, free, string_copy);
+    return anv_alloc_custom(test_calloc, test_dealloc, free, string_copy);
 }

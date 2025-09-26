@@ -2,7 +2,7 @@
 // Created by zack on 9/3/25.
 //
 
-#include "DynamicString.h"
+#include "containers/DynamicString.h"
 #include "TestAssert.h"
 #include <stdlib.h>
 #include <time.h>
@@ -40,45 +40,45 @@ static void ensure_seeded(void)
     }
 }
 
-static void perform_random_operation(DSCString* str)
+static void perform_random_operation(ANVString* str)
 {
     const int op = fuzz_rand_range(8);
 
     switch (op)
     {
         case 0:                                                       // push_back
-            dsc_str_push_back(str, (char)(fuzz_rand_range(95) + 32)); // Printable ASCII
+            anv_str_push_back(str, (char)(fuzz_rand_range(95) + 32)); // Printable ASCII
             break;
         case 1: // pop_back
-            if (!dsc_str_empty(str))
+            if (!anv_str_empty(str))
             {
-                dsc_str_pop_back(str);
+                anv_str_pop_back(str);
             }
             break;
         case 2: // insert
-            if (dsc_str_size(str) > 0)
+            if (anv_str_size(str) > 0)
             {
-                dsc_str_insert_char(str, fuzz_rand_size(dsc_str_size(str)), 'X');
+                anv_str_insert_char(str, fuzz_rand_size(anv_str_size(str)), 'X');
             }
             break;
         case 3: // erase
-            if (dsc_str_size(str) > 0)
+            if (anv_str_size(str) > 0)
             {
-                dsc_str_erase(str, fuzz_rand_size(dsc_str_size(str)));
+                anv_str_erase(str, fuzz_rand_size(anv_str_size(str)));
             }
             break;
         case 4: // assign
-            dsc_str_assign_cstring(str, "fuzz");
+            anv_str_assign_cstring(str, "fuzz");
             break;
         case 5: // clear
-            dsc_str_clear(str);
+            anv_str_clear(str);
             break;
         case 6: // trim
-            dsc_str_trim_front(str);
-            dsc_str_trim_back(str);
+            anv_str_trim_front(str);
+            anv_str_trim_back(str);
             break;
         case 7: // reserve
-            dsc_str_reserve(str, (size_t)fuzz_rand_range(256));
+            anv_str_reserve(str, (size_t)fuzz_rand_range(256));
             break;
 
         default:
@@ -89,14 +89,14 @@ static void perform_random_operation(DSCString* str)
 int test_string_fuzz(void)
 {
     ensure_seeded();
-    DSCString str = dsc_str_create_empty(0);
+    ANVString str = anv_str_create_empty(0);
 
     for (int i = 0; i < NUM_FUZZ_OPERATIONS; ++i)
     {
         perform_random_operation(&str);
     }
 
-    dsc_str_destroy(&str);
+    anv_str_destroy(&str);
     printf("DString fuzz test completed %d operations without crashing.\n", NUM_FUZZ_OPERATIONS);
     return TEST_SUCCESS;
 }

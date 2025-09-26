@@ -5,7 +5,7 @@
 // Tests cover basic iteration, edge cases, bidirectional movement with zigzag compensation,
 // error handling, and API behavior separation.
 
-#include "Iterator.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -21,7 +21,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -62,8 +62,8 @@ static int verify_values(const int* actual, const int* expected, const int count
  */
 static int test_range_positive_step(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 5, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 5, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -87,8 +87,8 @@ static int test_range_positive_step(void)
  */
 static int test_range_negative_step(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(10, 5, -1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(10, 5, -1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -112,8 +112,8 @@ static int test_range_negative_step(void)
  */
 static int test_range_larger_step(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(2, 15, 3, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(2, 15, 3, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -133,8 +133,8 @@ static int test_range_larger_step(void)
  */
 static int test_range_negative_step_size(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(20, 5, -4, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(20, 5, -4, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -158,8 +158,8 @@ static int test_range_negative_step_size(void)
  */
 static int test_range_empty(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(5, 5, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(5, 5, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
     ASSERT_FALSE(it.has_next(&it));
@@ -174,8 +174,8 @@ static int test_range_empty(void)
  */
 static int test_single_element_range(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(7, 8, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(7, 8, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
     ASSERT_TRUE(it.has_next(&it));
@@ -197,10 +197,10 @@ static int test_single_element_range(void)
  */
 static int test_range_extreme_values(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test near INT_MAX
-    DSCIterator it1 = dsc_iterator_range(INT_MAX - 3, INT_MAX, 1, &alloc);
+    ANVIterator it1 = anv_iterator_range(INT_MAX - 3, INT_MAX, 1, &alloc);
     ASSERT_TRUE(it1.is_valid(&it1));
 
     const int expected_max[] = {INT_MAX - 3, INT_MAX - 2, INT_MAX - 1};
@@ -212,7 +212,7 @@ static int test_range_extreme_values(void)
     it1.destroy(&it1);
 
     // Test near INT_MIN
-    DSCIterator it2 = dsc_iterator_range(INT_MIN + 3, INT_MIN, -1, &alloc);
+    ANVIterator it2 = anv_iterator_range(INT_MIN + 3, INT_MIN, -1, &alloc);
     ASSERT_TRUE(it2.is_valid(&it2));
 
     const int expected_min[] = {INT_MIN + 3, INT_MIN + 2, INT_MIN + 1};
@@ -235,24 +235,24 @@ static int test_range_extreme_values(void)
  */
 static int test_range_invalid_step(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test zero step
-    DSCIterator it1 = dsc_iterator_range(0, 5, 0, &alloc);
+    ANVIterator it1 = anv_iterator_range(0, 5, 0, &alloc);
     ASSERT_FALSE(it1.is_valid(&it1));
     ASSERT_FALSE(it1.has_next(&it1));
     ASSERT_NULL(it1.get(&it1));
     it1.destroy(&it1);
 
     // Test conflicting direction: start < end with negative step
-    DSCIterator it2 = dsc_iterator_range(0, 10, -1, &alloc);
+    ANVIterator it2 = anv_iterator_range(0, 10, -1, &alloc);
     ASSERT_FALSE(it2.is_valid(&it2));
     ASSERT_FALSE(it2.has_next(&it2));
     ASSERT_NULL(it2.get(&it2));
     it2.destroy(&it2);
 
     // Test conflicting direction: start > end with positive step
-    DSCIterator it3 = dsc_iterator_range(10, 0, 1, &alloc);
+    ANVIterator it3 = anv_iterator_range(10, 0, 1, &alloc);
     ASSERT_FALSE(it3.is_valid(&it3));
     ASSERT_FALSE(it3.has_next(&it3));
     ASSERT_NULL(it3.get(&it3));
@@ -266,7 +266,7 @@ static int test_range_invalid_step(void)
  */
 static int test_invalid_allocator(void)
 {
-    DSCIterator it = dsc_iterator_range(0, 5, 1, NULL);
+    ANVIterator it = anv_iterator_range(0, 5, 1, NULL);
     ASSERT_FALSE(it.is_valid(&it));
     ASSERT_FALSE(it.has_next(&it));
     ASSERT_NULL(it.get(&it));
@@ -284,10 +284,10 @@ static int test_invalid_allocator(void)
  */
 static int test_range_stress(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
     const int SIZE = 10000;
 
-    DSCIterator it = dsc_iterator_range(0, SIZE, 1, &alloc);
+    ANVIterator it = anv_iterator_range(0, SIZE, 1, &alloc);
     ASSERT_TRUE(it.is_valid(&it));
 
     int count = 0;
@@ -320,8 +320,8 @@ static int test_range_stress(void)
  */
 static int test_range_reset(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 10, 2, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 10, 2, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -357,8 +357,8 @@ static int test_range_reset(void)
  */
 static int test_reset_after_bidirectional(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(10, 20, 3, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(10, 20, 3, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -391,8 +391,8 @@ static int test_reset_after_bidirectional(void)
  */
 static int test_zigzag_compensation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 10, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 10, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -433,8 +433,8 @@ static int test_zigzag_compensation(void)
  */
 static int test_bidirectional_boundaries(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 5, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 5, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -468,8 +468,8 @@ static int test_bidirectional_boundaries(void)
  */
 static int test_direction_change_compensation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(10, 20, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(10, 20, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -504,8 +504,8 @@ static int test_direction_change_compensation(void)
  */
 static int test_start_boundary_behavior(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 5, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 5, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -536,8 +536,8 @@ static int test_start_boundary_behavior(void)
  */
 static int test_get_next_separation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(5, 10, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(5, 10, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -565,8 +565,8 @@ static int test_get_next_separation(void)
  */
 static int test_next_return_codes(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 2, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 2, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -584,8 +584,8 @@ static int test_next_return_codes(void)
  */
 static int test_prev_return_codes(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 3, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 3, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -609,8 +609,8 @@ static int test_prev_return_codes(void)
  */
 static int test_memory_consistency(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(100, 105, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(100, 105, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -649,8 +649,8 @@ static int test_memory_consistency(void)
  */
 static int test_has_prev_at_start(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(10, 15, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(10, 15, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -678,8 +678,8 @@ static int test_has_prev_at_start(void)
  */
 static int test_has_next_at_end(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 3, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 3, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -706,8 +706,8 @@ static int test_has_next_at_end(void)
  */
 static int test_bidirectional_with_large_steps(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 20, 5, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 20, 5, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -745,8 +745,8 @@ static int test_bidirectional_with_large_steps(void)
  */
 static int test_negative_step_boundaries(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(10, 0, -2, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(10, 0, -2, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
     // Expected range: 10, 8, 6, 4, 2
@@ -787,8 +787,8 @@ static int test_negative_step_boundaries(void)
  */
 static int test_operations_on_invalid_iterator(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 5, 0, &alloc); // Invalid: zero step
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 5, 0, &alloc); // Invalid: zero step
 
     ASSERT_FALSE(it.is_valid(&it));
 
@@ -812,8 +812,8 @@ static int test_operations_on_invalid_iterator(void)
  */
 static int test_reset_after_boundary_errors(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 3, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 3, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -849,8 +849,8 @@ static int test_reset_after_boundary_errors(void)
  */
 static int test_concurrent_get_calls_during_movement(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(100, 104, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(100, 104, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 
@@ -886,8 +886,8 @@ static int test_concurrent_get_calls_during_movement(void)
  */
 static int test_single_step_boundaries(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(5, 8, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(5, 8, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
     // Range: 5, 6, 7
@@ -921,7 +921,7 @@ static int test_single_step_boundaries(void)
 /**
  * Enhanced helper function with better validation.
  */
-static int collect_values_with_validation(const DSCIterator* it, int* values, int max_count)
+static int collect_values_with_validation(const ANVIterator* it, int* values, int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -950,8 +950,8 @@ static int collect_values_with_validation(const DSCIterator* it, int* values, in
  */
 static int test_helper_function_validation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
-    DSCIterator it = dsc_iterator_range(0, 5, 1, &alloc);
+    const ANVAllocator alloc = create_int_allocator();
+    ANVIterator it = anv_iterator_range(0, 5, 1, &alloc);
 
     ASSERT_TRUE(it.is_valid(&it));
 

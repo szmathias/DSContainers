@@ -5,16 +5,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "HashMap.h"
-#include "Iterator.h"
+#include "containers/HashMap.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Test basic iterator functionality
 static int test_hashmap_iterator_basic(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3", "key4", "key5"};
     const char* values[] = {"val1", "val2", "val3", "val4", "val5"};
@@ -23,11 +23,11 @@ static int test_hashmap_iterator_basic(void)
     // Add test data
     for (int i = 0; i < num_items; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
+        ASSERT_EQ(anv_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
     }
 
     // Test iterator
-    DSCIterator it = dsc_hashmap_iterator(map);
+    ANVIterator it = anv_hashmap_iterator(map);
     ASSERT(it.is_valid(&it));
 
     int visited_count = 0;
@@ -35,7 +35,7 @@ static int test_hashmap_iterator_basic(void)
 
     while (it.has_next(&it))
     {
-        const DSCPair* pair = it.get(&it);
+        const ANVPair* pair = it.get(&it);
         ASSERT_NOT_NULL(pair);
         ASSERT_NOT_NULL(pair->first);
         ASSERT_NOT_NULL(pair->second);
@@ -68,17 +68,17 @@ static int test_hashmap_iterator_basic(void)
     ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty map
 static int test_hashmap_iterator_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    DSCIterator it = dsc_hashmap_iterator(map);
+    ANVIterator it = anv_hashmap_iterator(map);
 
     // Verify iterator for empty map
     ASSERT(!it.has_next(&it));
@@ -86,15 +86,15 @@ static int test_hashmap_iterator_empty(void)
     ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with modifications
 static int test_hashmap_iterator_with_modifications(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Insert initial elements
     const char* keys[] = {"key1", "key2", "key3"};
@@ -102,19 +102,19 @@ static int test_hashmap_iterator_with_modifications(void)
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
+        ASSERT_EQ(anv_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
     }
 
     // Create iterator
-    DSCIterator it = dsc_hashmap_iterator(map);
+    ANVIterator it = anv_hashmap_iterator(map);
 
     // Consume first element
-    const DSCPair* pair = it.get(&it);
+    const ANVPair* pair = it.get(&it);
     ASSERT_NOT_NULL(pair);
     it.next(&it);
 
     // Modify map by adding new element
-    ASSERT_EQ(dsc_hashmap_put(map, "new_key", "new_val"), 0);
+    ASSERT_EQ(anv_hashmap_put(map, "new_key", "new_val"), 0);
 
     // Continue iteration - new element should be visible
     int remaining_count = 0;
@@ -130,15 +130,15 @@ static int test_hashmap_iterator_with_modifications(void)
     ASSERT_GTE(remaining_count, 2);
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test multiple iterators
 static int test_hashmap_iterator_multiple(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Insert elements
     for (int i = 1; i <= 5; i++)
@@ -147,15 +147,15 @@ static int test_hashmap_iterator_multiple(void)
         char* value = malloc(16);
         snprintf(key, 16, "key%d", i);
         snprintf(value, 16, "val%d", i);
-        ASSERT_EQ(dsc_hashmap_put(map, key, value), 0);
+        ASSERT_EQ(anv_hashmap_put(map, key, value), 0);
     }
 
     // Create two independent iterators
-    DSCIterator it1 = dsc_hashmap_iterator(map);
-    DSCIterator it2 = dsc_hashmap_iterator(map);
+    ANVIterator it1 = anv_hashmap_iterator(map);
+    ANVIterator it2 = anv_hashmap_iterator(map);
 
     // First iterator consumes two elements
-    const DSCPair* pair1 = it1.get(&it1);
+    const ANVPair* pair1 = it1.get(&it1);
     ASSERT_NOT_NULL(pair1);
     it1.next(&it1);
 
@@ -164,7 +164,7 @@ static int test_hashmap_iterator_multiple(void)
     it1.next(&it1);
 
     // Second iterator should still be at the beginning
-    const DSCPair* pair2 = it2.get(&it2);
+    const ANVPair* pair2 = it2.get(&it2);
     ASSERT_NOT_NULL(pair2);
     it2.next(&it2);
 
@@ -190,31 +190,31 @@ static int test_hashmap_iterator_multiple(void)
 
     it1.destroy(&it1);
     it2.destroy(&it2);
-    dsc_hashmap_destroy(map, true, true);
+    anv_hashmap_destroy(map, true, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator get function
 static int test_hashmap_iterator_get(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "test_key";
     char* value = "test_value";
 
-    ASSERT_EQ(dsc_hashmap_put(map, key, value), 0);
+    ASSERT_EQ(anv_hashmap_put(map, key, value), 0);
 
-    DSCIterator it = dsc_hashmap_iterator(map);
+    ANVIterator it = anv_hashmap_iterator(map);
 
     // Test get without advancing
-    const DSCPair* pair = it.get(&it);
+    const ANVPair* pair = it.get(&it);
     ASSERT_NOT_NULL(pair);
     ASSERT_EQ_STR((char*)pair->first, key);
     ASSERT_EQ_STR((char*)pair->second, value);
 
     // Get again - should return same value
-    const DSCPair* pair2 = it.get(&it);
+    const ANVPair* pair2 = it.get(&it);
     ASSERT_EQ(pair, pair2); // Same pointer
 
     // Now advance
@@ -223,72 +223,72 @@ static int test_hashmap_iterator_get(void)
     ASSERT_NULL(it.get(&it));
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator backward operations (should not be supported)
 static int test_hashmap_iterator_backward(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    ASSERT_EQ(dsc_hashmap_put(map, "key", "value"), 0);
+    ASSERT_EQ(anv_hashmap_put(map, "key", "value"), 0);
 
-    DSCIterator it = dsc_hashmap_iterator(map);
+    ANVIterator it = anv_hashmap_iterator(map);
 
     // HashMap iterator should not support backward iteration
     ASSERT(!it.has_prev(&it));
     ASSERT_EQ(it.prev(&it), -1);
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test creating hashmap from iterator
 static int test_hashmap_from_iterator(void)
 {
-    DSCAllocator alloc = create_string_allocator();
-    alloc.copy_func = dsc_pair_copy_string_string;
+    ANVAllocator alloc = create_string_allocator();
+    alloc.copy = anv_pair_copy_string_string;
 
     // Create original hashmap
-    DSCHashMap* original = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashMap* original = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3"};
     const char* values[] = {"val1", "val2", "val3"};
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put(original, (void*)keys[i], (void*)values[i]), 0);
+        ASSERT_EQ(anv_hashmap_put(original, (void*)keys[i], (void*)values[i]), 0);
     }
 
     // Create iterator from original
-    DSCIterator it = dsc_hashmap_iterator(original);
+    ANVIterator it = anv_hashmap_iterator(original);
 
     // Create new hashmap from iterator
-    DSCHashMap* new_map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashMap* new_map = anv_hashmap_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(new_map);
-    ASSERT_EQ(dsc_hashmap_size(new_map), 3);
+    ASSERT_EQ(anv_hashmap_size(new_map), 3);
 
     // Verify all data was copied
     for (int i = 0; i < 3; i++)
     {
-        void* value = dsc_hashmap_get(new_map, keys[i]);
+        void* value = anv_hashmap_get(new_map, keys[i]);
         ASSERT_NOT_NULL(value);
         ASSERT_EQ_STR((char*)value, values[i]);
     }
 
     it.destroy(&it);
-    dsc_hashmap_destroy(original, false, false);
-    dsc_hashmap_destroy(new_map, true, true);
+    anv_hashmap_destroy(original, false, false);
+    anv_hashmap_destroy(new_map, true, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator with invalid hashmap
 static int test_hashmap_iterator_invalid(void)
 {
-    const DSCIterator iter = dsc_hashmap_iterator(NULL);
+    const ANVIterator iter = anv_hashmap_iterator(NULL);
     ASSERT(!iter.is_valid(&iter));
     return TEST_SUCCESS;
 }
@@ -296,11 +296,11 @@ static int test_hashmap_iterator_invalid(void)
 // Test copy isolation - verify that copied elements are independent
 static int test_hashmap_copy_isolation(void)
 {
-    DSCAllocator alloc = create_string_allocator();
-    alloc.copy_func = dsc_pair_copy_string_string;
+    ANVAllocator alloc = create_string_allocator();
+    alloc.copy = anv_pair_copy_string_string;
 
     // Create source hashmap
-    DSCHashMap* source_map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashMap* source_map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
     ASSERT_NOT_NULL(source_map);
 
     const char* keys[] = {"key1", "key2", "key3"};
@@ -308,93 +308,93 @@ static int test_hashmap_copy_isolation(void)
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put(source_map, (void*)keys[i], (void*)values[i]), 0);
+        ASSERT_EQ(anv_hashmap_put(source_map, (void*)keys[i], (void*)values[i]), 0);
     }
 
-    DSCIterator map_it = dsc_hashmap_iterator(source_map);
+    ANVIterator map_it = anv_hashmap_iterator(source_map);
     ASSERT(map_it.is_valid(&map_it));
 
     // Create hashmap with copying enabled
-    DSCHashMap* new_map = dsc_hashmap_from_iterator(&map_it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashMap* new_map = anv_hashmap_from_iterator(&map_it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(new_map);
-    ASSERT_EQ(dsc_hashmap_size(new_map), 3);
+    ASSERT_EQ(anv_hashmap_size(new_map), 3);
 
     // Verify all original values are preserved in new map
     for (int i = 0; i < 3; i++)
     {
-        void* value = dsc_hashmap_get(new_map, keys[i]);
+        void* value = anv_hashmap_get(new_map, keys[i]);
         ASSERT_NOT_NULL(value);
         ASSERT_EQ_STR((char*)value, values[i]);
     }
 
     map_it.destroy(&map_it);
-    dsc_hashmap_destroy(new_map, true, true);
-    dsc_hashmap_destroy(source_map, false, false);
+    anv_hashmap_destroy(new_map, true, true);
+    anv_hashmap_destroy(source_map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test that should_copy=true fails when allocator has no copy function
 static int test_hashmap_copy_function_required(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    alloc.copy_func = NULL;
+    ANVAllocator alloc = anv_alloc_default();
+    alloc.copy = NULL;
 
-    DSCHashMap* source = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    ASSERT_EQ(dsc_hashmap_put(source, "key", "value"), 0);
+    ANVHashMap* source = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
+    ASSERT_EQ(anv_hashmap_put(source, "key", "value"), 0);
 
-    DSCIterator it = dsc_hashmap_iterator(source);
+    ANVIterator it = anv_hashmap_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Should return NULL because should_copy=true but no copy function available
-    DSCHashMap* map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashMap* map = anv_hashmap_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NULL(map);
 
     it.destroy(&it);
-    dsc_hashmap_destroy(source, false, false);
+    anv_hashmap_destroy(source, false, false);
     return TEST_SUCCESS;
 }
 
 // Test that should_copy=false uses elements directly without copying
 static int test_hashmap_from_iterator_no_copy(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
     // Create source map with allocated strings
-    DSCHashMap* source = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashMap* source = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = malloc(16);
     char* value = malloc(16);
     strcpy(key, "test_key");
     strcpy(value, "test_value");
 
-    ASSERT_EQ(dsc_hashmap_put(source, key, value), 0);
+    ASSERT_EQ(anv_hashmap_put(source, key, value), 0);
 
-    DSCIterator it = dsc_hashmap_iterator(source);
+    ANVIterator it = anv_hashmap_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Create hashmap without copying (should_copy = false)
-    DSCHashMap* map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, false);
+    ANVHashMap* map = anv_hashmap_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, false);
     ASSERT_NOT_NULL(map);
-    ASSERT_EQ(dsc_hashmap_size(map), 1);
+    ASSERT_EQ(anv_hashmap_size(map), 1);
 
     // Verify value is correct
-    void* retrieved_value = dsc_hashmap_get(map, "test_key");
+    void* retrieved_value = anv_hashmap_get(map, "test_key");
     ASSERT_NOT_NULL(retrieved_value);
     ASSERT_EQ_STR((char*)retrieved_value, "test_value");
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, false, false);  // Don't free since we're sharing data
-    dsc_hashmap_destroy(source, true, true); // Free the original allocated data
+    anv_hashmap_destroy(map, false, false);  // Don't free since we're sharing data
+    anv_hashmap_destroy(source, true, true); // Free the original allocated data
     return TEST_SUCCESS;
 }
 
-// Test that iterator is exhausted after being consumed by dsc_hashmap_from_iterator
+// Test that iterator is exhausted after being consumed by anv_hashmap_from_iterator
 static int test_hashmap_iterator_exhaustion_after_creation(void)
 {
-    DSCAllocator alloc = create_string_allocator();
-    alloc.copy_func = dsc_pair_copy_string_string;
+    ANVAllocator alloc = create_string_allocator();
+    alloc.copy = anv_pair_copy_string_string;
 
-    DSCHashMap* source = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashMap* source = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     for (int i = 0; i < 5; i++)
     {
@@ -402,19 +402,19 @@ static int test_hashmap_iterator_exhaustion_after_creation(void)
         char* value = malloc(16);
         snprintf(key, 16, "key%d", i);
         snprintf(value, 16, "val%d", i);
-        ASSERT_EQ(dsc_hashmap_put(source, key, value), 0);
+        ASSERT_EQ(anv_hashmap_put(source, key, value), 0);
     }
 
-    DSCIterator it = dsc_hashmap_iterator(source);
+    ANVIterator it = anv_hashmap_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Verify iterator starts with elements
     ASSERT(it.has_next(&it));
 
     // Create hashmap from iterator (consumes all elements)
-    DSCHashMap* map = dsc_hashmap_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashMap* map = anv_hashmap_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(map);
-    ASSERT_EQ(dsc_hashmap_size(map), 5);
+    ASSERT_EQ(anv_hashmap_size(map), 5);
 
     // Iterator should now be exhausted
     ASSERT(!it.has_next(&it));
@@ -425,21 +425,21 @@ static int test_hashmap_iterator_exhaustion_after_creation(void)
     ASSERT(it.is_valid(&it));
 
     it.destroy(&it);
-    dsc_hashmap_destroy(map, true, true);
-    dsc_hashmap_destroy(source, true, true);
+    anv_hashmap_destroy(map, true, true);
+    anv_hashmap_destroy(source, true, true);
     return TEST_SUCCESS;
 }
 
 // Test next() return values for proper error handling
 static int test_hashmap_iterator_next_return_values(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add single element
-    ASSERT_EQ(dsc_hashmap_put(map, "key", "value"), 0);
+    ASSERT_EQ(anv_hashmap_put(map, "key", "value"), 0);
 
-    DSCIterator iter = dsc_hashmap_iterator(map);
+    ANVIterator iter = anv_hashmap_iterator(map);
     ASSERT(iter.is_valid(&iter));
 
     // Should successfully advance once
@@ -455,30 +455,30 @@ static int test_hashmap_iterator_next_return_values(void)
     ASSERT(!iter.has_next(&iter));   // Still no elements
 
     iter.destroy(&iter);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test various combinations of get/next/has_next calls for consistency
 static int test_hashmap_iterator_mixed_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add test data
     const char* keys[] = {"a", "b", "c"};
     const char* values[] = {"10", "20", "30"};
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
+        ASSERT_EQ(anv_hashmap_put(map, (void*)keys[i], (void*)values[i]), 0);
     }
 
-    DSCIterator iter = dsc_hashmap_iterator(map);
+    ANVIterator iter = anv_hashmap_iterator(map);
     ASSERT(iter.is_valid(&iter));
 
     // Multiple get() calls should return same pointer and same content
-    const DSCPair* pair1 = iter.get(&iter);
-    const DSCPair* pair2 = iter.get(&iter);
+    const ANVPair* pair1 = iter.get(&iter);
+    const ANVPair* pair2 = iter.get(&iter);
     ASSERT_NOT_NULL(pair1);
     ASSERT_NOT_NULL(pair2);
     ASSERT_EQ(pair1, pair2);                                 // Same pointer
@@ -498,7 +498,7 @@ static int test_hashmap_iterator_mixed_operations(void)
 
     // Advance and verify new position
     ASSERT_EQ(iter.next(&iter), 0);
-    const DSCPair* pair3 = iter.get(&iter);
+    const ANVPair* pair3 = iter.get(&iter);
     ASSERT_NOT_NULL(pair3);
 
     // Same pointer (cached), but different content after advancing
@@ -507,7 +507,7 @@ static int test_hashmap_iterator_mixed_operations(void)
            strcmp(first_value, (char*)pair3->second) != 0); // Different content
 
     // Verify get() consistency at new position
-    const DSCPair* pair4 = iter.get(&iter);
+    const ANVPair* pair4 = iter.get(&iter);
     ASSERT_EQ(pair3, pair4);                                 // Same pointer
     ASSERT_EQ_STR((char*)pair3->first, (char*)pair4->first);     // Same content
     ASSERT_EQ_STR((char*)pair3->second, (char*)pair4->second); // Same content
@@ -522,7 +522,7 @@ static int test_hashmap_iterator_mixed_operations(void)
 
     ASSERT_EQ(iter.next(&iter), 0);
 
-    const DSCPair* pair5 = iter.get(&iter);
+    const ANVPair* pair5 = iter.get(&iter);
     ASSERT_NOT_NULL(pair5);
 
     // Should be different from both previous positions
@@ -533,15 +533,15 @@ static int test_hashmap_iterator_mixed_operations(void)
            strcmp(second_value, pair5->second) != 0);
 
     iter.destroy(&iter);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 
 // Test reset functionality
 static int test_hashmap_iterator_reset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
     {
@@ -549,10 +549,10 @@ static int test_hashmap_iterator_reset(void)
         char* value = malloc(16);
         snprintf(key, 16, "key%d", i);
         snprintf(value, 16, "val%d", i);
-        ASSERT_EQ(dsc_hashmap_put(map, key, value), 0);
+        ASSERT_EQ(anv_hashmap_put(map, key, value), 0);
     }
 
-    DSCIterator iter = dsc_hashmap_iterator(map);
+    ANVIterator iter = anv_hashmap_iterator(map);
 
     // First iteration
     int first_count = 0;
@@ -576,24 +576,24 @@ static int test_hashmap_iterator_reset(void)
     ASSERT_EQ(second_count, 3);
 
     iter.destroy(&iter);
-    dsc_hashmap_destroy(map, true, true);
+    anv_hashmap_destroy(map, true, true);
     return TEST_SUCCESS;
 }
 
 // Test single element iterator behavior
 static int test_hashmap_iterator_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    ASSERT_EQ(dsc_hashmap_put(map, "single", "element"), 0);
+    ASSERT_EQ(anv_hashmap_put(map, "single", "element"), 0);
 
-    DSCIterator iter = dsc_hashmap_iterator(map);
+    ANVIterator iter = anv_hashmap_iterator(map);
 
     ASSERT(iter.has_next(&iter));
     ASSERT(!iter.has_prev(&iter)); // HashMap doesn't support backward iteration
 
-    const DSCPair* pair = iter.get(&iter);
+    const ANVPair* pair = iter.get(&iter);
     ASSERT_NOT_NULL(pair);
     ASSERT_EQ_STR((char*)pair->first, "single");
     ASSERT_EQ_STR((char*)pair->second, "element");
@@ -603,7 +603,7 @@ static int test_hashmap_iterator_single_element(void)
     ASSERT(!iter.has_prev(&iter)); // Still no backward support
 
     iter.destroy(&iter);
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
     return TEST_SUCCESS;
 }
 

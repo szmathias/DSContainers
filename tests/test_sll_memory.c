@@ -7,98 +7,98 @@
 #include <string.h>
 #include <time.h>
 
-#include "SinglyLinkedList.h"
+#include "containers/SinglyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Tests from test_sll.c that fit into memory/resource category
 int test_custom_allocator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
     *a = 42;
-    ASSERT_EQ(dsc_sll_push_back(list, a), 0);
+    ASSERT_EQ(anv_sll_push_back(list, a), 0);
     ASSERT_EQ(list->size, 1);
-    dsc_sll_destroy(list, true);
+    anv_sll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_clear(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_push_back(list, val);
+        anv_sll_push_back(list, val);
     }
     ASSERT_EQ(list->size, 5);
 
     // Clear the list
-    dsc_sll_clear(list, true);
+    anv_sll_clear(list, true);
 
     // Verify list state
     ASSERT_NULL(list->head);
     ASSERT_EQ(list->size, 0);
-    ASSERT_EQ(dsc_sll_is_empty(list), 1);
+    ASSERT_EQ(anv_sll_is_empty(list), 1);
 
     // Make sure we can still add elements after clearing
     int* val = malloc(sizeof(int));
     *val = 42;
-    ASSERT_EQ(dsc_sll_push_back(list, val), 0);
+    ASSERT_EQ(anv_sll_push_back(list, val), 0);
     ASSERT_EQ(list->size, 1);
 
-    dsc_sll_destroy(list, true);
+    anv_sll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_clear_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Clear an already empty list
-    dsc_sll_clear(list, true);
+    anv_sll_clear(list, true);
     ASSERT_NULL(list->head);
     ASSERT_EQ(list->size, 0);
 
-    dsc_sll_destroy(list, false);
+    anv_sll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 int test_clear_null(void)
 {
     // Calling clear on NULL shouldn't crash
-    dsc_sll_clear(NULL, true);
+    anv_sll_clear(NULL, true);
     return TEST_SUCCESS;
 }
 
 int test_copy_shallow(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i * 10;
-        dsc_sll_push_back(list, val);
+        anv_sll_push_back(list, val);
     }
 
     // Create shallow clone
-    DSCSinglyLinkedList* clone = dsc_sll_copy(list);
+    ANVSinglyLinkedList* clone = anv_sll_copy(list);
     ASSERT_NOT_NULL(clone);
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure
-    DSCSinglyLinkedNode* orig_node = list->head;
-    DSCSinglyLinkedNode* clone_node = clone->head;
+    ANVSinglyLinkedNode* orig_node = list->head;
+    ANVSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
         // Data pointers should be identical in shallow clone
@@ -116,32 +116,32 @@ int test_copy_shallow(void)
     ASSERT_EQ(*(int*)clone->head->data, 999);
 
     // Cleanup - free each int only once since they're shared
-    dsc_sll_destroy(list, true);
-    dsc_sll_destroy(clone, false);
+    anv_sll_destroy(list, true);
+    anv_sll_destroy(clone, false);
     return TEST_SUCCESS;
 }
 
 int test_copy_deep(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i * 10;
-        dsc_sll_push_back(list, val);
+        anv_sll_push_back(list, val);
     }
 
     // Create deep clone
-    DSCSinglyLinkedList* clone = dsc_sll_copy_deep(list, int_copy, true);
+    ANVSinglyLinkedList* clone = anv_sll_copy_deep(list, int_copy, true);
     ASSERT_NOT_NULL(clone);
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure and values
-    const DSCSinglyLinkedNode* orig_node = list->head;
-    const DSCSinglyLinkedNode* clone_node = clone->head;
+    const ANVSinglyLinkedNode* orig_node = list->head;
+    const ANVSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
         // Data pointers should be different in deep clone
@@ -159,33 +159,33 @@ int test_copy_deep(void)
     ASSERT_NOT_EQ(*(int*)clone->head->data, 999);
 
     // Cleanup - each list has its own data
-    dsc_sll_destroy(list, true);
-    dsc_sll_destroy(clone, true);
+    anv_sll_destroy(list, true);
+    anv_sll_destroy(clone, true);
     return TEST_SUCCESS;
 }
 
 int test_copy_complex_data(void)
 {
-    DSCAllocator alloc = create_person_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_person_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Add some people
     Person* p1 = create_person("Alice", 30);
     Person* p2 = create_person("Bob", 25);
     Person* p3 = create_person("Charlie", 40);
 
-    dsc_sll_push_back(list, p1);
-    dsc_sll_push_back(list, p2);
-    dsc_sll_push_back(list, p3);
+    anv_sll_push_back(list, p1);
+    anv_sll_push_back(list, p2);
+    anv_sll_push_back(list, p3);
 
     // Create deep clone
-    DSCSinglyLinkedList* clone = dsc_sll_copy_deep(list, person_copy, true);
+    ANVSinglyLinkedList* clone = anv_sll_copy_deep(list, person_copy, true);
     ASSERT_NOT_NULL(clone);
     ASSERT_EQ(clone->size, list->size);
 
     // Verify structure and values
-    const DSCSinglyLinkedNode* orig_node = list->head;
-    const DSCSinglyLinkedNode* clone_node = clone->head;
+    const ANVSinglyLinkedNode* orig_node = list->head;
+    const ANVSinglyLinkedNode* clone_node = clone->head;
     while (orig_node && clone_node)
     {
         Person* orig_person = orig_node->data;
@@ -208,129 +208,129 @@ int test_copy_complex_data(void)
     ASSERT_NOT_EQ(first_person->age, clone_first->age);
 
     // Cleanup
-    dsc_sll_destroy(list, true);
-    dsc_sll_destroy(clone, true);
+    anv_sll_destroy(list, true);
+    anv_sll_destroy(clone, true);
     return TEST_SUCCESS;
 }
 
 int test_copy_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
 
     // Clone empty list
-    DSCSinglyLinkedList* shallow_clone = dsc_sll_copy(list);
+    ANVSinglyLinkedList* shallow_clone = anv_sll_copy(list);
     ASSERT_NOT_NULL(shallow_clone);
     ASSERT_EQ(shallow_clone->size, 0);
     ASSERT_NULL(shallow_clone->head);
 
-    DSCSinglyLinkedList* deep_clone = dsc_sll_copy_deep(list, int_copy, true);
+    ANVSinglyLinkedList* deep_clone = anv_sll_copy_deep(list, int_copy, true);
     ASSERT_NOT_NULL(deep_clone);
     ASSERT_EQ(deep_clone->size, 0);
     ASSERT_NULL(deep_clone->head);
 
     // Cleanup
-    dsc_sll_destroy(list, false);
-    dsc_sll_destroy(shallow_clone, false);
-    dsc_sll_destroy(deep_clone, false);
+    anv_sll_destroy(list, false);
+    anv_sll_destroy(shallow_clone, false);
+    anv_sll_destroy(deep_clone, false);
     return TEST_SUCCESS;
 }
 
 int test_copy_null(void)
 {
     // Should handle NULL gracefully
-    ASSERT_NULL(dsc_sll_copy(NULL));
-    ASSERT_NULL(dsc_sll_copy_deep(NULL, int_copy, true));
+    ASSERT_NULL(anv_sll_copy(NULL));
+    ASSERT_NULL(anv_sll_copy_deep(NULL, int_copy, true));
 
     // Should require a valid copy function
-    DSCAllocator alloc = create_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
-    ASSERT_NULL(dsc_sll_copy_deep(list, NULL, false));
-    dsc_sll_destroy(list, false);
+    ANVAllocator alloc = create_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
+    ASSERT_NULL(anv_sll_copy_deep(list, NULL, false));
+    anv_sll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 int test_transform_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1); // Ensure normal allocation for setup
-    DSCAllocator alloc = create_failing_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_failing_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
     ASSERT_NOT_NULL(list);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_push_back(list, val);
+        anv_sll_push_back(list, val);
     }
 
     // Case 1: Fail on creation of the result list
     set_alloc_fail_countdown(0);
-    DSCSinglyLinkedList* mapped1 = dsc_sll_transform(list, double_value_failing, true);
+    ANVSinglyLinkedList* mapped1 = anv_sll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped1);
 
     // Case 2: Fail on data allocation inside the transform function
     // Allocations: 1=result list, FAIL on 2=data for first element
     set_alloc_fail_countdown(1);
-    DSCSinglyLinkedList* mapped2 = dsc_sll_transform(list, double_value_failing, true);
+    ANVSinglyLinkedList* mapped2 = anv_sll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped2); // sll_transform should handle this and clean up
 
     // Case 3: Fail on node allocation inside sll_insert_back
     // Allocations: 1=result list, 2=data for first element, FAIL on 3=node for first element
     set_alloc_fail_countdown(2);
-    DSCSinglyLinkedList* mapped3 = dsc_sll_transform(list, double_value_failing, true);
+    ANVSinglyLinkedList* mapped3 = anv_sll_transform(list, double_value_failing, true);
     ASSERT_NULL(mapped3);
 
-    dsc_sll_destroy(list, true);
+    anv_sll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_copy_deep_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAllocator alloc = create_failing_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_failing_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_push_back(list, val);
+        anv_sll_push_back(list, val);
     }
 
     // Case 1: Fail allocating the new list struct itself
     set_alloc_fail_countdown(0);
-    DSCSinglyLinkedList* clone1 = dsc_sll_copy_deep(list, failing_int_copy, true);
+    ANVSinglyLinkedList* clone1 = anv_sll_copy_deep(list, failing_int_copy, true);
     ASSERT_NULL(clone1);
 
     // Case 2: Fail allocating a node partway through
     set_alloc_fail_countdown(3); // 1=clone list, 2=data0, 3=node0, FAIL on data1
-    DSCSinglyLinkedList* clone2 = dsc_sll_copy_deep(list, failing_int_copy, true);
+    ANVSinglyLinkedList* clone2 = anv_sll_copy_deep(list, failing_int_copy, true);
     ASSERT_NULL(clone2);
 
     // Case 3: Fail allocating the *data* partway through
     set_alloc_fail_countdown(2); // 1=clone list, 2=data0, FAIL on node0
-    DSCSinglyLinkedList* clone3 = dsc_sll_copy_deep(list, failing_int_copy, true);
+    ANVSinglyLinkedList* clone3 = anv_sll_copy_deep(list, failing_int_copy, true);
     ASSERT_NULL(clone3);
 
     set_alloc_fail_countdown(-1); // Reset for cleanup
-    dsc_sll_destroy(list, true);
+    anv_sll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_insert_allocation_failure(void)
 {
     set_alloc_fail_countdown(-1);
-    DSCAllocator alloc = create_failing_int_allocator();
-    DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
+    ANVAllocator alloc = create_failing_int_allocator();
+    ANVSinglyLinkedList* list = anv_sll_create(&alloc);
     int* a = malloc(sizeof(int));
     *a = 1;
-    dsc_sll_push_back(list, a);
+    anv_sll_push_back(list, a);
     ASSERT_EQ(list->size, 1);
 
     // Set allocator to fail on the next allocation
     set_alloc_fail_countdown(0);
     int* b = malloc(sizeof(int));
     *b = 2;
-    ASSERT_EQ(dsc_sll_push_back(list, b), -1);
+    ASSERT_EQ(anv_sll_push_back(list, b), -1);
 
     // Verify list is unchanged
     ASSERT_EQ(list->size, 1);
@@ -338,7 +338,7 @@ int test_insert_allocation_failure(void)
     ASSERT_NULL(list->head->next);
 
     set_alloc_fail_countdown(-1);
-    dsc_sll_destroy(list, true);
+    anv_sll_destroy(list, true);
     free(b); // 'b' was never added to the list, so we must free it manually
     return TEST_SUCCESS;
 }

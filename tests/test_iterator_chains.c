@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -21,7 +21,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -56,9 +56,9 @@ static int verify_values(const int* actual, const int* expected, const int count
 /**
  * Helper function to create a test list with integers 1 through n.
  */
-static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
+static ANVDoublyLinkedList* create_test_list(ANVAllocator* alloc, const int n)
 {
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(alloc);
     if (!list)
         return NULL;
 
@@ -67,11 +67,11 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
         int* val = malloc(sizeof(int));
         if (!val)
         {
-            dsc_dll_destroy(list, true);
+            anv_dll_destroy(list, true);
             return NULL;
         }
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
     return list;
 }
@@ -85,14 +85,14 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
  */
 static int test_range_filter_even(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Chain with even filter
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
     // Expected: [1,2,3,4,5,6,7,8,9,10] → [2,4,6,8,10]
@@ -112,14 +112,14 @@ static int test_range_filter_even(void)
  */
 static int test_range_step_filter_div3(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [2, 5, 8, 11, 14, 17, 20]
-    DSCIterator range_it = dsc_iterator_range(2, 21, 3, &alloc);
+    ANVIterator range_it = anv_iterator_range(2, 21, 3, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Chain with divisible by 3 filter
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_divisible_by_3);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_divisible_by_3);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
     // Expected: [2,5,8,11,14,17,20] → [] (none divisible by 3)
@@ -135,13 +135,13 @@ static int test_range_step_filter_div3(void)
  */
 static int test_range_filter_greater_than_5(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8]
-    DSCIterator range_it = dsc_iterator_range(1, 9, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 9, 1, &alloc);
 
     // Chain with greater than 5 filter
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_greater_than_five);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_greater_than_five);
 
     // Expected: [1,2,3,4,5,6,7,8] → [6,7,8]
     const int expected[] = {6, 7, 8};
@@ -164,13 +164,13 @@ static int test_range_filter_greater_than_5(void)
  */
 static int test_range_transform_double(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5]
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Chain with double transform
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, double_value, true);
+    ANVIterator transform_it = anv_iterator_transform(&range_it, &alloc, double_value, true);
 
     // Expected: [1,2,3,4,5] → [2,4,6,8,10]
     const int expected[] = {2, 4, 6, 8, 10};
@@ -189,13 +189,13 @@ static int test_range_transform_double(void)
  */
 static int test_range_transform_square(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [2, 4, 6]
-    DSCIterator range_it = dsc_iterator_range(2, 7, 2, &alloc);
+    ANVIterator range_it = anv_iterator_range(2, 7, 2, &alloc);
 
     // Chain with square transform
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, square_func, true);
+    ANVIterator transform_it = anv_iterator_transform(&range_it, &alloc, square_func, true);
 
     // Expected: [2,4,6] → [4,16,36]
     const int expected[] = {4, 16, 36};
@@ -214,13 +214,13 @@ static int test_range_transform_square(void)
  */
 static int test_range_transform_add_ten(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4]
-    DSCIterator range_it = dsc_iterator_range(1, 5, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 5, 1, &alloc);
 
     // Chain with add_ten transform
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, add_ten_func, true);
+    ANVIterator transform_it = anv_iterator_transform(&range_it, &alloc, add_ten_func, true);
 
     // Expected: [1,2,3,4] → [11,12,13,14]
     const int expected[] = {11, 12, 13, 14};
@@ -243,16 +243,16 @@ static int test_range_transform_add_ten(void)
  */
 static int test_filter_transform_even_double(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 6);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 6);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: filter even → transform double
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, double_value, true);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, double_value, true);
 
     // Expected: [1,2,3,4,5,6] → [2,4,6] → [4,8,12]
     const int expected[] = {4, 8, 12};
@@ -263,7 +263,7 @@ static int test_filter_transform_even_double(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_transform_even_double"));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -272,15 +272,15 @@ static int test_filter_transform_even_double(void)
  */
 static int test_filter_transform_odd_square(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: filter odd → transform square
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_odd);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, square_func, true);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_odd);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, square_func, true);
 
     // Expected: [1,2,3,4,5] → [1,3,5] → [1,9,25]
     const int expected[] = {1, 9, 25};
@@ -291,7 +291,7 @@ static int test_filter_transform_odd_square(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_transform_odd_square"));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -300,30 +300,30 @@ static int test_filter_transform_odd_square(void)
  */
 static int test_filter_transform_no_matches(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create list with only odd numbers
     const int odd_values[] = {1, 3, 5, 7};
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     for (int i = 0; i < 4; i++)
     {
         int* val = malloc(sizeof(int));
         *val = odd_values[i];
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: filter even (no matches) → transform double
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, double_value, true);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, double_value, true);
 
     // Expected: [1,3,5,7] → [] → []
     ASSERT_FALSE(transform_it.has_next(&transform_it));
     ASSERT_NULL(transform_it.get(&transform_it));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -336,15 +336,15 @@ static int test_filter_transform_no_matches(void)
  */
 static int test_transform_filter_add_one_even(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: transform add_one → filter even
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_one, true);
-    DSCIterator filter_it = dsc_iterator_filter(&transform_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, add_one, true);
+    ANVIterator filter_it = anv_iterator_filter(&transform_it, &alloc, is_even);
 
     // Expected: [1,2,3,4,5] → [2,3,4,5,6] → [2,4,6]
     const int expected[] = {2, 4, 6};
@@ -355,7 +355,7 @@ static int test_transform_filter_add_one_even(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "transform_filter_add_one_even"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -364,15 +364,15 @@ static int test_transform_filter_add_one_even(void)
  */
 static int test_transform_filter_square_gt10(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: transform square → filter > 10
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, square_func, true);
-    DSCIterator filter_it = dsc_iterator_filter(&transform_it, &alloc, is_greater_than_10);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, square_func, true);
+    ANVIterator filter_it = anv_iterator_filter(&transform_it, &alloc, is_greater_than_10);
 
     // Expected: [1,2,3,4,5] → [1,4,9,16,25] → [16,25]
     const int expected[] = {16, 25};
@@ -383,7 +383,7 @@ static int test_transform_filter_square_gt10(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "transform_filter_square_gt10"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -392,15 +392,15 @@ static int test_transform_filter_square_gt10(void)
  */
 static int test_transform_filter_multiply3_div6(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 4);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 4);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: transform multiply by 3 → filter divisible by 6
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, multiply_by_three, true);
-    DSCIterator filter_it = dsc_iterator_filter(&transform_it, &alloc, is_divisible_by_six);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, multiply_by_three, true);
+    ANVIterator filter_it = anv_iterator_filter(&transform_it, &alloc, is_divisible_by_six);
 
     // Expected: [1,2,3,4] → [3,6,9,12] → [6,12]
     const int expected[] = {6, 12};
@@ -411,7 +411,7 @@ static int test_transform_filter_multiply3_div6(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "transform_filter_multiply3_div6"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -424,14 +424,14 @@ static int test_transform_filter_multiply3_div6(void)
  */
 static int test_range_filter_transform_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Chain: range → filter even → transform square
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, square_func, true);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, square_func, true);
 
     // Expected: [1,2,3,4,5,6,7,8,9,10] → [2,4,6,8,10] → [4,16,36,64,100]
     const int expected[] = {4, 16, 36, 64, 100};
@@ -450,14 +450,14 @@ static int test_range_filter_transform_chain(void)
  */
 static int test_range_transform_filter_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8]
-    DSCIterator range_it = dsc_iterator_range(1, 9, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 9, 1, &alloc);
 
     // Chain: range → transform add_ten → filter divisible by 3
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, add_ten_func, true);
-    DSCIterator filter_it = dsc_iterator_filter(&transform_it, &alloc, is_divisible_by_3);
+    ANVIterator transform_it = anv_iterator_transform(&range_it, &alloc, add_ten_func, true);
+    ANVIterator filter_it = anv_iterator_filter(&transform_it, &alloc, is_divisible_by_3);
 
     // Expected: [1,2,3,4,5,6,7,8] → [11,12,13,14,15,16,17,18] → [12,15,18]
     const int expected[] = {12, 15, 18};
@@ -476,15 +476,15 @@ static int test_range_transform_filter_chain(void)
  */
 static int test_range_filter_transform_filter_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Chain: range → filter odd → transform square → filter > 20
-    DSCIterator filter_odd = dsc_iterator_filter(&range_it, &alloc, is_odd);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_odd, &alloc, square_func, true);
-    DSCIterator filter_gt20 = dsc_iterator_filter(&transform_it, &alloc, is_greater_than_20);
+    ANVIterator filter_odd = anv_iterator_filter(&range_it, &alloc, is_odd);
+    ANVIterator transform_it = anv_iterator_transform(&filter_odd, &alloc, square_func, true);
+    ANVIterator filter_gt20 = anv_iterator_filter(&transform_it, &alloc, is_greater_than_20);
 
     // Expected: [1,2,3,4,5,6,7,8,9,10] → [1,3,5,7,9] → [1,9,25,49,81] → [25,49,81]
     const int expected[] = {25, 49, 81};
@@ -503,15 +503,15 @@ static int test_range_filter_transform_filter_chain(void)
  */
 static int test_range_transform_transform_filter_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4]
-    DSCIterator range_it = dsc_iterator_range(1, 5, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 5, 1, &alloc);
 
     // Chain: range → transform double → transform add_five → filter > 10
-    DSCIterator transform_double = dsc_iterator_transform(&range_it, &alloc, double_value, true);
-    DSCIterator transform_add5 = dsc_iterator_transform(&transform_double, &alloc, add_five, true);
-    DSCIterator filter_gt10 = dsc_iterator_filter(&transform_add5, &alloc, is_greater_than_10);
+    ANVIterator transform_double = anv_iterator_transform(&range_it, &alloc, double_value, true);
+    ANVIterator transform_add5 = anv_iterator_transform(&transform_double, &alloc, add_five, true);
+    ANVIterator filter_gt10 = anv_iterator_filter(&transform_add5, &alloc, is_greater_than_10);
 
     // Expected: [1,2,3,4] → [2,4,6,8] → [7,9,11,13] → [11,13]
     const int expected[] = {11, 13};
@@ -530,16 +530,16 @@ static int test_range_transform_transform_filter_chain(void)
  */
 static int test_deep_nested_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    DSCIterator range_it = dsc_iterator_range(1, 13, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 13, 1, &alloc);
 
     // Chain: range → filter even → transform add_one → filter divisible by 3 → transform square
-    DSCIterator filter_even = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_add1 = dsc_iterator_transform(&filter_even, &alloc, add_one, true);
-    DSCIterator filter_div3 = dsc_iterator_filter(&transform_add1, &alloc, is_divisible_by_3);
-    DSCIterator transform_square = dsc_iterator_transform(&filter_div3, &alloc, square_func, true);
+    ANVIterator filter_even = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_add1 = anv_iterator_transform(&filter_even, &alloc, add_one, true);
+    ANVIterator filter_div3 = anv_iterator_filter(&transform_add1, &alloc, is_divisible_by_3);
+    ANVIterator transform_square = anv_iterator_transform(&filter_div3, &alloc, square_func, true);
 
     // Expected: [1..12] → [2,4,6,8,10,12] → [3,5,7,9,11,13] → [3,9] → [9,81]
     const int expected[] = {9, 81};
@@ -562,14 +562,14 @@ static int test_deep_nested_chain(void)
  */
 static int test_empty_chain_propagation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range with only odd numbers, then filter for even
-    DSCIterator range_it = dsc_iterator_range(1, 10, 2, &alloc); // [1,3,5,7,9]
+    ANVIterator range_it = anv_iterator_range(1, 10, 2, &alloc); // [1,3,5,7,9]
 
     // Chain: range (odd) → filter even → transform double
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, double_value, true);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, double_value, true);
 
     // Expected: [1,3,5,7,9] → [] → []
     ASSERT_FALSE(transform_it.has_next(&transform_it));
@@ -585,14 +585,14 @@ static int test_empty_chain_propagation(void)
  */
 static int test_single_element_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range with single element
-    DSCIterator range_it = dsc_iterator_range(4, 5, 1, &alloc); // [4]
+    ANVIterator range_it = anv_iterator_range(4, 5, 1, &alloc); // [4]
 
     // Chain: range → filter even → transform square
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, square_func, true);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, square_func, true);
 
     // Expected: [4] → [4] → [16]
     ASSERT_TRUE(transform_it.has_next(&transform_it));
@@ -613,14 +613,14 @@ static int test_single_element_chain(void)
  */
 static int test_chain_invalid_intermediate(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [100, 200, 300]
-    DSCIterator range_it = dsc_iterator_range(100, 301, 100, &alloc);
+    ANVIterator range_it = anv_iterator_range(100, 301, 100, &alloc);
 
     // Chain: range → filter (impossible condition) → transform
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_odd); // None match (all are even)
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, double_value, true);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_odd); // None match (all are even)
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, double_value, true);
 
     // Should have no elements
     ASSERT_FALSE(transform_it.has_next(&transform_it));
@@ -639,17 +639,17 @@ static int test_chain_invalid_intermediate(void)
  */
 static int test_list_complex_chain(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 10);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator from list
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: list → filter even → transform square → filter > 20
-    DSCIterator filter_even = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator transform_square = dsc_iterator_transform(&filter_even, &alloc, square_func, true);
-    DSCIterator filter_gt20 = dsc_iterator_filter(&transform_square, &alloc, is_greater_than_20);
+    ANVIterator filter_even = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator transform_square = anv_iterator_transform(&filter_even, &alloc, square_func, true);
+    ANVIterator filter_gt20 = anv_iterator_filter(&transform_square, &alloc, is_greater_than_20);
 
     // Expected: [1,2,3,4,5,6,7,8,9,10] → [2,4,6,8,10] → [4,16,36,64,100] → [36,64,100]
     const int expected[] = {36, 64, 100};
@@ -660,7 +660,7 @@ static int test_list_complex_chain(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "list_complex_chain"));
 
     filter_gt20.destroy(&filter_gt20);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -669,16 +669,16 @@ static int test_list_complex_chain(void)
  */
 static int test_list_multiple_filters(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 30);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 30);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: list → filter even → filter divisible by 3 → filter > 10
-    DSCIterator filter_even = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator filter_div3 = dsc_iterator_filter(&filter_even, &alloc, is_divisible_by_3);
-    DSCIterator filter_gt10 = dsc_iterator_filter(&filter_div3, &alloc, is_greater_than_10);
+    ANVIterator filter_even = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_div3 = anv_iterator_filter(&filter_even, &alloc, is_divisible_by_3);
+    ANVIterator filter_gt10 = anv_iterator_filter(&filter_div3, &alloc, is_greater_than_10);
 
     // Expected: numbers divisible by 6 and > 10: [12,18,24,30]
     const int expected[] = {12, 18, 24, 30};
@@ -689,7 +689,7 @@ static int test_list_multiple_filters(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "list_multiple_filters"));
 
     filter_gt10.destroy(&filter_gt10);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -698,16 +698,16 @@ static int test_list_multiple_filters(void)
  */
 static int test_list_multiple_transforms(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain: list → transform double → transform add_one → transform multiply_by_three
-    DSCIterator transform_double = dsc_iterator_transform(&base_it, &alloc, double_value, true);
-    DSCIterator transform_add1 = dsc_iterator_transform(&transform_double, &alloc, add_one, true);
-    DSCIterator transform_mult3 = dsc_iterator_transform(&transform_add1, &alloc, multiply_by_three, true);
+    ANVIterator transform_double = anv_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator transform_add1 = anv_iterator_transform(&transform_double, &alloc, add_one, true);
+    ANVIterator transform_mult3 = anv_iterator_transform(&transform_add1, &alloc, multiply_by_three, true);
 
     // Expected: [1,2,3] → [2,4,6] → [3,5,7] → [9,15,21]
     const int expected[] = {9, 15, 21};
@@ -718,7 +718,7 @@ static int test_list_multiple_transforms(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "list_multiple_transforms"));
 
     transform_mult3.destroy(&transform_mult3);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -731,13 +731,13 @@ static int test_list_multiple_transforms(void)
  */
 static int test_chain_memory_consistency(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, multiply_by_three, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, multiply_by_three, true);
 
     // Get multiple references to the same value
     const int* ptr1 = transform_it.get(&transform_it);
@@ -759,7 +759,7 @@ static int test_chain_memory_consistency(void)
     ASSERT_NOT_EQ(first_value, *ptr3);
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -768,12 +768,12 @@ static int test_chain_memory_consistency(void)
  */
 static int test_chain_ownership_cleanup(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create a chain of iterators
-    DSCIterator range_it = dsc_iterator_range(1, 5, 1, &alloc);
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, double_value, true);
+    ANVIterator range_it = anv_iterator_range(1, 5, 1, &alloc);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, double_value, true);
 
     // Verify chain works
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
@@ -793,16 +793,16 @@ static int test_chain_ownership_cleanup(void)
  */
 static int test_chain_performance(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create a moderately large range
-    DSCIterator range_it = dsc_iterator_range(1, 1001, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 1001, 1, &alloc);
 
     // Create a complex chain that actually filters significantly
-    DSCIterator filter_even = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_double = dsc_iterator_transform(&filter_even, &alloc, double_value, true);
-    DSCIterator filter_div6 = dsc_iterator_filter(&transform_double, &alloc, is_divisible_by_six);
-    DSCIterator transform_add5 = dsc_iterator_transform(&filter_div6, &alloc, add_five, true);
+    ANVIterator filter_even = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_double = anv_iterator_transform(&filter_even, &alloc, double_value, true);
+    ANVIterator filter_div6 = anv_iterator_filter(&transform_double, &alloc, is_divisible_by_six);
+    ANVIterator transform_add5 = anv_iterator_transform(&filter_div6, &alloc, add_five, true);
 
     // Count all results to verify chain works efficiently
     int count = 0;
@@ -835,7 +835,7 @@ static int test_chain_performance(void)
 /**
  * Enhanced helper function with better validation for chains.
  */
-static int collect_values_with_validation(const DSCIterator* it, int* values, int max_count)
+static int collect_values_with_validation(const ANVIterator* it, int* values, int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -875,11 +875,11 @@ static int collect_values_with_validation(const DSCIterator* it, int* values, in
  */
 static int test_chain_helper_validation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create a simple chain
-    DSCIterator range_it = dsc_iterator_range(1, 7, 1, &alloc);
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator range_it = anv_iterator_range(1, 7, 1, &alloc);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
 
     int values[3];
     const int count = collect_values_with_validation(&filter_it, values, 3);

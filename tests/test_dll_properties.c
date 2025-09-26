@@ -4,82 +4,82 @@
 
 #include <stdlib.h>
 
-#include "DoublyLinkedList.h"
+#include "containers/DoublyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Property: The size of the list should be consistent after a series of insertions and removals.
-int test_dsc_dll_size_after_insert_and_remove(void)
+int test_anv_dll_size_after_insert_and_remove(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
-    ASSERT_EQ(dsc_dll_size(list), 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
+    ASSERT_EQ(anv_dll_size(list), 0);
 
     int* a = malloc(sizeof(int));
     *a = 1;
-    dsc_dll_push_back(list, a);
-    ASSERT_EQ(dsc_dll_size(list), 1);
+    anv_dll_push_back(list, a);
+    ASSERT_EQ(anv_dll_size(list), 1);
 
     int* b = malloc(sizeof(int));
     *b = 2;
-    dsc_dll_push_front(list, b);
-    ASSERT_EQ(dsc_dll_size(list), 2);
+    anv_dll_push_front(list, b);
+    ASSERT_EQ(anv_dll_size(list), 2);
 
-    dsc_dll_remove_at(list, 0, true);
-    ASSERT_EQ(dsc_dll_size(list), 1);
+    anv_dll_remove_at(list, 0, true);
+    ASSERT_EQ(anv_dll_size(list), 1);
 
-    dsc_dll_pop_back(list, true);
-    ASSERT_EQ(dsc_dll_size(list), 0);
+    anv_dll_pop_back(list, true);
+    ASSERT_EQ(anv_dll_size(list), 0);
 
-    dsc_dll_destroy(list, false);
+    anv_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 // Property: Sorting an already sorted list should not change it.
-int test_dsc_dll_sort_is_idempotent(void)
+int test_anv_dll_sort_is_idempotent(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    dsc_dll_sort(list, int_cmp); // First sort
-    DSCDoublyLinkedList* copy = dsc_dll_copy_deep(list, true);
+    anv_dll_sort(list, int_cmp); // First sort
+    ANVDoublyLinkedList* copy = anv_dll_copy_deep(list, true);
 
-    dsc_dll_sort(list, int_cmp); // Second sort
+    anv_dll_sort(list, int_cmp); // Second sort
 
-    ASSERT_EQ(dsc_dll_equals(list, copy, int_cmp), 1);
+    ASSERT_EQ(anv_dll_equals(list, copy, int_cmp), 1);
 
-    dsc_dll_destroy(list, true);
-    dsc_dll_destroy(copy, true);
+    anv_dll_destroy(list, true);
+    anv_dll_destroy(copy, true);
     return TEST_SUCCESS;
 }
 
 // Property: Reversing a list twice should return it to its original state.
-int test_dsc_dll_reverse_is_involution(void)
+int test_anv_dll_reverse_is_involution(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    DSCDoublyLinkedList* copy = dsc_dll_copy_deep(list, true);
+    ANVDoublyLinkedList* copy = anv_dll_copy_deep(list, true);
 
-    dsc_dll_reverse(list);
-    dsc_dll_reverse(list);
+    anv_dll_reverse(list);
+    anv_dll_reverse(list);
 
-    ASSERT_EQ(dsc_dll_equals(list, copy, int_cmp), 1);
+    ASSERT_EQ(anv_dll_equals(list, copy, int_cmp), 1);
 
-    dsc_dll_destroy(list, true);
-    dsc_dll_destroy(copy, true);
+    anv_dll_destroy(list, true);
+    anv_dll_destroy(copy, true);
     return TEST_SUCCESS;
 }
 
@@ -90,9 +90,9 @@ typedef struct
 } TestCase;
 
 TestCase tests[] = {
-    {test_dsc_dll_size_after_insert_and_remove, "test_dsc_dll_size_after_insert_and_remove"},
-    {test_dsc_dll_sort_is_idempotent, "test_dsc_dll_sort_is_idempotent"},
-    {test_dsc_dll_reverse_is_involution, "test_dsc_dll_reverse_is_involution"},
+    {test_anv_dll_size_after_insert_and_remove, "test_anv_dll_size_after_insert_and_remove"},
+    {test_anv_dll_sort_is_idempotent, "test_anv_dll_sort_is_idempotent"},
+    {test_anv_dll_reverse_is_involution, "test_anv_dll_reverse_is_involution"},
 };
 
 int main(void)

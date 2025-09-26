@@ -2,12 +2,12 @@
 // Created by zack on 9/4/25.
 //
 
-#include "DynamicString.h"
+#include "containers/DynamicString.h"
 #include "TestAssert.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef DSCONTAINERS_PLATFORM_WINDOWS
+#ifdef ANVIL_PLATFORM_WINDOWS
 #include <io.h>
 #include <process.h>
 #else
@@ -17,56 +17,56 @@
 // Property: The size of a string should never exceed its capacity.
 int test_string_size_and_capacity(void)
 {
-    DSCString str = dsc_str_create_empty(0);
-    ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
+    ANVString str = anv_str_create_empty(0);
+    ASSERT_GTE(anv_str_capacity(&str), anv_str_size(&str));
 
-    dsc_str_assign_cstring(&str, "hello");
-    ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
+    anv_str_assign_cstring(&str, "hello");
+    ASSERT_GTE(anv_str_capacity(&str), anv_str_size(&str));
 
     for (int i = 0; i < 100; ++i)
     {
-        dsc_str_push_back(&str, 'a');
-        ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
+        anv_str_push_back(&str, 'a');
+        ASSERT_GTE(anv_str_capacity(&str), anv_str_size(&str));
     }
 
-    dsc_str_shrink_to_fit(&str);
-    ASSERT_GTE(dsc_str_capacity(&str), dsc_str_size(&str));
+    anv_str_shrink_to_fit(&str);
+    ASSERT_GTE(anv_str_capacity(&str), anv_str_size(&str));
 
-    dsc_str_destroy(&str);
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 // Property: Trimming an already-trimmed string should not change it.
 int test_string_idempotent_trim(void)
 {
-    DSCString str = dsc_str_create_from_cstring("no whitespace");
-    DSCString copy = dsc_str_create_from_string(&str);
+    ANVString str = anv_str_create_from_cstring("no whitespace");
+    ANVString copy = anv_str_create_from_string(&str);
 
-    dsc_str_trim_front(&str);
-    dsc_str_trim_back(&str);
+    anv_str_trim_front(&str);
+    anv_str_trim_back(&str);
 
     ASSERT_EQ_DSTRING(&str, &copy);
 
-    dsc_str_destroy(&str);
-    dsc_str_destroy(&copy);
+    anv_str_destroy(&str);
+    anv_str_destroy(&copy);
     return TEST_SUCCESS;
 }
 
 // Property: Converting to lower than upper case should be the same as just converting to upper case.
 int test_string_case_conversion_reversibility(void)
 {
-    DSCString str1 = dsc_str_create_from_cstring("MiXeD cAsE 123!");
-    DSCString str2 = dsc_str_create_from_string(&str1);
+    ANVString str1 = anv_str_create_from_cstring("MiXeD cAsE 123!");
+    ANVString str2 = anv_str_create_from_string(&str1);
 
-    dsc_str_to_lower(&str1);
-    dsc_str_to_upper(&str1);
+    anv_str_to_lower(&str1);
+    anv_str_to_upper(&str1);
 
-    dsc_str_to_upper(&str2);
+    anv_str_to_upper(&str2);
 
     ASSERT_EQ_DSTRING(&str1, &str2);
 
-    dsc_str_destroy(&str1);
-    dsc_str_destroy(&str2);
+    anv_str_destroy(&str1);
+    anv_str_destroy(&str2);
     return TEST_SUCCESS;
 }
 

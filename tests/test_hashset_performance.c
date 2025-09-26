@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "HashSet.h"
+#include "containers/HashSet.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -17,8 +17,8 @@
 // Test performance of add operations
 int test_hashset_add_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     const clock_t start = clock();
 
@@ -27,24 +27,24 @@ int test_hashset_add_performance(void)
     {
         char* key = malloc(32);
         sprintf(key, "key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+        ASSERT_EQ(anv_hashset_add(set, key), 0);
     }
 
     const clock_t end = clock();
     const double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("Added %d elements in %f seconds\n", LARGE_SET_SIZE, time_taken);
-    ASSERT_EQ(dsc_hashset_size(set), LARGE_SET_SIZE);
+    ASSERT_EQ(anv_hashset_size(set), LARGE_SET_SIZE);
 
-    dsc_hashset_destroy(set, true);
+    anv_hashset_destroy(set, true);
     return TEST_SUCCESS;
 }
 
 // Test performance of contains operations
 int test_hashset_contains_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add elements
     char** keys = malloc(MEDIUM_SET_SIZE * sizeof(char*));
@@ -52,7 +52,7 @@ int test_hashset_contains_performance(void)
     {
         keys[i] = malloc(32);
         sprintf(keys[i], "key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(set, keys[i]), 0);
     }
 
     const clock_t start = clock();
@@ -63,7 +63,7 @@ int test_hashset_contains_performance(void)
     {
         for (int i = 0; i < MEDIUM_SET_SIZE; i++)
         {
-            if (dsc_hashset_contains(set, keys[i]))
+            if (anv_hashset_contains(set, keys[i]))
             {
                 found_count++;
             }
@@ -76,7 +76,7 @@ int test_hashset_contains_performance(void)
     printf("Performed %d lookups in %f seconds\n", found_count, time_taken);
     ASSERT_EQ(found_count, MEDIUM_SET_SIZE * 10);
 
-    dsc_hashset_destroy(set, true);
+    anv_hashset_destroy(set, true);
     free(keys);
     return TEST_SUCCESS;
 }
@@ -84,8 +84,8 @@ int test_hashset_contains_performance(void)
 // Test performance of remove operations
 int test_hashset_remove_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add elements
     char** keys = malloc(MEDIUM_SET_SIZE * sizeof(char*));
@@ -93,7 +93,7 @@ int test_hashset_remove_performance(void)
     {
         keys[i] = malloc(32);
         sprintf(keys[i], "key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(set, keys[i]), 0);
     }
 
     const clock_t start = clock();
@@ -101,27 +101,27 @@ int test_hashset_remove_performance(void)
     // Remove all elements
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
-        ASSERT_EQ(dsc_hashset_remove(set, keys[i], true), 0);
+        ASSERT_EQ(anv_hashset_remove(set, keys[i], true), 0);
     }
 
     const clock_t end = clock();
     const double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("Removed %d elements in %f seconds\n", MEDIUM_SET_SIZE, time_taken);
-    ASSERT_EQ(dsc_hashset_size(set), 0);
+    ASSERT_EQ(anv_hashset_size(set), 0);
 
     free(keys);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test performance of set operations
 int test_hashset_set_operations_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
-    DSCHashSet* set1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* set2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* set1 = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
+    ANVHashSet* set2 = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add elements to both sets with some overlap
     for (int i = 0; i < SMALL_SET_SIZE; i++)
@@ -131,8 +131,8 @@ int test_hashset_set_operations_performance(void)
         sprintf(key1, "set1_key_%d", i);
         sprintf(key2, "set2_key_%d", i);
 
-        ASSERT_EQ(dsc_hashset_add(set1, key1), 0);
-        ASSERT_EQ(dsc_hashset_add(set2, key2), 0);
+        ASSERT_EQ(anv_hashset_add(set1, key1), 0);
+        ASSERT_EQ(anv_hashset_add(set2, key2), 0);
 
         // Add some overlapping elements
         if (i % 3 == 0)
@@ -141,17 +141,17 @@ int test_hashset_set_operations_performance(void)
             char* common_key2 = malloc(32);
             sprintf(common_key1, "common_key_%d", i);
             sprintf(common_key2, "common_key_%d", i);
-            ASSERT_EQ(dsc_hashset_add(set1, common_key1), 0);
-            ASSERT_EQ(dsc_hashset_add(set2, common_key2), 0);
+            ASSERT_EQ(anv_hashset_add(set1, common_key1), 0);
+            ASSERT_EQ(anv_hashset_add(set2, common_key2), 0);
         }
     }
 
     const clock_t start = clock();
 
     // Perform set operations
-    DSCHashSet* union_set = dsc_hashset_union(set1, set2);
-    DSCHashSet* intersection_set = dsc_hashset_intersection(set1, set2);
-    DSCHashSet* difference_set = dsc_hashset_difference(set1, set2);
+    ANVHashSet* union_set = anv_hashset_union(set1, set2);
+    ANVHashSet* intersection_set = anv_hashset_intersection(set1, set2);
+    ANVHashSet* difference_set = anv_hashset_difference(set1, set2);
 
     const clock_t end = clock();
     const double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -162,26 +162,26 @@ int test_hashset_set_operations_performance(void)
     ASSERT_NOT_NULL(intersection_set);
     ASSERT_NOT_NULL(difference_set);
 
-    dsc_hashset_destroy(set1, true);
-    dsc_hashset_destroy(set2, true);
-    dsc_hashset_destroy(union_set, false);
-    dsc_hashset_destroy(intersection_set, false);
-    dsc_hashset_destroy(difference_set, false);
+    anv_hashset_destroy(set1, true);
+    anv_hashset_destroy(set2, true);
+    anv_hashset_destroy(union_set, false);
+    anv_hashset_destroy(intersection_set, false);
+    anv_hashset_destroy(difference_set, false);
     return TEST_SUCCESS;
 }
 
 // Test performance of iterator operations
 int test_hashset_iterator_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add elements
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
         char* key = malloc(32);
         sprintf(key, "key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+        ASSERT_EQ(anv_hashset_add(set, key), 0);
     }
 
     const clock_t start = clock();
@@ -189,7 +189,7 @@ int test_hashset_iterator_performance(void)
     // Iterate through the set multiple times
     for (int iter = 0; iter < 10; iter++)
     {
-        DSCIterator it = dsc_hashset_iterator(set);
+        ANVIterator it = anv_hashset_iterator(set);
         int count = 0;
         while (it.has_next(&it))
         {
@@ -207,28 +207,28 @@ int test_hashset_iterator_performance(void)
 
     printf("Performed 10 full iterations in %f seconds\n", time_taken);
 
-    dsc_hashset_destroy(set, true);
+    anv_hashset_destroy(set, true);
     return TEST_SUCCESS;
 }
 
 // Test performance of copy operations
 int test_hashset_copy_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* original = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add elements
     for (int i = 0; i < MEDIUM_SET_SIZE; i++)
     {
         char* key = malloc(32);
         sprintf(key, "key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(original, key), 0);
+        ASSERT_EQ(anv_hashset_add(original, key), 0);
     }
 
     clock_t start = clock();
 
     // Perform shallow copy
-    DSCHashSet* shallow_copy = dsc_hashset_copy(original);
+    ANVHashSet* shallow_copy = anv_hashset_copy(original);
 
     clock_t end = clock();
     const double shallow_time = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -236,7 +236,7 @@ int test_hashset_copy_performance(void)
     start = clock();
 
     // Perform deep copy with proper string copy function
-    DSCHashSet* deep_copy = dsc_hashset_copy_deep(original, string_copy);
+    ANVHashSet* deep_copy = anv_hashset_copy_deep(original, string_copy);
 
     end = clock();
     const double deep_time = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -245,42 +245,42 @@ int test_hashset_copy_performance(void)
 
     ASSERT_NOT_NULL(shallow_copy);
     ASSERT_NOT_NULL(deep_copy);
-    ASSERT_EQ(dsc_hashset_size(shallow_copy), MEDIUM_SET_SIZE);
-    ASSERT_EQ(dsc_hashset_size(deep_copy), MEDIUM_SET_SIZE);
+    ASSERT_EQ(anv_hashset_size(shallow_copy), MEDIUM_SET_SIZE);
+    ASSERT_EQ(anv_hashset_size(deep_copy), MEDIUM_SET_SIZE);
 
-    dsc_hashset_destroy(original, true);
-    dsc_hashset_destroy(shallow_copy, false);
-    dsc_hashset_destroy(deep_copy, true);
+    anv_hashset_destroy(original, true);
+    anv_hashset_destroy(shallow_copy, false);
+    anv_hashset_destroy(deep_copy, true);
     return TEST_SUCCESS;
 }
 
 // Test load factor impact on performance
 int test_hashset_load_factor_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Test with small initial capacity (high load factor)
-    DSCHashSet* high_load_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 4);
+    ANVHashSet* high_load_set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 4);
 
     clock_t start = clock();
     for (int i = 0; i < SMALL_SET_SIZE; i++)
     {
         char* key = malloc(32);
         sprintf(key, "high_load_key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(high_load_set, key), 0);
+        ASSERT_EQ(anv_hashset_add(high_load_set, key), 0);
     }
     clock_t end = clock();
     const double high_load_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     // Test with large initial capacity (low load factor)
-    DSCHashSet* low_load_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 1024);
+    ANVHashSet* low_load_set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 1024);
 
     start = clock();
     for (int i = 0; i < SMALL_SET_SIZE; i++)
     {
         char* key = malloc(32);
         sprintf(key, "low_load_key_%d", i);
-        ASSERT_EQ(dsc_hashset_add(low_load_set, key), 0);
+        ASSERT_EQ(anv_hashset_add(low_load_set, key), 0);
     }
     end = clock();
     const double low_load_time = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -289,11 +289,11 @@ int test_hashset_load_factor_performance(void)
            high_load_time, low_load_time);
 
     printf("High load factor: %f, Low load factor: %f\n",
-           dsc_hashset_load_factor(high_load_set),
-           dsc_hashset_load_factor(low_load_set));
+           anv_hashset_load_factor(high_load_set),
+           anv_hashset_load_factor(low_load_set));
 
-    dsc_hashset_destroy(high_load_set, true);
-    dsc_hashset_destroy(low_load_set, true);
+    anv_hashset_destroy(high_load_set, true);
+    anv_hashset_destroy(low_load_set, true);
     return TEST_SUCCESS;
 }
 
