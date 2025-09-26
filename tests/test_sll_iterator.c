@@ -2,12 +2,13 @@
 // Created by zack on 9/2/25.
 //
 
-#include "SinglyLinkedList.h"
-#include "TestAssert.h"
-#include "TestHelpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "SinglyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 int test_forward_iterator(void)
 {
@@ -19,7 +20,7 @@ int test_forward_iterator(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
@@ -54,23 +55,23 @@ int test_iterator_get(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
 
     // Test get without advancing
-    int* val = (int*)iter.get(&iter);
+    const int* val = iter.get(&iter);
     ASSERT_NOT_NULL(val);
     ASSERT_EQ(*val, 1);
 
     // Get again - should return same value
-    val = (int*)iter.get(&iter);
+    val = iter.get(&iter);
     ASSERT_EQ(*val, 1);
 
     // Now advance and test get
     iter.next(&iter);
-    val = (int*)iter.get(&iter);
+    val = iter.get(&iter);
     ASSERT_EQ(*val, 2);
 
     iter.destroy(&iter);
@@ -88,7 +89,7 @@ int test_iterator_reset(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
@@ -99,7 +100,7 @@ int test_iterator_reset(void)
 
     // Reset and verify back at beginning
     iter.reset(&iter);
-    int* val = (int*)iter.get(&iter);
+    const int* val = iter.get(&iter);
     ASSERT_EQ(*val, 1);
     ASSERT(iter.has_next(&iter));
 
@@ -132,7 +133,7 @@ int test_iterator_single_element(void)
 
     int* val = malloc(sizeof(int));
     *val = 42;
-    dsc_sll_insert_back(list, val);
+    dsc_sll_push_back(list, val);
 
     DSCIterator iter = dsc_sll_iterator(list);
 
@@ -169,7 +170,7 @@ int test_from_iterator(void)
 
     // Verify singly linked list has correct values in sequential order
     // Iterator gives 0,1,2,3,4 and singly linked list should have them as 0,1,2,3,4 (head to tail)
-    DSCSinglyLinkedNode* node = list->head;
+    const DSCSinglyLinkedNode* node = list->head;
     for (int expected = 0; expected < 5; expected++)
     {
         ASSERT_NOT_NULL(node);
@@ -200,7 +201,7 @@ int test_iterator_modification(void)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_sll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_sll_push_back(list, data), 0);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
@@ -214,7 +215,7 @@ int test_iterator_modification(void)
     // Modify singly linked list while iterator exists (implementation detail: iterator may become invalid)
     int* new_data = malloc(sizeof(int));
     *new_data = 999;
-    ASSERT_EQ(dsc_sll_insert_back(list, new_data), 0);
+    ASSERT_EQ(dsc_sll_push_back(list, new_data), 0);
 
     // Iterator should still be valid but may not reflect new state
     ASSERT(iter.is_valid(&iter));
@@ -230,7 +231,7 @@ int test_sll_copy_isolation(void)
     DSCAllocator alloc = create_int_allocator();
 
     // Create original data that we can modify
-    int original_values[] = {10, 20, 30};
+    const int original_values[] = {10, 20, 30};
     int* data_ptrs[3];
 
     // Create a source singly linked list
@@ -241,7 +242,7 @@ int test_sll_copy_isolation(void)
     {
         data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
-        ASSERT_EQ(dsc_sll_insert_back(source_list, data_ptrs[i]), 0);
+        ASSERT_EQ(dsc_sll_push_back(source_list, data_ptrs[i]), 0);
     }
 
     DSCIterator list_it = dsc_sll_iterator(source_list);
@@ -259,7 +260,7 @@ int test_sll_copy_isolation(void)
 
     // SinglyLinkedList should still have original values (proving data was copied)
     // Sequential order: 10, 20, 30
-    DSCSinglyLinkedNode* node = new_list->head;
+    const DSCSinglyLinkedNode* node = new_list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 10); // Should be unchanged
 
@@ -316,7 +317,7 @@ int test_sll_from_iterator_no_copy(void)
     ASSERT_EQ(dsc_sll_size(list), 3);
 
     // Verify values are correct (sequential order: 0, 1, 2)
-    DSCSinglyLinkedNode* node = list->head;
+    const DSCSinglyLinkedNode* node = list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 0);
 
@@ -372,7 +373,7 @@ int test_sll_iterator_next_return_values(void)
     // Add single element
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_sll_insert_back(list, data), 0);
+    ASSERT_EQ(dsc_sll_push_back(list, data), 0);
 
     DSCIterator iter = dsc_sll_iterator(list);
     ASSERT(iter.is_valid(&iter));
@@ -406,7 +407,7 @@ int test_sll_iterator_mixed_operations(void)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_sll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_sll_push_back(list, data), 0);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
@@ -462,7 +463,7 @@ int test_sll_iterator_unsupported_operations(void)
     {
         int* data = malloc(sizeof(int));
         *data = i;
-        ASSERT_EQ(dsc_sll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_sll_push_back(list, data), 0);
     }
 
     DSCIterator iter = dsc_sll_iterator(list);
@@ -500,7 +501,7 @@ int test_sll_iterator_order(void)
     {
         int* data = malloc(sizeof(int));
         *data = values[i];
-        ASSERT_EQ(dsc_sll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_sll_push_back(list, data), 0);
     }
 
     // Create iterator and verify order
@@ -532,7 +533,7 @@ int test_multiple_iterators(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     // Create two iterators on the same list
@@ -571,7 +572,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_forward_iterator, "test_forward_iterator"},
         {test_iterator_get, "test_iterator_get"},
         {test_iterator_reset, "test_iterator_reset"},
@@ -608,9 +609,7 @@ int main(void)
         printf("%d test(s) failed.\n", failed);
         return 1;
     }
-    else
-    {
-        printf("All singly linked list iterator tests passed!\n");
-        return 0;
-    }
+
+    printf("All singly linked list iterator tests passed!\n");
+    return 0;
 }

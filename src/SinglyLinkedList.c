@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 //==============================================================================
-// Static helper functions (private to this file)
+// Static helper functions
 //==============================================================================
 
 /**
@@ -210,9 +210,9 @@ int dsc_sll_equals(const DSCSinglyLinkedList* list1, const DSCSinglyLinkedList* 
 //==============================================================================
 
 /**
- * Insert data at the front of the list.
+ * Add data to the front of the list.
  */
-int dsc_sll_insert_front(DSCSinglyLinkedList* list, void* data)
+int dsc_sll_push_front(DSCSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
@@ -240,9 +240,9 @@ int dsc_sll_insert_front(DSCSinglyLinkedList* list, void* data)
 }
 
 /**
- * Insert data at the back of the list.
+ * Add data to the back of the list.
  */
-int dsc_sll_insert_back(DSCSinglyLinkedList* list, void* data)
+int dsc_sll_push_back(DSCSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
@@ -287,7 +287,7 @@ int dsc_sll_insert_at(DSCSinglyLinkedList* list, const size_t pos, void* data)
 
     if (pos == 0)
     {
-        return dsc_sll_insert_front(list, data);
+        return dsc_sll_push_front(list, data);
     }
 
     DSCSinglyLinkedNode* node = dsc_alloc_malloc(list->alloc, sizeof(DSCSinglyLinkedNode));
@@ -407,7 +407,7 @@ int dsc_sll_remove_at(DSCSinglyLinkedList* list, const size_t pos, const bool sh
 /**
  * Remove first element.
  */
-int dsc_sll_remove_front(DSCSinglyLinkedList* list, const bool should_free_data)
+int dsc_sll_pop_front(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -430,7 +430,7 @@ int dsc_sll_remove_front(DSCSinglyLinkedList* list, const bool should_free_data)
 /**
  * Remove last element.
  */
-int dsc_sll_remove_back(DSCSinglyLinkedList* list, const bool should_free_data)
+int dsc_sll_pop_back(DSCSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -439,7 +439,7 @@ int dsc_sll_remove_back(DSCSinglyLinkedList* list, const bool should_free_data)
 
     if (list->size == 1)
     {
-        return dsc_sll_remove_front(list, should_free_data);
+        return dsc_sll_pop_front(list, should_free_data);
     }
 
     DSCSinglyLinkedNode* prev = NULL;
@@ -658,7 +658,7 @@ DSCSinglyLinkedList* dsc_sll_filter(const DSCSinglyLinkedList* list, const pred_
     {
         if (pred(curr->data))
         {
-            if (dsc_sll_insert_back(filtered, curr->data) != 0)
+            if (dsc_sll_push_back(filtered, curr->data) != 0)
             {
                 dsc_sll_destroy(filtered, false);
                 return NULL;
@@ -689,7 +689,7 @@ DSCSinglyLinkedList* dsc_sll_filter_deep(const DSCSinglyLinkedList* list, const 
         if (pred(curr->data))
         {
             void* filtered_data = dsc_alloc_copy(filtered->alloc, curr->data);
-            if (dsc_sll_insert_back(filtered, filtered_data) != 0)
+            if (dsc_sll_push_back(filtered, filtered_data) != 0)
             {
                 if (filtered_data)
                 {
@@ -722,7 +722,7 @@ DSCSinglyLinkedList* dsc_sll_transform(const DSCSinglyLinkedList* list, const tr
     while (curr)
     {
         void* new_data = transform(curr->data);
-        if (dsc_sll_insert_back(transformed, new_data) != 0)
+        if (dsc_sll_push_back(transformed, new_data) != 0)
         {
             if (should_free_data && new_data)
             {
@@ -777,7 +777,7 @@ DSCSinglyLinkedList* dsc_sll_copy(const DSCSinglyLinkedList* list)
     const DSCSinglyLinkedNode* curr = list->head;
     while (curr)
     {
-        if (dsc_sll_insert_back(clone, curr->data) != 0)
+        if (dsc_sll_push_back(clone, curr->data) != 0)
         {
             dsc_sll_destroy(clone, false);
             return NULL;
@@ -815,7 +815,7 @@ DSCSinglyLinkedList* dsc_sll_copy_deep(const DSCSinglyLinkedList* list, const co
             dsc_sll_destroy(clone, should_free_data);
             return NULL;
         }
-        if (dsc_sll_insert_back(clone, data_copy) != 0)
+        if (dsc_sll_push_back(clone, data_copy) != 0)
         {
             if (should_free_data)
             {
@@ -1010,7 +1010,7 @@ DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAllocator* alloc,
             }
         }
 
-        if (dsc_sll_insert_back(list, element_to_insert) != 0)
+        if (dsc_sll_push_back(list, element_to_insert) != 0)
         {
             if (should_copy)
             {

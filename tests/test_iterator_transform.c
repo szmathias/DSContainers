@@ -5,12 +5,13 @@
 // Tests cover basic transformation, chaining, error handling, memory management,
 // and integration with different data structures and iterator types.
 
-#include "Iterator.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
+#include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 //==============================================================================
 // Helper Functions for Transform Iterator Tests
@@ -70,7 +71,7 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
             return NULL;
         }
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -369,7 +370,7 @@ static int test_transform_operations_on_invalid(void)
 
     // All operations should fail gracefully
     ASSERT_EQ(invalid_it.next(&invalid_it), -1);
-    ASSERT_EQ(invalid_it.prev(&invalid_it), 0); // Transform doesn't support prev
+    ASSERT_EQ(invalid_it.prev(&invalid_it), -1); // Transform doesn't support prev
     ASSERT_FALSE(invalid_it.has_next(&invalid_it));
     ASSERT_FALSE(invalid_it.has_prev(&invalid_it)); // Transform doesn't support has_prev
     ASSERT_NULL(invalid_it.get(&invalid_it));
@@ -468,7 +469,7 @@ static int test_transform_unsupported_operations(void)
 
     // Transform iterator should not support bidirectional operations
     ASSERT_FALSE(transform_it.has_prev(&transform_it));
-    ASSERT_EQ(transform_it.prev(&transform_it), 0); // Returns 0 for unsupported
+    ASSERT_EQ(transform_it.prev(&transform_it), -1); // Returns -1 for unsupported
 
     // Reset should be safe but ineffective
     transform_it.reset(&transform_it);

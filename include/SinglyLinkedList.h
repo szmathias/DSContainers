@@ -149,22 +149,22 @@ DSC_API int dsc_sll_equals(const DSCSinglyLinkedList* list1, const DSCSinglyLink
 //==============================================================================
 
 /**
- * Insert element at the front of the list.
+ * Add element to the front of the list.
  *
  * @param list The list to modify
  * @param data Pointer to data (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_sll_insert_front(DSCSinglyLinkedList* list, void* data);
+DSC_API int dsc_sll_push_front(DSCSinglyLinkedList* list, void* data);
 
 /**
- * Insert element at the back of the list.
+ * Add element to the back of the list.
  *
  * @param list The list to modify
  * @param data Pointer to data (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_sll_insert_back(DSCSinglyLinkedList* list, void* data);
+DSC_API int dsc_sll_push_back(DSCSinglyLinkedList* list, void* data);
 
 /**
  * Insert element at a specific position (0..size).
@@ -208,7 +208,7 @@ DSC_API int dsc_sll_remove_at(DSCSinglyLinkedList* list, size_t pos, bool should
  * @param should_free_data If true free element data
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_sll_remove_front(DSCSinglyLinkedList* list, bool should_free_data);
+DSC_API int dsc_sll_pop_front(DSCSinglyLinkedList* list, bool should_free_data);
 
 /**
  * Remove the last element.
@@ -217,7 +217,7 @@ DSC_API int dsc_sll_remove_front(DSCSinglyLinkedList* list, bool should_free_dat
  * @param should_free_data If true free element data
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_sll_remove_back(DSCSinglyLinkedList* list, bool should_free_data);
+DSC_API int dsc_sll_pop_back(DSCSinglyLinkedList* list, bool should_free_data);
 
 //==============================================================================
 // List manipulation functions
@@ -367,3 +367,4 @@ DSC_API DSCSinglyLinkedList* dsc_sll_from_iterator(DSCIterator* it, DSCAllocator
 #endif
 
 #endif //DSCONTAINERS_SINGLYLINKEDLIST_H
+

@@ -5,12 +5,13 @@
 // Tests cover basic filtering, filter chaining, error handling, memory management,
 // and integration with different data structures.
 
-#include "Iterator.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
+#include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 //==============================================================================
 // Helper Functions for Filter Iterator Tests
@@ -70,7 +71,7 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
             return NULL;
         }
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -93,7 +94,7 @@ static DSCDoublyLinkedList* create_list_with_values(DSCAllocator* alloc, const i
             return NULL;
         }
         *val = values[i];
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
     return list;
 }
@@ -406,7 +407,7 @@ static int test_filter_operations_on_invalid(void)
 
     // All operations should fail gracefully
     ASSERT_EQ(invalid_it.next(&invalid_it), -1);
-    ASSERT_EQ(invalid_it.prev(&invalid_it), 0); // Filter doesn't support prev
+    ASSERT_EQ(invalid_it.prev(&invalid_it), -1); // Filter doesn't support prev
     ASSERT_FALSE(invalid_it.has_next(&invalid_it));
     ASSERT_FALSE(invalid_it.has_prev(&invalid_it)); // Filter doesn't support has_prev
     ASSERT_NULL(invalid_it.get(&invalid_it));
@@ -508,7 +509,7 @@ static int test_filter_unsupported_operations(void)
 
     // Filter iterator should not support bidirectional operations
     ASSERT_FALSE(filter_it.has_prev(&filter_it));
-    ASSERT_EQ(filter_it.prev(&filter_it), 0); // Returns 0 for unsupported
+    ASSERT_EQ(filter_it.prev(&filter_it), -1); // Returns -1 for unsupported
 
     // Reset should be safe but ineffective
     filter_it.reset(&filter_it);

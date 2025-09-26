@@ -5,15 +5,15 @@
 // Tests cover basic iteration, edge cases, index tracking,
 // error handling, and composition with other iterators.
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "ArrayList.h"
 #include "DoublyLinkedList.h"
 #include "Iterator.h"
 #include "Queue.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 //==============================================================================
 // Helper Functions for Enumerate Iterator Tests
@@ -377,7 +377,7 @@ int test_enumerate_dll(void)
     {
         int* val = malloc(sizeof(int));
         *val = i * 5;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Create iterator and enumerate starting from index 0

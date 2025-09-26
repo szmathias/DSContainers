@@ -137,22 +137,22 @@ DSC_API int dsc_dll_equals(const DSCDoublyLinkedList* list1, const DSCDoublyLink
 //==============================================================================
 
 /**
- * Insert data at the front of the list.
+ * Add data to the front of the list.
  *
  * @param list The list to modify
  * @param data Pointer to the data to insert (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_dll_insert_front(DSCDoublyLinkedList* list, void* data);
+DSC_API int dsc_dll_push_front(DSCDoublyLinkedList* list, void* data);
 
 /**
- * Insert data at the back of the list.
+ * Add data to the back of the list.
  *
  * @param list The list to modify
  * @param data Pointer to the data to insert (ownership transferred to list)
  * @return 0 on success, -1 on error
  */
-DSC_API int dsc_dll_insert_back(DSCDoublyLinkedList* list, void* data);
+DSC_API int dsc_dll_push_back(DSCDoublyLinkedList* list, void* data);
 
 /**
  * Insert data at a specific position in the list.
@@ -196,7 +196,7 @@ DSC_API int dsc_dll_remove_at(DSCDoublyLinkedList* list, size_t pos, bool should
  * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-DSC_API int dsc_dll_remove_front(DSCDoublyLinkedList* list, bool should_free_data);
+DSC_API int dsc_dll_pop_front(DSCDoublyLinkedList* list, bool should_free_data);
 
 /**
  * Remove the last node in the list.
@@ -205,7 +205,7 @@ DSC_API int dsc_dll_remove_front(DSCDoublyLinkedList* list, bool should_free_dat
  * @param should_free_data
  * @return 0 on success, -1 on error (e.g., empty list)
  */
-DSC_API int dsc_dll_remove_back(DSCDoublyLinkedList* list, bool should_free_data);
+DSC_API int dsc_dll_pop_back(DSCDoublyLinkedList* list, bool should_free_data);
 
 //==============================================================================
 // List manipulation functions
@@ -362,3 +362,4 @@ DSC_API DSCDoublyLinkedList* dsc_dll_from_iterator(DSCIterator* it, DSCAllocator
 #endif
 
 #endif //DSCONTAINERS_DOUBLYLINKEDLIST_H
+

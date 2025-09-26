@@ -2,13 +2,14 @@
 // Created by zack on 9/2/25.
 //
 
-#include "SinglyLinkedList.h"
-#include "TestAssert.h"
-#include "TestHelpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "SinglyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 // Tests from test_sll.c that fit into memory/resource category
 int test_custom_allocator(void)
@@ -18,7 +19,7 @@ int test_custom_allocator(void)
     ASSERT_NOT_NULL(list);
     int* a = malloc(sizeof(int));
     *a = 42;
-    ASSERT_EQ(dsc_sll_insert_back(list, a), 0);
+    ASSERT_EQ(dsc_sll_push_back(list, a), 0);
     ASSERT_EQ(list->size, 1);
     dsc_sll_destroy(list, true);
     return TEST_SUCCESS;
@@ -34,7 +35,7 @@ int test_clear(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
     ASSERT_EQ(list->size, 5);
 
@@ -49,7 +50,7 @@ int test_clear(void)
     // Make sure we can still add elements after clearing
     int* val = malloc(sizeof(int));
     *val = 42;
-    ASSERT_EQ(dsc_sll_insert_back(list, val), 0);
+    ASSERT_EQ(dsc_sll_push_back(list, val), 0);
     ASSERT_EQ(list->size, 1);
 
     dsc_sll_destroy(list, true);
@@ -87,7 +88,7 @@ int test_copy_shallow(void)
     {
         int* val = malloc(sizeof(int));
         *val = i * 10;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     // Create shallow clone
@@ -130,7 +131,7 @@ int test_copy_deep(void)
     {
         int* val = malloc(sizeof(int));
         *val = i * 10;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     // Create deep clone
@@ -173,9 +174,9 @@ int test_copy_complex_data(void)
     Person* p2 = create_person("Bob", 25);
     Person* p3 = create_person("Charlie", 40);
 
-    dsc_sll_insert_back(list, p1);
-    dsc_sll_insert_back(list, p2);
-    dsc_sll_insert_back(list, p3);
+    dsc_sll_push_back(list, p1);
+    dsc_sll_push_back(list, p2);
+    dsc_sll_push_back(list, p3);
 
     // Create deep clone
     DSCSinglyLinkedList* clone = dsc_sll_copy_deep(list, person_copy, true);
@@ -259,7 +260,7 @@ int test_transform_allocation_failure(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     // Case 1: Fail on creation of the result list
@@ -292,7 +293,7 @@ int test_copy_deep_allocation_failure(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_sll_insert_back(list, val);
+        dsc_sll_push_back(list, val);
     }
 
     // Case 1: Fail allocating the new list struct itself
@@ -322,14 +323,14 @@ int test_insert_allocation_failure(void)
     DSCSinglyLinkedList* list = dsc_sll_create(&alloc);
     int* a = malloc(sizeof(int));
     *a = 1;
-    dsc_sll_insert_back(list, a);
+    dsc_sll_push_back(list, a);
     ASSERT_EQ(list->size, 1);
 
     // Set allocator to fail on the next allocation
     set_alloc_fail_countdown(0);
     int* b = malloc(sizeof(int));
     *b = 2;
-    ASSERT_EQ(dsc_sll_insert_back(list, b), -1);
+    ASSERT_EQ(dsc_sll_push_back(list, b), -1);
 
     // Verify list is unchanged
     ASSERT_EQ(list->size, 1);

@@ -354,7 +354,7 @@ int test_allocator_with_linked_list(void)
         int* value = dsc_alloc_malloc(&data_alloc, sizeof(int));
         ASSERT(value != NULL);
         *value = i + 1;
-        dsc_sll_insert_back(list, value);
+        dsc_sll_push_back(list, value);
     }
 
     ASSERT_EQ(dsc_sll_size(list), 5);

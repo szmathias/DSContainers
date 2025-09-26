@@ -2,12 +2,13 @@
 // Created by zack on 9/5/25.
 //
 
-#include "DoublyLinkedList.h"
-#include "TestAssert.h"
-#include "TestHelpers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "DoublyLinkedList.h"
+#include "TestAssert.h"
+#include "TestHelpers.h"
 
 int test_stress(void)
 {
@@ -20,7 +21,7 @@ int test_stress(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        ASSERT_EQ(dsc_dll_insert_back(list, val), 0);
+        ASSERT_EQ(dsc_dll_push_back(list, val), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS);
 
@@ -33,7 +34,7 @@ int test_stress(void)
     // Remove elements from the front
     for (int i = 0; i < NUM_ELEMENTS / 2; i++)
     {
-        ASSERT_EQ(dsc_dll_remove_front(list, true), 0);
+        ASSERT_EQ(dsc_dll_pop_front(list, true), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS / 2);
 
@@ -63,7 +64,7 @@ int test_performance(void)
         {
             int* val = malloc(sizeof(int));
             *val = i;
-            dsc_dll_insert_back(list, val);
+            dsc_dll_push_back(list, val);
         }
         clock_t end = clock();
         printf("Insert %d elements: %.6f seconds\n", SIZE,

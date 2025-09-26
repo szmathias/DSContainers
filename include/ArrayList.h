@@ -6,8 +6,8 @@
 #define DSCONTAINERS_ARRAYLIST_H
 
 #include <stddef.h>
+
 #include "Alloc.h"
-#include "CStandardCompatibility.h"
 #include "Iterator.h"
 
 #ifdef __cplusplus

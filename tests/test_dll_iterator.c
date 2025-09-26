@@ -2,12 +2,12 @@
 // Created by zack on 8/26/25.
 //
 
+#include <stdlib.h>
+
 #include "DoublyLinkedList.h"
 #include "Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-
-#include <stdlib.h>
 
 // Test basic iterator functionality
 static int test_basic_iteration(void)
@@ -21,7 +21,7 @@ static int test_basic_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Create iterator
@@ -87,7 +87,7 @@ static int test_iterator_with_modifications(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Create iterator
@@ -102,7 +102,7 @@ static int test_iterator_with_modifications(void)
     // Modify list by adding new elements
     int* new_val = malloc(sizeof(int));
     *new_val = 99;
-    dsc_dll_insert_back(list, new_val);
+    dsc_dll_push_back(list, new_val);
 
     // Continue iteration
     value = it.get(&it);
@@ -142,7 +142,7 @@ static int test_multiple_iterators(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Create two independent iterators
@@ -194,7 +194,7 @@ static int test_reverse_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     // Create reverse iterator
@@ -234,7 +234,7 @@ static int test_iterator_get(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     DSCIterator it = dsc_dll_iterator(list);
@@ -272,7 +272,7 @@ static int test_bidirectional_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     DSCIterator it = dsc_dll_iterator(list);
@@ -320,7 +320,7 @@ static int test_from_iterator(void)
 
     // Verify doubly linked list has correct values in sequential order
     // Iterator gives 0,1,2,3,4 and doubly linked list should have them as 0,1,2,3,4 (head to tail)
-    DSCDoublyLinkedNode* node = list->head;
+    const DSCDoublyLinkedNode* node = list->head;
     for (int expected = 0; expected < 5; expected++)
     {
         ASSERT_NOT_NULL(node);
@@ -346,7 +346,7 @@ static int test_dll_copy_isolation(void)
     DSCAllocator alloc = create_int_allocator();
 
     // Create original data that we can modify
-    int original_values[] = {10, 20, 30};
+    const int original_values[] = {10, 20, 30};
     int* data_ptrs[3];
 
     // Create a source doubly linked list
@@ -357,7 +357,7 @@ static int test_dll_copy_isolation(void)
     {
         data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
-        ASSERT_EQ(dsc_dll_insert_back(source_list, data_ptrs[i]), 0);
+        ASSERT_EQ(dsc_dll_push_back(source_list, data_ptrs[i]), 0);
     }
 
     DSCIterator list_it = dsc_dll_iterator(source_list);
@@ -375,7 +375,7 @@ static int test_dll_copy_isolation(void)
 
     // DoublyLinkedList should still have original values (proving data was copied)
     // Sequential order: 10, 20, 30
-    DSCDoublyLinkedNode* node = new_list->head;
+    const DSCDoublyLinkedNode* node = new_list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 10); // Should be unchanged
 
@@ -432,7 +432,7 @@ static int test_dll_from_iterator_no_copy(void)
     ASSERT_EQ(dsc_dll_size(list), 3);
 
     // Verify values are correct (sequential order: 0, 1, 2)
-    DSCDoublyLinkedNode* node = list->head;
+    const DSCDoublyLinkedNode* node = list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 0);
 
@@ -488,7 +488,7 @@ static int test_dll_iterator_next_return_values(void)
     // Add single element
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+    ASSERT_EQ(dsc_dll_push_back(list, data), 0);
 
     DSCIterator iter = dsc_dll_iterator(list);
     ASSERT(iter.is_valid(&iter));
@@ -522,7 +522,7 @@ static int test_dll_iterator_mixed_operations(void)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_dll_push_back(list, data), 0);
     }
 
     DSCIterator iter = dsc_dll_iterator(list);
@@ -579,7 +579,7 @@ static int test_dll_iterator_order(void)
     {
         int* data = malloc(sizeof(int));
         *data = values[i];
-        ASSERT_EQ(dsc_dll_insert_back(list, data), 0);
+        ASSERT_EQ(dsc_dll_push_back(list, data), 0);
     }
 
     // Create iterator and verify order
@@ -612,7 +612,7 @@ static int test_dll_iterator_reset(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list, val);
+        dsc_dll_push_back(list, val);
     }
 
     DSCIterator iter = dsc_dll_iterator(list);
@@ -623,7 +623,7 @@ static int test_dll_iterator_reset(void)
 
     // Reset and verify back at beginning
     iter.reset(&iter);
-    int* val = (int*)iter.get(&iter);
+    const int* val = iter.get(&iter);
     ASSERT_EQ(*val, 1);
     ASSERT(iter.has_next(&iter));
 
@@ -640,7 +640,7 @@ static int test_dll_iterator_single_element(void)
 
     int* val = malloc(sizeof(int));
     *val = 42;
-    dsc_dll_insert_back(list, val);
+    dsc_dll_push_back(list, val);
 
     DSCIterator iter = dsc_dll_iterator(list);
 
@@ -667,7 +667,7 @@ typedef struct
 
 int main(void)
 {
-    TestCase tests[] = {
+    const TestCase tests[] = {
         {test_basic_iteration, "test_basic_iteration"},
         {test_empty_list_iterator, "test_empty_list_iterator"},
         {test_iterator_with_modifications, "test_iterator_with_modifications"},
@@ -705,9 +705,7 @@ int main(void)
         printf("%d test(s) failed.\n", failed);
         return 1;
     }
-    else
-    {
-        printf("All doubly linked list iterator tests passed!\n");
-        return 0;
-    }
+
+    printf("All doubly linked list iterator tests passed!\n");
+    return 0;
 }

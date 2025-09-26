@@ -5,6 +5,9 @@
 // Tests cover basic iteration, edge cases, pair handling,
 // error handling, and composition with other iterators.
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "ArrayList.h"
 #include "DoublyLinkedList.h"
 #include "Iterator.h"
@@ -13,9 +16,6 @@
 #include "Stack.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
-
-#include <stdio.h>
-#include <stdlib.h>
 
 //==============================================================================
 // Helper Functions for Zip Iterator Tests
@@ -546,7 +546,7 @@ int test_zip_dll_iterators(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list1, val);
+        dsc_dll_push_back(list1, val);
     }
 
     // Populate list2 with 50, 60 (shorter list)
@@ -554,7 +554,7 @@ int test_zip_dll_iterators(void)
     {
         int* val = malloc(sizeof(int));
         *val = i * 10;
-        dsc_dll_insert_back(list2, val);
+        dsc_dll_push_back(list2, val);
     }
 
     // Create iterators
@@ -601,7 +601,7 @@ int test_zip_arraylist_with_dll(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(dll, val);
+        dsc_dll_push_back(dll, val);
     }
 
     // Create iterators
@@ -730,7 +730,7 @@ int test_zip_filtered_data_structures(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_insert_back(list2, val);
+        dsc_dll_push_back(list2, val);
     }
 
     // Create iterators and filter them
