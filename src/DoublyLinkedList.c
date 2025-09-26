@@ -19,7 +19,7 @@
  */
 static DSCDoublyLinkedNode* dsc_dll_split(DSCDoublyLinkedNode* head)
 {
-    if (!head->next)
+    if (!head || !head->next)
     {
         return NULL;
     }
