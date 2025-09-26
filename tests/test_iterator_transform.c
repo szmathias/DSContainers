@@ -469,7 +469,7 @@ static int test_transform_unsupported_operations(void)
 
     // Transform iterator should not support bidirectional operations
     ASSERT_FALSE(transform_it.has_prev(&transform_it));
-    ASSERT_EQ(transform_it.prev(&transform_it), -1); // Returns 0 for unsupported
+    ASSERT_EQ(transform_it.prev(&transform_it), -1); // Returns -1 for unsupported
 
     // Reset should be safe but ineffective
     transform_it.reset(&transform_it);
