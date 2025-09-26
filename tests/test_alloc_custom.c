@@ -2,7 +2,7 @@
 // Created by GitHub Copilot on 9/11/25.
 //
 
-#include "Alloc.h"
+#include "common/Allocator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include <stdio.h>
@@ -163,19 +163,19 @@ static void* counting_int_copy(const void* data)
 
 int test_default_allocator(void)
 {
-    const DSCAllocator alloc = dsc_alloc_default();
+    const ANVAllocator alloc = anv_alloc_default();
 
     // Test allocation
-    void* ptr = dsc_alloc_malloc(&alloc, 100);
+    void* ptr = anv_alloc_malloc(&alloc, 100);
     ASSERT(ptr != NULL);
 
     // Test copy (should return same pointer for default)
     const int value = 42;
-    const void* copied = dsc_alloc_copy(&alloc, &value);
+    const void* copied = anv_alloc_copy(&alloc, &value);
     ASSERT(copied == &value);
 
     // Test free
-    dsc_alloc_free(&alloc, ptr);
+    anv_alloc_free(&alloc, ptr);
 
     return TEST_SUCCESS;
 }
@@ -185,16 +185,16 @@ int test_arena_allocator(void)
     // Initialize arena
     ASSERT_EQ(arena_init(1024), 0);
 
-    const DSCAllocator alloc = dsc_alloc_custom(arena_alloc, arena_free, NULL, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(arena_alloc, arena_free, NULL, NULL);
 
     // Test multiple allocations
-    const void* ptr1 = dsc_alloc_malloc(&alloc, 64);
+    const void* ptr1 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr1 != NULL);
 
-    const void* ptr2 = dsc_alloc_malloc(&alloc, 128);
+    const void* ptr2 = anv_alloc_malloc(&alloc, 128);
     ASSERT(ptr2 != NULL);
 
-    const void* ptr3 = dsc_alloc_malloc(&alloc, 256);
+    const void* ptr3 = anv_alloc_malloc(&alloc, 256);
     ASSERT(ptr3 != NULL);
 
     // Verify pointers are different and ordered
@@ -204,12 +204,12 @@ int test_arena_allocator(void)
     ASSERT(ptr2 < ptr3);
 
     // Test allocation failure when out of memory
-    const void* big_ptr = dsc_alloc_malloc(&alloc, 1024);
+    const void* big_ptr = anv_alloc_malloc(&alloc, 1024);
     ASSERT(big_ptr == NULL);
 
     // Test reset and reuse
     arena_reset();
-    const void* ptr4 = dsc_alloc_malloc(&alloc, 64);
+    const void* ptr4 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr4 == ptr1); // Should reuse same memory
 
     arena_destroy();
@@ -220,22 +220,22 @@ int test_stack_allocator(void)
 {
     stack_reset();
 
-    const DSCAllocator alloc = dsc_alloc_custom(stack_alloc, stack_free, NULL, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(stack_alloc, stack_free, NULL, NULL);
 
     // Test allocation
-    const void* ptr1 = dsc_alloc_malloc(&alloc, 64);
+    const void* ptr1 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr1 != NULL);
 
-    void* ptr2 = dsc_alloc_malloc(&alloc, 128);
+    void* ptr2 = anv_alloc_malloc(&alloc, 128);
     ASSERT(ptr2 != NULL);
 
     // Test LIFO deallocation
-    dsc_alloc_free(&alloc, ptr2);
-    const void* ptr3 = dsc_alloc_malloc(&alloc, 100);
+    anv_alloc_free(&alloc, ptr2);
+    const void* ptr3 = anv_alloc_malloc(&alloc, 100);
     ASSERT(ptr3 == ptr2); // Should reuse freed space
 
     // Test stack overflow
-    const void* big_ptr = dsc_alloc_malloc(&alloc, STACK_SIZE);
+    const void* big_ptr = anv_alloc_malloc(&alloc, STACK_SIZE);
     ASSERT(big_ptr == NULL);
 
     stack_reset();
@@ -246,35 +246,35 @@ int test_counting_allocator(void)
 {
     reset_counters();
 
-    const DSCAllocator alloc = dsc_alloc_custom(counting_alloc, counting_free, counting_free, counting_int_copy);
+    const ANVAllocator alloc = anv_alloc_custom(counting_alloc, counting_free, counting_free, counting_int_copy);
 
     // Test allocations are counted
-    void* ptr1 = dsc_alloc_malloc(&alloc, 64);
+    void* ptr1 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr1 != NULL);
     ASSERT_EQ(alloc_count, 1);
     ASSERT_EQ(free_count, 0);
 
-    void* ptr2 = dsc_alloc_malloc(&alloc, 128);
+    void* ptr2 = anv_alloc_malloc(&alloc, 128);
     ASSERT(ptr2 != NULL);
     ASSERT_EQ(alloc_count, 2);
     ASSERT_EQ(free_count, 0);
 
     // Test copy function (should allocate new memory)
     const int value = 42;
-    void* copied = dsc_alloc_copy(&alloc, &value);
+    void* copied = anv_alloc_copy(&alloc, &value);
     ASSERT(copied != NULL);
     ASSERT(copied != &value);
     ASSERT_EQ(*(int*)copied, 42);
     ASSERT_EQ(alloc_count, 3); // Copy should trigger allocation
 
     // Test frees are counted
-    dsc_alloc_free(&alloc, ptr1);
+    anv_alloc_free(&alloc, ptr1);
     ASSERT_EQ(free_count, 1);
 
-    dsc_alloc_free(&alloc, ptr2);
+    anv_alloc_free(&alloc, ptr2);
     ASSERT_EQ(free_count, 2);
 
-    dsc_alloc_data_free(&alloc, copied);
+    anv_alloc_data_free(&alloc, copied);
     ASSERT_EQ(free_count, 3);
 
     return TEST_SUCCESS;
@@ -282,45 +282,45 @@ int test_counting_allocator(void)
 
 int test_custom_copy_functions(void)
 {
-    const DSCAllocator int_alloc = dsc_alloc_custom(malloc, free, free, int_copy);
-    const DSCAllocator str_alloc = dsc_alloc_custom(malloc, free, free, string_copy);
+    const ANVAllocator int_alloc = anv_alloc_custom(malloc, free, free, int_copy);
+    const ANVAllocator str_alloc = anv_alloc_custom(malloc, free, free, string_copy);
 
     // Test integer deep copy
     const int original_int = 123;
-    int* copied_int = dsc_alloc_copy(&int_alloc, &original_int);
+    int* copied_int = anv_alloc_copy(&int_alloc, &original_int);
     ASSERT(copied_int != NULL);
     ASSERT(copied_int != &original_int);
     ASSERT_EQ(*copied_int, 123);
-    dsc_alloc_data_free(&int_alloc, copied_int);
+    anv_alloc_data_free(&int_alloc, copied_int);
 
     // Test string deep copy
     const char* original_str = "Hello, World!";
-    char* copied_str = dsc_alloc_copy(&str_alloc, original_str);
+    char* copied_str = anv_alloc_copy(&str_alloc, original_str);
     ASSERT(copied_str != NULL);
     ASSERT(copied_str != original_str);
     ASSERT_EQ_STR(copied_str, "Hello, World!");
-    dsc_alloc_data_free(&str_alloc, copied_str);
+    anv_alloc_data_free(&str_alloc, copied_str);
 
     return TEST_SUCCESS;
 }
 
 int test_allocator_edge_cases(void)
 {
-    const DSCAllocator alloc = dsc_alloc_default();
+    const ANVAllocator alloc = anv_alloc_default();
 
     // Test NULL pointer handling
-    dsc_alloc_free(&alloc, NULL); // Should not crash
+    anv_alloc_free(&alloc, NULL); // Should not crash
 
-    const void* null_copy = dsc_alloc_copy(&alloc, NULL);
+    const void* null_copy = anv_alloc_copy(&alloc, NULL);
     ASSERT(null_copy == NULL);
 
     // Test zero-size allocation
-    void* zero_ptr = dsc_alloc_malloc(&alloc, 0);
+    void* zero_ptr = anv_alloc_malloc(&alloc, 0);
     // Behavior is implementation-defined, but shouldn't crash
-    dsc_alloc_free(&alloc, zero_ptr);
+    anv_alloc_free(&alloc, zero_ptr);
 
     // Test NULL allocator
-    const void* null_alloc_ptr = dsc_alloc_malloc(NULL, 100);
+    const void* null_alloc_ptr = anv_alloc_malloc(NULL, 100);
     ASSERT(null_alloc_ptr == NULL);
 
     return TEST_SUCCESS;
@@ -329,20 +329,20 @@ int test_allocator_edge_cases(void)
 int test_allocator_with_null_functions(void)
 {
     // Test allocator with NULL copy and data_free functions
-    const DSCAllocator alloc = dsc_alloc_custom(malloc, free, NULL, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(malloc, free, NULL, NULL);
 
-    void* ptr = dsc_alloc_malloc(&alloc, 64);
+    void* ptr = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr != NULL);
 
     // data_free with NULL function should not crash
-    dsc_alloc_data_free(&alloc, ptr);
+    anv_alloc_data_free(&alloc, ptr);
 
     // copy with NULL function should use default copy (return same pointer)
     const int value = 42;
-    const void* copied = dsc_alloc_copy(&alloc, &value);
+    const void* copied = anv_alloc_copy(&alloc, &value);
     ASSERT(copied == &value); // Default copy returns original pointer
 
-    dsc_alloc_free(&alloc, ptr);
+    anv_alloc_free(&alloc, ptr);
 
     return TEST_SUCCESS;
 }
@@ -351,11 +351,11 @@ int test_arena_memory_alignment(void)
 {
     ASSERT_EQ(arena_init(1024), 0);
 
-    const DSCAllocator alloc = dsc_alloc_custom(arena_alloc, arena_free, NULL, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(arena_alloc, arena_free, NULL, NULL);
 
     // Test that allocations are properly aligned
-    void* ptr1 = dsc_alloc_malloc(&alloc, 1);
-    void* ptr2 = dsc_alloc_malloc(&alloc, 1);
+    void* ptr1 = anv_alloc_malloc(&alloc, 1);
+    void* ptr2 = anv_alloc_malloc(&alloc, 1);
 
     ASSERT(ptr1 != NULL);
     ASSERT(ptr2 != NULL);
@@ -376,30 +376,30 @@ int test_stack_allocator_lifo_behavior(void)
 {
     stack_reset();
 
-    const DSCAllocator alloc = dsc_alloc_custom(stack_alloc, stack_free, NULL, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(stack_alloc, stack_free, NULL, NULL);
 
     // Allocate in order
-    const void* ptr1 = dsc_alloc_malloc(&alloc, 64);
-    void* ptr2 = dsc_alloc_malloc(&alloc, 64);
-    void* ptr3 = dsc_alloc_malloc(&alloc, 64);
+    const void* ptr1 = anv_alloc_malloc(&alloc, 64);
+    void* ptr2 = anv_alloc_malloc(&alloc, 64);
+    void* ptr3 = anv_alloc_malloc(&alloc, 64);
 
     ASSERT(ptr1 != NULL);
     ASSERT(ptr2 != NULL);
     ASSERT(ptr3 != NULL);
 
     // Free in LIFO order (last allocated first)
-    dsc_alloc_free(&alloc, ptr3);
+    anv_alloc_free(&alloc, ptr3);
 
     // Next allocation should reuse ptr3's space
-    void* ptr4 = dsc_alloc_malloc(&alloc, 64);
+    void* ptr4 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr4 == ptr3);
 
     // Free ptr4 and ptr2 (not in LIFO order for ptr2)
-    dsc_alloc_free(&alloc, ptr4);
-    dsc_alloc_free(&alloc, ptr2);
+    anv_alloc_free(&alloc, ptr4);
+    anv_alloc_free(&alloc, ptr2);
 
     // New allocation should still work
-    const void* ptr5 = dsc_alloc_malloc(&alloc, 64);
+    const void* ptr5 = anv_alloc_malloc(&alloc, 64);
     ASSERT(ptr5 == ptr2);
 
     stack_reset();

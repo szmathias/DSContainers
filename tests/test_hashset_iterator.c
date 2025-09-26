@@ -5,16 +5,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "HashSet.h"
-#include "Iterator.h"
+#include "containers/HashSet.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Test basic iterator functionality
 static int test_hashset_iterator_basic(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3", "key4", "key5"};
     const int num_items = 5;
@@ -22,11 +22,11 @@ static int test_hashset_iterator_basic(void)
     // Add test data
     for (int i = 0; i < num_items; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(set, (void*)keys[i]), 0);
     }
 
     // Test iterator
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVIterator it = anv_hashset_iterator(set);
     ASSERT(it.is_valid(&it));
 
     int visited_count = 0;
@@ -64,17 +64,17 @@ static int test_hashset_iterator_basic(void)
     ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty set
 static int test_hashset_iterator_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVIterator it = anv_hashset_iterator(set);
 
     // Verify iterator for empty set
     ASSERT(!it.has_next(&it));
@@ -82,26 +82,26 @@ static int test_hashset_iterator_empty(void)
     ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with modifications
 static int test_hashset_iterator_with_modifications(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Insert initial elements
     const char* keys[] = {"key1", "key2", "key3"};
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(set, (void*)keys[i]), 0);
     }
 
     // Create iterator
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVIterator it = anv_hashset_iterator(set);
 
     // Consume first element
     const void* key = it.get(&it);
@@ -109,7 +109,7 @@ static int test_hashset_iterator_with_modifications(void)
     it.next(&it);
 
     // Modify set by adding new element
-    ASSERT_EQ(dsc_hashset_add(set, "new_key"), 0);
+    ASSERT_EQ(anv_hashset_add(set, "new_key"), 0);
 
     // Continue iteration - new element should be visible
     int remaining_count = 0;
@@ -125,27 +125,27 @@ static int test_hashset_iterator_with_modifications(void)
     ASSERT_GTE(remaining_count, 2);
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test multiple iterators
 static int test_hashset_iterator_multiple(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Insert elements
     for (int i = 1; i <= 5; i++)
     {
         char* key = malloc(16);
         snprintf(key, 16, "key%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+        ASSERT_EQ(anv_hashset_add(set, key), 0);
     }
 
     // Create two independent iterators
-    DSCIterator it1 = dsc_hashset_iterator(set);
-    DSCIterator it2 = dsc_hashset_iterator(set);
+    ANVIterator it1 = anv_hashset_iterator(set);
+    ANVIterator it2 = anv_hashset_iterator(set);
 
     // First iterator consumes two elements
     const void* key1 = it1.get(&it1);
@@ -183,21 +183,21 @@ static int test_hashset_iterator_multiple(void)
 
     it1.destroy(&it1);
     it2.destroy(&it2);
-    dsc_hashset_destroy(set, true);
+    anv_hashset_destroy(set, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator get function
 static int test_hashset_iterator_get(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "test_key";
 
-    ASSERT_EQ(dsc_hashset_add(set, key), 0);
+    ASSERT_EQ(anv_hashset_add(set, key), 0);
 
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVIterator it = anv_hashset_iterator(set);
 
     // Test get without advancing
     const void* current_key = it.get(&it);
@@ -214,68 +214,68 @@ static int test_hashset_iterator_get(void)
     ASSERT_NULL(it.get(&it));
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator backward operations (should not be supported)
 static int test_hashset_iterator_backward(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    ASSERT_EQ(dsc_hashset_add(set, "key"), 0);
+    ASSERT_EQ(anv_hashset_add(set, "key"), 0);
 
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVIterator it = anv_hashset_iterator(set);
 
     // HashSet iterator should not support backward iteration
     ASSERT(!it.has_prev(&it));
     ASSERT_EQ(it.prev(&it), -1);
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test creating hashset from iterator
 static int test_hashset_from_iterator(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
     // Create original hashset
-    DSCHashSet* original = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* original = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     const char* keys[] = {"key1", "key2", "key3"};
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(original, (void*)keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(original, (void*)keys[i]), 0);
     }
 
     // Create iterator from original
-    DSCIterator it = dsc_hashset_iterator(original);
+    ANVIterator it = anv_hashset_iterator(original);
 
     // Create new hashset from iterator
-    DSCHashSet* new_set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashSet* new_set = anv_hashset_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(new_set);
-    ASSERT_EQ(dsc_hashset_size(new_set), 3);
+    ASSERT_EQ(anv_hashset_size(new_set), 3);
 
     // Verify all data was copied
     for (int i = 0; i < 3; i++)
     {
-        ASSERT(dsc_hashset_contains(new_set, keys[i]));
+        ASSERT(anv_hashset_contains(new_set, keys[i]));
     }
 
     it.destroy(&it);
-    dsc_hashset_destroy(original, false);
-    dsc_hashset_destroy(new_set, true);
+    anv_hashset_destroy(original, false);
+    anv_hashset_destroy(new_set, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator with invalid hashset
 static int test_hashset_iterator_invalid(void)
 {
-    const DSCIterator iter = dsc_hashset_iterator(NULL);
+    const ANVIterator iter = anv_hashset_iterator(NULL);
     ASSERT(!iter.is_valid(&iter));
     return TEST_SUCCESS;
 }
@@ -283,114 +283,114 @@ static int test_hashset_iterator_invalid(void)
 // Test copy isolation - verify that copied elements are independent
 static int test_hashset_copy_isolation(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
     // Create source hashset
-    DSCHashSet* source_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* source_set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
     ASSERT_NOT_NULL(source_set);
 
     const char* keys[] = {"key1", "key2", "key3"};
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(source_set, (void*)keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(source_set, (void*)keys[i]), 0);
     }
 
-    DSCIterator set_it = dsc_hashset_iterator(source_set);
+    ANVIterator set_it = anv_hashset_iterator(source_set);
     ASSERT(set_it.is_valid(&set_it));
 
     // Create hashset with copying enabled
-    DSCHashSet* new_set = dsc_hashset_from_iterator(&set_it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashSet* new_set = anv_hashset_from_iterator(&set_it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(new_set);
-    ASSERT_EQ(dsc_hashset_size(new_set), 3);
+    ASSERT_EQ(anv_hashset_size(new_set), 3);
 
     // Verify all original values are preserved in new set
     for (int i = 0; i < 3; i++)
     {
-        ASSERT(dsc_hashset_contains(new_set, keys[i]));
+        ASSERT(anv_hashset_contains(new_set, keys[i]));
     }
 
     set_it.destroy(&set_it);
-    dsc_hashset_destroy(new_set, true);
-    dsc_hashset_destroy(source_set, false);
+    anv_hashset_destroy(new_set, true);
+    anv_hashset_destroy(source_set, false);
     return TEST_SUCCESS;
 }
 
 // Test that should_copy=true fails when allocator has no copy function
 static int test_hashset_copy_function_required(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    alloc.copy_func = NULL;
+    ANVAllocator alloc = anv_alloc_default();
+    alloc.copy = NULL;
 
-    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    ASSERT_EQ(dsc_hashset_add(source, "key"), 0);
+    ANVHashSet* source = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
+    ASSERT_EQ(anv_hashset_add(source, "key"), 0);
 
-    DSCIterator it = dsc_hashset_iterator(source);
+    ANVIterator it = anv_hashset_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Should return NULL because should_copy=true but no copy function available
-    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashSet* set = anv_hashset_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NULL(set);
 
     it.destroy(&it);
-    dsc_hashset_destroy(source, false);
+    anv_hashset_destroy(source, false);
     return TEST_SUCCESS;
 }
 
 // Test that should_copy=false uses elements directly without copying
 static int test_hashset_from_iterator_no_copy(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
     // Create source set with allocated strings
-    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* source = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = malloc(16);
     strcpy(key, "test_key");
 
-    ASSERT_EQ(dsc_hashset_add(source, key), 0);
+    ASSERT_EQ(anv_hashset_add(source, key), 0);
 
-    DSCIterator it = dsc_hashset_iterator(source);
+    ANVIterator it = anv_hashset_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Create hashset without copying (should_copy = false)
-    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, false);
+    ANVHashSet* set = anv_hashset_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, false);
     ASSERT_NOT_NULL(set);
-    ASSERT_EQ(dsc_hashset_size(set), 1);
+    ASSERT_EQ(anv_hashset_size(set), 1);
 
     // Verify key is correct
-    ASSERT(dsc_hashset_contains(set, "test_key"));
+    ASSERT(anv_hashset_contains(set, "test_key"));
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);   // Don't free since we're sharing data
-    dsc_hashset_destroy(source, true); // Free the original allocated data
+    anv_hashset_destroy(set, false);   // Don't free since we're sharing data
+    anv_hashset_destroy(source, true); // Free the original allocated data
     return TEST_SUCCESS;
 }
 
-// Test that iterator is exhausted after being consumed by dsc_hashset_from_iterator
+// Test that iterator is exhausted after being consumed by anv_hashset_from_iterator
 static int test_hashset_iterator_exhaustion_after_creation(void)
 {
-    DSCAllocator alloc = create_string_allocator();
+    ANVAllocator alloc = create_string_allocator();
 
-    DSCHashSet* source = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* source = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     for (int i = 0; i < 5; i++)
     {
         char* key = malloc(16);
         snprintf(key, 16, "key%d", i);
-        ASSERT_EQ(dsc_hashset_add(source, key), 0);
+        ASSERT_EQ(anv_hashset_add(source, key), 0);
     }
 
-    DSCIterator it = dsc_hashset_iterator(source);
+    ANVIterator it = anv_hashset_iterator(source);
     ASSERT(it.is_valid(&it));
 
     // Verify iterator starts with elements
     ASSERT(it.has_next(&it));
 
     // Create hashset from iterator (consumes all elements)
-    DSCHashSet* set = dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, dsc_key_equals_string, true);
+    ANVHashSet* set = anv_hashset_from_iterator(&it, &alloc, anv_hash_string, anv_key_equals_string, true);
     ASSERT_NOT_NULL(set);
-    ASSERT_EQ(dsc_hashset_size(set), 5);
+    ASSERT_EQ(anv_hashset_size(set), 5);
 
     // Iterator should now be exhausted
     ASSERT(!it.has_next(&it));
@@ -401,21 +401,21 @@ static int test_hashset_iterator_exhaustion_after_creation(void)
     ASSERT(it.is_valid(&it));
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, true);
-    dsc_hashset_destroy(source, true);
+    anv_hashset_destroy(set, true);
+    anv_hashset_destroy(source, true);
     return TEST_SUCCESS;
 }
 
 // Test next() return values for proper error handling
 static int test_hashset_iterator_next_return_values(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add single element
-    ASSERT_EQ(dsc_hashset_add(set, "key"), 0);
+    ASSERT_EQ(anv_hashset_add(set, "key"), 0);
 
-    DSCIterator iter = dsc_hashset_iterator(set);
+    ANVIterator iter = anv_hashset_iterator(set);
     ASSERT(iter.is_valid(&iter));
 
     // Should successfully advance once
@@ -431,25 +431,25 @@ static int test_hashset_iterator_next_return_values(void)
     ASSERT(!iter.has_next(&iter));   // Still no elements
 
     iter.destroy(&iter);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test various combinations of get/next/has_next calls for consistency
 static int test_hashset_iterator_mixed_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Add test data
     const char* keys[] = {"a", "b", "c"};
 
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_hashset_add(set, (void*)keys[i]), 0);
+        ASSERT_EQ(anv_hashset_add(set, (void*)keys[i]), 0);
     }
 
-    DSCIterator iter = dsc_hashset_iterator(set);
+    ANVIterator iter = anv_hashset_iterator(set);
     ASSERT(iter.is_valid(&iter));
 
     // Multiple get() calls should return same value
@@ -485,24 +485,24 @@ static int test_hashset_iterator_mixed_operations(void)
     }
 
     iter.destroy(&iter);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test reset functionality
 static int test_hashset_iterator_reset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     for (int i = 0; i < 3; i++)
     {
         char* key = malloc(16);
         snprintf(key, 16, "key%d", i);
-        ASSERT_EQ(dsc_hashset_add(set, key), 0);
+        ASSERT_EQ(anv_hashset_add(set, key), 0);
     }
 
-    DSCIterator iter = dsc_hashset_iterator(set);
+    ANVIterator iter = anv_hashset_iterator(set);
 
     // First iteration
     int first_count = 0;
@@ -526,19 +526,19 @@ static int test_hashset_iterator_reset(void)
     ASSERT_EQ(second_count, 3);
 
     iter.destroy(&iter);
-    dsc_hashset_destroy(set, true);
+    anv_hashset_destroy(set, true);
     return TEST_SUCCESS;
 }
 
 // Test single element iterator behavior
 static int test_hashset_iterator_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
-    ASSERT_EQ(dsc_hashset_add(set, "single"), 0);
+    ASSERT_EQ(anv_hashset_add(set, "single"), 0);
 
-    DSCIterator iter = dsc_hashset_iterator(set);
+    ANVIterator iter = anv_hashset_iterator(set);
 
     ASSERT(iter.has_next(&iter));
     ASSERT(!iter.has_prev(&iter)); // HashSet doesn't support backward iteration
@@ -552,31 +552,31 @@ static int test_hashset_iterator_single_element(void)
     ASSERT(!iter.has_prev(&iter)); // Still no backward support
 
     iter.destroy(&iter);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test from_iterator with NULL parameters
 static int test_hashset_from_iterator_null_params(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCIterator it = dsc_hashset_iterator(set);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
+    ANVIterator it = anv_hashset_iterator(set);
 
     // Test NULL iterator
-    ASSERT_NULL(dsc_hashset_from_iterator(NULL, &alloc, dsc_hash_string, dsc_key_equals_string, true));
+    ASSERT_NULL(anv_hashset_from_iterator(NULL, &alloc, anv_hash_string, anv_key_equals_string, true));
 
     // Test NULL allocator
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, NULL, dsc_hash_string, dsc_key_equals_string, true));
+    ASSERT_NULL(anv_hashset_from_iterator(&it, NULL, anv_hash_string, anv_key_equals_string, true));
 
     // Test NULL hash function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, NULL, dsc_key_equals_string, true));
+    ASSERT_NULL(anv_hashset_from_iterator(&it, &alloc, NULL, anv_key_equals_string, true));
 
     // Test NULL key_equals function
-    ASSERT_NULL(dsc_hashset_from_iterator(&it, &alloc, dsc_hash_string, NULL, true));
+    ASSERT_NULL(anv_hashset_from_iterator(&it, &alloc, anv_hash_string, NULL, true));
 
     it.destroy(&it);
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 

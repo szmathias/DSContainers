@@ -5,15 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "HashMap.h"
+#include "containers/HashMap.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
-// Test the new dsc_hashmap_put_replace function
+// Test the new anv_hashmap_put_replace function
 int test_hashmap_put_replace(void)
 {
-    DSCAllocator alloc = create_string_allocator();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_string_allocator();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "test_key";
 
@@ -28,65 +28,65 @@ int test_hashmap_put_replace(void)
     void* old_value = NULL;
 
     // Insert first value - should return NULL for old_value
-    ASSERT_EQ(dsc_hashmap_put_replace(map, key, value1, &old_value), 0);
+    ASSERT_EQ(anv_hashmap_put_replace(map, key, value1, &old_value), 0);
     ASSERT_EQ(old_value, NULL);
-    ASSERT_EQ(dsc_hashmap_size(map), 1);
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "first_heap_value");
+    ASSERT_EQ(anv_hashmap_size(map), 1);
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "first_heap_value");
 
     // Replace with second value - should return first value
-    ASSERT_EQ(dsc_hashmap_put_replace(map, key, value2, &old_value), 0);
+    ASSERT_EQ(anv_hashmap_put_replace(map, key, value2, &old_value), 0);
     ASSERT_EQ(old_value, value1);
-    ASSERT_EQ(dsc_hashmap_size(map), 1); // Size unchanged
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "second_heap_value");
+    ASSERT_EQ(anv_hashmap_size(map), 1); // Size unchanged
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "second_heap_value");
     free(old_value); // Clean up first value - no leak!
 
     // Replace with third value - should return second value
-    ASSERT_EQ(dsc_hashmap_put_replace(map, key, value3, &old_value), 0);
+    ASSERT_EQ(anv_hashmap_put_replace(map, key, value3, &old_value), 0);
     ASSERT_EQ(old_value, value2);
-    ASSERT_EQ(dsc_hashmap_size(map), 1); // Size unchanged
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "third_heap_value");
+    ASSERT_EQ(anv_hashmap_size(map), 1); // Size unchanged
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "third_heap_value");
     free(old_value); // Clean up second value - no leak!
 
     // Test error conditions
-    ASSERT_EQ(dsc_hashmap_put_replace(NULL, key, value3, &old_value), -1);
-    ASSERT_EQ(dsc_hashmap_put_replace(map, NULL, value3, &old_value), -1);
-    ASSERT_EQ(dsc_hashmap_put_replace(map, key, value3, NULL), -1);
+    ASSERT_EQ(anv_hashmap_put_replace(NULL, key, value3, &old_value), -1);
+    ASSERT_EQ(anv_hashmap_put_replace(map, NULL, value3, &old_value), -1);
+    ASSERT_EQ(anv_hashmap_put_replace(map, key, value3, NULL), -1);
 
     // Clean up final value
-    char* final_value = (char*)dsc_hashmap_get(map, key);
-    dsc_hashmap_destroy(map, false, false);
+    char* final_value = (char*)anv_hashmap_get(map, key);
+    anv_hashmap_destroy(map, false, false);
     free(final_value);
 
     return TEST_SUCCESS;
 }
 
-// Test the new dsc_hashmap_put_with_free function
+// Test the new anv_hashmap_put_with_free function
 int test_hashmap_put_with_free(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = anv_alloc_default();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "auto_free_key";
 
     // Test with string literals (should_free_old_value = false)
-    ASSERT_EQ(dsc_hashmap_put_with_free(map, key, "literal1", false), 0);
-    ASSERT_EQ(dsc_hashmap_size(map), 1);
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "literal1");
+    ASSERT_EQ(anv_hashmap_put_with_free(map, key, "literal1", false), 0);
+    ASSERT_EQ(anv_hashmap_size(map), 1);
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "literal1");
 
-    ASSERT_EQ(dsc_hashmap_put_with_free(map, key, "literal2", false), 0);
-    ASSERT_EQ(dsc_hashmap_size(map), 1); // Size unchanged
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "literal2");
+    ASSERT_EQ(anv_hashmap_put_with_free(map, key, "literal2", false), 0);
+    ASSERT_EQ(anv_hashmap_size(map), 1); // Size unchanged
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "literal2");
 
     // Test error conditions
-    ASSERT_EQ(dsc_hashmap_put_with_free(NULL, key, "value", false), -1);
-    ASSERT_EQ(dsc_hashmap_put_with_free(map, NULL, "value", false), -1);
+    ASSERT_EQ(anv_hashmap_put_with_free(NULL, key, "value", false), -1);
+    ASSERT_EQ(anv_hashmap_put_with_free(map, NULL, "value", false), -1);
 
     // Test that function works with new keys
-    ASSERT_EQ(dsc_hashmap_put_with_free(map, "new_key", "new_value", false), 0);
-    ASSERT_EQ(dsc_hashmap_size(map), 2);
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, "new_key"), "new_value");
+    ASSERT_EQ(anv_hashmap_put_with_free(map, "new_key", "new_value", false), 0);
+    ASSERT_EQ(anv_hashmap_size(map), 2);
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, "new_key"), "new_value");
 
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
 
     return TEST_SUCCESS;
 }
@@ -94,8 +94,8 @@ int test_hashmap_put_with_free(void)
 // Test memory leak prevention comparison
 int test_memory_leak_prevention(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = anv_alloc_default();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "leak_test_key";
 
@@ -105,26 +105,26 @@ int test_memory_leak_prevention(void)
     char* old_style_value2 = "old_second";
 
     // Old way - would leak if these were malloc'd
-    dsc_hashmap_put(map, key, old_style_value1);
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "old_first");
+    anv_hashmap_put(map, key, old_style_value1);
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "old_first");
 
-    dsc_hashmap_put(map, key, old_style_value2); // old_first would be lost!
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "old_second");
+    anv_hashmap_put(map, key, old_style_value2); // old_first would be lost!
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "old_second");
 
-    dsc_hashmap_clear(map, false, false);
+    anv_hashmap_clear(map, false, false);
 
     // New safe way with put_replace
     void* retrieved_old = NULL;
-    dsc_hashmap_put_replace(map, key, "safe_first", &retrieved_old);
+    anv_hashmap_put_replace(map, key, "safe_first", &retrieved_old);
     ASSERT_EQ(retrieved_old, NULL); // No old value
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "safe_first");
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "safe_first");
 
-    dsc_hashmap_put_replace(map, key, "safe_second", &retrieved_old);
+    anv_hashmap_put_replace(map, key, "safe_second", &retrieved_old);
     ASSERT_EQ_STR((char*)retrieved_old, "safe_first"); // Got old value back!
-    ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), "safe_second");
+    ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), "safe_second");
     // In real usage with malloc'd values, we would: free(retrieved_old);
 
-    dsc_hashmap_destroy(map, false, false);
+    anv_hashmap_destroy(map, false, false);
 
     return TEST_SUCCESS;
 }
@@ -132,8 +132,8 @@ int test_memory_leak_prevention(void)
 // Test multiple key updates with proper cleanup
 int test_multiple_updates_cleanup(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    DSCHashMap* map = dsc_hashmap_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = anv_alloc_default();
+    ANVHashMap* map = anv_hashmap_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* key = "multi_update_key";
 
@@ -148,26 +148,26 @@ int test_multiple_updates_cleanup(void)
     void* old_value = NULL;
 
     // Insert first value
-    ASSERT_EQ(dsc_hashmap_put_replace(map, key, values[0], &old_value), 0);
+    ASSERT_EQ(anv_hashmap_put_replace(map, key, values[0], &old_value), 0);
     ASSERT_EQ(old_value, NULL);
 
     // Update multiple times, cleaning up each old value
     for (int i = 1; i < 5; i++)
     {
-        ASSERT_EQ(dsc_hashmap_put_replace(map, key, values[i], &old_value), 0);
+        ASSERT_EQ(anv_hashmap_put_replace(map, key, values[i], &old_value), 0);
         ASSERT_NOT_NULL(old_value);
         ASSERT_EQ(old_value, values[i - 1]);
         free(old_value); // Clean up previous value
 
         char expected[20];
         sprintf(expected, "value_%d", i);
-        ASSERT_EQ_STR((char*)dsc_hashmap_get(map, key), expected);
-        ASSERT_EQ(dsc_hashmap_size(map), 1); // Size always 1
+        ASSERT_EQ_STR((char*)anv_hashmap_get(map, key), expected);
+        ASSERT_EQ(anv_hashmap_size(map), 1); // Size always 1
     }
 
     // Clean up final value
-    char* final_value = (char*)dsc_hashmap_get(map, key);
-    dsc_hashmap_destroy(map, false, false);
+    char* final_value = (char*)anv_hashmap_get(map, key);
+    anv_hashmap_destroy(map, false, false);
     free(final_value);
 
     return TEST_SUCCESS;

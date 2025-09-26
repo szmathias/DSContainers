@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "BinarySearchTree.h"
+#include "containers/BinarySearchTree.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -29,8 +29,8 @@ void collect_desc(void* elem) {
 // Test BST property invariant - left < root < right
 int test_bst_invariant_property(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Insert values in random order
     int values[] = {50, 25, 75, 10, 30, 60, 80, 5, 15, 27, 35};
@@ -40,12 +40,12 @@ int test_bst_invariant_property(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Reset and collect traversal results
     invariant_index = 0;
-    dsc_bst_inorder(bst, collect_for_invariant);
+    anv_bst_inorder(bst, collect_for_invariant);
 
     // Check that results are in ascending order
     for (int i = 1; i < 11; i++)
@@ -53,78 +53,78 @@ int test_bst_invariant_property(void)
         ASSERT(invariant_results[i-1] < invariant_results[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test height calculation
 int test_bst_height_calculation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Empty tree height
-    ASSERT_EQ(dsc_bst_height(bst), 0);
+    ASSERT_EQ(anv_bst_height(bst), 0);
 
     // Single node tree
     int* data1 = malloc(sizeof(int));
     *data1 = 50;
-    dsc_bst_insert(bst, data1);
-    ASSERT_EQ(dsc_bst_height(bst), 1);
+    anv_bst_insert(bst, data1);
+    ASSERT_EQ(anv_bst_height(bst), 1);
 
     // Add left child - height should be 2
     int* data2 = malloc(sizeof(int));
     *data2 = 30;
-    dsc_bst_insert(bst, data2);
-    ASSERT_EQ(dsc_bst_height(bst), 2);
+    anv_bst_insert(bst, data2);
+    ASSERT_EQ(anv_bst_height(bst), 2);
 
     // Add right child - height still 2
     int* data3 = malloc(sizeof(int));
     *data3 = 70;
-    dsc_bst_insert(bst, data3);
-    ASSERT_EQ(dsc_bst_height(bst), 2);
+    anv_bst_insert(bst, data3);
+    ASSERT_EQ(anv_bst_height(bst), 2);
 
     // Add deeper left node - height becomes 3
     int* data4 = malloc(sizeof(int));
     *data4 = 20;
-    dsc_bst_insert(bst, data4);
-    ASSERT_EQ(dsc_bst_height(bst), 3);
+    anv_bst_insert(bst, data4);
+    ASSERT_EQ(anv_bst_height(bst), 3);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test degenerate tree (linear chain)
 int test_bst_degenerate_tree(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Insert in ascending order to create right-skewed tree
     for (int i = 1; i <= 10; i++)
     {
         int* data = malloc(sizeof(int));
         *data = i;
-        ASSERT_EQ(dsc_bst_insert(bst, data), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data), 0);
     }
 
     // Height should be equal to number of nodes (worst case)
-    ASSERT_EQ(dsc_bst_height(bst), 10);
-    ASSERT_EQ(dsc_bst_size(bst), 10);
+    ASSERT_EQ(anv_bst_height(bst), 10);
+    ASSERT_EQ(anv_bst_size(bst), 10);
 
     // Min should be 1, max should be 10
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), 1);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), 10);
+    ASSERT_EQ(*(int*)anv_bst_min(bst), 1);
+    ASSERT_EQ(*(int*)anv_bst_max(bst), 10);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test perfect binary tree
 int test_bst_perfect_tree(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Insert values to create perfect binary tree
     // Level 1: 50
@@ -137,25 +137,25 @@ int test_bst_perfect_tree(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    ASSERT_EQ(dsc_bst_size(bst), 7);
-    ASSERT_EQ(dsc_bst_height(bst), 3); // Perfect tree with 7 nodes has height 3
+    ASSERT_EQ(anv_bst_size(bst), 7);
+    ASSERT_EQ(anv_bst_height(bst), 3); // Perfect tree with 7 nodes has height 3
 
     // Verify min and max
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), 12);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), 87);
+    ASSERT_EQ(*(int*)anv_bst_min(bst), 12);
+    ASSERT_EQ(*(int*)anv_bst_max(bst), 87);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test duplicate handling
 int test_bst_duplicate_handling(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -165,29 +165,29 @@ int test_bst_duplicate_handling(void)
     *data3 = 50; // Another duplicate
 
     // First insert should succeed
-    ASSERT_EQ(dsc_bst_insert(bst, data1), 0);
-    ASSERT_EQ(dsc_bst_size(bst), 1);
+    ASSERT_EQ(anv_bst_insert(bst, data1), 0);
+    ASSERT_EQ(anv_bst_size(bst), 1);
 
     // Duplicate inserts should return 1 and not change size
-    ASSERT_EQ(dsc_bst_insert(bst, data2), 1);
-    ASSERT_EQ(dsc_bst_size(bst), 1);
+    ASSERT_EQ(anv_bst_insert(bst, data2), 1);
+    ASSERT_EQ(anv_bst_size(bst), 1);
 
-    ASSERT_EQ(dsc_bst_insert(bst, data3), 1);
-    ASSERT_EQ(dsc_bst_size(bst), 1);
+    ASSERT_EQ(anv_bst_insert(bst, data3), 1);
+    ASSERT_EQ(anv_bst_size(bst), 1);
 
     // Clean up duplicate data that wasn't inserted
     free(data2);
     free(data3);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test with negative numbers
 int test_bst_negative_numbers(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int values[] = {0, -10, 10, -5, 5, -15, 15};
     int* data[7];
@@ -196,90 +196,90 @@ int test_bst_negative_numbers(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    ASSERT_EQ(dsc_bst_size(bst), 7);
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), -15);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), 15);
+    ASSERT_EQ(anv_bst_size(bst), 7);
+    ASSERT_EQ(*(int*)anv_bst_min(bst), -15);
+    ASSERT_EQ(*(int*)anv_bst_max(bst), 15);
 
     // Verify all values are present
     for (int i = 0; i < 7; i++)
     {
-        ASSERT(dsc_bst_contains(bst, &values[i]));
+        ASSERT(anv_bst_contains(bst, &values[i]));
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test removal of root with various configurations
 int test_bst_root_removal_cases(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Case 1: Root with no children
-    DSCBinarySearchTree* bst1 = dsc_bst_create(&alloc, int_cmp);
+    ANVBinarySearchTree* bst1 = anv_bst_create(&alloc, int_cmp);
     int* root1 = malloc(sizeof(int));
     *root1 = 50;
-    dsc_bst_insert(bst1, root1);
+    anv_bst_insert(bst1, root1);
 
     int remove_val = 50;
-    ASSERT_EQ(dsc_bst_remove(bst1, &remove_val, true), 0);
-    ASSERT_EQ(dsc_bst_size(bst1), 0);
-    ASSERT(dsc_bst_is_empty(bst1));
-    dsc_bst_destroy(bst1, false);
+    ASSERT_EQ(anv_bst_remove(bst1, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_size(bst1), 0);
+    ASSERT(anv_bst_is_empty(bst1));
+    anv_bst_destroy(bst1, false);
 
     // Case 2: Root with only left child
-    DSCBinarySearchTree* bst2 = dsc_bst_create(&alloc, int_cmp);
+    ANVBinarySearchTree* bst2 = anv_bst_create(&alloc, int_cmp);
     int* root2 = malloc(sizeof(int));
     int* left2 = malloc(sizeof(int));
     *root2 = 50;
     *left2 = 30;
-    dsc_bst_insert(bst2, root2);
-    dsc_bst_insert(bst2, left2);
+    anv_bst_insert(bst2, root2);
+    anv_bst_insert(bst2, left2);
 
     remove_val = 50;
-    ASSERT_EQ(dsc_bst_remove(bst2, &remove_val, true), 0);
-    ASSERT_EQ(dsc_bst_size(bst2), 1);
-    ASSERT_EQ(*(int*)dsc_bst_min(bst2), 30);
-    dsc_bst_destroy(bst2, true);
+    ASSERT_EQ(anv_bst_remove(bst2, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_size(bst2), 1);
+    ASSERT_EQ(*(int*)anv_bst_min(bst2), 30);
+    anv_bst_destroy(bst2, true);
 
     // Case 3: Root with only right child
-    DSCBinarySearchTree* bst3 = dsc_bst_create(&alloc, int_cmp);
+    ANVBinarySearchTree* bst3 = anv_bst_create(&alloc, int_cmp);
     int* root3 = malloc(sizeof(int));
     int* right3 = malloc(sizeof(int));
     *root3 = 50;
     *right3 = 70;
-    dsc_bst_insert(bst3, root3);
-    dsc_bst_insert(bst3, right3);
+    anv_bst_insert(bst3, root3);
+    anv_bst_insert(bst3, right3);
 
     remove_val = 50;
-    ASSERT_EQ(dsc_bst_remove(bst3, &remove_val, true), 0);
-    ASSERT_EQ(dsc_bst_size(bst3), 1);
-    ASSERT_EQ(*(int*)dsc_bst_min(bst3), 70);
-    dsc_bst_destroy(bst3, true);
+    ASSERT_EQ(anv_bst_remove(bst3, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_size(bst3), 1);
+    ASSERT_EQ(*(int*)anv_bst_min(bst3), 70);
+    anv_bst_destroy(bst3, true);
 
     // Case 4: Root with both children
-    DSCBinarySearchTree* bst4 = dsc_bst_create(&alloc, int_cmp);
+    ANVBinarySearchTree* bst4 = anv_bst_create(&alloc, int_cmp);
     int values[] = {50, 30, 70, 20, 40, 60, 80};
     int* data[7];
     for (int i = 0; i < 7; i++)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        dsc_bst_insert(bst4, data[i]);
+        anv_bst_insert(bst4, data[i]);
     }
 
     remove_val = 50;
-    ASSERT_EQ(dsc_bst_remove(bst4, &remove_val, true), 0);
-    ASSERT_EQ(dsc_bst_size(bst4), 6);
-    ASSERT(!dsc_bst_contains(bst4, &remove_val));
+    ASSERT_EQ(anv_bst_remove(bst4, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_size(bst4), 6);
+    ASSERT(!anv_bst_contains(bst4, &remove_val));
 
     // Tree should still maintain BST property
-    ASSERT_EQ(*(int*)dsc_bst_min(bst4), 20);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst4), 80);
-    dsc_bst_destroy(bst4, true);
+    ASSERT_EQ(*(int*)anv_bst_min(bst4), 20);
+    ASSERT_EQ(*(int*)anv_bst_max(bst4), 80);
+    anv_bst_destroy(bst4, true);
 
     return TEST_SUCCESS;
 }
@@ -287,8 +287,8 @@ int test_bst_root_removal_cases(void)
 // Test tree behavior after multiple operations
 int test_bst_complex_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Build initial tree
     int initial_values[] = {50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45};
@@ -297,19 +297,19 @@ int test_bst_complex_operations(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = initial_values[i];
-        dsc_bst_insert(bst, data[i]);
+        anv_bst_insert(bst, data[i]);
     }
 
-    ASSERT_EQ(dsc_bst_size(bst), 11);
+    ASSERT_EQ(anv_bst_size(bst), 11);
 
     // Remove some leaf nodes
     int remove_values[] = {10, 45, 25};
     for (int i = 0; i < 3; i++)
     {
-        ASSERT_EQ(dsc_bst_remove(bst, &remove_values[i], true), 0);
+        ASSERT_EQ(anv_bst_remove(bst, &remove_values[i], true), 0);
     }
 
-    ASSERT_EQ(dsc_bst_size(bst), 8);
+    ASSERT_EQ(anv_bst_size(bst), 8);
 
     // Add some new values
     int new_values[] = {15, 55, 75};
@@ -318,24 +318,24 @@ int test_bst_complex_operations(void)
     {
         new_data[i] = malloc(sizeof(int));
         *(new_data[i]) = new_values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, new_data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, new_data[i]), 0);
     }
 
-    ASSERT_EQ(dsc_bst_size(bst), 11);
+    ASSERT_EQ(anv_bst_size(bst), 11);
 
     // Verify BST property still holds
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), 15);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), 80);
+    ASSERT_EQ(*(int*)anv_bst_min(bst), 15);
+    ASSERT_EQ(*(int*)anv_bst_max(bst), 80);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test with custom comparison function (descending order)
 int test_bst_custom_comparison(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp_desc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp_desc);
 
     int values[] = {50, 30, 70, 20, 80};
     int* data[5];
@@ -344,16 +344,16 @@ int test_bst_custom_comparison(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // With descending comparison, min and max are swapped
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), 80); // "Minimum" in descending order
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), 20); // "Maximum" in descending order
+    ASSERT_EQ(*(int*)anv_bst_min(bst), 80); // "Minimum" in descending order
+    ASSERT_EQ(*(int*)anv_bst_max(bst), 20); // "Maximum" in descending order
 
     // In-order traversal should be in descending order
     desc_index = 0;
-    dsc_bst_inorder(bst, collect_desc);
+    anv_bst_inorder(bst, collect_desc);
 
     // Should be in descending order: 80, 70, 50, 30, 20
     for (int i = 1; i < 5; i++)
@@ -361,15 +361,15 @@ int test_bst_custom_comparison(void)
         ASSERT(desc_results[i-1] > desc_results[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test boundary conditions
 int test_bst_boundary_conditions(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Test with extreme values
     int* min_int = malloc(sizeof(int));
@@ -379,20 +379,20 @@ int test_bst_boundary_conditions(void)
     *max_int = INT_MAX;
     *zero = 0;
 
-    ASSERT_EQ(dsc_bst_insert(bst, zero), 0);
-    ASSERT_EQ(dsc_bst_insert(bst, min_int), 0);
-    ASSERT_EQ(dsc_bst_insert(bst, max_int), 0);
+    ASSERT_EQ(anv_bst_insert(bst, zero), 0);
+    ASSERT_EQ(anv_bst_insert(bst, min_int), 0);
+    ASSERT_EQ(anv_bst_insert(bst, max_int), 0);
 
-    ASSERT_EQ(dsc_bst_size(bst), 3);
-    ASSERT_EQ(*(int*)dsc_bst_min(bst), INT_MIN);
-    ASSERT_EQ(*(int*)dsc_bst_max(bst), INT_MAX);
+    ASSERT_EQ(anv_bst_size(bst), 3);
+    ASSERT_EQ(*(int*)anv_bst_min(bst), INT_MIN);
+    ASSERT_EQ(*(int*)anv_bst_max(bst), INT_MAX);
 
     // Test contains with extreme values
-    ASSERT(dsc_bst_contains(bst, min_int));
-    ASSERT(dsc_bst_contains(bst, max_int));
-    ASSERT(dsc_bst_contains(bst, zero));
+    ASSERT(anv_bst_contains(bst, min_int));
+    ASSERT(anv_bst_contains(bst, max_int));
+    ASSERT(anv_bst_contains(bst, zero));
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 

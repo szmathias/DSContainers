@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -21,7 +21,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -56,9 +56,9 @@ static int verify_values(const int* actual, const int* expected, const int count
 /**
  * Helper function to create a test list with integers 1 through n.
  */
-static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
+static ANVDoublyLinkedList* create_test_list(ANVAllocator* alloc, const int n)
 {
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(alloc);
     if (!list)
         return NULL;
 
@@ -67,11 +67,11 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
         int* val = malloc(sizeof(int));
         if (!val)
         {
-            dsc_dll_destroy(list, true);
+            anv_dll_destroy(list, true);
             return NULL;
         }
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
     return list;
 }
@@ -79,9 +79,9 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
 /**
  * Helper function to create a test list with specific values.
  */
-static DSCDoublyLinkedList* create_list_with_values(DSCAllocator* alloc, const int* values, const int count)
+static ANVDoublyLinkedList* create_list_with_values(ANVAllocator* alloc, const int* values, const int count)
 {
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(alloc);
     if (!list)
         return NULL;
 
@@ -90,11 +90,11 @@ static DSCDoublyLinkedList* create_list_with_values(DSCAllocator* alloc, const i
         int* val = malloc(sizeof(int));
         if (!val)
         {
-            dsc_dll_destroy(list, true);
+            anv_dll_destroy(list, true);
             return NULL;
         }
         *val = values[i];
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
     return list;
 }
@@ -108,16 +108,16 @@ static DSCDoublyLinkedList* create_list_with_values(DSCAllocator* alloc, const i
  */
 static int test_filter_basic_even(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 10);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
 
     // Create filter iterator for even numbers
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
     ASSERT_NOT_NULL(filter_it.data_state);
 
@@ -135,7 +135,7 @@ static int test_filter_basic_even(void)
 
     // Cleanup
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -144,12 +144,12 @@ static int test_filter_basic_even(void)
  */
 static int test_filter_odd(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 7);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 7);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_odd);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_odd);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -162,7 +162,7 @@ static int test_filter_odd(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_odd"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -171,12 +171,12 @@ static int test_filter_odd(void)
  */
 static int test_filter_greater_than_five(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 8);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 8);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_greater_than_five);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_greater_than_five);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -189,7 +189,7 @@ static int test_filter_greater_than_five(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_greater_than_five"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -198,12 +198,12 @@ static int test_filter_greater_than_five(void)
  */
 static int test_filter_divisible_by_3(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 12);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 12);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_divisible_by_3);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_divisible_by_3);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -216,7 +216,7 @@ static int test_filter_divisible_by_3(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_divisible_by_3"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -229,16 +229,16 @@ static int test_filter_divisible_by_3(void)
  */
 static int test_filter_empty_input(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Create iterator on empty list
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_FALSE(base_it.has_next(&base_it));
 
     // Create filter iterator
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
     ASSERT_FALSE(filter_it.has_next(&filter_it));
     ASSERT_NULL(filter_it.get(&filter_it));
@@ -247,7 +247,7 @@ static int test_filter_empty_input(void)
     ASSERT_EQ(filter_it.next(&filter_it), -1);
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, false);
+    anv_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
@@ -256,15 +256,15 @@ static int test_filter_empty_input(void)
  */
 static int test_filter_no_matches(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create list with only odd numbers: [1,3,5,7,9]
     const int odd_values[] = {1, 3, 5, 7, 9};
-    DSCDoublyLinkedList* list = create_list_with_values(&alloc, odd_values, 5);
+    ANVDoublyLinkedList* list = create_list_with_values(&alloc, odd_values, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -276,7 +276,7 @@ static int test_filter_no_matches(void)
     ASSERT_EQ(filter_it.next(&filter_it), -1);
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -285,15 +285,15 @@ static int test_filter_no_matches(void)
  */
 static int test_filter_all_matches(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create list with only even numbers: [2,4,6,8,10]
     const int even_values[] = {2, 4, 6, 8, 10};
-    DSCDoublyLinkedList* list = create_list_with_values(&alloc, even_values, 5);
+    ANVDoublyLinkedList* list = create_list_with_values(&alloc, even_values, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -306,7 +306,7 @@ static int test_filter_all_matches(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "filter_all_matches"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -315,13 +315,13 @@ static int test_filter_all_matches(void)
  */
 static int test_filter_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
     // Test with single odd element (should be filtered out)
-    DSCIterator base_it1 = dsc_dll_iterator(list);
-    DSCIterator filter_it1 = dsc_iterator_filter(&base_it1, &alloc, is_even);
+    ANVIterator base_it1 = anv_dll_iterator(list);
+    ANVIterator filter_it1 = anv_iterator_filter(&base_it1, &alloc, is_even);
 
     ASSERT_TRUE(filter_it1.is_valid(&filter_it1));
     ASSERT_FALSE(filter_it1.has_next(&filter_it1));
@@ -331,11 +331,11 @@ static int test_filter_single_element(void)
 
     // Test with single even element (should pass through)
     const int even_value[] = {4};
-    DSCDoublyLinkedList* even_list = create_list_with_values(&alloc, even_value, 1);
+    ANVDoublyLinkedList* even_list = create_list_with_values(&alloc, even_value, 1);
     ASSERT_NOT_NULL(even_list);
 
-    DSCIterator base_it2 = dsc_dll_iterator(even_list);
-    DSCIterator filter_it2 = dsc_iterator_filter(&base_it2, &alloc, is_even);
+    ANVIterator base_it2 = anv_dll_iterator(even_list);
+    ANVIterator filter_it2 = anv_iterator_filter(&base_it2, &alloc, is_even);
 
     ASSERT_TRUE(filter_it2.is_valid(&filter_it2));
     ASSERT_TRUE(filter_it2.has_next(&filter_it2));
@@ -349,8 +349,8 @@ static int test_filter_single_element(void)
     ASSERT_NULL(filter_it2.get(&filter_it2));
 
     filter_it2.destroy(&filter_it2);
-    dsc_dll_destroy(list, true);
-    dsc_dll_destroy(even_list, true);
+    anv_dll_destroy(list, true);
+    anv_dll_destroy(even_list, true);
     return TEST_SUCCESS;
 }
 
@@ -363,25 +363,25 @@ static int test_filter_single_element(void)
  */
 static int test_filter_invalid_inputs(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Test with NULL iterator
-    DSCIterator invalid_it1 = dsc_iterator_filter(NULL, &alloc, is_even);
+    ANVIterator invalid_it1 = anv_iterator_filter(NULL, &alloc, is_even);
     ASSERT_FALSE(invalid_it1.is_valid(&invalid_it1));
     ASSERT_FALSE(invalid_it1.has_next(&invalid_it1));
     ASSERT_NULL(invalid_it1.get(&invalid_it1));
 
     // Test with NULL filter function
-    DSCIterator invalid_it2 = dsc_iterator_filter(&base_it, &alloc, NULL);
+    ANVIterator invalid_it2 = anv_iterator_filter(&base_it, &alloc, NULL);
     ASSERT_FALSE(invalid_it2.is_valid(&invalid_it2));
 
     // Test with NULL allocator
-    DSCIterator base_it2 = dsc_dll_iterator(list);
-    DSCIterator invalid_it3 = dsc_iterator_filter(&base_it2, NULL, is_even);
+    ANVIterator base_it2 = anv_dll_iterator(list);
+    ANVIterator invalid_it3 = anv_iterator_filter(&base_it2, NULL, is_even);
     ASSERT_FALSE(invalid_it3.is_valid(&invalid_it3));
 
     // Cleanup
@@ -390,7 +390,7 @@ static int test_filter_invalid_inputs(void)
     invalid_it3.destroy(&invalid_it3);
     base_it2.destroy(&base_it2);
     base_it.destroy(&base_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -399,10 +399,10 @@ static int test_filter_invalid_inputs(void)
  */
 static int test_filter_operations_on_invalid(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create invalid filter iterator
-    DSCIterator invalid_it = dsc_iterator_filter(NULL, &alloc, is_even);
+    ANVIterator invalid_it = anv_iterator_filter(NULL, &alloc, is_even);
     ASSERT_FALSE(invalid_it.is_valid(&invalid_it));
 
     // All operations should fail gracefully
@@ -428,12 +428,12 @@ static int test_filter_operations_on_invalid(void)
  */
 static int test_filter_get_next_separation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 6);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 6);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -458,7 +458,7 @@ static int test_filter_get_next_separation(void)
     ASSERT_NOT_EQ(first_value, *value3);
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -467,15 +467,15 @@ static int test_filter_get_next_separation(void)
  */
 static int test_filter_next_return_codes(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create list with only 2 even numbers: [2,4]
     const int even_values[] = {2, 4};
-    DSCDoublyLinkedList* list = create_list_with_values(&alloc, even_values, 2);
+    ANVDoublyLinkedList* list = create_list_with_values(&alloc, even_values, 2);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -489,7 +489,7 @@ static int test_filter_next_return_codes(void)
     ASSERT_EQ(filter_it.next(&filter_it), -1);
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -498,12 +498,12 @@ static int test_filter_next_return_codes(void)
  */
 static int test_filter_unsupported_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -518,7 +518,7 @@ static int test_filter_unsupported_operations(void)
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -531,16 +531,16 @@ static int test_filter_unsupported_operations(void)
  */
 static int test_multiple_filter_chain_even_div3(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 20);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 20);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain filters: even AND divisible by 3 (i.e., divisible by 6)
-    DSCIterator filter_even = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator filter_div3 = dsc_iterator_filter(&filter_even, &alloc, is_divisible_by_3);
+    ANVIterator filter_even = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_div3 = anv_iterator_filter(&filter_even, &alloc, is_divisible_by_3);
 
     ASSERT_TRUE(filter_div3.is_valid(&filter_div3));
 
@@ -553,7 +553,7 @@ static int test_multiple_filter_chain_even_div3(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "multiple_filter_chain_even_div3"));
 
     filter_div3.destroy(&filter_div3);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -562,16 +562,16 @@ static int test_multiple_filter_chain_even_div3(void)
  */
 static int test_multiple_filter_chain_div4_gt10(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 25);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 25);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain filters: divisible by 4 AND greater than 10
-    DSCIterator filter_div4 = dsc_iterator_filter(&base_it, &alloc, is_divisible_by_4);
-    DSCIterator filter_gt10 = dsc_iterator_filter(&filter_div4, &alloc, is_greater_than_10);
+    ANVIterator filter_div4 = anv_iterator_filter(&base_it, &alloc, is_divisible_by_4);
+    ANVIterator filter_gt10 = anv_iterator_filter(&filter_div4, &alloc, is_greater_than_10);
 
     ASSERT_TRUE(filter_gt10.is_valid(&filter_gt10));
 
@@ -584,7 +584,7 @@ static int test_multiple_filter_chain_div4_gt10(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "multiple_filter_chain_div4_gt10"));
 
     filter_gt10.destroy(&filter_gt10);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -593,17 +593,17 @@ static int test_multiple_filter_chain_div4_gt10(void)
  */
 static int test_triple_filter_chain(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 30);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 30);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain three filters: odd AND greater than 5 AND divisible by 3
-    DSCIterator filter_odd = dsc_iterator_filter(&base_it, &alloc, is_odd);
-    DSCIterator filter_gt5 = dsc_iterator_filter(&filter_odd, &alloc, is_greater_than_five);
-    DSCIterator filter_div3 = dsc_iterator_filter(&filter_gt5, &alloc, is_divisible_by_3);
+    ANVIterator filter_odd = anv_iterator_filter(&base_it, &alloc, is_odd);
+    ANVIterator filter_gt5 = anv_iterator_filter(&filter_odd, &alloc, is_greater_than_five);
+    ANVIterator filter_div3 = anv_iterator_filter(&filter_gt5, &alloc, is_divisible_by_3);
 
     ASSERT_TRUE(filter_div3.is_valid(&filter_div3));
 
@@ -618,7 +618,7 @@ static int test_triple_filter_chain(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "triple_filter_chain"));
 
     filter_div3.destroy(&filter_div3);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -627,16 +627,16 @@ static int test_triple_filter_chain(void)
  */
 static int test_filter_chain_no_matches(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 10);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain filters: even AND greater than 20 (no matches in [1..10])
-    DSCIterator filter_even = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator filter_gt20 = dsc_iterator_filter(&filter_even, &alloc, is_greater_than_20);
+    ANVIterator filter_even = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_gt20 = anv_iterator_filter(&filter_even, &alloc, is_greater_than_20);
 
     ASSERT_TRUE(filter_gt20.is_valid(&filter_gt20));
 
@@ -646,7 +646,7 @@ static int test_filter_chain_no_matches(void)
     ASSERT_EQ(filter_gt20.next(&filter_gt20), -1);
 
     filter_gt20.destroy(&filter_gt20);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -655,16 +655,16 @@ static int test_filter_chain_no_matches(void)
  */
 static int test_filter_chain_single_match(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 15);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 15);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain filters: divisible by 6 AND greater than 10 (only 12 matches in [1..15])
-    DSCIterator filter_div6 = dsc_iterator_filter(&base_it, &alloc, is_divisible_by_six);
-    DSCIterator filter_gt10 = dsc_iterator_filter(&filter_div6, &alloc, is_greater_than_10);
+    ANVIterator filter_div6 = anv_iterator_filter(&base_it, &alloc, is_divisible_by_six);
+    ANVIterator filter_gt10 = anv_iterator_filter(&filter_div6, &alloc, is_greater_than_10);
 
     ASSERT_TRUE(filter_gt10.is_valid(&filter_gt10));
 
@@ -680,7 +680,7 @@ static int test_filter_chain_single_match(void)
     ASSERT_NULL(filter_gt10.get(&filter_gt10));
 
     filter_gt10.destroy(&filter_gt10);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -693,12 +693,12 @@ static int test_filter_chain_single_match(void)
  */
 static int test_filter_memory_consistency(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 4);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 4);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     // Get multiple references to the same value
     const int* ptr1 = filter_it.get(&filter_it);
@@ -726,7 +726,7 @@ static int test_filter_memory_consistency(void)
     ASSERT_NOT_EQ(first_value, *ptr4);
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -735,16 +735,16 @@ static int test_filter_memory_consistency(void)
  */
 static int test_filter_iterator_ownership(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
 
     // Create filter iterator (takes ownership of base_it)
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
     // Verify filter works
@@ -757,7 +757,7 @@ static int test_filter_iterator_ownership(void)
 
     // Note: We should not access base_it after this point as it's been destroyed
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -766,17 +766,17 @@ static int test_filter_iterator_ownership(void)
  */
 static int test_filter_chain_memory_management(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 20);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 20);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Create a chain of filters
-    DSCIterator filter1 = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator filter2 = dsc_iterator_filter(&filter1, &alloc, is_divisible_by_3);
-    DSCIterator filter3 = dsc_iterator_filter(&filter2, &alloc, is_greater_than_five);
+    ANVIterator filter1 = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator filter2 = anv_iterator_filter(&filter1, &alloc, is_divisible_by_3);
+    ANVIterator filter3 = anv_iterator_filter(&filter2, &alloc, is_greater_than_five);
 
     ASSERT_TRUE(filter3.is_valid(&filter3));
 
@@ -796,7 +796,7 @@ static int test_filter_chain_memory_management(void)
     // Destroying the final filter should clean up the entire chain
     filter3.destroy(&filter3);
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -809,14 +809,14 @@ static int test_filter_chain_memory_management(void)
  */
 static int test_filter_large_dataset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
     const int SIZE = 1000;
 
-    DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
+    ANVDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -838,7 +838,7 @@ static int test_filter_large_dataset(void)
     ASSERT_FALSE(filter_it.has_next(&filter_it));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -847,16 +847,16 @@ static int test_filter_large_dataset(void)
  */
 static int test_filter_complex_chaining(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 100);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 100);
     ASSERT_NOT_NULL(list);
 
     // Create a complex chain: even -> divisible by 3 -> greater than 10 -> divisible by 4
-    DSCIterator it1 = dsc_dll_iterator(list);
-    DSCIterator it2 = dsc_iterator_filter(&it1, &alloc, is_even);
-    DSCIterator it3 = dsc_iterator_filter(&it2, &alloc, is_divisible_by_3);
-    DSCIterator it4 = dsc_iterator_filter(&it3, &alloc, is_greater_than_10);
-    DSCIterator final_it = dsc_iterator_filter(&it4, &alloc, is_divisible_by_4);
+    ANVIterator it1 = anv_dll_iterator(list);
+    ANVIterator it2 = anv_iterator_filter(&it1, &alloc, is_even);
+    ANVIterator it3 = anv_iterator_filter(&it2, &alloc, is_divisible_by_3);
+    ANVIterator it4 = anv_iterator_filter(&it3, &alloc, is_greater_than_10);
+    ANVIterator final_it = anv_iterator_filter(&it4, &alloc, is_divisible_by_4);
 
     ASSERT_TRUE(final_it.is_valid(&final_it));
 
@@ -881,7 +881,7 @@ static int test_filter_complex_chaining(void)
     ASSERT_TRUE(count > 0);
 
     final_it.destroy(&final_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -892,7 +892,7 @@ static int test_filter_complex_chaining(void)
 /**
  * Enhanced helper function with better validation.
  */
-static int collect_values_with_validation(const DSCIterator* it, int* values, int max_count)
+static int collect_values_with_validation(const ANVIterator* it, int* values, int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -921,12 +921,12 @@ static int collect_values_with_validation(const DSCIterator* it, int* values, in
  */
 static int test_filter_helper_validation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 10);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
 
     ASSERT_TRUE(filter_it.is_valid(&filter_it));
 
@@ -940,7 +940,7 @@ static int test_filter_helper_validation(void)
     ASSERT_TRUE(verify_values(values, expected, count, "helper_validation"));
 
     filter_it.destroy(&filter_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 

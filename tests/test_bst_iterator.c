@@ -6,15 +6,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "BinarySearchTree.h"
+#include "containers/BinarySearchTree.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Test basic in-order iterator functionality
 int test_bst_iterator_inorder(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Create balanced tree: 50, 30, 70, 20, 40, 60, 80
     int values[] = {50, 30, 70, 20, 40, 60, 80};
@@ -24,10 +24,10 @@ int test_bst_iterator_inorder(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    DSCIterator it = dsc_bst_iterator(bst);
+    ANVIterator it = anv_bst_iterator(bst);
     ASSERT(it.is_valid(&it));
 
     // Expected order: 20, 30, 40, 50, 60, 70, 80
@@ -47,15 +47,15 @@ int test_bst_iterator_inorder(void)
 
     ASSERT_EQ(index, 7);
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test pre-order iterator functionality
 int test_bst_iterator_preorder(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Same tree structure
     int values[] = {50, 30, 70, 20, 40, 60, 80};
@@ -65,10 +65,10 @@ int test_bst_iterator_preorder(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    DSCIterator it = dsc_bst_iterator_preorder(bst);
+    ANVIterator it = anv_bst_iterator_preorder(bst);
     ASSERT(it.is_valid(&it));
 
     // Expected order: 50, 30, 20, 40, 70, 60, 80
@@ -88,15 +88,15 @@ int test_bst_iterator_preorder(void)
 
     ASSERT_EQ(index, 7);
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test post-order iterator functionality
 int test_bst_iterator_postorder(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Same tree structure
     int values[] = {50, 30, 70, 20, 40, 60, 80};
@@ -106,10 +106,10 @@ int test_bst_iterator_postorder(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    DSCIterator it = dsc_bst_iterator_postorder(bst);
+    ANVIterator it = anv_bst_iterator_postorder(bst);
     ASSERT(it.is_valid(&it));
 
     // Expected order: 20, 40, 30, 60, 80, 70, 50
@@ -129,41 +129,41 @@ int test_bst_iterator_postorder(void)
 
     ASSERT_EQ(index, 7);
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator on empty tree
 int test_bst_iterator_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
-    DSCIterator it = dsc_bst_iterator(bst);
+    ANVIterator it = anv_bst_iterator(bst);
     ASSERT(it.is_valid(&it));
     ASSERT(!it.has_next(&it));
     ASSERT_NULL(it.get(&it));
 
     it.destroy(&it);
-    dsc_bst_destroy(bst, false);
+    anv_bst_destroy(bst, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator on single node tree
 int test_bst_iterator_single_node(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_bst_insert(bst, data), 0);
+    ASSERT_EQ(anv_bst_insert(bst, data), 0);
 
     // Test all iterator types
-    DSCIterator iterators[3] = {
-        dsc_bst_iterator(bst),
-        dsc_bst_iterator_preorder(bst),
-        dsc_bst_iterator_postorder(bst)
+    ANVIterator iterators[3] = {
+        anv_bst_iterator(bst),
+        anv_bst_iterator_preorder(bst),
+        anv_bst_iterator_postorder(bst)
     };
 
     for (int i = 0; i < 3; i++)
@@ -181,15 +181,15 @@ int test_bst_iterator_single_node(void)
         iterators[i].destroy(&iterators[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator reset functionality
 int test_bst_iterator_reset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int values[] = {50, 30, 70};
     int* data[3];
@@ -198,10 +198,10 @@ int test_bst_iterator_reset(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
-    DSCIterator it = dsc_bst_iterator(bst);
+    ANVIterator it = anv_bst_iterator(bst);
 
     // Iterate through once
     int count1 = 0;
@@ -227,36 +227,36 @@ int test_bst_iterator_reset(void)
     ASSERT_EQ(count2, 3);
 
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator backward operations (should not be supported)
 int test_bst_iterator_backward(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_bst_insert(bst, data), 0);
+    ASSERT_EQ(anv_bst_insert(bst, data), 0);
 
-    DSCIterator it = dsc_bst_iterator(bst);
+    ANVIterator it = anv_bst_iterator(bst);
 
     // BST iterators should not support backward iteration
     ASSERT(!it.has_prev(&it));
     ASSERT_EQ(it.prev(&it), -1);
 
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test creating BST from iterator
 int test_bst_from_iterator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* source_bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* source_bst = anv_bst_create(&alloc, int_cmp);
 
     // Create source tree with known values
     int values[] = {50, 30, 70, 20, 40};
@@ -266,56 +266,56 @@ int test_bst_from_iterator(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(source_bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(source_bst, data[i]), 0);
     }
 
     // Create iterator and new BST from it
-    DSCIterator it = dsc_bst_iterator(source_bst);
-    DSCBinarySearchTree* new_bst = dsc_bst_from_iterator(&it, &alloc, int_cmp, true);
+    ANVIterator it = anv_bst_iterator(source_bst);
+    ANVBinarySearchTree* new_bst = anv_bst_from_iterator(&it, &alloc, int_cmp, true);
 
     ASSERT_NOT_NULL(new_bst);
-    ASSERT_EQ(dsc_bst_size(new_bst), 5);
+    ASSERT_EQ(anv_bst_size(new_bst), 5);
 
     // Verify all values are present in new BST
     for (int i = 0; i < 5; i++)
     {
-        ASSERT(dsc_bst_contains(new_bst, &values[i]));
+        ASSERT(anv_bst_contains(new_bst, &values[i]));
     }
 
     it.destroy(&it);
-    dsc_bst_destroy(source_bst, true);
-    dsc_bst_destroy(new_bst, true);
+    anv_bst_destroy(source_bst, true);
+    anv_bst_destroy(new_bst, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator with NULL parameters
 int test_bst_iterator_null_params(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Test creating iterator with NULL tree
-    DSCIterator it = dsc_bst_iterator(NULL);
+    ANVIterator it = anv_bst_iterator(NULL);
     ASSERT(!it.is_valid(&it));
 
-    // Test dsc_bst_from_iterator with NULL parameters
-    ASSERT_NULL(dsc_bst_from_iterator(NULL, &alloc, int_cmp, false));
+    // Test anv_bst_from_iterator with NULL parameters
+    ASSERT_NULL(anv_bst_from_iterator(NULL, &alloc, int_cmp, false));
 
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
-    DSCIterator valid_it = dsc_bst_iterator(bst);
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
+    ANVIterator valid_it = anv_bst_iterator(bst);
 
-    ASSERT_NULL(dsc_bst_from_iterator(&valid_it, NULL, int_cmp, false));
-    ASSERT_NULL(dsc_bst_from_iterator(&valid_it, &alloc, NULL, false));
+    ASSERT_NULL(anv_bst_from_iterator(&valid_it, NULL, int_cmp, false));
+    ASSERT_NULL(anv_bst_from_iterator(&valid_it, &alloc, NULL, false));
 
     valid_it.destroy(&valid_it);
-    dsc_bst_destroy(bst, false);
+    anv_bst_destroy(bst, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator on complex tree structure
 int test_bst_iterator_complex(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Insert values to create a more complex tree
     int values[] = {50, 25, 75, 12, 37, 62, 87, 6, 18, 31, 43};
@@ -325,11 +325,11 @@ int test_bst_iterator_complex(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Test in-order iterator (should be sorted)
-    DSCIterator it = dsc_bst_iterator(bst);
+    ANVIterator it = anv_bst_iterator(bst);
     int prev_value = -1;
     int count = 0;
 
@@ -350,7 +350,7 @@ int test_bst_iterator_complex(void)
 
     ASSERT_EQ(count, 11);
     it.destroy(&it);
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 

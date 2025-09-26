@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -23,7 +23,7 @@
  * Returns the number of values collected.
  * Note: For copy iterator, the user owns the returned values and must free them.
  */
-static int collect_values(const DSCIterator* it, int** values, const int max_count)
+static int collect_values(const ANVIterator* it, int** values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -69,9 +69,9 @@ static void free_collected_values(int** values, const int count)
 /**
  * Helper function to create a test list with integers 1 through n.
  */
-static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
+static ANVDoublyLinkedList* create_test_list(ANVAllocator* alloc, const int n)
 {
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(alloc);
     if (!list)
         return NULL;
 
@@ -80,11 +80,11 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
         int* val = malloc(sizeof(int));
         if (!val)
         {
-            dsc_dll_destroy(list, true);
+            anv_dll_destroy(list, true);
             return NULL;
         }
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
     return list;
 }
@@ -98,17 +98,17 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
  */
 static int test_copy_basic_integers(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
     ASSERT_TRUE(base_it.has_next(&base_it));
 
     // Create copy iterator that copies each integer
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
     ASSERT_TRUE(copy_it.has_next(&copy_it));
 
@@ -123,7 +123,7 @@ static int test_copy_basic_integers(void)
     base_it.destroy(&base_it);
 
     // Verify that returned pointers are different from original data
-    base_it = dsc_dll_iterator(list);
+    base_it = anv_dll_iterator(list);
     for (int i = 0; i < count; i++)
     {
         const int* original = base_it.get(&base_it);
@@ -140,7 +140,7 @@ static int test_copy_basic_integers(void)
     free_collected_values(actual, count);
     copy_it.destroy(&copy_it);
     base_it.destroy(&base_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -149,12 +149,12 @@ static int test_copy_basic_integers(void)
  */
 static int test_copy_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
     ASSERT_TRUE(copy_it.has_next(&copy_it));
@@ -175,7 +175,7 @@ static int test_copy_single_element(void)
     // User must free the copied value
     free((void*)copied_value);
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -184,8 +184,8 @@ static int test_copy_single_element(void)
  */
 static int test_copy_custom_structure(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Create test persons
@@ -193,12 +193,12 @@ static int test_copy_custom_structure(void)
     Person* p2 = create_person("Bob", 25);
     Person* p3 = create_person("Charlie", 35);
 
-    dsc_dll_push_back(list, p1);
-    dsc_dll_push_back(list, p2);
-    dsc_dll_push_back(list, p3);
+    anv_dll_push_back(list, p1);
+    anv_dll_push_back(list, p2);
+    anv_dll_push_back(list, p3);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, person_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, person_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -235,7 +235,7 @@ static int test_copy_custom_structure(void)
     }
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -248,16 +248,16 @@ static int test_copy_custom_structure(void)
  */
 static int test_copy_empty_input(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Create iterator on empty list
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_FALSE(base_it.has_next(&base_it));
 
     // Create copy iterator
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
     ASSERT_FALSE(copy_it.has_next(&copy_it));
     ASSERT_NULL(copy_it.get(&copy_it));
@@ -266,7 +266,7 @@ static int test_copy_empty_input(void)
     ASSERT_EQ(copy_it.next(&copy_it), -1);
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, false);
+    anv_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
@@ -275,14 +275,14 @@ static int test_copy_empty_input(void)
  */
 static int test_copy_large_dataset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
     #define SIZE 100
 
-    DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
+    ANVDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -312,7 +312,7 @@ static int test_copy_large_dataset(void)
     }
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
 
     #undef SIZE
     return TEST_SUCCESS;
@@ -327,25 +327,25 @@ static int test_copy_large_dataset(void)
  */
 static int test_copy_invalid_inputs(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Test with NULL iterator
-    DSCIterator invalid_it1 = dsc_iterator_copy(NULL, &alloc, int_copy);
+    ANVIterator invalid_it1 = anv_iterator_copy(NULL, &alloc, int_copy);
     ASSERT_FALSE(invalid_it1.is_valid(&invalid_it1));
     ASSERT_FALSE(invalid_it1.has_next(&invalid_it1));
     ASSERT_NULL(invalid_it1.get(&invalid_it1));
 
     // Test with NULL copy function
-    DSCIterator invalid_it2 = dsc_iterator_copy(&base_it, &alloc, NULL);
+    ANVIterator invalid_it2 = anv_iterator_copy(&base_it, &alloc, NULL);
     ASSERT_FALSE(invalid_it2.is_valid(&invalid_it2));
 
     // Test with NULL allocator
-    DSCIterator base_it2 = dsc_dll_iterator(list);
-    DSCIterator invalid_it3 = dsc_iterator_copy(&base_it2, NULL, int_copy);
+    ANVIterator base_it2 = anv_dll_iterator(list);
+    ANVIterator invalid_it3 = anv_iterator_copy(&base_it2, NULL, int_copy);
     ASSERT_FALSE(invalid_it3.is_valid(&invalid_it3));
 
     // Cleanup
@@ -354,7 +354,7 @@ static int test_copy_invalid_inputs(void)
     invalid_it3.destroy(&invalid_it3);
     base_it2.destroy(&base_it2);
     base_it.destroy(&base_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -363,10 +363,10 @@ static int test_copy_invalid_inputs(void)
  */
 static int test_copy_operations_on_invalid(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create invalid copy iterator
-    DSCIterator invalid_it = dsc_iterator_copy(NULL, &alloc, int_copy);
+    ANVIterator invalid_it = anv_iterator_copy(NULL, &alloc, int_copy);
     ASSERT_FALSE(invalid_it.is_valid(&invalid_it));
 
     // All operations should fail gracefully
@@ -392,12 +392,12 @@ static int test_copy_operations_on_invalid(void)
  */
 static int test_copy_get_next_separation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -424,7 +424,7 @@ static int test_copy_get_next_separation(void)
     free((void*)value3);
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -433,12 +433,12 @@ static int test_copy_get_next_separation(void)
  */
 static int test_copy_next_return_codes(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -463,7 +463,7 @@ static int test_copy_next_return_codes(void)
     free((void*)v2);
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -472,12 +472,12 @@ static int test_copy_next_return_codes(void)
  */
 static int test_copy_unsupported_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -492,7 +492,7 @@ static int test_copy_unsupported_operations(void)
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -505,14 +505,14 @@ static int test_copy_unsupported_operations(void)
  */
 static int test_copy_with_range_iterator(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator: [1, 2, 3, 4, 5]
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Apply copy
-    DSCIterator copy_it = dsc_iterator_copy(&range_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&range_it, &alloc, int_copy);
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
     // Expected: [1,2,3,4,5] copied to new memory locations
@@ -534,13 +534,13 @@ static int test_copy_with_range_iterator(void)
  */
 static int test_range_copy_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator: [2, 4, 6, 8, 10]
-    DSCIterator range_it = dsc_iterator_range(2, 11, 2, &alloc);
+    ANVIterator range_it = anv_iterator_range(2, 11, 2, &alloc);
 
     // Chain: range → copy
-    DSCIterator copy_it = dsc_iterator_copy(&range_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&range_it, &alloc, int_copy);
 
     // Expected: [2,4,6,8,10] copied
     const int expected[] = {2, 4, 6, 8, 10};
@@ -564,12 +564,12 @@ static int test_range_copy_chain(void)
  */
 static int test_copy_memory_ownership(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     // Get and verify ownership of copied values
     const int* copied1 = copy_it.get(&copy_it);
@@ -592,7 +592,7 @@ static int test_copy_memory_ownership(void)
     ASSERT_NOT_EQ(copied1, copied3);
 
     // Verify they're different from original data
-    DSCIterator check_it = dsc_dll_iterator(list);
+    ANVIterator check_it = anv_dll_iterator(list);
     const int* original1 = check_it.get(&check_it);
     ASSERT_NOT_EQ(copied1, original1);
     ASSERT_EQ(*copied1, *original1);
@@ -604,7 +604,7 @@ static int test_copy_memory_ownership(void)
 
     copy_it.destroy(&copy_it);
     check_it.destroy(&check_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -613,16 +613,16 @@ static int test_copy_memory_ownership(void)
  */
 static int test_copy_iterator_ownership(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
 
     // Create copy iterator (takes ownership of base_it)
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
     // Verify copy works
@@ -641,7 +641,7 @@ static int test_copy_iterator_ownership(void)
 
     // Note: We should not access base_it after this point as it's been destroyed
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -650,12 +650,12 @@ static int test_copy_iterator_ownership(void)
  */
 static int test_copy_memory_consistency(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     // Get multiple references to the same cached copy
     const int* ptr1 = copy_it.get(&copy_it);
@@ -686,7 +686,7 @@ static int test_copy_memory_consistency(void)
     free((void*)ptr4);
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -699,14 +699,14 @@ static int test_copy_memory_consistency(void)
  */
 static int test_filter_copy_chain(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 6);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 6);
     ASSERT_NOT_NULL(list);
 
     // Chain: list → filter even → copy
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator filter_it = dsc_iterator_filter(&base_it, &alloc, is_even);
-    DSCIterator copy_it = dsc_iterator_copy(&filter_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator filter_it = anv_iterator_filter(&base_it, &alloc, is_even);
+    ANVIterator copy_it = anv_iterator_copy(&filter_it, &alloc, int_copy);
 
     // Expected: [1,2,3,4,5,6] → [2,4,6] → copied [2,4,6]
     const int expected[] = {2, 4, 6};
@@ -718,7 +718,7 @@ static int test_filter_copy_chain(void)
 
     free_collected_values(actual, count);
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -727,14 +727,14 @@ static int test_filter_copy_chain(void)
  */
 static int test_transform_copy_chain(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 4);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 4);
     ASSERT_NOT_NULL(list);
 
     // Chain: list → transform double → copy
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
-    DSCIterator copy_it = dsc_iterator_copy(&transform_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator copy_it = anv_iterator_copy(&transform_it, &alloc, int_copy);
 
     // Expected: [1,2,3,4] → [2,4,6,8] → copied [2,4,6,8]
     const int expected[] = {2, 4, 6, 8};
@@ -746,7 +746,7 @@ static int test_transform_copy_chain(void)
 
     free_collected_values(actual, count);
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -755,15 +755,15 @@ static int test_transform_copy_chain(void)
  */
 static int test_complex_chain_with_copy(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range [1,2,3,4,5,6,7,8,9,10]
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Chain: range → filter even → transform square → copy
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
-    DSCIterator transform_it = dsc_iterator_transform(&filter_it, &alloc, square_func, true);
-    DSCIterator copy_it = dsc_iterator_copy(&transform_it, &alloc, int_copy);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator transform_it = anv_iterator_transform(&filter_it, &alloc, square_func, true);
+    ANVIterator copy_it = anv_iterator_copy(&transform_it, &alloc, int_copy);
 
     // Expected: [1..10] → [2,4,6,8,10] → [4,16,36,64,100] → copied [4,16,36,64,100]
     const int expected[] = {4, 16, 36, 64, 100};
@@ -787,8 +787,8 @@ static int test_complex_chain_with_copy(void)
  */
 static int test_copy_strings(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Create test strings
@@ -799,12 +799,12 @@ static int test_copy_strings(void)
     strcpy(str2, "World");
     strcpy(str3, "Test");
 
-    dsc_dll_push_back(list, str1);
-    dsc_dll_push_back(list, str2);
-    dsc_dll_push_back(list, str3);
+    anv_dll_push_back(list, str1);
+    anv_dll_push_back(list, str2);
+    anv_dll_push_back(list, str3);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, string_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, string_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -838,7 +838,7 @@ static int test_copy_strings(void)
     }
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -851,14 +851,14 @@ static int test_copy_strings(void)
  */
 static int test_copy_performance(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
     #define SIZE 1000
 
-    DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
+    ANVDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -883,7 +883,7 @@ static int test_copy_performance(void)
     }
 
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
 
     #undef SIZE
     return TEST_SUCCESS;
@@ -896,7 +896,7 @@ static int test_copy_performance(void)
 /**
  * Enhanced helper function with better validation for copy iterator.
  */
-static int collect_values_with_validation(const DSCIterator* it, int** values, int max_count)
+static int collect_values_with_validation(const ANVIterator* it, int** values, int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -925,12 +925,12 @@ static int collect_values_with_validation(const DSCIterator* it, int** values, i
  */
 static int test_copy_helper_validation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator copy_it = dsc_iterator_copy(&base_it, &alloc, int_copy);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator copy_it = anv_iterator_copy(&base_it, &alloc, int_copy);
 
     ASSERT_TRUE(copy_it.is_valid(&copy_it));
 
@@ -946,7 +946,7 @@ static int test_copy_helper_validation(void)
     // Free collected values
     free_collected_values(values, count);
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 

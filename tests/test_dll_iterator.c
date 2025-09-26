@@ -4,16 +4,16 @@
 
 #include <stdlib.h>
 
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Test basic iterator functionality
 static int test_basic_iteration(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements
@@ -21,11 +21,11 @@ static int test_basic_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
     // Create iterator
-    DSCIterator it = dsc_dll_iterator(list);
+    ANVIterator it = anv_dll_iterator(list);
     ASSERT_NOT_NULL(it.data_state);
     ASSERT_TRUE(it.has_next(&it));
 
@@ -50,18 +50,18 @@ static int test_basic_iteration(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty list
 static int test_empty_list_iterator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator it = dsc_dll_iterator(list);
+    ANVIterator it = anv_dll_iterator(list);
 
     // Verify iterator for empty list
     ASSERT_FALSE(it.has_next(&it));
@@ -71,15 +71,15 @@ static int test_empty_list_iterator(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, false);
+    anv_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with modifications
 static int test_iterator_with_modifications(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert initial elements
@@ -87,11 +87,11 @@ static int test_iterator_with_modifications(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
     // Create iterator
-    DSCIterator it = dsc_dll_iterator(list);
+    ANVIterator it = anv_dll_iterator(list);
 
     // Consume first element
     const int* value = it.get(&it);
@@ -102,7 +102,7 @@ static int test_iterator_with_modifications(void)
     // Modify list by adding new elements
     int* new_val = malloc(sizeof(int));
     *new_val = 99;
-    dsc_dll_push_back(list, new_val);
+    anv_dll_push_back(list, new_val);
 
     // Continue iteration
     value = it.get(&it);
@@ -126,15 +126,15 @@ static int test_iterator_with_modifications(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test multiple iterators
 static int test_multiple_iterators(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements
@@ -142,12 +142,12 @@ static int test_multiple_iterators(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
     // Create two independent iterators
-    DSCIterator it1 = dsc_dll_iterator(list);
-    DSCIterator it2 = dsc_dll_iterator(list);
+    ANVIterator it1 = anv_dll_iterator(list);
+    ANVIterator it2 = anv_dll_iterator(list);
 
     // First iterator consumes two elements
     const int* value1 = it1.get(&it1);
@@ -178,15 +178,15 @@ static int test_multiple_iterators(void)
         it1.destroy(&it1);
     if (it2.destroy)
         it2.destroy(&it2);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test reverse iterator
 static int test_reverse_iteration(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements 1-5
@@ -194,11 +194,11 @@ static int test_reverse_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
     // Create reverse iterator
-    DSCIterator it = dsc_dll_iterator_reverse(list);
+    ANVIterator it = anv_dll_iterator_reverse(list);
     ASSERT_NOT_NULL(it.data_state);
     ASSERT_TRUE(it.has_next(&it));
 
@@ -218,15 +218,15 @@ static int test_reverse_iteration(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator get function
 static int test_iterator_get(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements
@@ -234,10 +234,10 @@ static int test_iterator_get(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    DSCIterator it = dsc_dll_iterator(list);
+    ANVIterator it = anv_dll_iterator(list);
 
     // Test get without advancing
     const int* val = it.get(&it);
@@ -256,15 +256,15 @@ static int test_iterator_get(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test bidirectional iteration
 static int test_bidirectional_iteration(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Insert elements 1-5
@@ -272,10 +272,10 @@ static int test_bidirectional_iteration(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    DSCIterator it = dsc_dll_iterator(list);
+    ANVIterator it = anv_dll_iterator(list);
 
     // Move forward to middle
     it.next(&it); // Move to 2
@@ -298,29 +298,29 @@ static int test_bidirectional_iteration(void)
     // Cleanup
     if (it.destroy)
         it.destroy(&it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test creating doubly linked list from iterator
 static int test_from_iterator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create a range iterator (0, 1, 2, 3, 4)
-    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 5, 1, &alloc);
 
     // Create doubly linked list from iterator
-    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ANVDoublyLinkedList* list = anv_dll_from_iterator(&range_it, &alloc, true);
     ASSERT_NOT_NULL(list);
-    ASSERT_EQ(dsc_dll_size(list), 5);
+    ASSERT_EQ(anv_dll_size(list), 5);
 
     // Clean up the iterator immediately after use
     range_it.destroy(&range_it);
 
     // Verify doubly linked list has correct values in sequential order
     // Iterator gives 0,1,2,3,4 and doubly linked list should have them as 0,1,2,3,4 (head to tail)
-    const DSCDoublyLinkedNode* node = list->head;
+    const ANVDoublyLinkedNode* node = list->head;
     for (int expected = 0; expected < 5; expected++)
     {
         ASSERT_NOT_NULL(node);
@@ -328,14 +328,14 @@ static int test_from_iterator(void)
         node = node->next;
     }
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator with invalid doubly linked list
 static int test_iterator_invalid(void)
 {
-    const DSCIterator iter = dsc_dll_iterator(NULL);
+    const ANVIterator iter = anv_dll_iterator(NULL);
     ASSERT(!iter.is_valid(&iter));
     return TEST_SUCCESS;
 }
@@ -343,30 +343,30 @@ static int test_iterator_invalid(void)
 // Test copy isolation - verify that copied elements are independent
 static int test_dll_copy_isolation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create original data that we can modify
     const int original_values[] = {10, 20, 30};
     int* data_ptrs[3];
 
     // Create a source doubly linked list
-    DSCDoublyLinkedList* source_list = dsc_dll_create(&alloc);
+    ANVDoublyLinkedList* source_list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(source_list);
 
     for (int i = 0; i < 3; i++)
     {
         data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
-        ASSERT_EQ(dsc_dll_push_back(source_list, data_ptrs[i]), 0);
+        ASSERT_EQ(anv_dll_push_back(source_list, data_ptrs[i]), 0);
     }
 
-    DSCIterator list_it = dsc_dll_iterator(source_list);
+    ANVIterator list_it = anv_dll_iterator(source_list);
     ASSERT(list_it.is_valid(&list_it));
 
     // Create doubly linked list with copying enabled
-    DSCDoublyLinkedList* new_list = dsc_dll_from_iterator(&list_it, &alloc, true);
+    ANVDoublyLinkedList* new_list = anv_dll_from_iterator(&list_it, &alloc, true);
     ASSERT_NOT_NULL(new_list);
-    ASSERT_EQ(dsc_dll_size(new_list), 3);
+    ASSERT_EQ(anv_dll_size(new_list), 3);
 
     // Modify original data
     *data_ptrs[0] = 999;
@@ -375,7 +375,7 @@ static int test_dll_copy_isolation(void)
 
     // DoublyLinkedList should still have original values (proving data was copied)
     // Sequential order: 10, 20, 30
-    const DSCDoublyLinkedNode* node = new_list->head;
+    const ANVDoublyLinkedNode* node = new_list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 10); // Should be unchanged
 
@@ -389,8 +389,8 @@ static int test_dll_copy_isolation(void)
 
     // Cleanup
     list_it.destroy(&list_it);
-    dsc_dll_destroy(new_list, true);
-    dsc_dll_destroy(source_list, true);
+    anv_dll_destroy(new_list, true);
+    anv_dll_destroy(source_list, true);
 
     return TEST_SUCCESS;
 }
@@ -398,14 +398,14 @@ static int test_dll_copy_isolation(void)
 // Test that should_copy=true fails when allocator has no copy function
 static int test_dll_copy_function_required(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    alloc.copy_func = NULL;
+    ANVAllocator alloc = anv_alloc_default();
+    alloc.copy = NULL;
 
-    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 3, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Should return NULL because should_copy=true but no copy function available
-    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ANVDoublyLinkedList* list = anv_dll_from_iterator(&range_it, &alloc, true);
     ASSERT_NULL(list);
 
     range_it.destroy(&range_it);
@@ -415,24 +415,24 @@ static int test_dll_copy_function_required(void)
 // Test that should_copy=false uses elements directly without copying
 static int test_dll_from_iterator_no_copy(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create a range iterator and then a copy iterator to get actual owned data
-    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 3, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Use copy iterator to create actual data elements that we own
-    DSCIterator copy_it = dsc_iterator_copy(&range_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&range_it, &alloc, int_copy);
     ASSERT(copy_it.is_valid(&copy_it));
 
     // Create doubly linked list without copying (should_copy = false)
     // This will use the copied elements directly from the copy iterator
-    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&copy_it, &alloc, false);
+    ANVDoublyLinkedList* list = anv_dll_from_iterator(&copy_it, &alloc, false);
     ASSERT_NOT_NULL(list);
-    ASSERT_EQ(dsc_dll_size(list), 3);
+    ASSERT_EQ(anv_dll_size(list), 3);
 
     // Verify values are correct (sequential order: 0, 1, 2)
-    const DSCDoublyLinkedNode* node = list->head;
+    const ANVDoublyLinkedNode* node = list->head;
     ASSERT_NOT_NULL(node);
     ASSERT_EQ(*(int*)node->data, 0);
 
@@ -446,24 +446,24 @@ static int test_dll_from_iterator_no_copy(void)
 
     range_it.destroy(&range_it);
     copy_it.destroy(&copy_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
-// Test that iterator is exhausted after being consumed by dsc_dll_from_iterator
+// Test that iterator is exhausted after being consumed by anv_dll_from_iterator
 static int test_iterator_exhaustion_after_dll_creation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVIterator range_it = anv_iterator_range(0, 5, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Verify iterator starts with elements
     ASSERT(range_it.has_next(&range_it));
 
     // Create doubly linked list from iterator (consumes all elements)
-    DSCDoublyLinkedList* list = dsc_dll_from_iterator(&range_it, &alloc, true);
+    ANVDoublyLinkedList* list = anv_dll_from_iterator(&range_it, &alloc, true);
     ASSERT_NOT_NULL(list);
-    ASSERT_EQ(dsc_dll_size(list), 5);
+    ASSERT_EQ(anv_dll_size(list), 5);
 
     // Iterator should now be exhausted
     ASSERT(!range_it.has_next(&range_it));
@@ -474,23 +474,23 @@ static int test_iterator_exhaustion_after_dll_creation(void)
     ASSERT(range_it.is_valid(&range_it));
 
     range_it.destroy(&range_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test next() return values for proper error handling
 static int test_dll_iterator_next_return_values(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Add single element
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_dll_push_back(list, data), 0);
+    ASSERT_EQ(anv_dll_push_back(list, data), 0);
 
-    DSCIterator iter = dsc_dll_iterator(list);
+    ANVIterator iter = anv_dll_iterator(list);
     ASSERT(iter.is_valid(&iter));
 
     // Should successfully advance once
@@ -506,15 +506,15 @@ static int test_dll_iterator_next_return_values(void)
     ASSERT(!iter.has_next(&iter));   // Still no elements
 
     iter.destroy(&iter);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test various combinations of get/next/has_next calls for consistency
 static int test_dll_iterator_mixed_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Add test data (will be in sequential order: 0, 10, 20)
@@ -522,10 +522,10 @@ static int test_dll_iterator_mixed_operations(void)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_dll_push_back(list, data), 0);
+        ASSERT_EQ(anv_dll_push_back(list, data), 0);
     }
 
-    DSCIterator iter = dsc_dll_iterator(list);
+    ANVIterator iter = anv_dll_iterator(list);
     ASSERT(iter.is_valid(&iter));
 
     // Multiple get() calls should return same value
@@ -563,15 +563,15 @@ static int test_dll_iterator_mixed_operations(void)
     ASSERT_NULL(iter.get(&iter));
 
     iter.destroy(&iter);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test iterator traversal order
 static int test_dll_iterator_order(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
 
     // Add elements in specific order
     const int values[] = {100, 200, 300, 400, 500};
@@ -579,11 +579,11 @@ static int test_dll_iterator_order(void)
     {
         int* data = malloc(sizeof(int));
         *data = values[i];
-        ASSERT_EQ(dsc_dll_push_back(list, data), 0);
+        ASSERT_EQ(anv_dll_push_back(list, data), 0);
     }
 
     // Create iterator and verify order
-    DSCIterator iter = dsc_dll_iterator(list);
+    ANVIterator iter = anv_dll_iterator(list);
 
     for (int i = 0; i < 5; i++)
     {
@@ -597,25 +597,25 @@ static int test_dll_iterator_order(void)
     ASSERT(!iter.has_next(&iter));
 
     iter.destroy(&iter);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test reset functionality
 static int test_dll_iterator_reset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
 
     // Add numbers 1-3
     for (int i = 1; i <= 3; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
 
-    DSCIterator iter = dsc_dll_iterator(list);
+    ANVIterator iter = anv_dll_iterator(list);
 
     // Advance iterator
     iter.next(&iter);
@@ -628,21 +628,21 @@ static int test_dll_iterator_reset(void)
     ASSERT(iter.has_next(&iter));
 
     iter.destroy(&iter);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 // Test single element iterator behavior
 static int test_dll_iterator_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
 
     int* val = malloc(sizeof(int));
     *val = 42;
-    dsc_dll_push_back(list, val);
+    anv_dll_push_back(list, val);
 
-    DSCIterator iter = dsc_dll_iterator(list);
+    ANVIterator iter = anv_dll_iterator(list);
 
     ASSERT(iter.has_next(&iter));
     ASSERT(!iter.has_prev(&iter)); // At beginning, no previous
@@ -655,7 +655,7 @@ static int test_dll_iterator_single_element(void)
     ASSERT(iter.has_prev(&iter)); // At end, has previous
 
     iter.destroy(&iter);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 

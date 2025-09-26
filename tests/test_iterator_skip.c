@@ -5,7 +5,7 @@
 // Tests cover basic iteration, edge cases, skip handling,
 // error handling, and composition with other iterators.
 
-#include "Iterator.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -20,7 +20,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -58,13 +58,13 @@ static int verify_values(const int* actual, const int* expected, const int count
 
 int test_skip_basic_functionality(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Skip first 3 elements (should yield 4, 5, 6, 7, 8, 9, 10)
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 3);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 3);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     int values[10];
@@ -81,13 +81,13 @@ int test_skip_basic_functionality(void)
 
 int test_skip_zero_count(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-5
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Skip 0 elements (should yield all elements)
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 0);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 0);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     int values[10];
@@ -104,13 +104,13 @@ int test_skip_zero_count(void)
 
 int test_skip_more_than_available(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator with only 3 elements
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
 
     // Try to skip 10 elements (more than available)
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 10);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 10);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     // Should have no elements
@@ -123,13 +123,13 @@ int test_skip_more_than_available(void)
 
 int test_skip_all_elements(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-5
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Skip exactly all elements
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 5);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 5);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     // Should have no elements
@@ -142,13 +142,13 @@ int test_skip_all_elements(void)
 
 int test_skip_single_element(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-5
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Skip only 1 element
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 1);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 1);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     int values[10];
@@ -169,13 +169,13 @@ int test_skip_single_element(void)
 
 int test_skip_empty_source(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create empty range iterator
-    DSCIterator range_it = dsc_iterator_range(1, 1, 1, &alloc);  // Empty range
+    ANVIterator range_it = anv_iterator_range(1, 1, 1, &alloc);  // Empty range
 
     // Try to skip 5 elements from empty iterator
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 5);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 5);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     // Should have no elements
@@ -188,16 +188,16 @@ int test_skip_empty_source(void)
 
 int test_skip_invalid_parameters(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Test with NULL iterator
-    const DSCIterator skip_it1 = dsc_iterator_skip(NULL, &alloc, 5);
+    const ANVIterator skip_it1 = anv_iterator_skip(NULL, &alloc, 5);
     ASSERT_FALSE(skip_it1.is_valid(&skip_it1));
 
     // Test with NULL allocator
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
-    const DSCIterator skip_it2 = dsc_iterator_skip(&range_it, NULL, 5);
+    const ANVIterator skip_it2 = anv_iterator_skip(&range_it, NULL, 5);
     ASSERT_FALSE(skip_it2.is_valid(&skip_it2));
 
     // Clean up the range iterator manually since skip failed
@@ -208,13 +208,13 @@ int test_skip_invalid_parameters(void)
 
 int test_skip_large_count(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-5
-    DSCIterator range_it = dsc_iterator_range(1, 6, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 6, 1, &alloc);
 
     // Skip very large number of elements
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, SIZE_MAX);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, SIZE_MAX);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     // Should have no elements
@@ -231,14 +231,14 @@ int test_skip_large_count(void)
 
 int test_skip_with_filter(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-10, filter evens, then skip 1 (should skip first even: 2)
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
-    DSCIterator filter_it = dsc_iterator_filter(&range_it, &alloc, is_even);
+    ANVIterator filter_it = anv_iterator_filter(&range_it, &alloc, is_even);
 
-    DSCIterator skip_it = dsc_iterator_skip(&filter_it, &alloc, 1);
+    ANVIterator skip_it = anv_iterator_skip(&filter_it, &alloc, 1);
     ASSERT_TRUE(skip_it.is_valid(&skip_it));
 
     int values[10];
@@ -255,14 +255,14 @@ int test_skip_with_filter(void)
 
 int test_skip_chained(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-20, skip 5, then skip 2 more from that
-    DSCIterator range_it = dsc_iterator_range(1, 21, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 21, 1, &alloc);
 
-    DSCIterator skip_it1 = dsc_iterator_skip(&range_it, &alloc, 5);
+    ANVIterator skip_it1 = anv_iterator_skip(&range_it, &alloc, 5);
 
-    DSCIterator skip_it2 = dsc_iterator_skip(&skip_it1, &alloc, 2);
+    ANVIterator skip_it2 = anv_iterator_skip(&skip_it1, &alloc, 2);
     ASSERT_TRUE(skip_it2.is_valid(&skip_it2));
 
     int values[20];
@@ -279,14 +279,14 @@ int test_skip_chained(void)
 
 int test_skip_with_take(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range 1-20, skip 3, then take 5
-    DSCIterator range_it = dsc_iterator_range(1, 21, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 21, 1, &alloc);
 
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 3);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 3);
 
-    DSCIterator take_it = dsc_iterator_take(&skip_it, &alloc, 5);
+    ANVIterator take_it = anv_iterator_take(&skip_it, &alloc, 5);
     ASSERT_TRUE(take_it.is_valid(&take_it));
 
     int values[10];
@@ -307,13 +307,13 @@ int test_skip_with_take(void)
 
 int test_skip_iteration_state(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Skip first 2 elements
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 2);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 2);
 
     // Test step-by-step iteration
     ASSERT_TRUE(skip_it.has_next(&skip_it));
@@ -341,13 +341,13 @@ int test_skip_iteration_state(void)
 
 int test_skip_lazy_evaluation(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Skip first 3 elements - should not perform skip until first access
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 3);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 3);
 
     // The skip should happen on first has_next() call
     ASSERT_TRUE(skip_it.has_next(&skip_it));
@@ -363,13 +363,13 @@ int test_skip_lazy_evaluation(void)
 
 int test_skip_unsupported_operations(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator 1-10
-    DSCIterator range_it = dsc_iterator_range(1, 11, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 11, 1, &alloc);
 
     // Skip first 5 elements
-    DSCIterator skip_it = dsc_iterator_skip(&range_it, &alloc, 5);
+    ANVIterator skip_it = anv_iterator_skip(&range_it, &alloc, 5);
 
     // Test unsupported operations
     ASSERT_FALSE(skip_it.has_prev(&skip_it));

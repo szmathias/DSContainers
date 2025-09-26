@@ -2,7 +2,7 @@
 // Created by zack on 9/3/25.
 //
 
-#include "DynamicString.h"
+#include "containers/DynamicString.h"
 #include "TestAssert.h"
 
 #include <stdio.h>
@@ -11,330 +11,330 @@
 
 int test_create_and_assign(void)
 {
-    DSCString str = dsc_str_create_empty(32);
-    ASSERT_EQ(dsc_str_size(&str), 0);
-    dsc_str_assign_cstring(&str, "Hello");
-    ASSERT_EQ_STR(dsc_str_data(&str), "Hello");
-    ASSERT_EQ(dsc_str_size(&str), 5);
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(32);
+    ASSERT_EQ(anv_str_size(&str), 0);
+    anv_str_assign_cstring(&str, "Hello");
+    ASSERT_EQ_STR(anv_str_data(&str), "Hello");
+    ASSERT_EQ(anv_str_size(&str), 5);
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_append_and_insert(void)
 {
-    DSCString str = dsc_str_create_empty(16);
-    dsc_str_assign_cstring(&str, "abc");
-    dsc_str_append_cstring(&str, "def");
-    ASSERT_EQ_STR(dsc_str_data(&str), "abcdef");
-    dsc_str_insert_cstring(&str, 3, "XYZ");
-    ASSERT_EQ_STR(dsc_str_data(&str), "abcXYZdef");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(16);
+    anv_str_assign_cstring(&str, "abc");
+    anv_str_append_cstring(&str, "def");
+    ASSERT_EQ_STR(anv_str_data(&str), "abcdef");
+    anv_str_insert_cstring(&str, 3, "XYZ");
+    ASSERT_EQ_STR(anv_str_data(&str), "abcXYZdef");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_push_pop_erase(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_assign_cstring(&str, "hi");
-    dsc_str_push_back(&str, '!');
-    ASSERT_EQ_STR(dsc_str_data(&str), "hi!");
-    dsc_str_pop_back(&str);
-    ASSERT_EQ_STR(dsc_str_data(&str), "hi");
-    dsc_str_erase(&str, 0);
-    ASSERT_EQ_STR(dsc_str_data(&str), "i");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_assign_cstring(&str, "hi");
+    anv_str_push_back(&str, '!');
+    ASSERT_EQ_STR(anv_str_data(&str), "hi!");
+    anv_str_pop_back(&str);
+    ASSERT_EQ_STR(anv_str_data(&str), "hi");
+    anv_str_erase(&str, 0);
+    ASSERT_EQ_STR(anv_str_data(&str), "i");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_empty_string(void)
 {
-    DSCString str = dsc_str_create_empty(0);
-    ASSERT_EQ(dsc_str_size(&str), 0);
-    ASSERT_TRUE(dsc_str_empty(&str));
-    ASSERT_EQ_STR(dsc_str_data(&str), "");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(0);
+    ASSERT_EQ(anv_str_size(&str), 0);
+    ASSERT_TRUE(anv_str_empty(&str));
+    ASSERT_EQ_STR(anv_str_data(&str), "");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_assign_empty_cstring(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_assign_cstring(&str, "");
-    ASSERT_EQ(dsc_str_size(&str), 0);
-    ASSERT_TRUE(dsc_str_empty(&str));
-    ASSERT_EQ_STR(dsc_str_data(&str), "");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_assign_cstring(&str, "");
+    ASSERT_EQ(anv_str_size(&str), 0);
+    ASSERT_TRUE(anv_str_empty(&str));
+    ASSERT_EQ_STR(anv_str_data(&str), "");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_append_empty_cstring(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_append_cstring(&str, "");
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    ASSERT_EQ(dsc_str_size(&str), 3);
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_append_cstring(&str, "");
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    ASSERT_EQ(anv_str_size(&str), 3);
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_at_bounds(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_insert_cstring(&str, 0, "X");
-    ASSERT_EQ_STR(dsc_str_data(&str), "Xabc");
-    dsc_str_insert_cstring(&str, dsc_str_size(&str), "Y");
-    ASSERT_EQ_STR(dsc_str_data(&str), "XabcY");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_insert_cstring(&str, 0, "X");
+    ASSERT_EQ_STR(anv_str_data(&str), "Xabc");
+    anv_str_insert_cstring(&str, anv_str_size(&str), "Y");
+    ASSERT_EQ_STR(anv_str_data(&str), "XabcY");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_erase_out_of_bounds(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_erase(&str, 10); // Should do nothing
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_erase(&str, (size_t)-1); // Should do nothing (size_t -1 is large)
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_erase(&str, 10); // Should do nothing
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_erase(&str, (size_t)-1); // Should do nothing (size_t -1 is large)
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_self_assign_and_append(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_assign_string(&str, &str);
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_append_string(&str, &str);
-    ASSERT_EQ_STR(dsc_str_data(&str), "abcabc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_assign_string(&str, &str);
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_append_string(&str, &str);
+    ASSERT_EQ_STR(anv_str_data(&str), "abcabc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_clear_non_empty(void)
 {
-    DSCString str = dsc_str_create_from_cstring("not empty");
-    dsc_str_clear(&str);
-    ASSERT_TRUE(dsc_str_empty(&str));
-    ASSERT_EQ(dsc_str_size(&str), 0);
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("not empty");
+    anv_str_clear(&str);
+    ASSERT_TRUE(anv_str_empty(&str));
+    ASSERT_EQ(anv_str_size(&str), 0);
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_pop_back_empty(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_pop_back(&str); // Should not crash
-    ASSERT_TRUE(dsc_str_empty(&str));
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_pop_back(&str); // Should not crash
+    ASSERT_TRUE(anv_str_empty(&str));
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_erase_empty(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_erase(&str, 0); // Should not crash
-    ASSERT_TRUE(dsc_str_empty(&str));
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_erase(&str, 0); // Should not crash
+    ASSERT_TRUE(anv_str_empty(&str));
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_assign_char(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_assign_char(&str, 'A');
-    ASSERT_EQ_STR(dsc_str_data(&str), "A");
-    ASSERT_EQ(dsc_str_size(&str), 1);
-    dsc_str_assign_char(&str, '\0');
-    ASSERT_EQ(dsc_str_size(&str), 1);
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_assign_char(&str, 'A');
+    ASSERT_EQ_STR(anv_str_data(&str), "A");
+    ASSERT_EQ(anv_str_size(&str), 1);
+    anv_str_assign_char(&str, '\0');
+    ASSERT_EQ(anv_str_size(&str), 1);
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_char_positions(void)
 {
-    DSCString str = dsc_str_create_from_cstring("ac");
-    dsc_str_insert_char(&str, 1, 'b'); // Insert in middle
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_insert_char(&str, 0, 'X'); // Insert at start
-    ASSERT_EQ_STR(dsc_str_data(&str), "Xabc");
-    dsc_str_insert_char(&str, dsc_str_size(&str), 'Y'); // Insert at end
-    ASSERT_EQ_STR(dsc_str_data(&str), "XabcY");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("ac");
+    anv_str_insert_char(&str, 1, 'b'); // Insert in middle
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_insert_char(&str, 0, 'X'); // Insert at start
+    ASSERT_EQ_STR(anv_str_data(&str), "Xabc");
+    anv_str_insert_char(&str, anv_str_size(&str), 'Y'); // Insert at end
+    ASSERT_EQ_STR(anv_str_data(&str), "XabcY");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_append_char_multiple(void)
 {
-    DSCString str = dsc_str_create_empty(4);
-    dsc_str_append_char(&str, 'a');
-    dsc_str_append_char(&str, 'b');
-    dsc_str_append_char(&str, 'c');
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(4);
+    anv_str_append_char(&str, 'a');
+    anv_str_append_char(&str, 'b');
+    anv_str_append_char(&str, 'c');
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_clear_already_empty(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_clear(&str);
-    ASSERT_TRUE(dsc_str_empty(&str));
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_clear(&str);
+    ASSERT_TRUE(anv_str_empty(&str));
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_assign_string_different(void)
 {
-    DSCString str1 = dsc_str_create_from_cstring("foo");
-    DSCString str2 = dsc_str_create_from_cstring("bar");
-    dsc_str_assign_string(&str1, &str2);
-    ASSERT_EQ_STR(dsc_str_data(&str1), "bar");
-    dsc_str_destroy(&str1);
-    dsc_str_destroy(&str2);
+    ANVString str1 = anv_str_create_from_cstring("foo");
+    ANVString str2 = anv_str_create_from_cstring("bar");
+    anv_str_assign_string(&str1, &str2);
+    ASSERT_EQ_STR(anv_str_data(&str1), "bar");
+    anv_str_destroy(&str1);
+    anv_str_destroy(&str2);
     return TEST_SUCCESS;
 }
 
 int test_insert_cstring_empty(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_insert_cstring(&str, 1, "");
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_insert_cstring(&str, 1, "");
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_string_empty(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    DSCString empty = dsc_str_create_empty(4);
-    dsc_str_insert_string(&str, 1, &empty);
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
-    dsc_str_destroy(&empty);
+    ANVString str = anv_str_create_from_cstring("abc");
+    ANVString empty = anv_str_create_empty(4);
+    anv_str_insert_string(&str, 1, &empty);
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
+    anv_str_destroy(&empty);
     return TEST_SUCCESS;
 }
 
 int test_append_string_empty(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    DSCString empty = dsc_str_create_empty(4);
-    dsc_str_append_string(&str, &empty);
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
-    dsc_str_destroy(&empty);
+    ANVString str = anv_str_create_from_cstring("abc");
+    ANVString empty = anv_str_create_empty(4);
+    anv_str_append_string(&str, &empty);
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
+    anv_str_destroy(&empty);
     return TEST_SUCCESS;
 }
 
 int test_push_back_null_char(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_push_back(&str, '\0');
-    ASSERT_EQ(dsc_str_size(&str), 1);
-    ASSERT_EQ(dsc_str_data(&str)[0], '\0');
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_push_back(&str, '\0');
+    ASSERT_EQ(anv_str_size(&str), 1);
+    ASSERT_EQ(anv_str_data(&str)[0], '\0');
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_append_char_null_char(void)
 {
-    DSCString str = dsc_str_create_empty(8);
-    dsc_str_append_char(&str, '\0');
-    ASSERT_EQ(dsc_str_size(&str), 1);
-    ASSERT_EQ(dsc_str_data(&str)[0], '\0');
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_empty(8);
+    anv_str_append_char(&str, '\0');
+    ASSERT_EQ(anv_str_size(&str), 1);
+    ASSERT_EQ(anv_str_data(&str)[0], '\0');
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_char_out_of_bounds(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_insert_char(&str, 10, 'X'); // Should do nothing
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_insert_char(&str, 10, 'X'); // Should do nothing
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_cstring_out_of_bounds(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_insert_cstring(&str, 10, "XYZ"); // Should do nothing
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_insert_cstring(&str, 10, "XYZ"); // Should do nothing
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_string_out_of_bounds(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    DSCString other = dsc_str_create_from_cstring("XYZ");
-    dsc_str_insert_string(&str, 10, &other); // Should do nothing
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
-    dsc_str_destroy(&other);
+    ANVString str = anv_str_create_from_cstring("abc");
+    ANVString other = anv_str_create_from_cstring("XYZ");
+    anv_str_insert_string(&str, 10, &other); // Should do nothing
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
+    anv_str_destroy(&other);
     return TEST_SUCCESS;
 }
 
 int test_erase_at_size(void)
 {
-    DSCString str = dsc_str_create_from_cstring("abc");
-    dsc_str_erase(&str, dsc_str_size(&str)); // Should do nothing
-    ASSERT_EQ_STR(dsc_str_data(&str), "abc");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("abc");
+    anv_str_erase(&str, anv_str_size(&str)); // Should do nothing
+    ASSERT_EQ_STR(anv_str_data(&str), "abc");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_assign_string_self(void)
 {
-    DSCString str = dsc_str_create_from_cstring("self");
-    dsc_str_assign_string(&str, &str);
-    ASSERT_EQ_STR(dsc_str_data(&str), "self");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("self");
+    anv_str_assign_string(&str, &str);
+    ASSERT_EQ_STR(anv_str_data(&str), "self");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_append_string_self(void)
 {
-    DSCString str = dsc_str_create_from_cstring("dup");
-    dsc_str_append_string(&str, &str);
-    ASSERT_EQ_STR(dsc_str_data(&str), "dupdup");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("dup");
+    anv_str_append_string(&str, &str);
+    ASSERT_EQ_STR(anv_str_data(&str), "dupdup");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_char_at_0_and_size(void)
 {
-    DSCString str = dsc_str_create_from_cstring("bc");
-    dsc_str_insert_char(&str, 0, 'A');
-    ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
-    dsc_str_insert_char(&str, dsc_str_size(&str), 'Z');
-    ASSERT_EQ_STR(dsc_str_data(&str), "AbcZ");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("bc");
+    anv_str_insert_char(&str, 0, 'A');
+    ASSERT_EQ_STR(anv_str_data(&str), "Abc");
+    anv_str_insert_char(&str, anv_str_size(&str), 'Z');
+    ASSERT_EQ_STR(anv_str_data(&str), "AbcZ");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_cstring_at_0_and_size(void)
 {
-    DSCString str = dsc_str_create_from_cstring("bc");
-    dsc_str_insert_cstring(&str, 0, "A");
-    ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
-    dsc_str_insert_cstring(&str, dsc_str_size(&str), "Z");
-    ASSERT_EQ_STR(dsc_str_data(&str), "AbcZ");
-    dsc_str_destroy(&str);
+    ANVString str = anv_str_create_from_cstring("bc");
+    anv_str_insert_cstring(&str, 0, "A");
+    ASSERT_EQ_STR(anv_str_data(&str), "Abc");
+    anv_str_insert_cstring(&str, anv_str_size(&str), "Z");
+    ASSERT_EQ_STR(anv_str_data(&str), "AbcZ");
+    anv_str_destroy(&str);
     return TEST_SUCCESS;
 }
 
 int test_insert_string_at_0_and_size(void)
 {
-    DSCString str = dsc_str_create_from_cstring("bc");
-    DSCString sA = dsc_str_create_from_cstring("A");
-    DSCString sZ = dsc_str_create_from_cstring("Z");
-    dsc_str_insert_string(&str, 0, &sA);
-    ASSERT_EQ_STR(dsc_str_data(&str), "Abc");
-    dsc_str_insert_string(&str, dsc_str_size(&str), &sZ);
-    ASSERT_EQ_STR(dsc_str_data(&str), "AbcZ");
-    dsc_str_destroy(&str);
-    dsc_str_destroy(&sA);
-    dsc_str_destroy(&sZ);
+    ANVString str = anv_str_create_from_cstring("bc");
+    ANVString sA = anv_str_create_from_cstring("A");
+    ANVString sZ = anv_str_create_from_cstring("Z");
+    anv_str_insert_string(&str, 0, &sA);
+    ASSERT_EQ_STR(anv_str_data(&str), "Abc");
+    anv_str_insert_string(&str, anv_str_size(&str), &sZ);
+    ASSERT_EQ_STR(anv_str_data(&str), "AbcZ");
+    anv_str_destroy(&str);
+    anv_str_destroy(&sA);
+    anv_str_destroy(&sZ);
     return TEST_SUCCESS;
 }
 

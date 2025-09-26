@@ -1,5 +1,5 @@
-#include "Threads.h"
-#include "Mutex.h"
+#include "system/Threads.h"
+#include "system/Mutex.h"
 #include "TestAssert.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,7 @@
 typedef struct
 {
     int* counter;
-    DSCMutex* m;
+    ANVMutex* m;
 } thread_arg_t;
 
 static void* inc_thread(void* arg)
@@ -18,9 +18,9 @@ static void* inc_thread(void* arg)
     const thread_arg_t* t = (thread_arg_t*)arg;
     for (int i = 0; i < INCREMENTS; ++i)
     {
-        dsc_mutex_lock(t->m);
+        anv_mutex_lock(t->m);
         ++*(t->counter);
-        dsc_mutex_unlock(t->m);
+        anv_mutex_unlock(t->m);
     }
     return NULL;
 }
@@ -28,41 +28,41 @@ static void* inc_thread(void* arg)
 int test_mutex_basic(void)
 {
     int counter = 0;
-    DSCMutex m;
-    if (dsc_mutex_init(&m) != 0)
+    ANVMutex m;
+    if (anv_mutex_init(&m) != 0)
     {
-        fprintf(stderr, "dsc_mutex_init failed\n");
+        fprintf(stderr, "anv_mutex_init failed\n");
         return TEST_FAILURE;
     }
 
-    DSCThread threads[NUM_THREADS];
+    ANVThread threads[NUM_THREADS];
     thread_arg_t args[NUM_THREADS];
 
     for (int i = 0; i < NUM_THREADS; ++i)
     {
         args[i].counter = &counter;
         args[i].m = &m;
-        if (dsc_thread_create(&threads[i], inc_thread, &args[i]) != 0)
+        if (anv_thread_create(&threads[i], inc_thread, &args[i]) != 0)
         {
             fprintf(stderr, "thread_create failed\n");
-            dsc_mutex_destroy(&m);
+            anv_mutex_destroy(&m);
             return TEST_FAILURE;
         }
     }
 
     for (int i = 0; i < NUM_THREADS; ++i)
     {
-        dsc_thread_join(threads[i], NULL);
+        anv_thread_join(threads[i], NULL);
     }
 
     if (counter != NUM_THREADS * INCREMENTS)
     {
         fprintf(stderr, "Counter mismatch: expected %d, got %d\n", NUM_THREADS * INCREMENTS, counter);
-        dsc_mutex_destroy(&m);
+        anv_mutex_destroy(&m);
         return TEST_FAILURE;
     }
 
-    dsc_mutex_destroy(&m);
+    anv_mutex_destroy(&m);
     return TEST_SUCCESS;
 }
 

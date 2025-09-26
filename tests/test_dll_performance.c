@@ -6,14 +6,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "DoublyLinkedList.h"
+#include "containers/DoublyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 int test_stress(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     const int NUM_ELEMENTS = 10000;
 
     // Add many elements
@@ -21,20 +21,20 @@ int test_stress(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        ASSERT_EQ(dsc_dll_push_back(list, val), 0);
+        ASSERT_EQ(anv_dll_push_back(list, val), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS);
 
     // Find an element in the middle
     int key = NUM_ELEMENTS / 2;
-    const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
+    const ANVDoublyLinkedNode* found = anv_dll_find(list, &key, int_cmp);
     ASSERT_NOT_NULL(found);
     ASSERT_EQ(*(int*)found->data, key);
 
     // Remove elements from the front
     for (int i = 0; i < NUM_ELEMENTS / 2; i++)
     {
-        ASSERT_EQ(dsc_dll_pop_front(list, true), 0);
+        ASSERT_EQ(anv_dll_pop_front(list, true), 0);
     }
     ASSERT_EQ(list->size, (size_t)NUM_ELEMENTS / 2);
 
@@ -42,7 +42,7 @@ int test_stress(void)
     key = NUM_ELEMENTS / 2;
     ASSERT_EQ(*(int*)list->head->data, key);
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -55,8 +55,8 @@ int test_performance(void)
     for (size_t s = 0; s < NUM_SIZES; s++)
     {
         const int SIZE = SIZES[s];
-        DSCAllocator alloc = create_int_allocator();
-        DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+        ANVAllocator alloc = create_int_allocator();
+        ANVDoublyLinkedList* list = anv_dll_create(&alloc);
 
         // Measure insertion time
         clock_t start = clock();
@@ -64,7 +64,7 @@ int test_performance(void)
         {
             int* val = malloc(sizeof(int));
             *val = i;
-            dsc_dll_push_back(list, val);
+            anv_dll_push_back(list, val);
         }
         clock_t end = clock();
         printf("Insert %d elements: %.6f seconds\n", SIZE,
@@ -73,14 +73,14 @@ int test_performance(void)
         // Measure search time for last element
         start = clock();
         int key = SIZE - 1;
-        const DSCDoublyLinkedNode* found = dsc_dll_find(list, &key, int_cmp);
+        const ANVDoublyLinkedNode* found = anv_dll_find(list, &key, int_cmp);
         end = clock();
         printf("Find last element in %d elements: %.6f seconds\n", SIZE,
                (double)(end - start) / CLOCKS_PER_SEC);
         ASSERT_NOT_NULL(found);
 
         // Cleanup
-        dsc_dll_destroy(list, true);
+        anv_dll_destroy(list, true);
     }
 
     return TEST_SUCCESS;

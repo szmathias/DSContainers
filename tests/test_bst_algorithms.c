@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "BinarySearchTree.h"
+#include "containers/BinarySearchTree.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -33,8 +33,8 @@ void reset_traversal(void)
 // Test in-order traversal
 int test_bst_inorder_traversal(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Create a balanced tree:
     //      50
@@ -49,12 +49,12 @@ int test_bst_inorder_traversal(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Test in-order traversal (should be sorted)
     reset_traversal();
-    dsc_bst_inorder(bst, collect_int);
+    anv_bst_inorder(bst, collect_int);
 
     int expected[] = {20, 30, 40, 50, 60, 70, 80};
     ASSERT_EQ(traversal_index, 7);
@@ -63,15 +63,15 @@ int test_bst_inorder_traversal(void)
         ASSERT_EQ(traversal_results[i], expected[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test pre-order traversal
 int test_bst_preorder_traversal(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Same tree structure as above
     int values[] = {50, 30, 70, 20, 40, 60, 80};
@@ -81,12 +81,12 @@ int test_bst_preorder_traversal(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Test pre-order traversal (root, left, right)
     reset_traversal();
-    dsc_bst_preorder(bst, collect_int);
+    anv_bst_preorder(bst, collect_int);
 
     int expected[] = {50, 30, 20, 40, 70, 60, 80};
     ASSERT_EQ(traversal_index, 7);
@@ -95,15 +95,15 @@ int test_bst_preorder_traversal(void)
         ASSERT_EQ(traversal_results[i], expected[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test post-order traversal
 int test_bst_postorder_traversal(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Same tree structure as above
     int values[] = {50, 30, 70, 20, 40, 60, 80};
@@ -113,12 +113,12 @@ int test_bst_postorder_traversal(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Test post-order traversal (left, right, root)
     reset_traversal();
-    dsc_bst_postorder(bst, collect_int);
+    anv_bst_postorder(bst, collect_int);
 
     int expected[] = {20, 40, 30, 60, 80, 70, 50};
     ASSERT_EQ(traversal_index, 7);
@@ -127,98 +127,98 @@ int test_bst_postorder_traversal(void)
         ASSERT_EQ(traversal_results[i], expected[i]);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test traversal on empty tree
 int test_bst_traversal_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Test all traversals on empty tree
     reset_traversal();
-    dsc_bst_inorder(bst, collect_int);
+    anv_bst_inorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
     reset_traversal();
-    dsc_bst_preorder(bst, collect_int);
+    anv_bst_preorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
     reset_traversal();
-    dsc_bst_postorder(bst, collect_int);
+    anv_bst_postorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
-    dsc_bst_destroy(bst, false);
+    anv_bst_destroy(bst, false);
     return TEST_SUCCESS;
 }
 
 // Test traversal on single node tree
 int test_bst_traversal_single_node(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_bst_insert(bst, data), 0);
+    ASSERT_EQ(anv_bst_insert(bst, data), 0);
 
     // All traversals should visit the single node
     reset_traversal();
-    dsc_bst_inorder(bst, collect_int);
+    anv_bst_inorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 1);
     ASSERT_EQ(traversal_results[0], 42);
 
     reset_traversal();
-    dsc_bst_preorder(bst, collect_int);
+    anv_bst_preorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 1);
     ASSERT_EQ(traversal_results[0], 42);
 
     reset_traversal();
-    dsc_bst_postorder(bst, collect_int);
+    anv_bst_postorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 1);
     ASSERT_EQ(traversal_results[0], 42);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test traversal with NULL parameters
 int test_bst_traversal_null_params(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_bst_insert(bst, data), 0);
+    ASSERT_EQ(anv_bst_insert(bst, data), 0);
 
     // Test with NULL tree
     reset_traversal();
-    dsc_bst_inorder(NULL, collect_int);
+    anv_bst_inorder(NULL, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
-    dsc_bst_preorder(NULL, collect_int);
+    anv_bst_preorder(NULL, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
-    dsc_bst_postorder(NULL, collect_int);
+    anv_bst_postorder(NULL, collect_int);
     ASSERT_EQ(traversal_index, 0);
 
     // Test with NULL action function
-    dsc_bst_inorder(bst, NULL);
-    dsc_bst_preorder(bst, NULL);
-    dsc_bst_postorder(bst, NULL);
+    anv_bst_inorder(bst, NULL);
+    anv_bst_preorder(bst, NULL);
+    anv_bst_postorder(bst, NULL);
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test traversal on linear tree (worst case)
 int test_bst_traversal_linear(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Create a linear tree (all right children): 1->2->3->4->5
     int values[] = {1, 2, 3, 4, 5};
@@ -228,12 +228,12 @@ int test_bst_traversal_linear(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // In-order should still be sorted
     reset_traversal();
-    dsc_bst_inorder(bst, collect_int);
+    anv_bst_inorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 5);
     for (int i = 0; i < 5; i++)
     {
@@ -242,7 +242,7 @@ int test_bst_traversal_linear(void)
 
     // Pre-order should be same as insertion order for this case
     reset_traversal();
-    dsc_bst_preorder(bst, collect_int);
+    anv_bst_preorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 5);
     for (int i = 0; i < 5; i++)
     {
@@ -251,22 +251,22 @@ int test_bst_traversal_linear(void)
 
     // Post-order should be reverse
     reset_traversal();
-    dsc_bst_postorder(bst, collect_int);
+    anv_bst_postorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 5);
     for (int i = 0; i < 5; i++)
     {
         ASSERT_EQ(traversal_results[i], 5 - i);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 
 // Test traversal consistency after removals
 int test_bst_traversal_after_removal(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCBinarySearchTree* bst = dsc_bst_create(&alloc, int_cmp);
+    ANVAllocator alloc = create_int_allocator();
+    ANVBinarySearchTree* bst = anv_bst_create(&alloc, int_cmp);
 
     // Insert values
     int values[] = {50, 30, 70, 20, 40, 60, 80, 10, 90};
@@ -276,19 +276,19 @@ int test_bst_traversal_after_removal(void)
     {
         data[i] = malloc(sizeof(int));
         *(data[i]) = values[i];
-        ASSERT_EQ(dsc_bst_insert(bst, data[i]), 0);
+        ASSERT_EQ(anv_bst_insert(bst, data[i]), 0);
     }
 
     // Remove some values
     int remove_val = 30;
-    ASSERT_EQ(dsc_bst_remove(bst, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_remove(bst, &remove_val, true), 0);
 
     remove_val = 80;
-    ASSERT_EQ(dsc_bst_remove(bst, &remove_val, true), 0);
+    ASSERT_EQ(anv_bst_remove(bst, &remove_val, true), 0);
 
     // In-order traversal should still be sorted
     reset_traversal();
-    dsc_bst_inorder(bst, collect_int);
+    anv_bst_inorder(bst, collect_int);
     ASSERT_EQ(traversal_index, 7);
 
     // Verify sorted order
@@ -304,7 +304,7 @@ int test_bst_traversal_after_removal(void)
         ASSERT(traversal_results[i] != 80);
     }
 
-    dsc_bst_destroy(bst, true);
+    anv_bst_destroy(bst, true);
     return TEST_SUCCESS;
 }
 

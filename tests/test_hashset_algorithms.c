@@ -3,22 +3,22 @@
 //
 
 #include <stdio.h>
-#include "HashSet.h"
+#include "containers/HashSet.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
 // Helper function to create a set with string elements
-DSCHashSet* create_string_set(DSCAllocator* alloc, char** elements, const size_t count)
+ANVHashSet* create_string_set(ANVAllocator* alloc, char** elements, const size_t count)
 {
-    DSCHashSet* set = dsc_hashset_create(alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* set = anv_hashset_create(alloc, anv_hash_string, anv_key_equals_string, 0);
     if (!set)
         return NULL;
 
     for (size_t i = 0; i < count; i++)
     {
-        if (dsc_hashset_add(set, elements[i]) != 0)
+        if (anv_hashset_add(set, elements[i]) != 0)
         {
-            dsc_hashset_destroy(set, false);
+            anv_hashset_destroy(set, false);
             return NULL;
         }
     }
@@ -28,227 +28,227 @@ DSCHashSet* create_string_set(DSCAllocator* alloc, char** elements, const size_t
 // Test union operation
 int test_hashset_union(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c"};
     char* set2_elements[] = {"c", "d", "e"};
 
-    DSCHashSet* set1 = create_string_set(&alloc, set1_elements, 3);
-    DSCHashSet* set2 = create_string_set(&alloc, set2_elements, 3);
+    ANVHashSet* set1 = create_string_set(&alloc, set1_elements, 3);
+    ANVHashSet* set2 = create_string_set(&alloc, set2_elements, 3);
 
-    DSCHashSet* union_set = dsc_hashset_union(set1, set2);
+    ANVHashSet* union_set = anv_hashset_union(set1, set2);
     ASSERT_NOT_NULL(union_set);
-    ASSERT_EQ(dsc_hashset_size(union_set), 5); // a, b, c, d, e
+    ASSERT_EQ(anv_hashset_size(union_set), 5); // a, b, c, d, e
 
     // Check all elements are present
-    ASSERT(dsc_hashset_contains(union_set, "a"));
-    ASSERT(dsc_hashset_contains(union_set, "b"));
-    ASSERT(dsc_hashset_contains(union_set, "c"));
-    ASSERT(dsc_hashset_contains(union_set, "d"));
-    ASSERT(dsc_hashset_contains(union_set, "e"));
+    ASSERT(anv_hashset_contains(union_set, "a"));
+    ASSERT(anv_hashset_contains(union_set, "b"));
+    ASSERT(anv_hashset_contains(union_set, "c"));
+    ASSERT(anv_hashset_contains(union_set, "d"));
+    ASSERT(anv_hashset_contains(union_set, "e"));
 
-    dsc_hashset_destroy(set1, false);
-    dsc_hashset_destroy(set2, false);
-    dsc_hashset_destroy(union_set, false);
+    anv_hashset_destroy(set1, false);
+    anv_hashset_destroy(set2, false);
+    anv_hashset_destroy(union_set, false);
     return TEST_SUCCESS;
 }
 
 // Test intersection operation
 int test_hashset_intersection(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c", "d"};
     char* set2_elements[] = {"c", "d", "e", "f"};
 
-    DSCHashSet* set1 = create_string_set(&alloc, set1_elements, 4);
-    DSCHashSet* set2 = create_string_set(&alloc, set2_elements, 4);
+    ANVHashSet* set1 = create_string_set(&alloc, set1_elements, 4);
+    ANVHashSet* set2 = create_string_set(&alloc, set2_elements, 4);
 
-    DSCHashSet* intersection_set = dsc_hashset_intersection(set1, set2);
+    ANVHashSet* intersection_set = anv_hashset_intersection(set1, set2);
     ASSERT_NOT_NULL(intersection_set);
-    ASSERT_EQ(dsc_hashset_size(intersection_set), 2); // c, d
+    ASSERT_EQ(anv_hashset_size(intersection_set), 2); // c, d
 
     // Check intersection elements
-    ASSERT(dsc_hashset_contains(intersection_set, "c"));
-    ASSERT(dsc_hashset_contains(intersection_set, "d"));
-    ASSERT(!dsc_hashset_contains(intersection_set, "a"));
-    ASSERT(!dsc_hashset_contains(intersection_set, "b"));
-    ASSERT(!dsc_hashset_contains(intersection_set, "e"));
-    ASSERT(!dsc_hashset_contains(intersection_set, "f"));
+    ASSERT(anv_hashset_contains(intersection_set, "c"));
+    ASSERT(anv_hashset_contains(intersection_set, "d"));
+    ASSERT(!anv_hashset_contains(intersection_set, "a"));
+    ASSERT(!anv_hashset_contains(intersection_set, "b"));
+    ASSERT(!anv_hashset_contains(intersection_set, "e"));
+    ASSERT(!anv_hashset_contains(intersection_set, "f"));
 
-    dsc_hashset_destroy(set1, false);
-    dsc_hashset_destroy(set2, false);
-    dsc_hashset_destroy(intersection_set, false);
+    anv_hashset_destroy(set1, false);
+    anv_hashset_destroy(set2, false);
+    anv_hashset_destroy(intersection_set, false);
     return TEST_SUCCESS;
 }
 
 // Test difference operation
 int test_hashset_difference(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     char* set1_elements[] = {"a", "b", "c", "d"};
     char* set2_elements[] = {"c", "d", "e", "f"};
 
-    DSCHashSet* set1 = create_string_set(&alloc, set1_elements, 4);
-    DSCHashSet* set2 = create_string_set(&alloc, set2_elements, 4);
+    ANVHashSet* set1 = create_string_set(&alloc, set1_elements, 4);
+    ANVHashSet* set2 = create_string_set(&alloc, set2_elements, 4);
 
-    DSCHashSet* difference_set = dsc_hashset_difference(set1, set2);
+    ANVHashSet* difference_set = anv_hashset_difference(set1, set2);
     ASSERT_NOT_NULL(difference_set);
-    ASSERT_EQ(dsc_hashset_size(difference_set), 2); // a, b
+    ASSERT_EQ(anv_hashset_size(difference_set), 2); // a, b
 
     // Check difference elements (in set1 but not set2)
-    ASSERT(dsc_hashset_contains(difference_set, "a"));
-    ASSERT(dsc_hashset_contains(difference_set, "b"));
-    ASSERT(!dsc_hashset_contains(difference_set, "c"));
-    ASSERT(!dsc_hashset_contains(difference_set, "d"));
-    ASSERT(!dsc_hashset_contains(difference_set, "e"));
-    ASSERT(!dsc_hashset_contains(difference_set, "f"));
+    ASSERT(anv_hashset_contains(difference_set, "a"));
+    ASSERT(anv_hashset_contains(difference_set, "b"));
+    ASSERT(!anv_hashset_contains(difference_set, "c"));
+    ASSERT(!anv_hashset_contains(difference_set, "d"));
+    ASSERT(!anv_hashset_contains(difference_set, "e"));
+    ASSERT(!anv_hashset_contains(difference_set, "f"));
 
-    dsc_hashset_destroy(set1, false);
-    dsc_hashset_destroy(set2, false);
-    dsc_hashset_destroy(difference_set, false);
+    anv_hashset_destroy(set1, false);
+    anv_hashset_destroy(set2, false);
+    anv_hashset_destroy(difference_set, false);
     return TEST_SUCCESS;
 }
 
 // Test subset operation
 int test_hashset_is_subset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     char* superset_elements[] = {"a", "b", "c", "d", "e"};
     char* subset_elements[] = {"b", "d"};
     char* non_subset_elements[] = {"b", "f"};
 
-    DSCHashSet* superset = create_string_set(&alloc, superset_elements, 5);
-    DSCHashSet* subset = create_string_set(&alloc, subset_elements, 2);
-    DSCHashSet* non_subset = create_string_set(&alloc, non_subset_elements, 2);
-    DSCHashSet* empty_set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* superset = create_string_set(&alloc, superset_elements, 5);
+    ANVHashSet* subset = create_string_set(&alloc, subset_elements, 2);
+    ANVHashSet* non_subset = create_string_set(&alloc, non_subset_elements, 2);
+    ANVHashSet* empty_set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Test valid subset
-    ASSERT(dsc_hashset_is_subset(subset, superset));
+    ASSERT(anv_hashset_is_subset(subset, superset));
 
     // Test non-subset
-    ASSERT(!dsc_hashset_is_subset(non_subset, superset));
+    ASSERT(!anv_hashset_is_subset(non_subset, superset));
 
     // Test empty set is subset of any set
-    ASSERT(dsc_hashset_is_subset(empty_set, superset));
-    ASSERT(dsc_hashset_is_subset(empty_set, subset));
+    ASSERT(anv_hashset_is_subset(empty_set, superset));
+    ASSERT(anv_hashset_is_subset(empty_set, subset));
 
     // Test set is subset of itself
-    ASSERT(dsc_hashset_is_subset(superset, superset));
+    ASSERT(anv_hashset_is_subset(superset, superset));
 
-    dsc_hashset_destroy(superset, false);
-    dsc_hashset_destroy(subset, false);
-    dsc_hashset_destroy(non_subset, false);
-    dsc_hashset_destroy(empty_set, false);
+    anv_hashset_destroy(superset, false);
+    anv_hashset_destroy(subset, false);
+    anv_hashset_destroy(non_subset, false);
+    anv_hashset_destroy(empty_set, false);
     return TEST_SUCCESS;
 }
 
 // Test empty set operations
 int test_hashset_empty_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
-    DSCHashSet* empty1 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
-    DSCHashSet* empty2 = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVHashSet* empty1 = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
+    ANVHashSet* empty2 = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     char* set_elements[] = {"a", "b", "c"};
-    DSCHashSet* non_empty = create_string_set(&alloc, set_elements, 3);
+    ANVHashSet* non_empty = create_string_set(&alloc, set_elements, 3);
 
     // Union with empty set
-    DSCHashSet* union_result = dsc_hashset_union(empty1, non_empty);
+    ANVHashSet* union_result = anv_hashset_union(empty1, non_empty);
     ASSERT_NOT_NULL(union_result);
-    ASSERT_EQ(dsc_hashset_size(union_result), 3);
+    ASSERT_EQ(anv_hashset_size(union_result), 3);
 
     // Intersection with empty set
-    DSCHashSet* intersection_result = dsc_hashset_intersection(empty1, non_empty);
+    ANVHashSet* intersection_result = anv_hashset_intersection(empty1, non_empty);
     ASSERT_NOT_NULL(intersection_result);
-    ASSERT_EQ(dsc_hashset_size(intersection_result), 0);
+    ASSERT_EQ(anv_hashset_size(intersection_result), 0);
 
     // Difference with empty set
-    DSCHashSet* difference_result = dsc_hashset_difference(non_empty, empty1);
+    ANVHashSet* difference_result = anv_hashset_difference(non_empty, empty1);
     ASSERT_NOT_NULL(difference_result);
-    ASSERT_EQ(dsc_hashset_size(difference_result), 3);
+    ASSERT_EQ(anv_hashset_size(difference_result), 3);
 
     // Union of two empty sets
-    DSCHashSet* empty_union = dsc_hashset_union(empty1, empty2);
+    ANVHashSet* empty_union = anv_hashset_union(empty1, empty2);
     ASSERT_NOT_NULL(empty_union);
-    ASSERT_EQ(dsc_hashset_size(empty_union), 0);
+    ASSERT_EQ(anv_hashset_size(empty_union), 0);
 
-    dsc_hashset_destroy(empty1, false);
-    dsc_hashset_destroy(empty2, false);
-    dsc_hashset_destroy(non_empty, false);
-    dsc_hashset_destroy(union_result, false);
-    dsc_hashset_destroy(intersection_result, false);
-    dsc_hashset_destroy(difference_result, false);
-    dsc_hashset_destroy(empty_union, false);
+    anv_hashset_destroy(empty1, false);
+    anv_hashset_destroy(empty2, false);
+    anv_hashset_destroy(non_empty, false);
+    anv_hashset_destroy(union_result, false);
+    anv_hashset_destroy(intersection_result, false);
+    anv_hashset_destroy(difference_result, false);
+    anv_hashset_destroy(empty_union, false);
     return TEST_SUCCESS;
 }
 
 // Test NULL parameter handling for set operations
 int test_hashset_operations_null_params(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCHashSet* set = dsc_hashset_create(&alloc, dsc_hash_string, dsc_key_equals_string, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVHashSet* set = anv_hashset_create(&alloc, anv_hash_string, anv_key_equals_string, 0);
 
     // Test NULL parameters
-    ASSERT_NULL(dsc_hashset_union(NULL, set));
-    ASSERT_NULL(dsc_hashset_union(set, NULL));
-    ASSERT_NULL(dsc_hashset_union(NULL, NULL));
+    ASSERT_NULL(anv_hashset_union(NULL, set));
+    ASSERT_NULL(anv_hashset_union(set, NULL));
+    ASSERT_NULL(anv_hashset_union(NULL, NULL));
 
-    ASSERT_NULL(dsc_hashset_intersection(NULL, set));
-    ASSERT_NULL(dsc_hashset_intersection(set, NULL));
-    ASSERT_NULL(dsc_hashset_intersection(NULL, NULL));
+    ASSERT_NULL(anv_hashset_intersection(NULL, set));
+    ASSERT_NULL(anv_hashset_intersection(set, NULL));
+    ASSERT_NULL(anv_hashset_intersection(NULL, NULL));
 
-    ASSERT_NULL(dsc_hashset_difference(NULL, set));
-    // Note: dsc_hashset_difference(set, NULL) should return a copy of set
+    ASSERT_NULL(anv_hashset_difference(NULL, set));
+    // Note: anv_hashset_difference(set, NULL) should return a copy of set
     // since difference with empty set is the original set
-    DSCHashSet* diff_result = dsc_hashset_difference(set, NULL);
+    ANVHashSet* diff_result = anv_hashset_difference(set, NULL);
     ASSERT_NOT_NULL(diff_result);
-    dsc_hashset_destroy(diff_result, false);
+    anv_hashset_destroy(diff_result, false);
 
-    ASSERT(!dsc_hashset_is_subset(NULL, set));
-    ASSERT(!dsc_hashset_is_subset(set, NULL));
-    ASSERT(!dsc_hashset_is_subset(NULL, NULL));
+    ASSERT(!anv_hashset_is_subset(NULL, set));
+    ASSERT(!anv_hashset_is_subset(set, NULL));
+    ASSERT(!anv_hashset_is_subset(NULL, NULL));
 
-    dsc_hashset_destroy(set, false);
+    anv_hashset_destroy(set, false);
     return TEST_SUCCESS;
 }
 
 // Test set operations with identical sets
 int test_hashset_identical_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     char* elements[] = {"a", "b", "c"};
-    DSCHashSet* set1 = create_string_set(&alloc, elements, 3);
-    DSCHashSet* set2 = create_string_set(&alloc, elements, 3);
+    ANVHashSet* set1 = create_string_set(&alloc, elements, 3);
+    ANVHashSet* set2 = create_string_set(&alloc, elements, 3);
 
     // Union of identical sets
-    DSCHashSet* union_result = dsc_hashset_union(set1, set2);
+    ANVHashSet* union_result = anv_hashset_union(set1, set2);
     ASSERT_NOT_NULL(union_result);
-    ASSERT_EQ(dsc_hashset_size(union_result), 3);
+    ASSERT_EQ(anv_hashset_size(union_result), 3);
 
     // Intersection of identical sets
-    DSCHashSet* intersection_result = dsc_hashset_intersection(set1, set2);
+    ANVHashSet* intersection_result = anv_hashset_intersection(set1, set2);
     ASSERT_NOT_NULL(intersection_result);
-    ASSERT_EQ(dsc_hashset_size(intersection_result), 3);
+    ASSERT_EQ(anv_hashset_size(intersection_result), 3);
 
     // Difference of identical sets
-    DSCHashSet* difference_result = dsc_hashset_difference(set1, set2);
+    ANVHashSet* difference_result = anv_hashset_difference(set1, set2);
     ASSERT_NOT_NULL(difference_result);
-    ASSERT_EQ(dsc_hashset_size(difference_result), 0);
+    ASSERT_EQ(anv_hashset_size(difference_result), 0);
 
     // Subset check with identical sets
-    ASSERT(dsc_hashset_is_subset(set1, set2));
-    ASSERT(dsc_hashset_is_subset(set2, set1));
+    ASSERT(anv_hashset_is_subset(set1, set2));
+    ASSERT(anv_hashset_is_subset(set2, set1));
 
-    dsc_hashset_destroy(set1, false);
-    dsc_hashset_destroy(set2, false);
-    dsc_hashset_destroy(union_result, false);
-    dsc_hashset_destroy(intersection_result, false);
-    dsc_hashset_destroy(difference_result, false);
+    anv_hashset_destroy(set1, false);
+    anv_hashset_destroy(set2, false);
+    anv_hashset_destroy(union_result, false);
+    anv_hashset_destroy(intersection_result, false);
+    anv_hashset_destroy(difference_result, false);
     return TEST_SUCCESS;
 }
 

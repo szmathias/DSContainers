@@ -1,20 +1,20 @@
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include "Queue.h"
+#include "containers/Queue.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // Test basic queue creation and destruction
 int test_queue_create_destroy(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVQueue* queue = anv_queue_create(&alloc);
     ASSERT_NOT_NULL(queue);
-    ASSERT_EQ(dsc_queue_size(queue), 0);
-    ASSERT(dsc_queue_is_empty(queue));
+    ASSERT_EQ(anv_queue_size(queue), 0);
+    ASSERT(anv_queue_is_empty(queue));
 
-    dsc_queue_destroy(queue, false);
+    anv_queue_destroy(queue, false);
     return TEST_SUCCESS;
 }
 
@@ -22,20 +22,20 @@ int test_queue_create_destroy(void)
 int test_queue_null_parameters(void)
 {
     // Creating with NULL allocator should fail
-    ASSERT_NULL(dsc_queue_create(NULL));
+    ASSERT_NULL(anv_queue_create(NULL));
 
     // Operations on NULL queue should be safe
-    ASSERT_EQ(dsc_queue_size(NULL), 0);
-    ASSERT(dsc_queue_is_empty(NULL));
-    ASSERT_NULL(dsc_queue_front(NULL));
-    ASSERT_NULL(dsc_queue_back(NULL));
-    ASSERT_EQ(dsc_queue_enqueue(NULL, NULL), -1);
-    ASSERT_EQ(dsc_queue_dequeue(NULL, false), -1);
-    ASSERT_NULL(dsc_queue_dequeue_data(NULL));
+    ASSERT_EQ(anv_queue_size(NULL), 0);
+    ASSERT(anv_queue_is_empty(NULL));
+    ASSERT_NULL(anv_queue_front(NULL));
+    ASSERT_NULL(anv_queue_back(NULL));
+    ASSERT_EQ(anv_queue_enqueue(NULL, NULL), -1);
+    ASSERT_EQ(anv_queue_dequeue(NULL, false), -1);
+    ASSERT_NULL(anv_queue_dequeue_data(NULL));
 
     // Destruction should be safe
-    dsc_queue_destroy(NULL, false);
-    dsc_queue_clear(NULL, false);
+    anv_queue_destroy(NULL, false);
+    anv_queue_clear(NULL, false);
 
     return TEST_SUCCESS;
 }
@@ -43,8 +43,8 @@ int test_queue_null_parameters(void)
 // Test basic enqueue and dequeue operations
 int test_queue_enqueue_dequeue(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVQueue* queue = anv_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
@@ -54,126 +54,126 @@ int test_queue_enqueue_dequeue(void)
     *data3 = 30;
 
     // Test enqueuing elements
-    ASSERT_EQ(dsc_queue_enqueue(queue, data1), 0);
-    ASSERT_EQ(dsc_queue_size(queue), 1);
-    ASSERT(!dsc_queue_is_empty(queue));
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 10);
-    ASSERT_EQ(*(int*)dsc_queue_back(queue), 10); // Front and back same for single element
+    ASSERT_EQ(anv_queue_enqueue(queue, data1), 0);
+    ASSERT_EQ(anv_queue_size(queue), 1);
+    ASSERT(!anv_queue_is_empty(queue));
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 10);
+    ASSERT_EQ(*(int*)anv_queue_back(queue), 10); // Front and back same for single element
 
-    ASSERT_EQ(dsc_queue_enqueue(queue, data2), 0);
-    ASSERT_EQ(dsc_queue_size(queue), 2);
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 10); // FIFO - front should still be data1
-    ASSERT_EQ(*(int*)dsc_queue_back(queue), 20);  // Back should be data2
+    ASSERT_EQ(anv_queue_enqueue(queue, data2), 0);
+    ASSERT_EQ(anv_queue_size(queue), 2);
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 10); // FIFO - front should still be data1
+    ASSERT_EQ(*(int*)anv_queue_back(queue), 20);  // Back should be data2
 
-    ASSERT_EQ(dsc_queue_enqueue(queue, data3), 0);
-    ASSERT_EQ(dsc_queue_size(queue), 3);
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 10); // FIFO - front should still be data1
-    ASSERT_EQ(*(int*)dsc_queue_back(queue), 30);  // Back should be data3
+    ASSERT_EQ(anv_queue_enqueue(queue, data3), 0);
+    ASSERT_EQ(anv_queue_size(queue), 3);
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 10); // FIFO - front should still be data1
+    ASSERT_EQ(*(int*)anv_queue_back(queue), 30);  // Back should be data3
 
     // Test dequeuing elements
-    ASSERT_EQ(dsc_queue_dequeue(queue, true), 0); // Dequeues data1 and frees it
-    ASSERT_EQ(dsc_queue_size(queue), 2);
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 20); // Should see data2
+    ASSERT_EQ(anv_queue_dequeue(queue, true), 0); // Dequeues data1 and frees it
+    ASSERT_EQ(anv_queue_size(queue), 2);
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 20); // Should see data2
 
-    ASSERT_EQ(dsc_queue_dequeue(queue, true), 0); // Dequeues data2 and frees it
-    ASSERT_EQ(dsc_queue_size(queue), 1);
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 30); // Should see data3
-    ASSERT_EQ(*(int*)dsc_queue_back(queue), 30);  // Front and back same again
+    ASSERT_EQ(anv_queue_dequeue(queue, true), 0); // Dequeues data2 and frees it
+    ASSERT_EQ(anv_queue_size(queue), 1);
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 30); // Should see data3
+    ASSERT_EQ(*(int*)anv_queue_back(queue), 30);  // Front and back same again
 
-    ASSERT_EQ(dsc_queue_dequeue(queue, true), 0); // Dequeues data3 and frees it
-    ASSERT_EQ(dsc_queue_size(queue), 0);
-    ASSERT(dsc_queue_is_empty(queue));
-    ASSERT_NULL(dsc_queue_front(queue));
-    ASSERT_NULL(dsc_queue_back(queue));
+    ASSERT_EQ(anv_queue_dequeue(queue, true), 0); // Dequeues data3 and frees it
+    ASSERT_EQ(anv_queue_size(queue), 0);
+    ASSERT(anv_queue_is_empty(queue));
+    ASSERT_NULL(anv_queue_front(queue));
+    ASSERT_NULL(anv_queue_back(queue));
 
     // Test dequeuing from empty queue
-    ASSERT_EQ(dsc_queue_dequeue(queue, false), -1);
+    ASSERT_EQ(anv_queue_dequeue(queue, false), -1);
 
-    dsc_queue_destroy(queue, false);
+    anv_queue_destroy(queue, false);
     return TEST_SUCCESS;
 }
 
 // Test dequeue_data function
 int test_queue_dequeue_data(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVQueue* queue = anv_queue_create(&alloc);
 
     int* data1 = malloc(sizeof(int));
     int* data2 = malloc(sizeof(int));
     *data1 = 42;
     *data2 = 84;
 
-    ASSERT_EQ(dsc_queue_enqueue(queue, data1), 0);
-    ASSERT_EQ(dsc_queue_enqueue(queue, data2), 0);
+    ASSERT_EQ(anv_queue_enqueue(queue, data1), 0);
+    ASSERT_EQ(anv_queue_enqueue(queue, data2), 0);
 
     // Dequeue data1 and get its value
-    void* dequeued = dsc_queue_dequeue_data(queue);
+    void* dequeued = anv_queue_dequeue_data(queue);
     ASSERT_NOT_NULL(dequeued);
     ASSERT_EQ(*(int*)dequeued, 42);
-    ASSERT_EQ(dsc_queue_size(queue), 1);
+    ASSERT_EQ(anv_queue_size(queue), 1);
     free(dequeued); // Caller's responsibility to free
 
     // Dequeue data2 and get its value
-    dequeued = dsc_queue_dequeue_data(queue);
+    dequeued = anv_queue_dequeue_data(queue);
     ASSERT_NOT_NULL(dequeued);
     ASSERT_EQ(*(int*)dequeued, 84);
-    ASSERT_EQ(dsc_queue_size(queue), 0);
+    ASSERT_EQ(anv_queue_size(queue), 0);
     free(dequeued);
 
     // Dequeue from empty queue
-    ASSERT_NULL(dsc_queue_dequeue_data(queue));
+    ASSERT_NULL(anv_queue_dequeue_data(queue));
 
-    dsc_queue_destroy(queue, false);
+    anv_queue_destroy(queue, false);
     return TEST_SUCCESS;
 }
 
 // Test queue clear operation
 int test_queue_clear(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVQueue* queue = anv_queue_create(&alloc);
 
     // Add some elements
     for (int i = 0; i < 5; i++)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_queue_enqueue(queue, data), 0);
+        ASSERT_EQ(anv_queue_enqueue(queue, data), 0);
     }
 
-    ASSERT_EQ(dsc_queue_size(queue), 5);
+    ASSERT_EQ(anv_queue_size(queue), 5);
 
     // Clear with freeing data
-    dsc_queue_clear(queue, true);
-    ASSERT_EQ(dsc_queue_size(queue), 0);
-    ASSERT(dsc_queue_is_empty(queue));
-    ASSERT_NULL(dsc_queue_front(queue));
-    ASSERT_NULL(dsc_queue_back(queue));
+    anv_queue_clear(queue, true);
+    ASSERT_EQ(anv_queue_size(queue), 0);
+    ASSERT(anv_queue_is_empty(queue));
+    ASSERT_NULL(anv_queue_front(queue));
+    ASSERT_NULL(anv_queue_back(queue));
 
     // Queue should still be usable after clear
     int* new_data = malloc(sizeof(int));
     *new_data = 999;
-    ASSERT_EQ(dsc_queue_enqueue(queue, new_data), 0);
-    ASSERT_EQ(dsc_queue_size(queue), 1);
-    ASSERT_EQ(*(int*)dsc_queue_front(queue), 999);
+    ASSERT_EQ(anv_queue_enqueue(queue, new_data), 0);
+    ASSERT_EQ(anv_queue_size(queue), 1);
+    ASSERT_EQ(*(int*)anv_queue_front(queue), 999);
 
-    dsc_queue_destroy(queue, true);
+    anv_queue_destroy(queue, true);
     return TEST_SUCCESS;
 }
 
 // Test queue equality
 int test_queue_equals(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCQueue* queue1 = dsc_queue_create(&alloc);
-    DSCQueue* queue2 = dsc_queue_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVQueue* queue1 = anv_queue_create(&alloc);
+    ANVQueue* queue2 = anv_queue_create(&alloc);
 
     // Empty queues should be equal
-    ASSERT_EQ(dsc_queue_equals(queue1, queue2, int_cmp), 1);
+    ASSERT_EQ(anv_queue_equals(queue1, queue2, int_cmp), 1);
 
     // Same queue should be equal to itself
-    ASSERT_EQ(dsc_queue_equals(queue1, queue1, int_cmp), 1);
+    ASSERT_EQ(anv_queue_equals(queue1, queue1, int_cmp), 1);
 
     // Add same elements to both queues
     for (int i = 0; i < 3; i++)
@@ -181,55 +181,55 @@ int test_queue_equals(void)
         int* data1 = malloc(sizeof(int));
         int* data2 = malloc(sizeof(int));
         *data1 = *data2 = i * 10;
-        ASSERT_EQ(dsc_queue_enqueue(queue1, data1), 0);
-        ASSERT_EQ(dsc_queue_enqueue(queue2, data2), 0);
+        ASSERT_EQ(anv_queue_enqueue(queue1, data1), 0);
+        ASSERT_EQ(anv_queue_enqueue(queue2, data2), 0);
     }
 
-    ASSERT_EQ(dsc_queue_equals(queue1, queue2, int_cmp), 1);
+    ASSERT_EQ(anv_queue_equals(queue1, queue2, int_cmp), 1);
 
     // Add different element to one queue
     int* diff_data = malloc(sizeof(int));
     *diff_data = 999;
-    ASSERT_EQ(dsc_queue_enqueue(queue1, diff_data), 0);
+    ASSERT_EQ(anv_queue_enqueue(queue1, diff_data), 0);
 
-    ASSERT_EQ(dsc_queue_equals(queue1, queue2, int_cmp), 0);
+    ASSERT_EQ(anv_queue_equals(queue1, queue2, int_cmp), 0);
 
     // Test with NULL parameters
-    ASSERT_EQ(dsc_queue_equals(NULL, queue2, int_cmp), -1);
-    ASSERT_EQ(dsc_queue_equals(queue1, NULL, int_cmp), -1);
-    ASSERT_EQ(dsc_queue_equals(queue1, queue2, NULL), -1);
+    ASSERT_EQ(anv_queue_equals(NULL, queue2, int_cmp), -1);
+    ASSERT_EQ(anv_queue_equals(queue1, NULL, int_cmp), -1);
+    ASSERT_EQ(anv_queue_equals(queue1, queue2, NULL), -1);
 
-    dsc_queue_destroy(queue1, true);
-    dsc_queue_destroy(queue2, true);
+    anv_queue_destroy(queue1, true);
+    anv_queue_destroy(queue2, true);
     return TEST_SUCCESS;
 }
 
 // Test FIFO behavior specifically
 int test_queue_fifo_behavior(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCQueue* queue = dsc_queue_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVQueue* queue = anv_queue_create(&alloc);
 
     // Enqueue numbers 0-9
     for (int i = 0; i < 10; i++)
     {
         int* data = malloc(sizeof(int));
         *data = i;
-        ASSERT_EQ(dsc_queue_enqueue(queue, data), 0);
+        ASSERT_EQ(anv_queue_enqueue(queue, data), 0);
     }
 
     // Dequeue should give us 0-9 in order (FIFO)
     for (int i = 0; i < 10; i++)
     {
-        void* data = dsc_queue_dequeue_data(queue);
+        void* data = anv_queue_dequeue_data(queue);
         ASSERT_NOT_NULL(data);
         ASSERT_EQ(*(int*)data, i);
         free(data);
     }
 
-    ASSERT(dsc_queue_is_empty(queue));
+    ASSERT(anv_queue_is_empty(queue));
 
-    dsc_queue_destroy(queue, false);
+    anv_queue_destroy(queue, false);
     return TEST_SUCCESS;
 }
 

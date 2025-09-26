@@ -2,7 +2,7 @@
 // Created by zack on 9/2/25.
 //
 
-#include "ArrayList.h"
+#include "containers/ArrayList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include <stdio.h>
@@ -11,90 +11,90 @@
 
 int test_reserve(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 0);
 
     // Test reserve on empty list
-    ASSERT_EQ(dsc_arraylist_reserve(list, 100), 0);
-    ASSERT_GTE(dsc_arraylist_capacity(list), 100);
-    ASSERT_EQ(dsc_arraylist_size(list), 0);
+    ASSERT_EQ(anv_arraylist_reserve(list, 100), 0);
+    ASSERT_GTE(anv_arraylist_capacity(list), 100);
+    ASSERT_EQ(anv_arraylist_size(list), 0);
 
     // Add some elements
     int* a = malloc(sizeof(int));
     *a = 1;
     int* b = malloc(sizeof(int));
     *b = 2;
-    dsc_arraylist_push_back(list, a);
-    dsc_arraylist_push_back(list, b);
+    anv_arraylist_push_back(list, a);
+    anv_arraylist_push_back(list, b);
 
-    const size_t old_capacity = dsc_arraylist_capacity(list);
+    const size_t old_capacity = anv_arraylist_capacity(list);
 
     // Reserve smaller capacity (should not shrink)
-    ASSERT_EQ(dsc_arraylist_reserve(list, 5), 0);
-    ASSERT_EQ(dsc_arraylist_capacity(list), old_capacity);
-    ASSERT_EQ(dsc_arraylist_size(list), 2);
+    ASSERT_EQ(anv_arraylist_reserve(list, 5), 0);
+    ASSERT_EQ(anv_arraylist_capacity(list), old_capacity);
+    ASSERT_EQ(anv_arraylist_size(list), 2);
 
     // Reserve larger capacity
-    ASSERT_EQ(dsc_arraylist_reserve(list, 200), 0);
-    ASSERT_GTE(dsc_arraylist_capacity(list), 200);
-    ASSERT_EQ(dsc_arraylist_size(list), 2);
+    ASSERT_EQ(anv_arraylist_reserve(list, 200), 0);
+    ASSERT_GTE(anv_arraylist_capacity(list), 200);
+    ASSERT_EQ(anv_arraylist_size(list), 2);
 
     // Verify data integrity
-    ASSERT_EQ(*(int*)dsc_arraylist_get(list, 0), 1);
-    ASSERT_EQ(*(int*)dsc_arraylist_get(list, 1), 2);
+    ASSERT_EQ(*(int*)anv_arraylist_get(list, 0), 1);
+    ASSERT_EQ(*(int*)anv_arraylist_get(list, 1), 2);
 
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_shrink_to_fit(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 100);
 
     // Add some elements (less than capacity)
     for (int i = 0; i < 10; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
     }
 
-    ASSERT_GT(dsc_arraylist_capacity(list), dsc_arraylist_size(list));
+    ASSERT_GT(anv_arraylist_capacity(list), anv_arraylist_size(list));
 
     // Shrink to fit
-    ASSERT_EQ(dsc_arraylist_shrink_to_fit(list), 0);
-    ASSERT_EQ(dsc_arraylist_capacity(list), dsc_arraylist_size(list));
-    ASSERT_EQ(dsc_arraylist_size(list), 10);
+    ASSERT_EQ(anv_arraylist_shrink_to_fit(list), 0);
+    ASSERT_EQ(anv_arraylist_capacity(list), anv_arraylist_size(list));
+    ASSERT_EQ(anv_arraylist_size(list), 10);
 
     // Verify data integrity
     for (int i = 0; i < 10; i++)
     {
-        ASSERT_EQ(*(int*)dsc_arraylist_get(list, i), i);
+        ASSERT_EQ(*(int*)anv_arraylist_get(list, i), i);
     }
 
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_shrink_empty_list(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 100);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 100);
 
     // Shrink empty list
-    ASSERT_EQ(dsc_arraylist_shrink_to_fit(list), 0);
-    ASSERT_EQ(dsc_arraylist_capacity(list), 0);
-    ASSERT_EQ(dsc_arraylist_size(list), 0);
+    ASSERT_EQ(anv_arraylist_shrink_to_fit(list), 0);
+    ASSERT_EQ(anv_arraylist_capacity(list), 0);
+    ASSERT_EQ(anv_arraylist_size(list), 0);
 
-    dsc_arraylist_destroy(list, false);
+    anv_arraylist_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 int test_growth_pattern(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 0);
 
     size_t last_capacity = 0;
 
@@ -103,9 +103,9 @@ int test_growth_pattern(void)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
 
-        const size_t current_capacity = dsc_arraylist_capacity(list);
+        const size_t current_capacity = anv_arraylist_capacity(list);
         if (current_capacity != last_capacity)
         {
             // Capacity should grow by at least 1.5x (our growth factor)
@@ -117,15 +117,15 @@ int test_growth_pattern(void)
         }
     }
 
-    ASSERT_EQ(dsc_arraylist_size(list), 100);
+    ASSERT_EQ(anv_arraylist_size(list), 100);
 
     // Verify all data
     for (int i = 0; i < 100; i++)
     {
-        ASSERT_EQ(*(int*)dsc_arraylist_get(list, i), i);
+        ASSERT_EQ(*(int*)anv_arraylist_get(list, i), i);
     }
 
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -133,54 +133,54 @@ int test_memory_allocation_failure(void)
 {
     // This test would require a custom allocator that can simulate failures
     // For now, just test with NULL allocator
-    DSCArrayList* list = dsc_arraylist_create(NULL, 0);
+    ANVArrayList* list = anv_arraylist_create(NULL, 0);
     ASSERT_NULL(list);
     return TEST_SUCCESS;
 }
 
 int test_large_capacity(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 1000);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 1000);
 
     ASSERT_NOT_NULL(list);
-    ASSERT_GTE(dsc_arraylist_capacity(list), 1000);
-    ASSERT_EQ(dsc_arraylist_size(list), 0);
+    ASSERT_GTE(anv_arraylist_capacity(list), 1000);
+    ASSERT_EQ(anv_arraylist_size(list), 0);
 
     // Fill it up
     for (int i = 0; i < 1000; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
     }
 
-    ASSERT_EQ(dsc_arraylist_size(list), 1000);
+    ASSERT_EQ(anv_arraylist_size(list), 1000);
 
     // Spot check some values
-    ASSERT_EQ(*(int*)dsc_arraylist_get(list, 0), 0);
-    ASSERT_EQ(*(int*)dsc_arraylist_get(list, 500), 500);
-    ASSERT_EQ(*(int*)dsc_arraylist_get(list, 999), 999);
+    ASSERT_EQ(*(int*)anv_arraylist_get(list, 0), 0);
+    ASSERT_EQ(*(int*)anv_arraylist_get(list, 500), 500);
+    ASSERT_EQ(*(int*)anv_arraylist_get(list, 999), 999);
 
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 
 int test_memory_cleanup_on_destroy(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 10);
 
     // Add elements
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
     }
 
     // Destroy with data cleanup
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
 
     // If we get here without crash, memory was properly cleaned up
     return TEST_SUCCESS;
@@ -188,52 +188,52 @@ int test_memory_cleanup_on_destroy(void)
 
 int test_memory_cleanup_on_clear(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 10);
 
     // Add elements
     for (int i = 0; i < 5; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
     }
 
-    const size_t capacity_before = dsc_arraylist_capacity(list);
+    const size_t capacity_before = anv_arraylist_capacity(list);
 
     // Clear with data cleanup
-    dsc_arraylist_clear(list, true);
+    anv_arraylist_clear(list, true);
 
-    ASSERT_EQ(dsc_arraylist_size(list), 0);
-    ASSERT_EQ(dsc_arraylist_capacity(list), capacity_before); // Capacity preserved
+    ASSERT_EQ(anv_arraylist_size(list), 0);
+    ASSERT_EQ(anv_arraylist_capacity(list), capacity_before); // Capacity preserved
 
-    dsc_arraylist_destroy(list, false);
+    anv_arraylist_destroy(list, false);
     return TEST_SUCCESS;
 }
 
 int test_capacity_consistency(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
+    ANVAllocator alloc = create_int_allocator();
+    ANVArrayList* list = anv_arraylist_create(&alloc, 0);
 
     // Capacity should always be >= size
     for (int i = 0; i < 50; i++)
     {
         int* val = malloc(sizeof(int));
         *val = i;
-        dsc_arraylist_push_back(list, val);
+        anv_arraylist_push_back(list, val);
 
-        ASSERT_GTE(dsc_arraylist_capacity(list), dsc_arraylist_size(list));
+        ASSERT_GTE(anv_arraylist_capacity(list), anv_arraylist_size(list));
     }
 
     // Remove elements and check consistency
     for (int i = 0; i < 25; i++)
     {
-        dsc_arraylist_pop_back(list, true);
-        ASSERT_GTE(dsc_arraylist_capacity(list), dsc_arraylist_size(list));
+        anv_arraylist_pop_back(list, true);
+        ASSERT_GTE(anv_arraylist_capacity(list), anv_arraylist_size(list));
     }
 
-    dsc_arraylist_destroy(list, true);
+    anv_arraylist_destroy(list, true);
     return TEST_SUCCESS;
 }
 

@@ -3,9 +3,9 @@
 // Advanced allocator integration tests
 //
 
-#include "Alloc.h"
-#include "ArrayList.h"
-#include "SinglyLinkedList.h"
+#include "common/Allocator.h"
+#include "containers/ArrayList.h"
+#include "containers/SinglyLinkedList.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 #include <stdio.h>
@@ -196,28 +196,28 @@ int test_pool_allocator_integration(void)
     pool_reset();
 
     // Use separate allocators: default for ArrayList structure, pool for data
-    const DSCAllocator pool_data_alloc = dsc_alloc_custom(pool_alloc, pool_free, NULL, int_copy);
-    DSCAllocator default_alloc = dsc_alloc_default();
+    const ANVAllocator pool_data_alloc = anv_alloc_custom(pool_alloc, pool_free, NULL, int_copy);
+    ANVAllocator default_alloc = anv_alloc_default();
 
     // Test with ArrayList using default allocator for structure
-    DSCArrayList* list = dsc_arraylist_create(&default_alloc, 4);
+    ANVArrayList* list = anv_arraylist_create(&default_alloc, 4);
     ASSERT(list != NULL);
 
     // Add elements using pool allocator for the data
     for (int i = 0; i < 8; i++)
     {
-        int* value = dsc_alloc_malloc(&pool_data_alloc, sizeof(int));
+        int* value = anv_alloc_malloc(&pool_data_alloc, sizeof(int));
         ASSERT(value != NULL);
         *value = i * 10;
-        dsc_arraylist_push_back(list, value);
+        anv_arraylist_push_back(list, value);
     }
 
-    ASSERT_EQ(dsc_arraylist_size(list), 8);
+    ASSERT_EQ(anv_arraylist_size(list), 8);
 
     // Verify values
     for (size_t i = 0; i < 8; i++)
     {
-        const int* value = dsc_arraylist_get(list, i);
+        const int* value = anv_arraylist_get(list, i);
         ASSERT_EQ(*value, (int)(i * 10));
     }
 
@@ -227,7 +227,7 @@ int test_pool_allocator_integration(void)
 
     for (int i = 0; i < POOL_NUM_BLOCKS + 5; i++)
     {
-        void* ptr = dsc_alloc_malloc(&pool_data_alloc, 32);
+        void* ptr = anv_alloc_malloc(&pool_data_alloc, 32);
         if (ptr)
         {
             ptrs[allocated++] = ptr;
@@ -241,16 +241,16 @@ int test_pool_allocator_integration(void)
     // Free allocated blocks
     for (int i = 0; i < allocated; i++)
     {
-        dsc_alloc_free(&pool_data_alloc, ptrs[i]);
+        anv_alloc_free(&pool_data_alloc, ptrs[i]);
     }
 
     // Clean up: manually free data with pool allocator, then destroy list
-    for (size_t i = 0; i < dsc_arraylist_size(list); i++)
+    for (size_t i = 0; i < anv_arraylist_size(list); i++)
     {
-        int* value = dsc_arraylist_get(list, i);
-        dsc_alloc_free(&pool_data_alloc, value);
+        int* value = anv_arraylist_get(list, i);
+        anv_alloc_free(&pool_data_alloc, value);
     }
-    dsc_arraylist_destroy(list, false); // Don't auto-free data since we freed it manually
+    anv_arraylist_destroy(list, false); // Don't auto-free data since we freed it manually
 
     return TEST_SUCCESS;
 }
@@ -270,12 +270,12 @@ int test_debug_allocator_tracking(void)
 {
     debug_reset();
 
-    const DSCAllocator alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
+    const ANVAllocator alloc = anv_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
 
     // Test allocation tracking
-    void* ptr1 = dsc_alloc_malloc(&alloc, 100);
-    void* ptr2 = dsc_alloc_malloc(&alloc, 200);
-    void* ptr3 = dsc_alloc_malloc(&alloc, 300);
+    void* ptr1 = anv_alloc_malloc(&alloc, 100);
+    void* ptr2 = anv_alloc_malloc(&alloc, 200);
+    void* ptr3 = anv_alloc_malloc(&alloc, 300);
 
     ASSERT(ptr1 != NULL);
     ASSERT(ptr2 != NULL);
@@ -285,22 +285,22 @@ int test_debug_allocator_tracking(void)
     ASSERT_EQ(peak_allocated, 600);
 
     // Free one allocation
-    dsc_alloc_free(&alloc, ptr2);
+    anv_alloc_free(&alloc, ptr2);
     ASSERT_EQ(allocation_count, 2);
     ASSERT_EQ(total_allocated, 400);
     ASSERT_EQ(peak_allocated, 600); // Peak should remain
 
     // Test copy function (should create new allocation)
     const int value = 42;
-    int* copied = dsc_alloc_copy(&alloc, &value);
+    int* copied = anv_alloc_copy(&alloc, &value);
     ASSERT(copied != NULL);
     ASSERT_EQ(*copied, 42);
     ASSERT_EQ(allocation_count, 3); // Should increase
 
     // Clean up
-    dsc_alloc_free(&alloc, ptr1);
-    dsc_alloc_free(&alloc, ptr3);
-    dsc_alloc_data_free(&alloc, copied);
+    anv_alloc_free(&alloc, ptr1);
+    anv_alloc_free(&alloc, ptr3);
+    anv_alloc_data_free(&alloc, copied);
 
     ASSERT_EQ(allocation_count, 0);
     ASSERT_EQ(total_allocated, 0);
@@ -312,26 +312,26 @@ int test_failing_allocator_error_handling(void)
 {
     set_alloc_fail_countdown(2); // Allow 2 allocations, then fail
 
-    const DSCAllocator alloc = dsc_alloc_custom(failing_alloc, failing_free, failing_free, NULL);
+    const ANVAllocator alloc = anv_alloc_custom(failing_alloc, failing_free, failing_free, NULL);
 
     // First two allocations should succeed
-    void* ptr1 = dsc_alloc_malloc(&alloc, 100);
-    void* ptr2 = dsc_alloc_malloc(&alloc, 100);
+    void* ptr1 = anv_alloc_malloc(&alloc, 100);
+    void* ptr2 = anv_alloc_malloc(&alloc, 100);
 
     ASSERT(ptr1 != NULL);
     ASSERT(ptr2 != NULL);
 
     // Third allocation should fail
-    const void* ptr3 = dsc_alloc_malloc(&alloc, 100);
+    const void* ptr3 = anv_alloc_malloc(&alloc, 100);
     ASSERT(ptr3 == NULL);
 
     // Fourth allocation should also fail
-    const void* ptr4 = dsc_alloc_malloc(&alloc, 100);
+    const void* ptr4 = anv_alloc_malloc(&alloc, 100);
     ASSERT(ptr4 == NULL);
 
     // Clean up successful allocations
-    dsc_alloc_free(&alloc, ptr1);
-    dsc_alloc_free(&alloc, ptr2);
+    anv_alloc_free(&alloc, ptr1);
+    anv_alloc_free(&alloc, ptr2);
 
     return TEST_SUCCESS;
 }
@@ -341,26 +341,26 @@ int test_allocator_with_linked_list(void)
     debug_reset();
 
     // Use debug allocator only for data, regular allocator for structure
-    const DSCAllocator data_alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
-    DSCAllocator regular_alloc = dsc_alloc_default();
+    const ANVAllocator data_alloc = anv_alloc_custom(debug_alloc, debug_free, debug_free, debug_int_copy);
+    ANVAllocator regular_alloc = anv_alloc_default();
 
     // Create linked list with regular allocator for structure
-    DSCSinglyLinkedList* list = dsc_sll_create(&regular_alloc);
+    ANVSinglyLinkedList* list = anv_sll_create(&regular_alloc);
     ASSERT(list != NULL);
 
     // Add several elements using debug allocator for data
     for (int i = 0; i < 5; i++)
     {
-        int* value = dsc_alloc_malloc(&data_alloc, sizeof(int));
+        int* value = anv_alloc_malloc(&data_alloc, sizeof(int));
         ASSERT(value != NULL);
         *value = i + 1;
-        dsc_sll_push_back(list, value);
+        anv_sll_push_back(list, value);
     }
 
-    ASSERT_EQ(dsc_sll_size(list), 5);
+    ASSERT_EQ(anv_sll_size(list), 5);
 
     // Verify elements using iterator
-    DSCIterator iter = dsc_sll_iterator(list);
+    ANVIterator iter = anv_sll_iterator(list);
     int expected = 1;
     while (iter.has_next(&iter))
     {
@@ -372,22 +372,22 @@ int test_allocator_with_linked_list(void)
 
     // Test find functionality
     const int search_value = 3;
-    const DSCSinglyLinkedNode* found_node = dsc_sll_find(list, &search_value, int_cmp);
+    const ANVSinglyLinkedNode* found_node = anv_sll_find(list, &search_value, int_cmp);
     ASSERT(found_node != NULL);
     ASSERT_EQ(*(int*)found_node->data, 3);
 
     // Clean up manually: iterate through list and free each data element
-    DSCIterator cleanup_iter = dsc_sll_iterator(list);
+    ANVIterator cleanup_iter = anv_sll_iterator(list);
     while (cleanup_iter.has_next(&cleanup_iter))
     {
         int* value = cleanup_iter.get(&cleanup_iter);
-        dsc_alloc_free(&data_alloc, value);
+        anv_alloc_free(&data_alloc, value);
         cleanup_iter.next(&cleanup_iter);
     }
     cleanup_iter.destroy(&cleanup_iter);
 
     // Destroy list structure without auto-freeing data since we freed it manually
-    dsc_sll_destroy(list, false);
+    anv_sll_destroy(list, false);
 
     // Check for memory leaks in our debug allocator
     ASSERT_EQ(allocation_count, 0); // Should be no leaks
@@ -400,7 +400,7 @@ int test_allocator_stress_test(void)
 {
     debug_reset();
 
-    const DSCAllocator alloc = dsc_alloc_custom(debug_alloc, debug_free, debug_free, string_copy);
+    const ANVAllocator alloc = anv_alloc_custom(debug_alloc, debug_free, debug_free, string_copy);
 
     const int num_operations = 100;
     void* ptrs[100]; // Fixed size array instead of VLA
@@ -413,7 +413,7 @@ int test_allocator_stress_test(void)
         {
             // Allocate
             const size_t size = 16 + (i % 64); // Variable sizes
-            ptrs[active_ptrs] = dsc_alloc_malloc(&alloc, size);
+            ptrs[active_ptrs] = anv_alloc_malloc(&alloc, size);
             ASSERT(ptrs[active_ptrs] != NULL);
             active_ptrs++;
         }
@@ -421,7 +421,7 @@ int test_allocator_stress_test(void)
         {
             // Free a random pointer
             const int index = i % active_ptrs;
-            dsc_alloc_free(&alloc, ptrs[index]);
+            anv_alloc_free(&alloc, ptrs[index]);
 
             // Move last pointer to freed slot
             ptrs[index] = ptrs[active_ptrs - 1];
@@ -432,7 +432,7 @@ int test_allocator_stress_test(void)
     // Free remaining allocations
     for (int i = 0; i < active_ptrs; i++)
     {
-        dsc_alloc_free(&alloc, ptrs[i]);
+        anv_alloc_free(&alloc, ptrs[i]);
     }
 
     // Verify no memory leaks
@@ -446,19 +446,19 @@ int test_allocator_stress_test(void)
 int test_mixed_allocator_scenarios(void)
 {
     // Test using different allocators for different purposes
-    const DSCAllocator debug_alloc_struct = dsc_alloc_custom(debug_alloc, debug_free, debug_free, NULL);
-    const DSCAllocator pool_alloc_struct = dsc_alloc_custom(pool_alloc, pool_free, NULL, NULL);
+    const ANVAllocator debug_alloc_struct = anv_alloc_custom(debug_alloc, debug_free, debug_free, NULL);
+    const ANVAllocator pool_alloc_struct = anv_alloc_custom(pool_alloc, pool_free, NULL, NULL);
 
     debug_reset();
     pool_reset();
 
     // Use debug allocator for large allocations
-    void* large_ptr = dsc_alloc_malloc(&debug_alloc_struct, 1024);
+    void* large_ptr = anv_alloc_malloc(&debug_alloc_struct, 1024);
     ASSERT(large_ptr != NULL);
 
     // Use pool allocator for small allocations
-    void* small_ptr1 = dsc_alloc_malloc(&pool_alloc_struct, 32);
-    void* small_ptr2 = dsc_alloc_malloc(&pool_alloc_struct, 16);
+    void* small_ptr1 = anv_alloc_malloc(&pool_alloc_struct, 32);
+    void* small_ptr2 = anv_alloc_malloc(&pool_alloc_struct, 16);
 
     ASSERT(small_ptr1 != NULL);
     ASSERT(small_ptr2 != NULL);
@@ -468,9 +468,9 @@ int test_mixed_allocator_scenarios(void)
     ASSERT_EQ(total_allocated, 1024);
 
     // Clean up
-    dsc_alloc_free(&debug_alloc_struct, large_ptr);
-    dsc_alloc_free(&pool_alloc_struct, small_ptr1);
-    dsc_alloc_free(&pool_alloc_struct, small_ptr2);
+    anv_alloc_free(&debug_alloc_struct, large_ptr);
+    anv_alloc_free(&pool_alloc_struct, small_ptr1);
+    anv_alloc_free(&pool_alloc_struct, small_ptr2);
 
     ASSERT_EQ(allocation_count, 0);
     ASSERT_EQ(total_allocated, 0);
@@ -481,17 +481,17 @@ int test_mixed_allocator_scenarios(void)
 int test_allocator_copy_function_variants(void)
 {
     // Test different copy function behaviors
-    const DSCAllocator shallow_alloc = dsc_alloc_custom(malloc, free, free, NULL);
-    const DSCAllocator deep_alloc = dsc_alloc_custom(malloc, free, free, int_copy);
+    const ANVAllocator shallow_alloc = anv_alloc_custom(malloc, free, free, NULL);
+    const ANVAllocator deep_alloc = anv_alloc_custom(malloc, free, free, int_copy);
 
     int original = 42;
 
     // Shallow copy should use default copy (return same pointer)
-    const void* shallow_copy = dsc_alloc_copy(&shallow_alloc, &original);
+    const void* shallow_copy = anv_alloc_copy(&shallow_alloc, &original);
     ASSERT(shallow_copy == &original); // Default copy returns original pointer
 
     // Deep copy should create new allocation
-    int* deep_copy = dsc_alloc_copy(&deep_alloc, &original);
+    int* deep_copy = anv_alloc_copy(&deep_alloc, &original);
     ASSERT(deep_copy != NULL);
     ASSERT(deep_copy != &original);
     ASSERT_EQ(*deep_copy, 42);
@@ -500,7 +500,7 @@ int test_allocator_copy_function_variants(void)
     original = 100;
     ASSERT_EQ(*deep_copy, 42);
 
-    dsc_alloc_data_free(&deep_alloc, deep_copy);
+    anv_alloc_data_free(&deep_alloc, deep_copy);
 
     return TEST_SUCCESS;
 }

@@ -4,16 +4,16 @@
 
 #include "TestAssert.h"
 #include "TestHelpers.h"
-#include "Stack.h"
-#include "ArrayList.h"
+#include "containers/Stack.h"
+#include "containers/ArrayList.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // Test stack with iterator
 int test_stack_iterator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCStack* stack = dsc_stack_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVStack* stack = anv_stack_create(&alloc);
 
     // Add some test data
     for (int i = 0; i < 5; i++)
@@ -21,11 +21,11 @@ int test_stack_iterator(void)
         const int values[] = {10, 20, 30, 40, 50};
         int* data = malloc(sizeof(int));
         *data = values[i];
-        ASSERT_EQ(dsc_stack_push(stack, data), 0);
+        ASSERT_EQ(anv_stack_push(stack, data), 0);
     }
 
     // Create iterator
-    DSCIterator it = dsc_stack_iterator(stack);
+    ANVIterator it = anv_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
 
     // Iterate through stack (should be in LIFO order: 50, 40, 30, 20, 10)
@@ -55,22 +55,22 @@ int test_stack_iterator(void)
     ASSERT(it.has_next(&it)); // Should still have next
 
     it.destroy(&it);
-    dsc_stack_destroy(stack, true);
+    anv_stack_destroy(stack, true);
     return TEST_SUCCESS;
 }
 
 // Test creating stack from iterator
 int test_stack_from_iterator(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create a range iterator (0, 1, 2, 3, 4)
-    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 5, 1, &alloc);
 
     // Create stack from iterator
-    DSCStack* stack = dsc_stack_from_iterator(&range_it, &alloc, true);
+    ANVStack* stack = anv_stack_from_iterator(&range_it, &alloc, true);
     ASSERT_NOT_NULL(stack);
-    ASSERT_EQ(dsc_stack_size(stack), 5);
+    ASSERT_EQ(anv_stack_size(stack), 5);
 
     // Clean up the iterator immediately after use
     range_it.destroy(&range_it);
@@ -79,37 +79,37 @@ int test_stack_from_iterator(void)
     // Iterator gives 0,1,2,3,4 but stack should have them as 4,3,2,1,0 (top to bottom)
     for (int expected = 4; expected >= 0; expected--)
     {
-        void* data = dsc_stack_pop_data(stack);
+        void* data = anv_stack_pop_data(stack);
         ASSERT_NOT_NULL(data);
         ASSERT_EQ(*(int*)data, expected);
         free(data);
     }
 
-    dsc_stack_destroy(stack, false);
+    anv_stack_destroy(stack, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator with empty stack
 int test_stack_iterator_empty(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCStack* stack = dsc_stack_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVStack* stack = anv_stack_create(&alloc);
 
-    DSCIterator it = dsc_stack_iterator(stack);
+    ANVIterator it = anv_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
     ASSERT(!it.has_next(&it));
     ASSERT_NULL(it.get(&it));
     ASSERT_EQ(it.next(&it), -1); // Should return error code
 
     it.destroy(&it);
-    dsc_stack_destroy(stack, false);
+    anv_stack_destroy(stack, false);
     return TEST_SUCCESS;
 }
 
 // Test iterator validity with invalid stack
 int test_stack_iterator_invalid(void)
 {
-    const DSCIterator it = dsc_stack_iterator(NULL);
+    const ANVIterator it = anv_stack_iterator(NULL);
     ASSERT(!it.is_valid(&it));
     return TEST_SUCCESS;
 }
@@ -117,18 +117,18 @@ int test_stack_iterator_invalid(void)
 // Test iterator state after stack modifications
 int test_stack_iterator_modification(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCStack* stack = dsc_stack_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVStack* stack = anv_stack_create(&alloc);
 
     // Add initial data
     for (int i = 0; i < 3; i++)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_stack_push(stack, data), 0);
+        ASSERT_EQ(anv_stack_push(stack, data), 0);
     }
 
-    DSCIterator it = dsc_stack_iterator(stack);
+    ANVIterator it = anv_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
 
     // Get first element
@@ -139,43 +139,43 @@ int test_stack_iterator_modification(void)
     // Modify stack while iterator exists (implementation detail: iterator may become invalid)
     int* new_data = malloc(sizeof(int));
     *new_data = 999;
-    ASSERT_EQ(dsc_stack_push(stack, new_data), 0);
+    ASSERT_EQ(anv_stack_push(stack, new_data), 0);
 
     // Iterator should still be valid but may not reflect new state
     ASSERT(it.is_valid(&it));
 
     it.destroy(&it);
-    dsc_stack_destroy(stack, true);
+    anv_stack_destroy(stack, true);
     return TEST_SUCCESS;
 }
 
 // Test copy isolation - verify that copied elements are independent
 int test_stack_copy_isolation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create original data that we can modify
     int original_values[] = {10, 20, 30};
     int* data_ptrs[3];
 
     // Create a simple array-based iterator or use existing data structure
-    DSCArrayList* list = dsc_arraylist_create(&alloc, 0);
+    ANVArrayList* list = anv_arraylist_create(&alloc, 0);
     ASSERT_NOT_NULL(list);
 
     for (int i = 0; i < 3; i++)
     {
         data_ptrs[i] = malloc(sizeof(int));
         *data_ptrs[i] = original_values[i];
-        ASSERT_EQ(dsc_arraylist_push_back(list, data_ptrs[i]), 0);
+        ASSERT_EQ(anv_arraylist_push_back(list, data_ptrs[i]), 0);
     }
 
-    DSCIterator list_it = dsc_arraylist_iterator(list);
+    ANVIterator list_it = anv_arraylist_iterator(list);
     ASSERT(list_it.is_valid(&list_it));
 
     // Create stack with copying enabled
-    DSCStack* stack = dsc_stack_from_iterator(&list_it, &alloc, true);
+    ANVStack* stack = anv_stack_from_iterator(&list_it, &alloc, true);
     ASSERT_NOT_NULL(stack);
-    ASSERT_EQ(dsc_stack_size(stack), 3);
+    ASSERT_EQ(anv_stack_size(stack), 3);
 
     // Modify original data
     *data_ptrs[0] = 999;
@@ -183,25 +183,25 @@ int test_stack_copy_isolation(void)
     *data_ptrs[2] = 777;
 
     // Stack should still have original values (proving data was copied)
-    void* stack_data = dsc_stack_pop_data(stack);
+    void* stack_data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(stack_data);
     ASSERT_EQ(*(int*)stack_data, 30); // Should be unchanged
     free(stack_data);
 
-    stack_data = dsc_stack_pop_data(stack);
+    stack_data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(stack_data);
     ASSERT_EQ(*(int*)stack_data, 20); // Should be unchanged
     free(stack_data);
 
-    stack_data = dsc_stack_pop_data(stack);
+    stack_data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(stack_data);
     ASSERT_EQ(*(int*)stack_data, 10); // Should be unchanged
     free(stack_data);
 
     // Cleanup
     list_it.destroy(&list_it);
-    dsc_stack_destroy(stack, false);
-    dsc_arraylist_destroy(list, true);
+    anv_stack_destroy(stack, false);
+    anv_arraylist_destroy(list, true);
 
     return TEST_SUCCESS;
 }
@@ -209,14 +209,14 @@ int test_stack_copy_isolation(void)
 // Test that should_copy=true fails when allocator has no copy function
 int test_stack_copy_function_required(void)
 {
-    DSCAllocator alloc = dsc_alloc_default();
-    alloc.copy_func = NULL;
+    ANVAllocator alloc = anv_alloc_default();
+    alloc.copy = NULL;
 
-    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 3, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Should return NULL because should_copy=true but no copy function available
-    DSCStack* stack = dsc_stack_from_iterator(&range_it, &alloc, true);
+    ANVStack* stack = anv_stack_from_iterator(&range_it, &alloc, true);
     ASSERT_NULL(stack);
 
     range_it.destroy(&range_it);
@@ -226,58 +226,58 @@ int test_stack_copy_function_required(void)
 // Test that should_copy=false uses elements directly without copying
 int test_stack_from_iterator_no_copy(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
 
     // Create a range iterator and then a copy iterator to get actual owned data
-    DSCIterator range_it = dsc_iterator_range(0, 3, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(0, 3, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Use copy iterator to create actual data elements that we own
-    DSCIterator copy_it = dsc_iterator_copy(&range_it, &alloc, int_copy);
+    ANVIterator copy_it = anv_iterator_copy(&range_it, &alloc, int_copy);
     ASSERT(copy_it.is_valid(&copy_it));
 
     // Create stack without copying (should_copy = false)
     // This will use the copied elements directly from the copy iterator
-    DSCStack* stack = dsc_stack_from_iterator(&copy_it, &alloc, false);
+    ANVStack* stack = anv_stack_from_iterator(&copy_it, &alloc, false);
     ASSERT_NOT_NULL(stack);
-    ASSERT_EQ(dsc_stack_size(stack), 3);
+    ASSERT_EQ(anv_stack_size(stack), 3);
 
     // Verify values are correct (LIFO order: 2, 1, 0)
-    void* data = dsc_stack_pop_data(stack);
+    void* data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(data);
     ASSERT_EQ(*(int*)data, 2);
     free(data); // We own this data from the copy iterator
 
-    data = dsc_stack_pop_data(stack);
+    data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(data);
     ASSERT_EQ(*(int*)data, 1);
     free(data); // We own this data from the copy iterator
 
-    data = dsc_stack_pop_data(stack);
+    data = anv_stack_pop_data(stack);
     ASSERT_NOT_NULL(data);
     ASSERT_EQ(*(int*)data, 0);
     free(data); // We own this data from the copy iterator
 
     range_it.destroy(&range_it);
     copy_it.destroy(&copy_it);
-    dsc_stack_destroy(stack, false); // Don't free elements since we already freed them
+    anv_stack_destroy(stack, false); // Don't free elements since we already freed them
     return TEST_SUCCESS;
 }
 
-// Test that iterator is exhausted after being consumed by dsc_stack_from_iterator
+// Test that iterator is exhausted after being consumed by anv_stack_from_iterator
 int test_iterator_exhaustion_after_stack_creation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCIterator range_it = dsc_iterator_range(0, 5, 1, &alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVIterator range_it = anv_iterator_range(0, 5, 1, &alloc);
     ASSERT(range_it.is_valid(&range_it));
 
     // Verify iterator starts with elements
     ASSERT(range_it.has_next(&range_it));
 
     // Create stack from iterator (consumes all elements)
-    DSCStack* stack = dsc_stack_from_iterator(&range_it, &alloc, true);
+    ANVStack* stack = anv_stack_from_iterator(&range_it, &alloc, true);
     ASSERT_NOT_NULL(stack);
-    ASSERT_EQ(dsc_stack_size(stack), 5);
+    ASSERT_EQ(anv_stack_size(stack), 5);
 
     // Iterator should now be exhausted
     ASSERT(!range_it.has_next(&range_it));
@@ -288,23 +288,23 @@ int test_iterator_exhaustion_after_stack_creation(void)
     ASSERT(range_it.is_valid(&range_it));
 
     range_it.destroy(&range_it);
-    dsc_stack_destroy(stack, true);
+    anv_stack_destroy(stack, true);
     return TEST_SUCCESS;
 }
 
 // Test next() return values for proper error handling
 int test_stack_iterator_next_return_values(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCStack* stack = dsc_stack_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVStack* stack = anv_stack_create(&alloc);
     ASSERT_NOT_NULL(stack);
 
     // Add single element
     int* data = malloc(sizeof(int));
     *data = 42;
-    ASSERT_EQ(dsc_stack_push(stack, data), 0);
+    ASSERT_EQ(anv_stack_push(stack, data), 0);
 
-    DSCIterator it = dsc_stack_iterator(stack);
+    ANVIterator it = anv_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
 
     // Should successfully advance once
@@ -320,15 +320,15 @@ int test_stack_iterator_next_return_values(void)
     ASSERT(!it.has_next(&it));   // Still no elements
 
     it.destroy(&it);
-    dsc_stack_destroy(stack, true);
+    anv_stack_destroy(stack, true);
     return TEST_SUCCESS;
 }
 
 // Test various combinations of get/next/has_next calls for consistency
 int test_stack_iterator_mixed_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCStack* stack = dsc_stack_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVStack* stack = anv_stack_create(&alloc);
     ASSERT_NOT_NULL(stack);
 
     // Add test data (will be in LIFO order: 20, 10, 0)
@@ -336,10 +336,10 @@ int test_stack_iterator_mixed_operations(void)
     {
         int* data = malloc(sizeof(int));
         *data = i * 10;
-        ASSERT_EQ(dsc_stack_push(stack, data), 0);
+        ASSERT_EQ(anv_stack_push(stack, data), 0);
     }
 
-    DSCIterator it = dsc_stack_iterator(stack);
+    ANVIterator it = anv_stack_iterator(stack);
     ASSERT(it.is_valid(&it));
 
     // Multiple get() calls should return same value
@@ -377,7 +377,7 @@ int test_stack_iterator_mixed_operations(void)
     ASSERT_NULL(it.get(&it));
 
     it.destroy(&it);
-    dsc_stack_destroy(stack, true);
+    anv_stack_destroy(stack, true);
     return TEST_SUCCESS;
 }
 

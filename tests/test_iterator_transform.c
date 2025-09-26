@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "DoublyLinkedList.h"
-#include "Iterator.h"
+#include "containers/DoublyLinkedList.h"
+#include "containers/Iterator.h"
 #include "TestAssert.h"
 #include "TestHelpers.h"
 
@@ -21,7 +21,7 @@
  * Helper function to collect all values from an iterator into an array.
  * Returns the number of values collected.
  */
-static int collect_values(const DSCIterator* it, int* values, const int max_count)
+static int collect_values(const ANVIterator* it, int* values, const int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -56,9 +56,9 @@ static int verify_values(const int* actual, const int* expected, const int count
 /**
  * Helper function to create a test list with integers 1 through n.
  */
-static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
+static ANVDoublyLinkedList* create_test_list(ANVAllocator* alloc, const int n)
 {
-    DSCDoublyLinkedList* list = dsc_dll_create(alloc);
+    ANVDoublyLinkedList* list = anv_dll_create(alloc);
     if (!list)
         return NULL;
 
@@ -67,11 +67,11 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
         int* val = malloc(sizeof(int));
         if (!val)
         {
-            dsc_dll_destroy(list, true);
+            anv_dll_destroy(list, true);
             return NULL;
         }
         *val = i;
-        dsc_dll_push_back(list, val);
+        anv_dll_push_back(list, val);
     }
     return list;
 }
@@ -85,17 +85,17 @@ static DSCDoublyLinkedList* create_test_list(DSCAllocator* alloc, const int n)
  */
 static int test_transform_basic_double(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
     ASSERT_TRUE(base_it.has_next(&base_it));
 
     // Create transform iterator that doubles each value
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
     ASSERT_TRUE(transform_it.has_next(&transform_it));
 
@@ -113,7 +113,7 @@ static int test_transform_basic_double(void)
 
     // Cleanup
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -122,12 +122,12 @@ static int test_transform_basic_double(void)
  */
 static int test_transform_square(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 4);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 4);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, square_func, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, square_func, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -140,7 +140,7 @@ static int test_transform_square(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "square_transform"));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -149,12 +149,12 @@ static int test_transform_square(void)
  */
 static int test_transform_add_one(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_one, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, add_one, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -167,7 +167,7 @@ static int test_transform_add_one(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "add_one_transform"));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -180,16 +180,16 @@ static int test_transform_add_one(void)
  */
 static int test_transform_chain_double_add_one(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Chain transforms: first double, then add one
-    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
-    DSCIterator add_one_it = dsc_iterator_transform(&double_it, &alloc, add_one, true);
+    ANVIterator double_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator add_one_it = anv_iterator_transform(&double_it, &alloc, add_one, true);
 
     ASSERT_TRUE(add_one_it.is_valid(&add_one_it));
 
@@ -202,7 +202,7 @@ static int test_transform_chain_double_add_one(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "chain_double_add_one"));
 
     add_one_it.destroy(&add_one_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -211,13 +211,13 @@ static int test_transform_chain_double_add_one(void)
  */
 static int test_transform_chain_square_multiply(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator square_it = dsc_iterator_transform(&base_it, &alloc, square_func, true);
-    DSCIterator multiply_it = dsc_iterator_transform(&square_it, &alloc, multiply_by_three, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator square_it = anv_iterator_transform(&base_it, &alloc, square_func, true);
+    ANVIterator multiply_it = anv_iterator_transform(&square_it, &alloc, multiply_by_three, true);
 
     // Expected: [1,2,3] -> [1,4,9] -> [3,12,27]
     const int expected[] = {3, 12, 27};
@@ -228,7 +228,7 @@ static int test_transform_chain_square_multiply(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "chain_square_multiply"));
 
     multiply_it.destroy(&multiply_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -237,14 +237,14 @@ static int test_transform_chain_square_multiply(void)
  */
 static int test_transform_triple_chain(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator double_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
-    DSCIterator add_five_it = dsc_iterator_transform(&double_it, &alloc, add_five, true);
-    DSCIterator square_it = dsc_iterator_transform(&add_five_it, &alloc, square_func, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator double_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator add_five_it = anv_iterator_transform(&double_it, &alloc, add_five, true);
+    ANVIterator square_it = anv_iterator_transform(&add_five_it, &alloc, square_func, true);
 
     // Expected: [1,2] -> [2,4] -> [7,9] -> [49,81]
     const int expected[] = {49, 81};
@@ -255,7 +255,7 @@ static int test_transform_triple_chain(void)
     ASSERT_TRUE(verify_values(actual, expected, count, "triple_chain"));
 
     square_it.destroy(&square_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -268,16 +268,16 @@ static int test_transform_triple_chain(void)
  */
 static int test_transform_empty_input(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = dsc_dll_create(&alloc);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = anv_dll_create(&alloc);
     ASSERT_NOT_NULL(list);
 
     // Create iterator on empty list
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_FALSE(base_it.has_next(&base_it));
 
     // Create transform iterator
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
     ASSERT_FALSE(transform_it.has_next(&transform_it));
     ASSERT_NULL(transform_it.get(&transform_it));
@@ -286,7 +286,7 @@ static int test_transform_empty_input(void)
     ASSERT_EQ(transform_it.next(&transform_it), -1);
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, false);
+    anv_dll_destroy(list, false);
     return TEST_SUCCESS;
 }
 
@@ -295,12 +295,12 @@ static int test_transform_empty_input(void)
  */
 static int test_transform_single_element(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, multiply_by_three, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, multiply_by_three, true);
 
     ASSERT_TRUE(transform_it.has_next(&transform_it));
 
@@ -313,7 +313,7 @@ static int test_transform_single_element(void)
     ASSERT_NULL(transform_it.get(&transform_it));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -326,25 +326,25 @@ static int test_transform_single_element(void)
  */
 static int test_transform_invalid_inputs(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 1);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 1);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
 
     // Test with NULL iterator
-    DSCIterator invalid_it1 = dsc_iterator_transform(NULL, &alloc, double_value, true);
+    ANVIterator invalid_it1 = anv_iterator_transform(NULL, &alloc, double_value, true);
     ASSERT_FALSE(invalid_it1.is_valid(&invalid_it1));
     ASSERT_FALSE(invalid_it1.has_next(&invalid_it1));
     ASSERT_NULL(invalid_it1.get(&invalid_it1));
 
     // Test with NULL transform function
-    DSCIterator invalid_it2 = dsc_iterator_transform(&base_it, &alloc, NULL, true);
+    ANVIterator invalid_it2 = anv_iterator_transform(&base_it, &alloc, NULL, true);
     ASSERT_FALSE(invalid_it2.is_valid(&invalid_it2));
 
     // Test with NULL allocator
-    DSCIterator base_it2 = dsc_dll_iterator(list);
-    DSCIterator invalid_it3 = dsc_iterator_transform(&base_it2, NULL, double_value, true);
+    ANVIterator base_it2 = anv_dll_iterator(list);
+    ANVIterator invalid_it3 = anv_iterator_transform(&base_it2, NULL, double_value, true);
     ASSERT_FALSE(invalid_it3.is_valid(&invalid_it3));
 
     // Cleanup
@@ -353,7 +353,7 @@ static int test_transform_invalid_inputs(void)
     invalid_it3.destroy(&invalid_it3);
     base_it2.destroy(&base_it2);
     base_it.destroy(&base_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -362,10 +362,10 @@ static int test_transform_invalid_inputs(void)
  */
 static int test_transform_operations_on_invalid(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create invalid transform iterator
-    DSCIterator invalid_it = dsc_iterator_transform(NULL, &alloc, double_value, false);
+    ANVIterator invalid_it = anv_iterator_transform(NULL, &alloc, double_value, false);
     ASSERT_FALSE(invalid_it.is_valid(&invalid_it));
 
     // All operations should fail gracefully
@@ -391,12 +391,12 @@ static int test_transform_operations_on_invalid(void)
  */
 static int test_transform_get_next_separation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_ten_func, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, add_ten_func, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -421,7 +421,7 @@ static int test_transform_get_next_separation(void)
     ASSERT_NOT_EQ(first_value, *value3);
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -430,12 +430,12 @@ static int test_transform_get_next_separation(void)
  */
 static int test_transform_next_return_codes(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -449,7 +449,7 @@ static int test_transform_next_return_codes(void)
     ASSERT_EQ(transform_it.next(&transform_it), -1);
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -458,12 +458,12 @@ static int test_transform_next_return_codes(void)
  */
 static int test_transform_unsupported_operations(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -478,7 +478,7 @@ static int test_transform_unsupported_operations(void)
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -491,14 +491,14 @@ static int test_transform_unsupported_operations(void)
  */
 static int test_transform_with_range_iterator(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator: [2, 4, 6, 8]
-    DSCIterator range_it = dsc_iterator_range(2, 10, 2, &alloc);
+    ANVIterator range_it = anv_iterator_range(2, 10, 2, &alloc);
     ASSERT_TRUE(range_it.is_valid(&range_it));
 
     // Apply square transform
-    DSCIterator transform_it = dsc_iterator_transform(&range_it, &alloc, square_func, true);
+    ANVIterator transform_it = anv_iterator_transform(&range_it, &alloc, square_func, true);
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
     // Expected: [2,4,6,8] -> [4,16,36,64]
@@ -518,14 +518,14 @@ static int test_transform_with_range_iterator(void)
  */
 static int test_range_transform_chain(void)
 {
-    const DSCAllocator alloc = create_int_allocator();
+    const ANVAllocator alloc = create_int_allocator();
 
     // Create range iterator: [1, 2, 3]
-    DSCIterator range_it = dsc_iterator_range(1, 4, 1, &alloc);
+    ANVIterator range_it = anv_iterator_range(1, 4, 1, &alloc);
 
     // Chain: range -> double -> add_five
-    DSCIterator double_it = dsc_iterator_transform(&range_it, &alloc, double_value, true);
-    DSCIterator add_five_it = dsc_iterator_transform(&double_it, &alloc, add_five, true);
+    ANVIterator double_it = anv_iterator_transform(&range_it, &alloc, double_value, true);
+    ANVIterator add_five_it = anv_iterator_transform(&double_it, &alloc, add_five, true);
 
     // Expected: [1,2,3] -> [2,4,6] -> [7,9,11]
     const int expected[] = {7, 9, 11};
@@ -548,12 +548,12 @@ static int test_range_transform_chain(void)
  */
 static int test_transform_memory_consistency(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 3);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 3);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, multiply_by_three, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, multiply_by_three, true);
 
     // Get multiple references to the same value
     const int* ptr1 = transform_it.get(&transform_it);
@@ -580,7 +580,7 @@ static int test_transform_memory_consistency(void)
     ASSERT_NOT_EQ(first_value, *ptr4); // Values should be different
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -589,16 +589,16 @@ static int test_transform_memory_consistency(void)
  */
 static int test_transform_iterator_ownership(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 2);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 2);
     ASSERT_NOT_NULL(list);
 
     // Create base iterator
-    DSCIterator base_it = dsc_dll_iterator(list);
+    ANVIterator base_it = anv_dll_iterator(list);
     ASSERT_TRUE(base_it.is_valid(&base_it));
 
     // Create transform iterator (takes ownership of base_it)
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
     // Verify transform works
@@ -611,7 +611,7 @@ static int test_transform_iterator_ownership(void)
 
     // Note: We should not access base_it after this point as it's been destroyed
 
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -624,14 +624,14 @@ static int test_transform_iterator_ownership(void)
  */
 static int test_transform_large_dataset(void)
 {
-    DSCAllocator alloc = create_int_allocator();
+    ANVAllocator alloc = create_int_allocator();
     const int SIZE = 1000;
 
-    DSCDoublyLinkedList* list = create_test_list(&alloc, SIZE);
+    ANVDoublyLinkedList* list = create_test_list(&alloc, SIZE);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, double_value, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, double_value, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -653,7 +653,7 @@ static int test_transform_large_dataset(void)
     ASSERT_FALSE(transform_it.has_next(&transform_it));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -662,17 +662,17 @@ static int test_transform_large_dataset(void)
  */
 static int test_transform_deep_chaining(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 10);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 10);
     ASSERT_NOT_NULL(list);
 
     // Create a deep chain of 5 transforms
-    DSCIterator it1 = dsc_dll_iterator(list);
-    DSCIterator it2 = dsc_iterator_transform(&it1, &alloc, add_one, true);
-    DSCIterator it3 = dsc_iterator_transform(&it2, &alloc, double_value, true);
-    DSCIterator it4 = dsc_iterator_transform(&it3, &alloc, add_five, true);
-    DSCIterator it5 = dsc_iterator_transform(&it4, &alloc, multiply_by_three, true);
-    DSCIterator final_it = dsc_iterator_transform(&it5, &alloc, square_func, true);
+    ANVIterator it1 = anv_dll_iterator(list);
+    ANVIterator it2 = anv_iterator_transform(&it1, &alloc, add_one, true);
+    ANVIterator it3 = anv_iterator_transform(&it2, &alloc, double_value, true);
+    ANVIterator it4 = anv_iterator_transform(&it3, &alloc, add_five, true);
+    ANVIterator it5 = anv_iterator_transform(&it4, &alloc, multiply_by_three, true);
+    ANVIterator final_it = anv_iterator_transform(&it5, &alloc, square_func, true);
 
     ASSERT_TRUE(final_it.is_valid(&final_it));
 
@@ -696,7 +696,7 @@ static int test_transform_deep_chaining(void)
     ASSERT_EQ(count, 10);
 
     final_it.destroy(&final_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
@@ -707,7 +707,7 @@ static int test_transform_deep_chaining(void)
 /**
  * Enhanced helper function with better validation.
  */
-static int collect_values_with_validation(const DSCIterator* it, int* values, int max_count)
+static int collect_values_with_validation(const ANVIterator* it, int* values, int max_count)
 {
     int count = 0;
     while (it->has_next(it) && count < max_count)
@@ -736,12 +736,12 @@ static int collect_values_with_validation(const DSCIterator* it, int* values, in
  */
 static int test_transform_helper_validation(void)
 {
-    DSCAllocator alloc = create_int_allocator();
-    DSCDoublyLinkedList* list = create_test_list(&alloc, 5);
+    ANVAllocator alloc = create_int_allocator();
+    ANVDoublyLinkedList* list = create_test_list(&alloc, 5);
     ASSERT_NOT_NULL(list);
 
-    DSCIterator base_it = dsc_dll_iterator(list);
-    DSCIterator transform_it = dsc_iterator_transform(&base_it, &alloc, add_five, true);
+    ANVIterator base_it = anv_dll_iterator(list);
+    ANVIterator transform_it = anv_iterator_transform(&base_it, &alloc, add_five, true);
 
     ASSERT_TRUE(transform_it.is_valid(&transform_it));
 
@@ -755,7 +755,7 @@ static int test_transform_helper_validation(void)
     ASSERT_TRUE(verify_values(values, expected, count, "helper_validation"));
 
     transform_it.destroy(&transform_it);
-    dsc_dll_destroy(list, true);
+    anv_dll_destroy(list, true);
     return TEST_SUCCESS;
 }
 
