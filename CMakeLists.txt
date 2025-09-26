@@ -64,7 +64,7 @@ elseif(MSVC)
 endif()
 
 # Sanitizers for Debug builds
-if(ANV_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+if(NOT WIN32 AND ANV_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     message(STATUS "Enabling sanitizers for Debug build")
     list(APPEND ANV_COMPILE_FLAGS -fsanitize=address,undefined -fno-omit-frame-pointer)
     set(ANV_LINK_FLAGS -fsanitize=address,undefined)
@@ -176,6 +176,15 @@ if(ANV_BUILD_SHARED)
             VERSION ${PROJECT_VERSION}
             SOVERSION ${PROJECT_VERSION_MAJOR}
     )
+
+    if(WIN32)
+        add_custom_command(TARGET Anvil POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:Anvil>
+                ${CMAKE_BINARY_DIR}/tests/
+                COMMENT "Copying Anvil.dll to tests directory for Windows"
+        )
+    endif()
 else()
     add_library(Anvil STATIC ${ANV_SOURCES})
     message(STATUS "Building static library")
