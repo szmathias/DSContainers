@@ -39,7 +39,7 @@ static void* const HASHSET_PRESENT = (void*)1;
 // Creation and destruction functions
 //==============================================================================
 
-ANVHashSet* anv_hashset_create(ANVAllocator* alloc, const hash_func hash,
+ANV_API ANVHashSet* anv_hashset_create(ANVAllocator* alloc, const hash_func hash,
                                const key_equals_func key_equals, const size_t initial_capacity)
 {
     if (!alloc || !hash || !key_equals)
@@ -63,7 +63,7 @@ ANVHashSet* anv_hashset_create(ANVAllocator* alloc, const hash_func hash,
     return set;
 }
 
-void anv_hashset_destroy(ANVHashSet* set, const bool should_free_keys)
+ANV_API void anv_hashset_destroy(ANVHashSet* set, const bool should_free_keys)
 {
     if (!set)
     {
@@ -81,7 +81,7 @@ void anv_hashset_destroy(ANVHashSet* set, const bool should_free_keys)
     }
 }
 
-void anv_hashset_clear(ANVHashSet* set, const bool should_free_keys)
+ANV_API void anv_hashset_clear(ANVHashSet* set, const bool should_free_keys)
 {
     if (!set || !set->map)
     {
@@ -96,17 +96,17 @@ void anv_hashset_clear(ANVHashSet* set, const bool should_free_keys)
 // Information functions
 //==============================================================================
 
-size_t anv_hashset_size(const ANVHashSet* set)
+ANV_API size_t anv_hashset_size(const ANVHashSet* set)
 {
     return set && set->map ? anv_hashmap_size(set->map) : 0;
 }
 
-int anv_hashset_is_empty(const ANVHashSet* set)
+ANV_API int anv_hashset_is_empty(const ANVHashSet* set)
 {
     return !set || !set->map || anv_hashmap_is_empty(set->map);
 }
 
-double anv_hashset_load_factor(const ANVHashSet* set)
+ANV_API double anv_hashset_load_factor(const ANVHashSet* set)
 {
     return set && set->map ? anv_hashmap_load_factor(set->map) : 0.0;
 }
@@ -115,7 +115,7 @@ double anv_hashset_load_factor(const ANVHashSet* set)
 // Hash set operations
 //==============================================================================
 
-int anv_hashset_add(ANVHashSet* set, void* key)
+ANV_API int anv_hashset_add(ANVHashSet* set, void* key)
 {
     if (!set || !set->map || !key)
     {
@@ -125,7 +125,7 @@ int anv_hashset_add(ANVHashSet* set, void* key)
     return anv_hashmap_put(set->map, key, HASHSET_PRESENT);
 }
 
-int anv_hashset_add_check(ANVHashSet* set, void* key, bool* was_added_out)
+ANV_API int anv_hashset_add_check(ANVHashSet* set, void* key, bool* was_added_out)
 {
     if (!set || !set->map || !key || !was_added_out)
     {
@@ -145,7 +145,7 @@ int anv_hashset_add_check(ANVHashSet* set, void* key, bool* was_added_out)
     return result;
 }
 
-int anv_hashset_contains(const ANVHashSet* set, const void* key)
+ANV_API int anv_hashset_contains(const ANVHashSet* set, const void* key)
 {
     if (!set || !set->map || !key)
     {
@@ -155,7 +155,7 @@ int anv_hashset_contains(const ANVHashSet* set, const void* key)
     return anv_hashmap_contains_key(set->map, key);
 }
 
-int anv_hashset_remove(ANVHashSet* set, const void* key, const bool should_free_key)
+ANV_API int anv_hashset_remove(ANVHashSet* set, const void* key, const bool should_free_key)
 {
     if (!set || !set->map || !key)
     {
@@ -166,7 +166,7 @@ int anv_hashset_remove(ANVHashSet* set, const void* key, const bool should_free_
     return anv_hashmap_remove(set->map, key, should_free_key, false);
 }
 
-void* anv_hashset_remove_get(ANVHashSet* set, const void* key)
+ANV_API void* anv_hashset_remove_get(ANVHashSet* set, const void* key)
 {
     if (!set || !set->map || !key)
     {
@@ -213,7 +213,7 @@ void* anv_hashset_remove_get(ANVHashSet* set, const void* key)
 // Set operations
 //==============================================================================
 
-ANVHashSet* anv_hashset_union(const ANVHashSet* set1, const ANVHashSet* set2)
+ANV_API ANVHashSet* anv_hashset_union(const ANVHashSet* set1, const ANVHashSet* set2)
 {
     if (!set1 || !set1->map || !set2 || !set2->map)
     {
@@ -260,7 +260,7 @@ ANVHashSet* anv_hashset_union(const ANVHashSet* set1, const ANVHashSet* set2)
     return result;
 }
 
-ANVHashSet* anv_hashset_intersection(const ANVHashSet* set1, const ANVHashSet* set2)
+ANV_API ANVHashSet* anv_hashset_intersection(const ANVHashSet* set1, const ANVHashSet* set2)
 {
     if (!set1 || !set1->map || !set2 || !set2->map)
     {
@@ -300,7 +300,7 @@ ANVHashSet* anv_hashset_intersection(const ANVHashSet* set1, const ANVHashSet* s
     return result;
 }
 
-ANVHashSet* anv_hashset_difference(const ANVHashSet* set1, const ANVHashSet* set2)
+ANV_API ANVHashSet* anv_hashset_difference(const ANVHashSet* set1, const ANVHashSet* set2)
 {
     if (!set1 || !set1->map)
     {
@@ -336,7 +336,7 @@ ANVHashSet* anv_hashset_difference(const ANVHashSet* set1, const ANVHashSet* set
     return result;
 }
 
-int anv_hashset_is_subset(const ANVHashSet* subset, const ANVHashSet* superset)
+ANV_API int anv_hashset_is_subset(const ANVHashSet* subset, const ANVHashSet* superset)
 {
     if (!subset || !subset->map || !superset || !superset->map)
     {
@@ -371,7 +371,7 @@ int anv_hashset_is_subset(const ANVHashSet* subset, const ANVHashSet* superset)
 // Bulk operations
 //==============================================================================
 
-int anv_hashset_get_elements(const ANVHashSet* set, void*** keys_out, size_t* count_out)
+ANV_API int anv_hashset_get_elements(const ANVHashSet* set, void*** keys_out, size_t* count_out)
 {
     if (!set || !set->map)
     {
@@ -381,7 +381,7 @@ int anv_hashset_get_elements(const ANVHashSet* set, void*** keys_out, size_t* co
     return anv_hashmap_get_keys(set->map, keys_out, count_out);
 }
 
-void anv_hashset_for_each(const ANVHashSet* set, void (*action)(void* key))
+ANV_API void anv_hashset_for_each(const ANVHashSet* set, void (*action)(void* key))
 {
     if (!set || !set->map || !action)
     {
@@ -397,7 +397,7 @@ void anv_hashset_for_each(const ANVHashSet* set, void (*action)(void* key))
 // Hash set copying functions
 //==============================================================================
 
-ANVHashSet* anv_hashset_copy(const ANVHashSet* set)
+ANV_API ANVHashSet* anv_hashset_copy(const ANVHashSet* set)
 {
     if (!set || !set->map)
     {
@@ -430,7 +430,7 @@ ANVHashSet* anv_hashset_copy(const ANVHashSet* set)
     return copy;
 }
 
-ANVHashSet* anv_hashset_copy_deep(const ANVHashSet* set, const copy_func key_copy)
+ANV_API ANVHashSet* anv_hashset_copy_deep(const ANVHashSet* set, const copy_func key_copy)
 {
     if (!set || !set->map)
     {
@@ -632,7 +632,7 @@ static void invalid_iterator_destroy(ANVIterator* it)
     (void)it;
 }
 
-ANVIterator anv_hashset_iterator(const ANVHashSet* set)
+ANV_API ANVIterator anv_hashset_iterator(const ANVHashSet* set)
 {
     ANVIterator it = {0};
 
@@ -675,7 +675,7 @@ ANVIterator anv_hashset_iterator(const ANVHashSet* set)
     return it;
 }
 
-ANVHashSet* anv_hashset_from_iterator(ANVIterator* it, ANVAllocator* alloc,
+ANV_API ANVHashSet* anv_hashset_from_iterator(ANVIterator* it, ANVAllocator* alloc,
                                       const hash_func hash, const key_equals_func key_equals, const bool should_copy)
 {
     if (!it || !alloc || !hash || !key_equals)

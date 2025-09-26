@@ -198,7 +198,7 @@ static DWORD WINAPI thread_func_wrapper(LPVOID param)
 // Public API (Windows): create a thread. On success the ANVThread is set
 // to a valid HANDLE value. Returns 0 on success, -1 on invalid args or
 // thread creation failure.
-int anv_thread_create(ANVThread* thread, anvthread_func func, void* arg)
+ANV_API int anv_thread_create(ANVThread* thread, anvthread_func func, void* arg)
 {
     if (!thread || !func)
     {
@@ -230,7 +230,7 @@ int anv_thread_create(ANVThread* thread, anvthread_func func, void* arg)
 // Public API (Windows): join a thread. Waits for the thread to exit and
 // retrieves the stored result pointer if retval is non-NULL. Returns 0 on
 // success and -1 on error.
-int anv_thread_join(ANVThread thread, void** retval)
+ANV_API int anv_thread_join(ANVThread thread, void** retval)
 {
     if (!thread)
     {
@@ -268,7 +268,7 @@ int anv_thread_join(ANVThread thread, void** retval)
 // Public API (Windows): detach a thread. Marks the thread as detached and
 // closes the native handle. If the thread already finished, resources are
 // removed immediately.
-int anv_thread_detach(ANVThread thread)
+ANV_API int anv_thread_detach(ANVThread thread)
 {
     if (!thread)
     {
@@ -317,7 +317,7 @@ int anv_thread_detach(ANVThread thread)
 // return values from pthread functions directly so callers can inspect
 // platform-specific error codes where appropriate.
 
-int anv_thread_create(ANVThread* thread, const anvthread_func func, void* arg)
+ANV_API int anv_thread_create(ANVThread* thread, const anvthread_func func, void* arg)
 {
     if (!thread || !func)
     {
@@ -326,12 +326,12 @@ int anv_thread_create(ANVThread* thread, const anvthread_func func, void* arg)
     return pthread_create(thread, NULL, func, arg);
 }
 
-int anv_thread_join(const ANVThread thread, void** retval)
+ANV_API int anv_thread_join(const ANVThread thread, void** retval)
 {
     return pthread_join(thread, retval);
 }
 
-int anv_thread_detach(const ANVThread thread)
+ANV_API int anv_thread_detach(const ANVThread thread)
 {
     return pthread_detach(thread);
 }

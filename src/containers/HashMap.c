@@ -157,7 +157,7 @@ static int check_and_resize(ANVHashMap* map)
 // Creation and destruction functions
 //==============================================================================
 
-ANVHashMap* anv_hashmap_create(ANVAllocator* alloc, const hash_func hash,
+ANV_API ANVHashMap* anv_hashmap_create(ANVAllocator* alloc, const hash_func hash,
                                const key_equals_func key_equals, const size_t initial_capacity)
 {
     if (!alloc || !hash || !key_equals)
@@ -196,7 +196,7 @@ ANVHashMap* anv_hashmap_create(ANVAllocator* alloc, const hash_func hash,
     return map;
 }
 
-void anv_hashmap_destroy(ANVHashMap* map, const bool should_free_keys, const bool should_free_values)
+ANV_API void anv_hashmap_destroy(ANVHashMap* map, const bool should_free_keys, const bool should_free_values)
 {
     if (!map)
     {
@@ -209,7 +209,7 @@ void anv_hashmap_destroy(ANVHashMap* map, const bool should_free_keys, const boo
     anv_alloc_free(map->alloc, map);
 }
 
-void anv_hashmap_clear(ANVHashMap* map, const bool should_free_keys, const bool should_free_values)
+ANV_API void anv_hashmap_clear(ANVHashMap* map, const bool should_free_keys, const bool should_free_values)
 {
     if (!map || !map->buckets)
     {
@@ -235,17 +235,17 @@ void anv_hashmap_clear(ANVHashMap* map, const bool should_free_keys, const bool 
 // Information functions
 //==============================================================================
 
-size_t anv_hashmap_size(const ANVHashMap* map)
+ANV_API size_t anv_hashmap_size(const ANVHashMap* map)
 {
     return map ? map->size : 0;
 }
 
-int anv_hashmap_is_empty(const ANVHashMap* map)
+ANV_API int anv_hashmap_is_empty(const ANVHashMap* map)
 {
     return !map || map->size == 0;
 }
 
-double anv_hashmap_load_factor(const ANVHashMap* map)
+ANV_API double anv_hashmap_load_factor(const ANVHashMap* map)
 {
     if (!map || map->bucket_count == 0)
     {
@@ -254,7 +254,7 @@ double anv_hashmap_load_factor(const ANVHashMap* map)
     return (double)map->size / (double)map->bucket_count;
 }
 
-int anv_hashmap_contains_key(const ANVHashMap* map, const void* key)
+ANV_API int anv_hashmap_contains_key(const ANVHashMap* map, const void* key)
 {
     return anv_hashmap_get(map, key) != NULL;
 }
@@ -263,7 +263,7 @@ int anv_hashmap_contains_key(const ANVHashMap* map, const void* key)
 // Hash map operations
 //==============================================================================
 
-int anv_hashmap_put(ANVHashMap* map, void* key, void* value)
+ANV_API int anv_hashmap_put(ANVHashMap* map, void* key, void* value)
 {
     if (!map || !key)
     {
@@ -301,7 +301,7 @@ int anv_hashmap_put(ANVHashMap* map, void* key, void* value)
     return check_and_resize(map);
 }
 
-int anv_hashmap_put_replace(ANVHashMap* map, void* key, void* value, void** old_value_out)
+ANV_API int anv_hashmap_put_replace(ANVHashMap* map, void* key, void* value, void** old_value_out)
 {
     if (!map || !key || !old_value_out)
     {
@@ -342,7 +342,7 @@ int anv_hashmap_put_replace(ANVHashMap* map, void* key, void* value, void** old_
     return check_and_resize(map);
 }
 
-int anv_hashmap_put_with_free(ANVHashMap* map, void* key, void* value, const bool should_free_old_value)
+ANV_API int anv_hashmap_put_with_free(ANVHashMap* map, void* key, void* value, const bool should_free_old_value)
 {
     if (!map || !key)
     {
@@ -386,7 +386,7 @@ int anv_hashmap_put_with_free(ANVHashMap* map, void* key, void* value, const boo
     return check_and_resize(map);
 }
 
-void* anv_hashmap_get(const ANVHashMap* map, const void* key)
+ANV_API void* anv_hashmap_get(const ANVHashMap* map, const void* key)
 {
     if (!map || !key)
     {
@@ -408,7 +408,7 @@ void* anv_hashmap_get(const ANVHashMap* map, const void* key)
     return NULL;
 }
 
-int anv_hashmap_remove(ANVHashMap* map, const void* key,
+ANV_API int anv_hashmap_remove(ANVHashMap* map, const void* key,
                        const bool should_free_key, const bool should_free_value)
 {
     if (!map || !key)
@@ -445,7 +445,7 @@ int anv_hashmap_remove(ANVHashMap* map, const void* key,
     return -1; // Key not found
 }
 
-void* anv_hashmap_remove_get(ANVHashMap* map, const void* key, const bool should_free_key)
+ANV_API void* anv_hashmap_remove_get(ANVHashMap* map, const void* key, const bool should_free_key)
 {
     if (!map || !key)
     {
@@ -486,7 +486,7 @@ void* anv_hashmap_remove_get(ANVHashMap* map, const void* key, const bool should
 // Bulk operations
 //==============================================================================
 
-int anv_hashmap_get_keys(const ANVHashMap* map, void*** keys_out, size_t* count_out)
+ANV_API int anv_hashmap_get_keys(const ANVHashMap* map, void*** keys_out, size_t* count_out)
 {
     if (!map || !keys_out || !count_out)
     {
@@ -522,7 +522,7 @@ int anv_hashmap_get_keys(const ANVHashMap* map, void*** keys_out, size_t* count_
     return 0;
 }
 
-int anv_hashmap_get_values(const ANVHashMap* map, void*** values_out, size_t* count_out)
+ANV_API int anv_hashmap_get_values(const ANVHashMap* map, void*** values_out, size_t* count_out)
 {
     if (!map || !values_out || !count_out)
     {
@@ -558,7 +558,7 @@ int anv_hashmap_get_values(const ANVHashMap* map, void*** values_out, size_t* co
     return 0;
 }
 
-void anv_hashmap_for_each(const ANVHashMap* map, void (*action)(void* key, void* value))
+ANV_API void anv_hashmap_for_each(const ANVHashMap* map, void (*action)(void* key, void* value))
 {
     if (!map || !action)
     {
@@ -580,7 +580,7 @@ void anv_hashmap_for_each(const ANVHashMap* map, void (*action)(void* key, void*
 // Hash map copying functions
 //==============================================================================
 
-ANVHashMap* anv_hashmap_copy(const ANVHashMap* map)
+ANV_API ANVHashMap* anv_hashmap_copy(const ANVHashMap* map)
 {
     if (!map)
     {
@@ -614,7 +614,7 @@ ANVHashMap* anv_hashmap_copy(const ANVHashMap* map)
     return copy;
 }
 
-ANVHashMap* anv_hashmap_copy_deep(const ANVHashMap* map,
+ANV_API ANVHashMap* anv_hashmap_copy_deep(const ANVHashMap* map,
                                   const copy_func key_copy, const copy_func value_copy)
 {
     if (!map)
@@ -798,7 +798,7 @@ static void hashmap_iterator_destroy(ANVIterator* it)
     it->data_state = NULL;
 }
 
-ANVIterator anv_hashmap_iterator(const ANVHashMap* map)
+ANV_API ANVIterator anv_hashmap_iterator(const ANVHashMap* map)
 {
     ANVIterator it = {0};
 
@@ -842,7 +842,7 @@ ANVIterator anv_hashmap_iterator(const ANVHashMap* map)
     return it;
 }
 
-ANVHashMap* anv_hashmap_from_iterator(ANVIterator* it, ANVAllocator* alloc,
+ANV_API ANVHashMap* anv_hashmap_from_iterator(ANVIterator* it, ANVAllocator* alloc,
                                       const hash_func hash, const key_equals_func key_equals, const bool should_copy)
 {
     if (!it || !alloc || !hash || !key_equals)
@@ -928,7 +928,7 @@ ANVHashMap* anv_hashmap_from_iterator(ANVIterator* it, ANVAllocator* alloc,
 // Utility hash functions
 //==============================================================================
 
-size_t anv_hash_string(const void* key)
+ANV_API size_t anv_hash_string(const void* key)
 {
     if (!key)
     {
@@ -947,7 +947,7 @@ size_t anv_hash_string(const void* key)
     return hash;
 }
 
-size_t anv_hash_int(const void* key)
+ANV_API size_t anv_hash_int(const void* key)
 {
     if (!key)
     {
@@ -963,7 +963,7 @@ size_t anv_hash_int(const void* key)
     return hash;
 }
 
-size_t anv_hash_pointer(const void* key)
+ANV_API size_t anv_hash_pointer(const void* key)
 {
     // Hash the pointer value itself
     const uintptr_t addr = (uintptr_t)key;
@@ -978,7 +978,7 @@ size_t anv_hash_pointer(const void* key)
 // Utility equality functions
 //==============================================================================
 
-int anv_key_equals_string(const void* key1, const void* key2)
+ANV_API int anv_key_equals_string(const void* key1, const void* key2)
 {
     if (!key1 || !key2)
     {
@@ -987,7 +987,7 @@ int anv_key_equals_string(const void* key1, const void* key2)
     return strcmp(key1, key2) == 0;
 }
 
-int anv_key_equals_int(const void* key1, const void* key2)
+ANV_API int anv_key_equals_int(const void* key1, const void* key2)
 {
     if (!key1 || !key2)
     {
@@ -996,7 +996,7 @@ int anv_key_equals_int(const void* key1, const void* key2)
     return *(const int*)key1 == *(const int*)key2;
 }
 
-int anv_key_equals_pointer(const void* key1, const void* key2)
+ANV_API int anv_key_equals_pointer(const void* key1, const void* key2)
 {
     return key1 == key2;
 }

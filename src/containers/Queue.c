@@ -51,7 +51,7 @@ static void free_node(ANVQueue* queue, ANVQueueNode* node, const bool should_fre
 // Creation and destruction functions
 //==============================================================================
 
-ANVQueue* anv_queue_create(ANVAllocator* alloc)
+ANV_API ANVQueue* anv_queue_create(ANVAllocator* alloc)
 {
     if (!alloc)
     {
@@ -72,7 +72,7 @@ ANVQueue* anv_queue_create(ANVAllocator* alloc)
     return queue;
 }
 
-void anv_queue_destroy(ANVQueue* queue, const bool should_free_data)
+ANV_API void anv_queue_destroy(ANVQueue* queue, const bool should_free_data)
 {
     if (!queue)
     {
@@ -84,7 +84,7 @@ void anv_queue_destroy(ANVQueue* queue, const bool should_free_data)
     anv_alloc_free(queue->alloc, queue);
 }
 
-void anv_queue_clear(ANVQueue* queue, const bool should_free_data)
+ANV_API void anv_queue_clear(ANVQueue* queue, const bool should_free_data)
 {
     if (!queue)
     {
@@ -108,17 +108,17 @@ void anv_queue_clear(ANVQueue* queue, const bool should_free_data)
 // Information functions
 //==============================================================================
 
-size_t anv_queue_size(const ANVQueue* queue)
+ANV_API size_t anv_queue_size(const ANVQueue* queue)
 {
     return queue ? queue->size : 0;
 }
 
-int anv_queue_is_empty(const ANVQueue* queue)
+ANV_API int anv_queue_is_empty(const ANVQueue* queue)
 {
     return !queue || queue->size == 0;
 }
 
-int anv_queue_equals(const ANVQueue* queue1, const ANVQueue* queue2, const cmp_func compare)
+ANV_API int anv_queue_equals(const ANVQueue* queue1, const ANVQueue* queue2, const cmp_func compare)
 {
     if (!queue1 || !queue2 || !compare)
     {
@@ -155,7 +155,7 @@ int anv_queue_equals(const ANVQueue* queue1, const ANVQueue* queue2, const cmp_f
 // Element access functions
 //==============================================================================
 
-void* anv_queue_front(const ANVQueue* queue)
+ANV_API void* anv_queue_front(const ANVQueue* queue)
 {
     if (!queue || !queue->front)
     {
@@ -164,7 +164,7 @@ void* anv_queue_front(const ANVQueue* queue)
     return queue->front->data;
 }
 
-void* anv_queue_back(const ANVQueue* queue)
+ANV_API void* anv_queue_back(const ANVQueue* queue)
 {
     if (!queue || !queue->back)
     {
@@ -177,7 +177,7 @@ void* anv_queue_back(const ANVQueue* queue)
 // Queue operations
 //==============================================================================
 
-int anv_queue_enqueue(ANVQueue* queue, void* data)
+ANV_API int anv_queue_enqueue(ANVQueue* queue, void* data)
 {
     if (!queue)
     {
@@ -207,7 +207,7 @@ int anv_queue_enqueue(ANVQueue* queue, void* data)
     return 0;
 }
 
-int anv_queue_dequeue(ANVQueue* queue, const bool should_free_data)
+ANV_API int anv_queue_dequeue(ANVQueue* queue, const bool should_free_data)
 {
     if (!queue || !queue->front)
     {
@@ -228,7 +228,7 @@ int anv_queue_dequeue(ANVQueue* queue, const bool should_free_data)
     return 0;
 }
 
-void* anv_queue_dequeue_data(ANVQueue* queue)
+ANV_API void* anv_queue_dequeue_data(ANVQueue* queue)
 {
     if (!queue || !queue->front)
     {
@@ -257,7 +257,7 @@ void* anv_queue_dequeue_data(ANVQueue* queue)
 // Higher-order functions
 //==============================================================================
 
-void anv_queue_for_each(const ANVQueue* queue, const action_func action)
+ANV_API void anv_queue_for_each(const ANVQueue* queue, const action_func action)
 {
     if (!queue || !action)
     {
@@ -276,7 +276,7 @@ void anv_queue_for_each(const ANVQueue* queue, const action_func action)
 // Queue copying functions
 //==============================================================================
 
-ANVQueue* anv_queue_copy(const ANVQueue* queue)
+ANV_API ANVQueue* anv_queue_copy(const ANVQueue* queue)
 {
     if (!queue)
     {
@@ -309,7 +309,7 @@ ANVQueue* anv_queue_copy(const ANVQueue* queue)
     return new_queue;
 }
 
-ANVQueue* anv_queue_copy_deep(const ANVQueue* queue, const bool should_free_data)
+ANV_API ANVQueue* anv_queue_copy_deep(const ANVQueue* queue, const bool should_free_data)
 {
     if (!queue || !queue->alloc || !queue->alloc->copy)
     {
@@ -448,7 +448,7 @@ static void queue_iterator_destroy(ANVIterator* it)
     it->data_state = NULL;
 }
 
-ANVIterator anv_queue_iterator(const ANVQueue* queue)
+ANV_API ANVIterator anv_queue_iterator(const ANVQueue* queue)
 {
     ANVIterator it = {0};
 
@@ -482,7 +482,7 @@ ANVIterator anv_queue_iterator(const ANVQueue* queue)
     return it;
 }
 
-ANVQueue* anv_queue_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
+ANV_API ANVQueue* anv_queue_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
 {
     if (!it || !alloc)
     {

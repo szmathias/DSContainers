@@ -57,7 +57,7 @@ static ANVSinglyLinkedNode* sll_sort_helper_merge(ANVSinglyLinkedNode* left, ANV
  * Create a new singly linked list using the provided allocator.
  * The allocator's function pointers are defaulted to malloc/free when NULL.
  */
-ANVSinglyLinkedList* anv_sll_create(ANVAllocator* alloc)
+ANV_API ANVSinglyLinkedList* anv_sll_create(ANVAllocator* alloc)
 {
     if (!alloc)
     {
@@ -82,7 +82,7 @@ ANVSinglyLinkedList* anv_sll_create(ANVAllocator* alloc)
  * Destroy the list and free nodes. When should_free_data is true the
  * allocator's data_free_func is used on stored element pointers.
  */
-void anv_sll_destroy(ANVSinglyLinkedList* list, const bool should_free_data)
+ANV_API void anv_sll_destroy(ANVSinglyLinkedList* list, const bool should_free_data)
 {
     if (list)
     {
@@ -94,7 +94,7 @@ void anv_sll_destroy(ANVSinglyLinkedList* list, const bool should_free_data)
 /**
  * Clear all nodes but keep the list structure.
  */
-void anv_sll_clear(ANVSinglyLinkedList* list, const bool should_free_data)
+ANV_API void anv_sll_clear(ANVSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list)
     {
@@ -124,7 +124,7 @@ void anv_sll_clear(ANVSinglyLinkedList* list, const bool should_free_data)
 /**
  * Return the number of elements in the list.
  */
-size_t anv_sll_size(const ANVSinglyLinkedList* list)
+ANV_API size_t anv_sll_size(const ANVSinglyLinkedList* list)
 {
     if (!list)
     {
@@ -136,7 +136,7 @@ size_t anv_sll_size(const ANVSinglyLinkedList* list)
 /**
  * Return non-zero if the list is empty or NULL.
  */
-int anv_sll_is_empty(const ANVSinglyLinkedList* list)
+ANV_API int anv_sll_is_empty(const ANVSinglyLinkedList* list)
 {
     return !list || list->size == 0;
 }
@@ -144,7 +144,7 @@ int anv_sll_is_empty(const ANVSinglyLinkedList* list)
 /**
  * Find the first node equal to data using compare.
  */
-ANVSinglyLinkedNode* anv_sll_find(const ANVSinglyLinkedList* list, const void* data, const cmp_func compare)
+ANV_API ANVSinglyLinkedNode* anv_sll_find(const ANVSinglyLinkedList* list, const void* data, const cmp_func compare)
 {
     if (!list || !compare)
     {
@@ -169,7 +169,7 @@ ANVSinglyLinkedNode* anv_sll_find(const ANVSinglyLinkedList* list, const void* d
  * Compare two lists element-wise using compare.
  * Returns 1 if equal, 0 if not equal, -1 on error.
  */
-int anv_sll_equals(const ANVSinglyLinkedList* list1, const ANVSinglyLinkedList* list2, const cmp_func compare)
+ANV_API int anv_sll_equals(const ANVSinglyLinkedList* list1, const ANVSinglyLinkedList* list2, const cmp_func compare)
 {
     if (!list1 || !list2 || !compare)
     {
@@ -210,7 +210,7 @@ int anv_sll_equals(const ANVSinglyLinkedList* list1, const ANVSinglyLinkedList* 
 /**
  * Add data to the front of the list.
  */
-int anv_sll_push_front(ANVSinglyLinkedList* list, void* data)
+ANV_API int anv_sll_push_front(ANVSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
@@ -240,7 +240,7 @@ int anv_sll_push_front(ANVSinglyLinkedList* list, void* data)
 /**
  * Add data to the back of the list.
  */
-int anv_sll_push_back(ANVSinglyLinkedList* list, void* data)
+ANV_API int anv_sll_push_back(ANVSinglyLinkedList* list, void* data)
 {
     if (!list)
     {
@@ -276,7 +276,7 @@ int anv_sll_push_back(ANVSinglyLinkedList* list, void* data)
 /**
  * Insert data at a specific zero-based position (0...size).
  */
-int anv_sll_insert_at(ANVSinglyLinkedList* list, const size_t pos, void* data)
+ANV_API int anv_sll_insert_at(ANVSinglyLinkedList* list, const size_t pos, void* data)
 {
     if (!list || pos > list->size)
     {
@@ -320,7 +320,7 @@ int anv_sll_insert_at(ANVSinglyLinkedList* list, const size_t pos, void* data)
 /**
  * Remove first element matching data using compare. Optionally free data.
  */
-int anv_sll_remove(ANVSinglyLinkedList* list, const void* data, const cmp_func compare, const bool should_free_data)
+ANV_API int anv_sll_remove(ANVSinglyLinkedList* list, const void* data, const cmp_func compare, const bool should_free_data)
 {
     if (!list || !compare)
     {
@@ -367,7 +367,7 @@ int anv_sll_remove(ANVSinglyLinkedList* list, const void* data, const cmp_func c
 /**
  * Remove element at zero-based position. Optionally free data.
  */
-int anv_sll_remove_at(ANVSinglyLinkedList* list, const size_t pos, const bool should_free_data)
+ANV_API int anv_sll_remove_at(ANVSinglyLinkedList* list, const size_t pos, const bool should_free_data)
 {
     if (!list || pos >= list->size)
     {
@@ -405,7 +405,7 @@ int anv_sll_remove_at(ANVSinglyLinkedList* list, const size_t pos, const bool sh
 /**
  * Remove first element.
  */
-int anv_sll_pop_front(ANVSinglyLinkedList* list, const bool should_free_data)
+ANV_API int anv_sll_pop_front(ANVSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -428,7 +428,7 @@ int anv_sll_pop_front(ANVSinglyLinkedList* list, const bool should_free_data)
 /**
  * Remove last element.
  */
-int anv_sll_pop_back(ANVSinglyLinkedList* list, const bool should_free_data)
+ANV_API int anv_sll_pop_back(ANVSinglyLinkedList* list, const bool should_free_data)
 {
     if (!list || !list->head)
     {
@@ -470,7 +470,7 @@ int anv_sll_pop_back(ANVSinglyLinkedList* list, const bool should_free_data)
 /**
  * Sort the list in-place using an iterative merge approach.
  */
-int anv_sll_sort(ANVSinglyLinkedList* list, const cmp_func compare)
+ANV_API int anv_sll_sort(ANVSinglyLinkedList* list, const cmp_func compare)
 {
     if (!list || !compare)
     {
@@ -520,7 +520,7 @@ int anv_sll_sort(ANVSinglyLinkedList* list, const cmp_func compare)
 /**
  * Reverse the list in-place.
  */
-int anv_sll_reverse(ANVSinglyLinkedList* list)
+ANV_API int anv_sll_reverse(ANVSinglyLinkedList* list)
 {
     if (!list)
     {
@@ -550,7 +550,7 @@ int anv_sll_reverse(ANVSinglyLinkedList* list)
 /**
  * Append src to dest; src is emptied but not destroyed.
  */
-int anv_sll_merge(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src)
+ANV_API int anv_sll_merge(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src)
 {
     if (!dest || !src)
     {
@@ -587,7 +587,7 @@ int anv_sll_merge(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src)
 /**
  * Splice src into dest at position pos. Src is emptied but not destroyed.
  */
-int anv_sll_splice(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src, const size_t pos)
+ANV_API int anv_sll_splice(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src, const size_t pos)
 {
     if (!dest || !src || pos > dest->size)
     {
@@ -638,7 +638,7 @@ int anv_sll_splice(ANVSinglyLinkedList* dest, ANVSinglyLinkedList* src, const si
 // Higher-order functions
 //==============================================================================
 
-ANVSinglyLinkedList* anv_sll_filter(const ANVSinglyLinkedList* list, const pred_func pred)
+ANV_API ANVSinglyLinkedList* anv_sll_filter(const ANVSinglyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred)
     {
@@ -668,7 +668,7 @@ ANVSinglyLinkedList* anv_sll_filter(const ANVSinglyLinkedList* list, const pred_
     return filtered;
 }
 
-ANVSinglyLinkedList* anv_sll_filter_deep(const ANVSinglyLinkedList* list, const pred_func pred)
+ANV_API ANVSinglyLinkedList* anv_sll_filter_deep(const ANVSinglyLinkedList* list, const pred_func pred)
 {
     if (!list || !pred || !list->alloc || !list->alloc->copy)
     {
@@ -703,7 +703,7 @@ ANVSinglyLinkedList* anv_sll_filter_deep(const ANVSinglyLinkedList* list, const 
     return filtered;
 }
 
-ANVSinglyLinkedList* anv_sll_transform(const ANVSinglyLinkedList* list, const transform_func transform, const bool should_free_data)
+ANV_API ANVSinglyLinkedList* anv_sll_transform(const ANVSinglyLinkedList* list, const transform_func transform, const bool should_free_data)
 {
     if (!list || !transform)
     {
@@ -735,7 +735,7 @@ ANVSinglyLinkedList* anv_sll_transform(const ANVSinglyLinkedList* list, const tr
     return transformed;
 }
 
-void anv_sll_for_each(const ANVSinglyLinkedList* list, const action_func action)
+ANV_API void anv_sll_for_each(const ANVSinglyLinkedList* list, const action_func action)
 {
     if (!list || !action)
     {
@@ -754,7 +754,7 @@ void anv_sll_for_each(const ANVSinglyLinkedList* list, const action_func action)
 // List copying functions
 //==============================================================================
 
-ANVSinglyLinkedList* anv_sll_copy(const ANVSinglyLinkedList* list)
+ANV_API ANVSinglyLinkedList* anv_sll_copy(const ANVSinglyLinkedList* list)
 {
     if (!list)
     {
@@ -786,7 +786,7 @@ ANVSinglyLinkedList* anv_sll_copy(const ANVSinglyLinkedList* list)
     return clone;
 }
 
-ANVSinglyLinkedList* anv_sll_copy_deep(const ANVSinglyLinkedList* list, const copy_func copy_data, const bool should_free_data)
+ANV_API ANVSinglyLinkedList* anv_sll_copy_deep(const ANVSinglyLinkedList* list, const copy_func copy_data, const bool should_free_data)
 {
     if (!list || !copy_data)
     {
@@ -928,7 +928,7 @@ static void sll_iterator_destroy(ANVIterator* it)
     it->data_state = NULL;
 }
 
-ANVIterator anv_sll_iterator(const ANVSinglyLinkedList* list)
+ANV_API ANVIterator anv_sll_iterator(const ANVSinglyLinkedList* list)
 {
     ANVIterator it = {0};
 
@@ -961,7 +961,7 @@ ANVIterator anv_sll_iterator(const ANVSinglyLinkedList* list)
     return it;
 }
 
-ANVSinglyLinkedList* anv_sll_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
+ANV_API ANVSinglyLinkedList* anv_sll_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
 {
     if (!it || !alloc)
     {

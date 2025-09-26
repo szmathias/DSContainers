@@ -220,7 +220,7 @@ static void anv_bst_node_postorder(const ANVBinarySearchTreeNode* node, const ac
 // Public API implementation
 //==============================================================================
 
-ANVBinarySearchTree* anv_bst_create(ANVAllocator* alloc, const cmp_func compare)
+ANV_API ANVBinarySearchTree* anv_bst_create(ANVAllocator* alloc, const cmp_func compare)
 {
     if (!compare)
     {
@@ -246,7 +246,7 @@ ANVBinarySearchTree* anv_bst_create(ANVAllocator* alloc, const cmp_func compare)
     return tree;
 }
 
-void anv_bst_destroy(ANVBinarySearchTree* tree, const bool should_free_data)
+ANV_API void anv_bst_destroy(ANVBinarySearchTree* tree, const bool should_free_data)
 {
     if (!tree)
     {
@@ -257,7 +257,7 @@ void anv_bst_destroy(ANVBinarySearchTree* tree, const bool should_free_data)
     anv_alloc_free(tree->alloc, tree);
 }
 
-void anv_bst_clear(ANVBinarySearchTree* tree, const bool should_free_data)
+ANV_API void anv_bst_clear(ANVBinarySearchTree* tree, const bool should_free_data)
 {
     if (!tree)
     {
@@ -269,22 +269,22 @@ void anv_bst_clear(ANVBinarySearchTree* tree, const bool should_free_data)
     tree->size = 0;
 }
 
-size_t anv_bst_size(const ANVBinarySearchTree* tree)
+ANV_API size_t anv_bst_size(const ANVBinarySearchTree* tree)
 {
     return tree ? tree->size : 0;
 }
 
-int anv_bst_is_empty(const ANVBinarySearchTree* tree)
+ANV_API int anv_bst_is_empty(const ANVBinarySearchTree* tree)
 {
     return !tree || tree->size == 0;
 }
 
-size_t anv_bst_height(const ANVBinarySearchTree* tree)
+ANV_API size_t anv_bst_height(const ANVBinarySearchTree* tree)
 {
     return tree ? anv_bst_node_height(tree->root) : 0;
 }
 
-int anv_bst_contains(const ANVBinarySearchTree* tree, const void* data)
+ANV_API int anv_bst_contains(const ANVBinarySearchTree* tree, const void* data)
 {
     if (!tree || !data)
     {
@@ -315,7 +315,7 @@ int anv_bst_contains(const ANVBinarySearchTree* tree, const void* data)
     return 0;
 }
 
-void* anv_bst_min(const ANVBinarySearchTree* tree)
+ANV_API void* anv_bst_min(const ANVBinarySearchTree* tree)
 {
     if (!tree || !tree->root)
     {
@@ -326,7 +326,7 @@ void* anv_bst_min(const ANVBinarySearchTree* tree)
     return min_node ? min_node->data : NULL;
 }
 
-void* anv_bst_max(const ANVBinarySearchTree* tree)
+ANV_API void* anv_bst_max(const ANVBinarySearchTree* tree)
 {
     if (!tree || !tree->root)
     {
@@ -337,7 +337,7 @@ void* anv_bst_max(const ANVBinarySearchTree* tree)
     return max_node ? max_node->data : NULL;
 }
 
-int anv_bst_insert(ANVBinarySearchTree* tree, void* data)
+ANV_API int anv_bst_insert(ANVBinarySearchTree* tree, void* data)
 {
     if (!tree || !data)
     {
@@ -400,7 +400,7 @@ int anv_bst_insert(ANVBinarySearchTree* tree, void* data)
     return 0;
 }
 
-int anv_bst_remove(ANVBinarySearchTree* tree, const void* data, const bool should_free_data)
+ANV_API int anv_bst_remove(ANVBinarySearchTree* tree, const void* data, const bool should_free_data)
 {
     if (!tree || !data)
     {
@@ -435,7 +435,7 @@ int anv_bst_remove(ANVBinarySearchTree* tree, const void* data, const bool shoul
     return -1; // Not found
 }
 
-void anv_bst_inorder(const ANVBinarySearchTree* tree, const action_func action)
+ANV_API void anv_bst_inorder(const ANVBinarySearchTree* tree, const action_func action)
 {
     if (!tree || !action)
     {
@@ -445,7 +445,7 @@ void anv_bst_inorder(const ANVBinarySearchTree* tree, const action_func action)
     anv_bst_node_inorder(tree->root, action);
 }
 
-void anv_bst_preorder(const ANVBinarySearchTree* tree, const action_func action)
+ANV_API void anv_bst_preorder(const ANVBinarySearchTree* tree, const action_func action)
 {
     if (!tree || !action)
     {
@@ -455,7 +455,7 @@ void anv_bst_preorder(const ANVBinarySearchTree* tree, const action_func action)
     anv_bst_node_preorder(tree->root, action);
 }
 
-void anv_bst_postorder(const ANVBinarySearchTree* tree, const action_func action)
+ANV_API void anv_bst_postorder(const ANVBinarySearchTree* tree, const action_func action)
 {
     if (!tree || !action)
     {
@@ -874,22 +874,22 @@ static ANVIterator bst_create_iterator(const ANVBinarySearchTree* tree, const BS
     return it;
 }
 
-ANVIterator anv_bst_iterator(const ANVBinarySearchTree* tree)
+ANV_API ANVIterator anv_bst_iterator(const ANVBinarySearchTree* tree)
 {
     return bst_create_iterator(tree, BST_TRAVERSAL_INORDER);
 }
 
-ANVIterator anv_bst_iterator_preorder(const ANVBinarySearchTree* tree)
+ANV_API ANVIterator anv_bst_iterator_preorder(const ANVBinarySearchTree* tree)
 {
     return bst_create_iterator(tree, BST_TRAVERSAL_PREORDER);
 }
 
-ANVIterator anv_bst_iterator_postorder(const ANVBinarySearchTree* tree)
+ANV_API ANVIterator anv_bst_iterator_postorder(const ANVBinarySearchTree* tree)
 {
     return bst_create_iterator(tree, BST_TRAVERSAL_POSTORDER);
 }
 
-ANVBinarySearchTree* anv_bst_from_iterator(ANVIterator* it, ANVAllocator* alloc, const cmp_func compare, const bool should_copy)
+ANV_API ANVBinarySearchTree* anv_bst_from_iterator(ANVIterator* it, ANVAllocator* alloc, const cmp_func compare, const bool should_copy)
 {
     if (!it || !compare || !alloc)
     {

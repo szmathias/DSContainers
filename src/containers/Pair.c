@@ -10,7 +10,7 @@
 // Creation and destruction functions
 //==============================================================================
 
-ANVPair* anv_pair_create(ANVAllocator* alloc, void* first, void* second)
+ANV_API ANVPair* anv_pair_create(ANVAllocator* alloc, void* first, void* second)
 {
     if (!alloc || !alloc->allocate || !alloc->deallocate)
     {
@@ -30,7 +30,7 @@ ANVPair* anv_pair_create(ANVAllocator* alloc, void* first, void* second)
     return pair;
 }
 
-int anv_pair_init(ANVPair* pair, ANVAllocator* alloc, void* first, void* second)
+ANV_API int anv_pair_init(ANVPair* pair, ANVAllocator* alloc, void* first, void* second)
 {
     if (!pair)
     {
@@ -44,7 +44,7 @@ int anv_pair_init(ANVPair* pair, ANVAllocator* alloc, void* first, void* second)
     return 0;
 }
 
-void anv_pair_destroy(ANVPair* pair, const bool should_free_first, const bool should_free_second)
+ANV_API void anv_pair_destroy(ANVPair* pair, const bool should_free_first, const bool should_free_second)
 {
     if (!pair)
     {
@@ -68,17 +68,17 @@ void anv_pair_destroy(ANVPair* pair, const bool should_free_first, const bool sh
 // Access functions
 //==============================================================================
 
-void* anv_pair_first(const ANVPair* pair)
+ANV_API void* anv_pair_first(const ANVPair* pair)
 {
     return pair ? pair->first : NULL;
 }
 
-void* anv_pair_second(const ANVPair* pair)
+ANV_API void* anv_pair_second(const ANVPair* pair)
 {
     return pair ? pair->second : NULL;
 }
 
-void anv_pair_set_first(ANVPair* pair, void* first, const bool should_free_old)
+ANV_API void anv_pair_set_first(ANVPair* pair, void* first, const bool should_free_old)
 {
     if (!pair)
     {
@@ -93,7 +93,7 @@ void anv_pair_set_first(ANVPair* pair, void* first, const bool should_free_old)
     pair->first = first;
 }
 
-void anv_pair_set_second(ANVPair* pair, void* second, const bool should_free_old)
+ANV_API void anv_pair_set_second(ANVPair* pair, void* second, const bool should_free_old)
 {
     if (!pair)
     {
@@ -112,7 +112,7 @@ void anv_pair_set_second(ANVPair* pair, void* second, const bool should_free_old
 // Utility functions
 //==============================================================================
 
-void anv_pair_swap(ANVPair* pair)
+ANV_API void anv_pair_swap(ANVPair* pair)
 {
     if (!pair)
     {
@@ -124,7 +124,7 @@ void anv_pair_swap(ANVPair* pair)
     pair->second = temp;
 }
 
-int anv_pair_compare(const ANVPair* pair1, const ANVPair* pair2,
+ANV_API int anv_pair_compare(const ANVPair* pair1, const ANVPair* pair2,
                      const pair_compare_func first_compare, const pair_compare_func second_compare)
 {
     if (!pair1 && !pair2)
@@ -161,13 +161,13 @@ int anv_pair_compare(const ANVPair* pair1, const ANVPair* pair2,
     return 0;
 }
 
-int anv_pair_equals(const ANVPair* pair1, const ANVPair* pair2,
+ANV_API int anv_pair_equals(const ANVPair* pair1, const ANVPair* pair2,
                     const pair_compare_func first_compare, const pair_compare_func second_compare)
 {
     return anv_pair_compare(pair1, pair2, first_compare, second_compare) == 0;
 }
 
-ANVPair* anv_pair_copy(const ANVPair* pair)
+ANV_API ANVPair* anv_pair_copy(const ANVPair* pair)
 {
     if (!pair || !pair->alloc)
     {
@@ -177,7 +177,7 @@ ANVPair* anv_pair_copy(const ANVPair* pair)
     return anv_pair_create(pair->alloc, pair->first, pair->second);
 }
 
-ANVPair* anv_pair_copy_deep(const ANVPair* pair, const bool should_free, const copy_func first_copy, const copy_func second_copy)
+ANV_API ANVPair* anv_pair_copy_deep(const ANVPair* pair, const bool should_free, const copy_func first_copy, const copy_func second_copy)
 {
     if (!pair || !pair->alloc)
     {
@@ -228,7 +228,7 @@ ANVPair* anv_pair_copy_deep(const ANVPair* pair, const bool should_free, const c
 // Common copy helper functions
 //==============================================================================
 
-void* anv_pair_copy_string_int(const void* pair_data)
+ANV_API void* anv_pair_copy_string_int(const void* pair_data)
 {
     if (!pair_data)
     {
@@ -287,7 +287,7 @@ void* anv_pair_copy_string_int(const void* pair_data)
     return new_pair;
 }
 
-void* anv_pair_copy_int_string(const void* pair_data)
+ANV_API void* anv_pair_copy_int_string(const void* pair_data)
 {
     if (!pair_data)
     {
@@ -346,7 +346,7 @@ void* anv_pair_copy_int_string(const void* pair_data)
     return new_pair;
 }
 
-void* anv_pair_copy_string_string(const void* pair_data)
+ANV_API void* anv_pair_copy_string_string(const void* pair_data)
 {
     if (!pair_data)
     {
@@ -407,7 +407,7 @@ void* anv_pair_copy_string_string(const void* pair_data)
     return new_pair;
 }
 
-void* anv_pair_copy_int_int(const void* pair_data)
+ANV_API void* anv_pair_copy_int_int(const void* pair_data)
 {
     if (!pair_data)
     {

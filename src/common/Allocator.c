@@ -23,7 +23,7 @@ static void* default_copy(const void* data)
 // Utility function implementations
 //==============================================================================
 
-ANVAllocator anv_alloc_default(void)
+ANV_API ANVAllocator anv_alloc_default(void)
 {
     const ANVAllocator alloc = {
         .allocate = malloc,
@@ -34,7 +34,7 @@ ANVAllocator anv_alloc_default(void)
     return alloc;
 }
 
-ANVAllocator anv_alloc_custom(const alloc_func alloc_func, const dealloc_func dealloc_func,
+ANV_API ANVAllocator anv_alloc_custom(const alloc_func alloc_func, const dealloc_func dealloc_func,
                               const data_free_func data_free_func, const copy_func copy_func)
 {
     const ANVAllocator alloc = {
@@ -46,7 +46,7 @@ ANVAllocator anv_alloc_custom(const alloc_func alloc_func, const dealloc_func de
     return alloc;
 }
 
-void* anv_alloc_malloc(const ANVAllocator* alloc, const size_t size)
+ANV_API void* anv_alloc_malloc(const ANVAllocator* alloc, const size_t size)
 {
     if (!alloc || !alloc->allocate)
     {
@@ -55,7 +55,7 @@ void* anv_alloc_malloc(const ANVAllocator* alloc, const size_t size)
     return alloc->allocate(size);
 }
 
-void anv_alloc_free(const ANVAllocator* alloc, void* ptr)
+ANV_API void anv_alloc_free(const ANVAllocator* alloc, void* ptr)
 {
     if (alloc && alloc->deallocate && ptr)
     {
@@ -63,7 +63,7 @@ void anv_alloc_free(const ANVAllocator* alloc, void* ptr)
     }
 }
 
-void anv_alloc_data_free(const ANVAllocator* alloc, void* ptr)
+ANV_API void anv_alloc_data_free(const ANVAllocator* alloc, void* ptr)
 {
     if (alloc && alloc->data_free && ptr)
     {
@@ -71,7 +71,7 @@ void anv_alloc_data_free(const ANVAllocator* alloc, void* ptr)
     }
 }
 
-void* anv_alloc_copy(const ANVAllocator* alloc, const void* data)
+ANV_API void* anv_alloc_copy(const ANVAllocator* alloc, const void* data)
 {
     if (!alloc || !alloc->copy || !data)
     {

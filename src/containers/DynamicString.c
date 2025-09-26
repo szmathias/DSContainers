@@ -81,7 +81,7 @@ static bool anv_str_ensure_capacity(ANVString* str, const size_t required_capaci
     return anv_str_realloc(str, new_capacity);
 }
 
-ANVString anv_str_create_empty(const size_t initial_capacity)
+ANV_API ANVString anv_str_create_empty(const size_t initial_capacity)
 {
     ANVString result;
 
@@ -110,7 +110,7 @@ ANVString anv_str_create_empty(const size_t initial_capacity)
     return result;
 }
 
-ANVString anv_str_create_from_cstring(const char* cstr)
+ANV_API ANVString anv_str_create_from_cstring(const char* cstr)
 {
     if (!cstr)
     {
@@ -126,7 +126,7 @@ ANVString anv_str_create_from_cstring(const char* cstr)
     return result;
 }
 
-ANVString anv_str_create_from_string(const ANVString* str)
+ANV_API ANVString anv_str_create_from_string(const ANVString* str)
 {
     if (!str)
     {
@@ -137,7 +137,7 @@ ANVString anv_str_create_from_string(const ANVString* str)
     return anv_str_create_from_cstring(data_to_use);
 }
 
-void anv_str_destroy(ANVString* str)
+ANV_API void anv_str_destroy(ANVString* str)
 {
     if (!str)
     {
@@ -153,7 +153,7 @@ void anv_str_destroy(ANVString* str)
     str->data = NULL;
 }
 
-void anv_str_destroy_split(ANVString** str, const size_t count)
+ANV_API void anv_str_destroy_split(ANVString** str, const size_t count)
 {
     if (!str)
     {
@@ -176,7 +176,7 @@ void anv_str_destroy_split(ANVString** str, const size_t count)
     *str = NULL;
 }
 
-void anv_str_assign_char(ANVString* str, const char value)
+ANV_API void anv_str_assign_char(ANVString* str, const char value)
 {
     if (!str)
     {
@@ -189,7 +189,7 @@ void anv_str_assign_char(ANVString* str, const char value)
     str->size = 1;
 }
 
-void anv_str_assign_cstring(ANVString* str, const char* cstr)
+ANV_API void anv_str_assign_cstring(ANVString* str, const char* cstr)
 {
     if (!str || !cstr)
     {
@@ -204,7 +204,7 @@ void anv_str_assign_cstring(ANVString* str, const char* cstr)
     str->size = length;
 }
 
-void anv_str_assign_string(ANVString* str, const ANVString* from)
+ANV_API void anv_str_assign_string(ANVString* str, const ANVString* from)
 {
     if (!str || !from)
     {
@@ -220,7 +220,7 @@ void anv_str_assign_string(ANVString* str, const ANVString* from)
     anv_str_assign_cstring(str, data_to_use);
 }
 
-void anv_str_push_back(ANVString* str, const char value)
+ANV_API void anv_str_push_back(ANVString* str, const char value)
 {
     if (!str)
     {
@@ -241,7 +241,7 @@ void anv_str_push_back(ANVString* str, const char value)
     ++str->size;
 }
 
-void anv_str_append_char(ANVString* str, const char value)
+ANV_API void anv_str_append_char(ANVString* str, const char value)
 {
     if (!str)
     {
@@ -251,7 +251,7 @@ void anv_str_append_char(ANVString* str, const char value)
     anv_str_push_back(str, value);
 }
 
-void anv_str_append_cstring(ANVString* str, const char* cstr)
+ANV_API void anv_str_append_cstring(ANVString* str, const char* cstr)
 {
     if (!str || !cstr)
     {
@@ -267,7 +267,7 @@ void anv_str_append_cstring(ANVString* str, const char* cstr)
     str->size += length;
 }
 
-void anv_str_append_string(ANVString* str, const ANVString* from)
+ANV_API void anv_str_append_string(ANVString* str, const ANVString* from)
 {
     if (!str || !from)
     {
@@ -278,7 +278,7 @@ void anv_str_append_string(ANVString* str, const ANVString* from)
     anv_str_append_cstring(str, data_to_use);
 }
 
-void anv_str_insert_char(ANVString* str, const size_t pos, const char value)
+ANV_API void anv_str_insert_char(ANVString* str, const size_t pos, const char value)
 {
     if (!str)
     {
@@ -312,7 +312,7 @@ void anv_str_insert_char(ANVString* str, const size_t pos, const char value)
     str->size++;
 }
 
-void anv_str_insert_cstring(ANVString* str, const size_t pos, const char* cstr)
+ANV_API void anv_str_insert_cstring(ANVString* str, const size_t pos, const char* cstr)
 {
     if (!str || !cstr)
     {
@@ -337,7 +337,7 @@ void anv_str_insert_cstring(ANVString* str, const size_t pos, const char* cstr)
     }
 }
 
-void anv_str_insert_string(ANVString* str, const size_t pos, const ANVString* from)
+ANV_API void anv_str_insert_string(ANVString* str, const size_t pos, const ANVString* from)
 {
     if (!str || !from)
     {
@@ -348,7 +348,7 @@ void anv_str_insert_string(ANVString* str, const size_t pos, const ANVString* fr
     anv_str_insert_cstring(str, pos, data_to_use);
 }
 
-void anv_str_pop_back(ANVString* str)
+ANV_API void anv_str_pop_back(ANVString* str)
 {
     if (!str)
     {
@@ -363,7 +363,7 @@ void anv_str_pop_back(ANVString* str)
     }
 }
 
-void anv_str_erase(ANVString* str, const size_t pos)
+ANV_API void anv_str_erase(ANVString* str, const size_t pos)
 {
     if (!str)
     {
@@ -392,7 +392,7 @@ void anv_str_erase(ANVString* str, const size_t pos)
     }
 }
 
-bool anv_str_empty(const ANVString* str)
+ANV_API bool anv_str_empty(const ANVString* str)
 {
     if (!str)
     {
@@ -402,7 +402,7 @@ bool anv_str_empty(const ANVString* str)
     return (str->size == 0);
 }
 
-void anv_str_clear(ANVString* str)
+ANV_API void anv_str_clear(ANVString* str)
 {
     if (!str)
     {
@@ -415,7 +415,7 @@ void anv_str_clear(ANVString* str)
     str->size = 0;
 }
 
-bool anv_str_reserve(ANVString* str, const size_t new_capacity)
+ANV_API bool anv_str_reserve(ANVString* str, const size_t new_capacity)
 {
     if (!str)
     {
@@ -430,7 +430,7 @@ bool anv_str_reserve(ANVString* str, const size_t new_capacity)
     return anv_str_realloc(str, new_capacity);
 }
 
-bool anv_str_shrink_to_fit(ANVString* str)
+ANV_API bool anv_str_shrink_to_fit(ANVString* str)
 {
     if (!str)
     {
@@ -452,7 +452,7 @@ bool anv_str_shrink_to_fit(ANVString* str)
     return true;
 }
 
-char* anv_str_data(ANVString* str)
+ANV_API char* anv_str_data(ANVString* str)
 {
     if (!str)
     {
@@ -462,7 +462,7 @@ char* anv_str_data(ANVString* str)
     return STR_DATA(str);
 }
 
-size_t anv_str_capacity(const ANVString* str)
+ANV_API size_t anv_str_capacity(const ANVString* str)
 {
     if (!str)
     {
@@ -472,7 +472,7 @@ size_t anv_str_capacity(const ANVString* str)
     return str->capacity;
 }
 
-size_t anv_str_size(const ANVString* str)
+ANV_API size_t anv_str_size(const ANVString* str)
 {
     if (!str)
     {
@@ -482,7 +482,7 @@ size_t anv_str_size(const ANVString* str)
     return str->size;
 }
 
-size_t anv_str_find_first_of(const ANVString* str, const char* value)
+ANV_API size_t anv_str_find_first_of(const ANVString* str, const char* value)
 {
     if (!str || !value)
     {
@@ -499,7 +499,7 @@ size_t anv_str_find_first_of(const ANVString* str, const char* value)
     return STR_NPOS;
 }
 
-size_t anv_str_find_cstring(const ANVString* str, const char* find)
+ANV_API size_t anv_str_find_cstring(const ANVString* str, const char* find)
 {
     if (!str || !find)
     {
@@ -529,7 +529,7 @@ size_t anv_str_find_cstring(const ANVString* str, const char* find)
     return pos;
 }
 
-size_t anv_str_find_string(const ANVString* str, const ANVString* find)
+ANV_API size_t anv_str_find_string(const ANVString* str, const ANVString* find)
 {
     if (!str || !find)
     {
@@ -540,7 +540,7 @@ size_t anv_str_find_string(const ANVString* str, const ANVString* find)
     return anv_str_find_cstring(str, data_to_use);
 }
 
-void anv_str_trim_front(ANVString* str)
+ANV_API void anv_str_trim_front(ANVString* str)
 {
     if (!str)
     {
@@ -575,7 +575,7 @@ void anv_str_trim_front(ANVString* str)
     }
 }
 
-void anv_str_trim_back(ANVString* str)
+ANV_API void anv_str_trim_back(ANVString* str)
 {
     if (!str)
     {
@@ -594,7 +594,7 @@ void anv_str_trim_back(ANVString* str)
     }
 }
 
-void anv_str_remove_extra_ws(ANVString* str)
+ANV_API void anv_str_remove_extra_ws(ANVString* str)
 {
     if (!str)
     {
@@ -623,7 +623,7 @@ void anv_str_remove_extra_ws(ANVString* str)
     }
 }
 
-void anv_str_to_lower(ANVString* str)
+ANV_API void anv_str_to_lower(ANVString* str)
 {
     if (!str)
     {
@@ -637,7 +637,7 @@ void anv_str_to_lower(ANVString* str)
     }
 }
 
-void anv_str_to_upper(ANVString* str)
+ANV_API void anv_str_to_upper(ANVString* str)
 {
     if (!str)
     {
@@ -651,7 +651,7 @@ void anv_str_to_upper(ANVString* str)
     }
 }
 
-ANVString anv_str_substr_create_cstring(const char* cstr, const size_t pos, size_t count)
+ANV_API ANVString anv_str_substr_create_cstring(const char* cstr, const size_t pos, size_t count)
 {
     if (!cstr)
     {
@@ -684,7 +684,7 @@ ANVString anv_str_substr_create_cstring(const char* cstr, const size_t pos, size
     return result;
 }
 
-ANVString anv_str_substr_create_string(const ANVString* str, const size_t pos, const size_t count)
+ANV_API ANVString anv_str_substr_create_string(const ANVString* str, const size_t pos, const size_t count)
 {
     if (!str)
     {
@@ -695,7 +695,7 @@ ANVString anv_str_substr_create_string(const ANVString* str, const size_t pos, c
     return anv_str_substr_create_cstring(data_to_use, pos, count);
 }
 
-char* anv_str_substr_cstring(const char* cstr, const size_t pos, size_t count, char* buffer)
+ANV_API char* anv_str_substr_cstring(const char* cstr, const size_t pos, size_t count, char* buffer)
 {
     if (!cstr || !buffer)
     {
@@ -726,7 +726,7 @@ char* anv_str_substr_cstring(const char* cstr, const size_t pos, size_t count, c
     return buffer;
 }
 
-char* anv_str_substr_string(const ANVString* str, const size_t pos, const size_t count, char* buffer)
+ANV_API char* anv_str_substr_string(const ANVString* str, const size_t pos, const size_t count, char* buffer)
 {
     if (!str || !buffer)
     {
@@ -737,7 +737,7 @@ char* anv_str_substr_string(const ANVString* str, const size_t pos, const size_t
     return anv_str_substr_cstring(data_to_use, pos, count, buffer);
 }
 
-size_t anv_str_split(const ANVString* str, const char* delim, ANVString** out)
+ANV_API size_t anv_str_split(const ANVString* str, const char* delim, ANVString** out)
 {
     if (!str || !delim)
     {
@@ -782,7 +782,7 @@ size_t anv_str_split(const ANVString* str, const char* delim, ANVString** out)
     return num_strings;
 }
 
-int anv_str_compare_cstring(const ANVString* lhs, const char* rhs)
+ANV_API int anv_str_compare_cstring(const ANVString* lhs, const char* rhs)
 {
     if (!lhs || !rhs)
     {
@@ -810,7 +810,7 @@ int anv_str_compare_cstring(const ANVString* lhs, const char* rhs)
     return result;
 }
 
-int anv_str_compare_string(const ANVString* lhs, const ANVString* rhs)
+ANV_API int anv_str_compare_string(const ANVString* lhs, const ANVString* rhs)
 {
     if (!lhs || !rhs)
     {
@@ -821,7 +821,7 @@ int anv_str_compare_string(const ANVString* lhs, const ANVString* rhs)
     return anv_str_compare_cstring(lhs, rhs_data_to_use);
 }
 
-int anv_str_getline_ch(FILE* stream, ANVString* line, int delim)
+ANV_API int anv_str_getline_ch(FILE* stream, ANVString* line, int delim)
 {
     if (line == NULL || stream == NULL)
     {
@@ -854,7 +854,7 @@ int anv_str_getline_ch(FILE* stream, ANVString* line, int delim)
     return status;
 }
 
-int anv_str_getline_cstring(FILE* stream, ANVString* line, const char* delim)
+ANV_API int anv_str_getline_cstring(FILE* stream, ANVString* line, const char* delim)
 {
     if (line == NULL || stream == NULL)
     {
@@ -887,7 +887,7 @@ int anv_str_getline_cstring(FILE* stream, ANVString* line, const char* delim)
     return status;
 }
 
-int anv_str_getline_string(FILE* stream, ANVString* line, const ANVString* delim)
+ANV_API int anv_str_getline_string(FILE* stream, ANVString* line, const ANVString* delim)
 {
     if (!line || !stream || !delim)
     {

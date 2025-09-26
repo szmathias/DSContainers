@@ -54,7 +54,7 @@ static void free_node(ANVStack* stack, ANVStackNode* node, const bool should_fre
 // Creation and destruction functions
 //==============================================================================
 
-ANVStack* anv_stack_create(ANVAllocator* alloc)
+ANV_API ANVStack* anv_stack_create(ANVAllocator* alloc)
 {
     if (!alloc)
     {
@@ -74,7 +74,7 @@ ANVStack* anv_stack_create(ANVAllocator* alloc)
     return stack;
 }
 
-void anv_stack_destroy(ANVStack* stack, const bool should_free_data)
+ANV_API void anv_stack_destroy(ANVStack* stack, const bool should_free_data)
 {
     if (!stack)
     {
@@ -86,7 +86,7 @@ void anv_stack_destroy(ANVStack* stack, const bool should_free_data)
     anv_alloc_free(stack->alloc, stack);
 }
 
-void anv_stack_clear(ANVStack* stack, const bool should_free_data)
+ANV_API void anv_stack_clear(ANVStack* stack, const bool should_free_data)
 {
     if (!stack)
     {
@@ -109,17 +109,17 @@ void anv_stack_clear(ANVStack* stack, const bool should_free_data)
 // Information functions
 //==============================================================================
 
-size_t anv_stack_size(const ANVStack* stack)
+ANV_API size_t anv_stack_size(const ANVStack* stack)
 {
     return stack ? stack->size : 0;
 }
 
-int anv_stack_is_empty(const ANVStack* stack)
+ANV_API int anv_stack_is_empty(const ANVStack* stack)
 {
     return !stack || stack->size == 0;
 }
 
-int anv_stack_equals(const ANVStack* stack1, const ANVStack* stack2, const cmp_func compare)
+ANV_API int anv_stack_equals(const ANVStack* stack1, const ANVStack* stack2, const cmp_func compare)
 {
     if (!stack1 || !stack2 || !compare)
     {
@@ -156,7 +156,7 @@ int anv_stack_equals(const ANVStack* stack1, const ANVStack* stack2, const cmp_f
 // Element access functions
 //==============================================================================
 
-void* anv_stack_peek(const ANVStack* stack)
+ANV_API void* anv_stack_peek(const ANVStack* stack)
 {
     if (!stack || !stack->top)
     {
@@ -165,7 +165,7 @@ void* anv_stack_peek(const ANVStack* stack)
     return stack->top->data;
 }
 
-void* anv_stack_top(const ANVStack* stack)
+ANV_API void* anv_stack_top(const ANVStack* stack)
 {
     return anv_stack_peek(stack);
 }
@@ -174,7 +174,7 @@ void* anv_stack_top(const ANVStack* stack)
 // Stack operations
 //==============================================================================
 
-int anv_stack_push(ANVStack* stack, void* data)
+ANV_API int anv_stack_push(ANVStack* stack, void* data)
 {
     if (!stack)
     {
@@ -194,7 +194,7 @@ int anv_stack_push(ANVStack* stack, void* data)
     return 0;
 }
 
-int anv_stack_pop(ANVStack* stack, const bool should_free_data)
+ANV_API int anv_stack_pop(ANVStack* stack, const bool should_free_data)
 {
     if (!stack || !stack->top)
     {
@@ -209,7 +209,7 @@ int anv_stack_pop(ANVStack* stack, const bool should_free_data)
     return 0;
 }
 
-void* anv_stack_pop_data(ANVStack* stack)
+ANV_API void* anv_stack_pop_data(ANVStack* stack)
 {
     if (!stack || !stack->top)
     {
@@ -231,7 +231,7 @@ void* anv_stack_pop_data(ANVStack* stack)
 // Higher-order functions
 //==============================================================================
 
-void anv_stack_for_each(const ANVStack* stack, const action_func action)
+ANV_API void anv_stack_for_each(const ANVStack* stack, const action_func action)
 {
     if (!stack || !action)
     {
@@ -250,7 +250,7 @@ void anv_stack_for_each(const ANVStack* stack, const action_func action)
 // Stack copying functions
 //==============================================================================
 
-ANVStack* anv_stack_copy(const ANVStack* stack)
+ANV_API ANVStack* anv_stack_copy(const ANVStack* stack)
 {
     if (!stack)
     {
@@ -300,7 +300,7 @@ ANVStack* anv_stack_copy(const ANVStack* stack)
     return new_stack;
 }
 
-ANVStack* anv_stack_copy_deep(const ANVStack* stack, const bool should_free_data)
+ANV_API ANVStack* anv_stack_copy_deep(const ANVStack* stack, const bool should_free_data)
 {
     if (!stack || !stack->alloc)
     {
@@ -471,7 +471,7 @@ static void stack_iterator_destroy(ANVIterator* it)
     it->data_state = NULL;
 }
 
-ANVIterator anv_stack_iterator(const ANVStack* stack)
+ANV_API ANVIterator anv_stack_iterator(const ANVStack* stack)
 {
     ANVIterator it = {0};
 
@@ -505,7 +505,7 @@ ANVIterator anv_stack_iterator(const ANVStack* stack)
     return it;
 }
 
-ANVStack* anv_stack_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
+ANV_API ANVStack* anv_stack_from_iterator(ANVIterator* it, ANVAllocator* alloc, const bool should_copy)
 {
     if (!it || !alloc)
     {

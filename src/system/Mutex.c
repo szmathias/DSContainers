@@ -20,7 +20,7 @@
  * @param mtx Pointer to an uninitialized ANVMutex.
  * @return 0 on success, -1 on invalid argument.
  */
-int anv_mutex_init(ANVMutex* mtx)
+ANV_API int anv_mutex_init(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -42,7 +42,7 @@ int anv_mutex_init(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, -1 on invalid argument.
  */
-int anv_mutex_lock(ANVMutex* mtx)
+ANV_API int anv_mutex_lock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -61,7 +61,7 @@ int anv_mutex_lock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 if lock acquired, 1 if not acquired, -1 on invalid argument.
  */
-int anv_mutex_trylock(ANVMutex* mtx)
+ANV_API int anv_mutex_trylock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -98,7 +98,7 @@ int anv_mutex_trylock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, -1 on invalid argument.
  */
-int anv_mutex_unlock(ANVMutex* mtx)
+ANV_API int anv_mutex_unlock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -117,7 +117,7 @@ int anv_mutex_unlock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, -1 on invalid argument.
  */
-int anv_mutex_destroy(ANVMutex* mtx)
+ANV_API int anv_mutex_destroy(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -139,7 +139,7 @@ int anv_mutex_destroy(ANVMutex* mtx)
  * @param mtx Pointer to an uninitialized ANVMutex.
  * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
  */
-int anv_mutex_init(ANVMutex* mtx)
+ANV_API int anv_mutex_init(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -154,7 +154,7 @@ int anv_mutex_init(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
  */
-int anv_mutex_lock(ANVMutex* mtx)
+ANV_API int anv_mutex_lock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -169,7 +169,7 @@ int anv_mutex_lock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 if lock acquired, EBUSY if already locked, other pthread error codes on failure, -1 on invalid argument.
  */
-int anv_mutex_trylock(ANVMutex* mtx)
+ANV_API int anv_mutex_trylock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -185,7 +185,7 @@ int anv_mutex_trylock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
  */
-int anv_mutex_unlock(ANVMutex* mtx)
+ANV_API int anv_mutex_unlock(ANVMutex* mtx)
 {
     if (!mtx)
     {
@@ -200,7 +200,7 @@ int anv_mutex_unlock(ANVMutex* mtx)
  * @param mtx Pointer to an initialized ANVMutex.
  * @return 0 on success, non-zero pthread error code on failure, -1 on invalid argument.
  */
-int anv_mutex_destroy(ANVMutex* mtx)
+ANV_API int anv_mutex_destroy(ANVMutex* mtx)
 {
     if (!mtx)
     {

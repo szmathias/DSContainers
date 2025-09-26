@@ -179,7 +179,7 @@ static void transform_destroy(ANVIterator* it)
 /**
  * Create a transforming iterator that applies a function to each element.
  */
-ANVIterator anv_iterator_transform(ANVIterator* it, const ANVAllocator* alloc, const transform_func transform, const int transform_allocates)
+ANV_API ANVIterator anv_iterator_transform(ANVIterator* it, const ANVAllocator* alloc, const transform_func transform, const int transform_allocates)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -403,7 +403,7 @@ static void filter_destroy(ANVIterator* it)
 /**
  * Create a filtering iterator that only yields elements matching a predicate.
  */
-ANVIterator anv_iterator_filter(ANVIterator* it, const ANVAllocator* alloc, const filter_func filter)
+ANV_API ANVIterator anv_iterator_filter(ANVIterator* it, const ANVAllocator* alloc, const filter_func filter)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -629,7 +629,7 @@ static void range_destroy(ANVIterator* it)
  * Note: Pointers returned by get() and next() are valid until the next
  * iterator operation. Do not free these pointers - they point to iterator-owned memory.
  */
-ANVIterator anv_iterator_range(const int start, const int end, const int step, const ANVAllocator* alloc)
+ANV_API ANVIterator anv_iterator_range(const int start, const int end, const int step, const ANVAllocator* alloc)
 {
     ANVIterator it = {0}; // Initialize all fields to NULL/0
 
@@ -805,7 +805,7 @@ static void copy_destroy(ANVIterator* it)
 /**
  * Create a copy iterator that returns deep copies of elements.
  */
-ANVIterator anv_iterator_copy(ANVIterator* it, const ANVAllocator* alloc, const copy_func copy)
+ANV_API ANVIterator anv_iterator_copy(ANVIterator* it, const ANVAllocator* alloc, const copy_func copy)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -982,7 +982,7 @@ static void take_destroy(ANVIterator* it)
 /**
  * Create a take iterator that limits iteration to first N elements.
  */
-ANVIterator anv_iterator_take(ANVIterator* it, const ANVAllocator* alloc, const size_t count)
+ANV_API ANVIterator anv_iterator_take(ANVIterator* it, const ANVAllocator* alloc, const size_t count)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -1166,7 +1166,7 @@ static void skip_destroy(ANVIterator* it)
 /**
  * Create a skip iterator that skips first N elements, then yields the rest.
  */
-ANVIterator anv_iterator_skip(ANVIterator* it, const ANVAllocator* alloc, const size_t count)
+ANV_API ANVIterator anv_iterator_skip(ANVIterator* it, const ANVAllocator* alloc, const size_t count)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -1371,7 +1371,7 @@ static void zip_destroy(ANVIterator* it)
 /**
  * Create a zip iterator that combines elements from two iterators pairwise.
  */
-ANVIterator anv_iterator_zip(ANVIterator* it1, ANVIterator* it2, const ANVAllocator* alloc)
+ANV_API ANVIterator anv_iterator_zip(ANVIterator* it1, ANVIterator* it2, const ANVAllocator* alloc)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -1559,7 +1559,7 @@ static void enumerate_destroy(ANVIterator* it)
 /**
  * Create an enumerate iterator that adds index numbers to elements.
  */
-ANVIterator anv_iterator_enumerate(ANVIterator* it, const ANVAllocator* alloc, const size_t start_index)
+ANV_API ANVIterator anv_iterator_enumerate(ANVIterator* it, const ANVAllocator* alloc, const size_t start_index)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -1716,7 +1716,7 @@ static void repeat_destroy(ANVIterator* it)
 /**
  * Create a repeat iterator that yields the same value N times.
  */
-ANVIterator anv_iterator_repeat(const void* value, const ANVAllocator* alloc, const size_t count)
+ANV_API ANVIterator anv_iterator_repeat(const void* value, const ANVAllocator* alloc, const size_t count)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
@@ -1923,7 +1923,7 @@ static void chain_destroy(ANVIterator* it)
 /**
  * Create a chain iterator that combines multiple iterators sequentially.
  */
-ANVIterator anv_iterator_chain(ANVIterator* iterators, const size_t iterator_count, const ANVAllocator* alloc)
+ANV_API ANVIterator anv_iterator_chain(ANVIterator* iterators, const size_t iterator_count, const ANVAllocator* alloc)
 {
     ANVIterator new_it = {0}; // Initialize all fields to NULL/0
 
