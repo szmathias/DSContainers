@@ -1859,23 +1859,6 @@ static int chain_next(const DSCIterator* it)
 
     return 0;
 
-    // // Try to advance current iterator
-    // if (current_it->has_next && current_it->has_next(current_it))
-    // {
-    //     return current_it->next(current_it);
-    // }
-    //
-    // // Current iterator exhausted, move to next one
-    // state->current_iterator_index++;
-    //
-    // // Check if we have more iterators
-    // if (state->current_iterator_index >= state->iterator_count)
-    // {
-    //     return -1; // No more iterators
-    // }
-    //
-    // // No need to advance the new iterator, just position at it
-    // return 0;
 }
 
 /**
