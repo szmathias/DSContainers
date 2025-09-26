@@ -509,7 +509,7 @@ static int test_filter_unsupported_operations(void)
 
     // Filter iterator should not support bidirectional operations
     ASSERT_FALSE(filter_it.has_prev(&filter_it));
-    ASSERT_EQ(filter_it.prev(&filter_it), -1); // Returns 0 for unsupported
+    ASSERT_EQ(filter_it.prev(&filter_it), -1); // Returns -1 for unsupported
 
     // Reset should be safe but ineffective
     filter_it.reset(&filter_it);
