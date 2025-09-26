@@ -19,11 +19,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/TestHelper.c")
     target_link_libraries(test_helpers PRIVATE Anvil::Anvil)
 
     # Apply same compiler settings as main library
-    target_compile_options(test_helpers PRIVATE ${ANV_COMPILE_FLAGS})
+    target_compile_options(test_helpers PRIVATE ${ANVIL_COMPILE_FLAGS})
 
     # Important: Apply sanitizer flags to test helpers too
-    if(ANV_LINK_FLAGS)
-        target_compile_options(test_helpers PUBLIC ${ANV_SANITIZER_FLAGS})
+    if(ANVIL_LINK_FLAGS)
+        target_compile_options(test_helpers PUBLIC ${ANVIL_SANITIZER_FLAGS})
     endif()
 
     set(TEST_HELPER_OBJECTS $<TARGET_OBJECTS:test_helpers>)
@@ -43,9 +43,9 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
     target_link_libraries(${TEST_NAME} PRIVATE Anvil::Anvil)
 
     # Apply sanitizer flags to test executables (skip problematic tests)
-    if(ANV_SANITIZER_FLAGS)
-        target_compile_options(${TEST_NAME} PRIVATE ${ANV_SANITIZER_FLAGS})
-        target_link_libraries(${TEST_NAME} PRIVATE ${ANV_SANITIZER_FLAGS})
+    if(ANVIL_SANITIZER_FLAGS)
+        target_compile_options(${TEST_NAME} PRIVATE ${ANVIL_SANITIZER_FLAGS})
+        target_link_libraries(${TEST_NAME} PRIVATE ${ANVIL_SANITIZER_FLAGS})
     endif()
 
     # Set output directory for tests
@@ -57,7 +57,7 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
     # Set environment variables for tests
-    if(ANV_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(ANVIL_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
         set_tests_properties(${TEST_NAME} PROPERTIES
                 ENVIRONMENT "ASAN_OPTIONS=halt_on_error=1:check_initialization_order=1:strict_init_order=1"
         )
